@@ -1,40 +1,26 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
+import { useCreateInviteMutation } from '../../../store/services/profileApi';
+import { addAlert } from '../../../store/slices/alertSlice';
 
 const InviteForm = () => {
+  const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
+  const [createInvite, { isLoading }] = useCreateInviteMutation();
   const [email, setEmail] = useState('');
   const [reason, setReason] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     try {
-      const res = await fetch('/api/profile/referral/create-invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          email,
-          reason,
-          userId: user?.id,
-          userName: user?.username
-        })
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? 'Failed to send invite.');
-      }
-      setSuccess('Invitation sent successfully.');
+      await createInvite({ email, reason: reason || undefined }).unwrap();
+      dispatch(addAlert('Invitation sent successfully.', 'success'));
       setEmail('');
       setReason('');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred.');
+    } catch {
+      dispatch(addAlert('Failed to send invite. Please try again.', 'danger'));
     }
   };
 
@@ -77,7 +63,7 @@ const InviteForm = () => {
                 size={60}
                 required
               />
-              <input type="submit" value="Invite" />
+              <input type="submit" value="Invite" disabled={isLoading} />
             </div>
           </div>
           <div className="field_div">
@@ -92,8 +78,6 @@ const InviteForm = () => {
               />
             </div>
           </div>
-          {success && <div className="success">{success}</div>}
-          {error && <div className="error">{error}</div>}
         </form>
       </div>
     </div>
