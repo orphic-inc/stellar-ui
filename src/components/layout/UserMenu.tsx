@@ -7,6 +7,7 @@ import {
   useDeleteNotificationMutation
 } from '../../store/services/miscApi';
 import { api } from '../../store/api';
+import { logout as logoutAction } from '../../store/slices/authSlice';
 import type { AuthUser } from '../../types';
 
 interface Props {
@@ -37,6 +38,7 @@ const UserMenu = ({ user }: Props) => {
 
   const handleLogout = async () => {
     await logout();
+    dispatch(logoutAction());
     dispatch(api.util.resetApiState());
     navigate('/login');
   };

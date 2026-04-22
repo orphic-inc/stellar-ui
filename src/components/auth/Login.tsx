@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { useLoginMutation, useGetMeQuery } from '../../store/services/authApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLoginMutation } from '../../store/services/authApi';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
 
 const LOCKOUT_LIMIT = 5;
@@ -21,7 +22,7 @@ const Login = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const [login, { isLoading }] = useLoginMutation();
-  const { data: me } = useGetMeQuery();
+  const user = useSelector(selectCurrentUser);
 
   const notice = (location.state as LocationState)?.notice;
   const [form, setForm] = useState<FormState>({ email: '', password: '' });
@@ -29,8 +30,8 @@ const Login = () => {
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
 
   useEffect(() => {
-    if (me) navigate('/private');
-  }, [me, navigate]);
+    if (user) navigate('/private');
+  }, [user, navigate]);
 
   const isLocked = lockedUntil !== null && Date.now() < lockedUntil;
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
