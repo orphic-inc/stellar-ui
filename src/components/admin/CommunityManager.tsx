@@ -6,7 +6,26 @@ import {
   useUpdateCommunityMutation
 } from '../../store/services/communityApi';
 import Spinner from '../layout/Spinner';
-import type { Community } from '../../types';
+import type { Community, CommunityType, RegistrationStatus } from '../../types';
+
+const COMMUNITY_TYPES: CommunityType[] = [
+  'Music',
+  'Applications',
+  'EBooks',
+  'ELearningVideos',
+  'Audiobooks',
+  'Comedy',
+  'Comics'
+];
+
+const REGISTRATION_STATUSES: { value: RegistrationStatus; label: string }[] = [
+  { value: 'open', label: 'Open' },
+  { value: 'invite', label: 'Invite only' },
+  { value: 'closed', label: 'Closed' }
+];
+
+const selectClass =
+  'rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
 
 const EditRow = ({
   community,
@@ -27,11 +46,17 @@ const EditRow = ({
 
   return (
     <tr className="bg-indigo-950/30">
-      <td className="px-4 py-2" colSpan={4}>
+      <td className="px-4 py-2" colSpan={5}>
         <form onSubmit={handleSave} className="flex flex-wrap gap-2 items-end">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Name</label>
+            <label
+              htmlFor={`edit-cm-name-${community.id}`}
+              className="block text-xs text-gray-400 mb-1"
+            >
+              Name
+            </label>
             <input
+              id={`edit-cm-name-${community.id}`}
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -40,10 +65,14 @@ const EditRow = ({
             />
           </div>
           <div className="flex-1 min-w-40">
-            <label className="block text-xs text-gray-400 mb-1">
+            <label
+              htmlFor={`edit-cm-desc-${community.id}`}
+              className="block text-xs text-gray-400 mb-1"
+            >
               Description
             </label>
             <input
+              id={`edit-cm-desc-${community.id}`}
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -77,12 +106,21 @@ const CommunityManager = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
+  const [newType, setNewType] = useState<CommunityType>('Music');
+  const [newStatus, setNewStatus] = useState<RegistrationStatus>('open');
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createCommunity({ name: newName, description: newDescription });
+    await createCommunity({
+      name: newName,
+      description: newDescription,
+      type: newType,
+      registrationStatus: newStatus
+    });
     setNewName('');
     setNewDescription('');
+    setNewType('Music');
+    setNewStatus('open');
   };
 
   return (
@@ -119,6 +157,7 @@ const CommunityManager = () => {
             <thead>
               <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
                 <th className="text-left px-4 py-2 font-semibold">Name</th>
+                <th className="text-left px-4 py-2 font-semibold">Type</th>
                 <th className="text-left px-4 py-2 font-semibold">
                   Description
                 </th>
@@ -130,7 +169,7 @@ const CommunityManager = () => {
               {!communities?.length ? (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-4 py-6 text-center text-gray-500"
                   >
                     No communities yet.
@@ -156,6 +195,9 @@ const CommunityManager = () => {
                         >
                           {c.name}
                         </Link>
+                      </td>
+                      <td className="px-4 py-2 text-gray-400">
+                        {c.type ?? '—'}
                       </td>
                       <td className="px-4 py-2 text-gray-400">
                         {c.description ?? '—'}
@@ -209,7 +251,49 @@ const CommunityManager = () => {
               className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-52"
             />
           </div>
-          <div className="flex-1 min-w-60">
+          <div>
+            <label
+              htmlFor="cm-type"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
+              Type <span className="text-red-400">*</span>
+            </label>
+            <select
+              id="cm-type"
+              value={newType}
+              onChange={(e) => setNewType(e.target.value as CommunityType)}
+              className={selectClass}
+            >
+              {COMMUNITY_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="cm-status"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
+              Registration <span className="text-red-400">*</span>
+            </label>
+            <select
+              id="cm-status"
+              value={newStatus}
+              onChange={(e) =>
+                setNewStatus(e.target.value as RegistrationStatus)
+              }
+              className={selectClass}
+            >
+              {REGISTRATION_STATUSES.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1 min-w-48">
             <label
               htmlFor="cm-description"
               className="block text-sm font-medium text-gray-300 mb-1"

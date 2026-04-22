@@ -83,10 +83,23 @@ export interface ForumPoll {
 
 // ─── Community ───────────────────────────────────────────────────────────────
 
+export type CommunityType =
+  | 'Music'
+  | 'Applications'
+  | 'EBooks'
+  | 'ELearningVideos'
+  | 'Audiobooks'
+  | 'Comedy'
+  | 'Comics';
+
+export type RegistrationStatus = 'open' | 'invite' | 'closed';
+
 export interface Community {
   id: number;
   name: string;
   description?: string;
+  type?: CommunityType;
+  registrationStatus?: RegistrationStatus;
   numReleases?: number;
   numContributors?: number;
   numConsumers?: number;
