@@ -46,14 +46,7 @@ export const authApi = api.injectEndpoints({
       }
     }),
     logout: build.mutation<void, void>({
-      query: () => ({ url: '/auth/logout', method: 'POST' }),
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-        } finally {
-          dispatch(logoutAction());
-        }
-      }
+      query: () => ({ url: '/auth/logout', method: 'POST' })
     }),
     register: build.mutation<AuthUser, RegisterArgs>({
       query: (data) => ({ url: '/auth/register', method: 'POST', body: data }),
