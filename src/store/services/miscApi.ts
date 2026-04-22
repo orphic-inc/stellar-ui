@@ -32,7 +32,11 @@ export const miscApi = api.injectEndpoints({
       invalidatesTags: ['Announcement']
     }),
     createBlogPost: build.mutation<void, { title: string; body: string }>({
-      query: (data) => ({ url: '/announcements/blog', method: 'POST', body: data }),
+      query: (data) => ({
+        url: '/announcements/blog',
+        method: 'POST',
+        body: data
+      }),
       invalidatesTags: ['Announcement']
     }),
     deleteBlogPost: build.mutation<void, number>({
@@ -51,7 +55,13 @@ export const miscApi = api.injectEndpoints({
       providesTags: ['Stylesheet']
     }),
     getComments: build.query<
-      { id: number; body: string; authorId: number; author?: { id: number; username: string; avatar?: string }; createdAt: string }[],
+      {
+        id: number;
+        body: string;
+        authorId: number;
+        author?: { id: number; username: string; avatar?: string };
+        createdAt: string;
+      }[],
       CommentParams
     >({
       query: (params) => ({ url: '/comments', params }),

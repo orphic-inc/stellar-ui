@@ -15,9 +15,11 @@ const inputClass =
 
 const NewsManager = () => {
   const { data: announcements, isLoading } = useGetAnnouncementsQuery();
-  const [createAnnouncement, { isLoading: creatingNews }] = useCreateAnnouncementMutation();
+  const [createAnnouncement, { isLoading: creatingNews }] =
+    useCreateAnnouncementMutation();
   const [deleteAnnouncement] = useDeleteAnnouncementMutation();
-  const [createBlogPost, { isLoading: creatingBlog }] = useCreateBlogPostMutation();
+  const [createBlogPost, { isLoading: creatingBlog }] =
+    useCreateBlogPostMutation();
   const [deleteBlogPost] = useDeleteBlogPostMutation();
 
   const [newsTitle, setNewsTitle] = useState('');
@@ -72,14 +74,22 @@ const NewsManager = () => {
             <tbody className="divide-y divide-gray-700/50">
               {!announcements?.data?.announcements?.length ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-6 text-center text-gray-500">
+                  <td
+                    colSpan={3}
+                    className="px-4 py-6 text-center text-gray-500"
+                  >
                     No announcements.
                   </td>
                 </tr>
               ) : (
                 announcements.data.announcements.map((n) => (
-                  <tr key={n.id} className="hover:bg-gray-700/30 transition-colors">
-                    <td className="px-4 py-2 text-gray-200 font-medium">{n.title}</td>
+                  <tr
+                    key={n.id}
+                    className="hover:bg-gray-700/30 transition-colors"
+                  >
+                    <td className="px-4 py-2 text-gray-200 font-medium">
+                      {n.title}
+                    </td>
                     <td className="px-4 py-2 text-gray-400 text-xs">
                       <Time date={n.createdAt} />
                     </td>
@@ -99,7 +109,10 @@ const NewsManager = () => {
           </table>
         )}
 
-        <form onSubmit={handleCreateNews} className="p-4 border-t border-gray-700 space-y-3">
+        <form
+          onSubmit={handleCreateNews}
+          className="p-4 border-t border-gray-700 space-y-3"
+        >
           <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
             Post Announcement
           </h4>
@@ -151,15 +164,25 @@ const NewsManager = () => {
             <tbody className="divide-y divide-gray-700/50">
               {!announcements?.data?.blogPosts?.length ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-6 text-center text-gray-500">
+                  <td
+                    colSpan={4}
+                    className="px-4 py-6 text-center text-gray-500"
+                  >
                     No blog posts.
                   </td>
                 </tr>
               ) : (
                 announcements.data.blogPosts.map((b) => (
-                  <tr key={b.id} className="hover:bg-gray-700/30 transition-colors">
-                    <td className="px-4 py-2 text-gray-200 font-medium">{b.title}</td>
-                    <td className="px-4 py-2 text-gray-400">{b.user?.username ?? '—'}</td>
+                  <tr
+                    key={b.id}
+                    className="hover:bg-gray-700/30 transition-colors"
+                  >
+                    <td className="px-4 py-2 text-gray-200 font-medium">
+                      {b.title}
+                    </td>
+                    <td className="px-4 py-2 text-gray-400">
+                      {b.user?.username ?? '—'}
+                    </td>
                     <td className="px-4 py-2 text-gray-400 text-xs">
                       <Time date={b.createdAt} />
                     </td>
@@ -179,7 +202,10 @@ const NewsManager = () => {
           </table>
         )}
 
-        <form onSubmit={handleCreateBlog} className="p-4 border-t border-gray-700 space-y-3">
+        <form
+          onSubmit={handleCreateBlog}
+          className="p-4 border-t border-gray-700 space-y-3"
+        >
           <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
             Write Blog Post
           </h4>

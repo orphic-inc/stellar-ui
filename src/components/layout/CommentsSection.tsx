@@ -15,7 +15,10 @@ interface Props {
 
 const CommentsSection = ({ page, pageId }: Props) => {
   const currentUser = useSelector(selectCurrentUser);
-  const { data: comments, isLoading } = useGetCommentsQuery({ page, id: pageId });
+  const { data: comments, isLoading } = useGetCommentsQuery({
+    page,
+    id: pageId
+  });
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
 
@@ -40,17 +43,24 @@ const CommentsSection = ({ page, pageId }: Props) => {
           <tbody>
             {comments.map((c) => (
               <tr key={c.id}>
-                <td style={{ width: 120, verticalAlign: 'top' }} className="small">
+                <td
+                  style={{ width: 120, verticalAlign: 'top' }}
+                  className="small"
+                >
                   <strong>{c.author?.username ?? 'Unknown'}</strong>
                   <br />
                   <span className="time">
                     <Time date={c.createdAt} />
                   </span>
                 </td>
+                <td dangerouslySetInnerHTML={{ __html: c.body }} />
                 <td
-                  dangerouslySetInnerHTML={{ __html: c.body }}
-                />
-                <td style={{ width: 40, textAlign: 'center', verticalAlign: 'top' }}>
+                  style={{
+                    width: 40,
+                    textAlign: 'center',
+                    verticalAlign: 'top'
+                  }}
+                >
                   {currentUser?.id === c.authorId && (
                     <button
                       type="button"

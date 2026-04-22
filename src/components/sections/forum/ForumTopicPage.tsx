@@ -48,22 +48,31 @@ const ForumTopicPage = () => {
 
   useEffect(() => {
     if (posts?.data?.length) {
-      markRead({ forumTopicId: tId, forumPostId: posts.data[posts.data.length - 1].id });
+      markRead({
+        forumTopicId: tId,
+        forumPostId: posts.data[posts.data.length - 1].id
+      });
     }
   }, [posts, tId, markRead]);
 
   if (topicLoading || postsLoading) return <Spinner />;
   if (!topic) return <div className="error">Topic not found.</div>;
 
-  const answers: string[] = poll ? (() => {
-    try { return JSON.parse(poll.answers); } catch { return []; }
-  })() : [];
+  const answers: string[] = poll
+    ? (() => {
+        try {
+          return JSON.parse(poll.answers);
+        } catch {
+          return [];
+        }
+      })()
+    : [];
 
   const myVote = poll?.votes.find((v) => v.userId === currentUser?.id);
   const totalVotes = poll?.votes.length ?? 0;
 
-  const voteCounts = answers.map((_, i) =>
-    poll?.votes.filter((v) => v.vote === i).length ?? 0
+  const voteCounts = answers.map(
+    (_, i) => poll?.votes.filter((v) => v.vote === i).length ?? 0
   );
 
   const handleVote = async (e: React.FormEvent) => {
@@ -83,7 +92,14 @@ const ForumTopicPage = () => {
       </div>
 
       <div className="box topic-header">
-        <div className="head colhead_dark" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          className="head colhead_dark"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
           <span>
             {topic.title}
             {topic.isLocked && <span className="topic-locked"> [Locked]</span>}
@@ -92,7 +108,10 @@ const ForumTopicPage = () => {
           <button
             type="button"
             onClick={() =>
-              subscribe({ topicId: tId, action: isSubscribed ? 'unsubscribe' : 'subscribe' })
+              subscribe({
+                topicId: tId,
+                action: isSubscribed ? 'unsubscribe' : 'subscribe'
+              })
             }
             disabled={subscribing}
             className="brackets btn-link"
@@ -111,12 +130,19 @@ const ForumTopicPage = () => {
               <tbody>
                 {answers.map((answer, i) => {
                   const count = voteCounts[i];
-                  const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+                  const pct =
+                    totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
                   return (
                     <tr key={i} className={myVote?.vote === i ? 'row1' : ''}>
                       <td>{answer}</td>
                       <td style={{ width: '60%' }}>
-                        <div style={{ background: '#334', height: 14, borderRadius: 3 }}>
+                        <div
+                          style={{
+                            background: '#334',
+                            height: 14,
+                            borderRadius: 3
+                          }}
+                        >
                           <div
                             style={{
                               background: '#6366f1',

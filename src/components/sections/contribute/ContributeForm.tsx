@@ -97,7 +97,9 @@ const ContributeForm = () => {
       }).unwrap();
       navigate('/private/communities');
     } catch {
-      dispatch(addAlert('Failed to submit contribution. Please try again.', 'danger'));
+      dispatch(
+        addAlert('Failed to submit contribution. Please try again.', 'danger')
+      );
     }
   };
 

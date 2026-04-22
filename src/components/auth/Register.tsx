@@ -43,7 +43,7 @@ const Register = () => {
       const errors = (err as { data?: { errors?: Record<string, string[]> } })
         ?.data?.errors;
       const msg = errors
-        ? (Object.values(errors).flat()[0] ?? 'Registration failed.')
+        ? Object.values(errors).flat()[0] ?? 'Registration failed.'
         : 'Registration failed.';
       dispatch(addAlert(msg, 'danger'));
     }
