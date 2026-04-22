@@ -1,0 +1,32 @@
+[    1053ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[    1059ms] [LOG] [HMR] Waiting for update signal from WDS... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[    1328ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom.development.js:29834
+[    1478ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[    1479ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/auth/Login.tsx
+   86:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  101:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 2 problems (2 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[    1576ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:9000/api/auth:0
+[    1638ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/login:0
+[   19485ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[   20842ms] [INFO] [webpack-dev-server] App hot update... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[   20843ms] [LOG] [HMR] Checking for updates on the server... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[   20945ms] [WARNING] [HMR] Cannot apply update. Need to do a full reload! @ webpack-internal:///./node_modules/webpack/hot/log.js:40
+[   20945ms] [WARNING] [HMR] Error: Aborted because ./src/components/auth/Login.tsx is not accepted
+Update propagation: ./src/components/auth/Login.tsx -> ./src/components/App.tsx -> ./src/index.tsx
+    at applyHandler (http://localhost:9000/main-bfc30ecc9117d966dc67.js:7499:31)
+    at http://localhost:9000/main-bfc30ecc9117d966dc67.js:7103:21
+    at Array.map (<anonymous>)
+    at internalApply (http://localhost:9000/main-bfc30ecc9117d966dc67.js:7102:54)
+    at http://localhost:9000/main-bfc30ecc9117d966dc67.js:7072:26
+    at waitForBlockingPromises (http://localhost:9000/main-bfc30ecc9117d966dc67.js:7026:48)
+    at http://localhost:9000/main-bfc30ecc9117d966dc67.js:7070:24 @ webpack-internal:///./node_modules/webpack/hot/log.js:40
+[   22097ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[   22100ms] [LOG] [HMR] Waiting for update signal from WDS... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[   22363ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom.development.js:29834
+[   22560ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:9000/api/auth:0
+[   22636ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/login:0

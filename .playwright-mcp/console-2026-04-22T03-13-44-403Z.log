@@ -1,0 +1,427 @@
+[     444ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[     445ms] [LOG] [HMR] Waiting for update signal from WDS... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[     488ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom.development.js:29834
+[     906ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/register:0
+[     906ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/register:0
+[  692483ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  693976ms] [INFO] [webpack-dev-server] App hot update... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  693980ms] [LOG] [HMR] Checking for updates on the server... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[  694168ms] [WARNING] [HMR] Cannot apply update. Need to do a full reload! @ webpack-internal:///./node_modules/webpack/hot/log.js:40
+[  694169ms] [WARNING] [HMR] Error: Aborted because ./src/components/layout/UserMenu.tsx is not accepted
+Update propagation: ./src/components/layout/UserMenu.tsx -> ./src/components/pages/private/layout/PrivateHeader.tsx -> ./src/components/pages/private/layout/PrivateLayout.tsx -> ./src/components/App.tsx -> ./src/index.tsx
+    at applyHandler (http://localhost:9000/main-9dde67ade5c840abb58b.js:7499:31)
+    at http://localhost:9000/main-9dde67ade5c840abb58b.js:7103:21
+    at Array.map (<anonymous>)
+    at internalApply (http://localhost:9000/main-9dde67ade5c840abb58b.js:7102:54)
+    at http://localhost:9000/main-9dde67ade5c840abb58b.js:7072:26
+    at waitForBlockingPromises (http://localhost:9000/main-9dde67ade5c840abb58b.js:7026:48)
+    at http://localhost:9000/main-9dde67ade5c840abb58b.js:7070:24 @ webpack-internal:///./node_modules/webpack/hot/log.js:40
+[  695680ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  695685ms] [LOG] [HMR] Waiting for update signal from WDS... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[  696051ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom.development.js:29834
+[  696680ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/register:0
+[  696680ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/register:0
+[  708848ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  709868ms] [INFO] [webpack-dev-server] App hot update... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  709868ms] [LOG] [HMR] Checking for updates on the server... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[  709932ms] [WARNING] [HMR] Cannot apply update. Need to do a full reload! @ webpack-internal:///./node_modules/webpack/hot/log.js:40
+[  709932ms] [WARNING] [HMR] Error: Aborted because ./src/components/pages/private/layout/PrivateHeader.tsx is not accepted
+Update propagation: ./src/components/pages/private/layout/PrivateHeader.tsx -> ./src/components/pages/private/layout/PrivateLayout.tsx -> ./src/components/App.tsx -> ./src/index.tsx
+    at applyHandler (http://localhost:9000/main-f4e134597ef54667d12b.js:7499:31)
+    at http://localhost:9000/main-f4e134597ef54667d12b.js:7103:21
+    at Array.map (<anonymous>)
+    at internalApply (http://localhost:9000/main-f4e134597ef54667d12b.js:7102:54)
+    at http://localhost:9000/main-f4e134597ef54667d12b.js:7072:26
+    at waitForBlockingPromises (http://localhost:9000/main-f4e134597ef54667d12b.js:7026:48)
+    at http://localhost:9000/main-f4e134597ef54667d12b.js:7070:24 @ webpack-internal:///./node_modules/webpack/hot/log.js:40
+[  711246ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  711249ms] [LOG] [HMR] Waiting for update signal from WDS... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[  711535ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom.development.js:29834
+[  711932ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/register:0
+[  711932ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "new-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/register:0
+[  714690ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  715577ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  715578ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  22:10  error  'Alert' is not defined  react/jsx-no-undef
+  40:8   error  'Alert' is not defined  react/jsx-no-undef
+
+✖ 2 problems (2 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  718003ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  719270ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  719270ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+✖ 1 problem (1 error, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  725392ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  725858ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  725858ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+✖ 1 problem (1 error, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  732087ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  732896ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  732896ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/store/services/miscApi.ts
+  2:38  error  'SiteStats' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+✖ 2 problems (2 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  736183ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  736882ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  736882ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+✖ 1 problem (1 error, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  739534ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  740132ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  740133ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+✖ 1 problem (1 error, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  742729ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  743371ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  743371ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+✖ 1 problem (1 error, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  772214ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  773751ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  773752ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 9 problems (7 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  773765ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  773765ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+    8:19  error  Replace `·label,·value·}:·{·label:·string;·value?:·number·|·string·` with `⏎··label,⏎··value⏎}:·{⏎··label:·string;⏎··value?:·number·|·string;⏎`  prettier/prettier
+   27:22  error  Delete `{'·'}⏎·······`                                                                                                                           prettier/prettier
+  127:23  error  Replace `·label="S/L·Ratio"` with `⏎················label="S/L·Ratio"⏎···············`                                                           prettier/prettier
+  128:1   error  Insert `··`                                                                                                                                      prettier/prettier
+  129:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  130:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  131:15  error  Replace `}` with `··}⏎·············`                                                                                                             prettier/prettier
+
+✖ 10 problems (8 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  802029ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  802778ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  802779ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 9 problems (7 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  802789ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  802789ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+    8:19  error  Replace `·label,·value·}:·{·label:·string;·value?:·number·|·string·` with `⏎··label,⏎··value⏎}:·{⏎··label:·string;⏎··value?:·number·|·string;⏎`  prettier/prettier
+   27:22  error  Delete `{'·'}⏎·······`                                                                                                                           prettier/prettier
+  127:23  error  Replace `·label="S/L·Ratio"` with `⏎················label="S/L·Ratio"⏎···············`                                                           prettier/prettier
+  128:1   error  Insert `··`                                                                                                                                      prettier/prettier
+  129:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  130:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  131:15  error  Replace `}` with `··}⏎·············`                                                                                                             prettier/prettier
+
+✖ 10 problems (8 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  830319ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  831161ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  831161ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 9 problems (7 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  831172ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  831173ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/admin/ForumCategoryControlPanel.tsx
+   29:16  error  Replace `·onSubmit={handleSave}·className="flex·gap-2·items-end·flex-wrap"` with `⏎············onSubmit={handleSave}⏎············className="flex·gap-2·items-end·flex-wrap"⏎··········`        prettier/prettier
+   31:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   40:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  135:51  error  Replace `⏎············Failed·to·load·categories.⏎··········` with `Failed·to·load·categories.`                                                                                                 prettier/prettier
+  142:72  error  Replace `⏎··················Sort⏎················` with `Sort`                                                                                                                                 prettier/prettier
+  160:39  error  Replace `(⏎··················<CategoryRow·key={c.id}·category={c}·/>⏎················)` with `<CategoryRow·key={c.id}·category={c}·/>`                                                         prettier/prettier
+  176:14  error  Replace `·onSubmit={handleCreate}·className="p-4·flex·gap-4·items-end·flex-wrap"` with `⏎··········onSubmit={handleCreate}⏎··········className="p-4·flex·gap-4·items-end·flex-wrap"⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+    8:19  error  Replace `·label,·value·}:·{·label:·string;·value?:·number·|·string·` with `⏎··label,⏎··value⏎}:·{⏎··label:·string;⏎··value?:·number·|·string;⏎`  prettier/prettier
+   27:22  error  Delete `{'·'}⏎·······`                                                                                                                           prettier/prettier
+  127:23  error  Replace `·label="S/L·Ratio"` with `⏎················label="S/L·Ratio"⏎···············`                                                           prettier/prettier
+  128:1   error  Insert `··`                                                                                                                                      prettier/prettier
+  129:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  130:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  131:15  error  Replace `}` with `··}⏎·············`                                                                                                             prettier/prettier
+
+✖ 17 problems (15 errors, 2 warnings)
+  12 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  861247ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  862019ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  862019ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 9 problems (7 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  862028ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  862028ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/admin/ForumCategoryControlPanel.tsx
+   29:16  error  Replace `·onSubmit={handleSave}·className="flex·gap-2·items-end·flex-wrap"` with `⏎············onSubmit={handleSave}⏎············className="flex·gap-2·items-end·flex-wrap"⏎··········`        prettier/prettier
+   31:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   40:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  135:51  error  Replace `⏎············Failed·to·load·categories.⏎··········` with `Failed·to·load·categories.`                                                                                                 prettier/prettier
+  142:72  error  Replace `⏎··················Sort⏎················` with `Sort`                                                                                                                                 prettier/prettier
+  160:39  error  Replace `(⏎··················<CategoryRow·key={c.id}·category={c}·/>⏎················)` with `<CategoryRow·key={c.id}·category={c}·/>`                                                         prettier/prettier
+  176:14  error  Replace `·onSubmit={handleCreate}·className="p-4·flex·gap-4·items-end·flex-wrap"` with `⏎··········onSubmit={handleCreate}⏎··········className="p-4·flex·gap-4·items-end·flex-wrap"⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+    8:19  error  Replace `·label,·value·}:·{·label:·string;·value?:·number·|·string·` with `⏎··label,⏎··value⏎}:·{⏎··label:·string;⏎··value?:·number·|·string;⏎`  prettier/prettier
+   27:22  error  Delete `{'·'}⏎·······`                                                                                                                           prettier/prettier
+  127:23  error  Replace `·label="S/L·Ratio"` with `⏎················label="S/L·Ratio"⏎···············`                                                           prettier/prettier
+  128:1   error  Insert `··`                                                                                                                                      prettier/prettier
+  129:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  130:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  131:15  error  Replace `}` with `··}⏎·············`                                                                                                             prettier/prettier
+
+✖ 17 problems (15 errors, 2 warnings)
+  12 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  869473ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  870529ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  870530ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 9 problems (7 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  870539ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  870539ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/admin/ForumCategoryControlPanel.tsx
+   29:16  error  Replace `·onSubmit={handleSave}·className="flex·gap-2·items-end·flex-wrap"` with `⏎············onSubmit={handleSave}⏎············className="flex·gap-2·items-end·flex-wrap"⏎··········`        prettier/prettier
+   31:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   40:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  135:51  error  Replace `⏎············Failed·to·load·categories.⏎··········` with `Failed·to·load·categories.`                                                                                                 prettier/prettier
+  142:72  error  Replace `⏎··················Sort⏎················` with `Sort`                                                                                                                                 prettier/prettier
+  160:39  error  Replace `(⏎··················<CategoryRow·key={c.id}·category={c}·/>⏎················)` with `<CategoryRow·key={c.id}·category={c}·/>`                                                         prettier/prettier
+  176:14  error  Replace `·onSubmit={handleCreate}·className="p-4·flex·gap-4·items-end·flex-wrap"` with `⏎··········onSubmit={handleCreate}⏎··········className="p-4·flex·gap-4·items-end·flex-wrap"⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+    8:19  error  Replace `·label,·value·}:·{·label:·string;·value?:·number·|·string·` with `⏎··label,⏎··value⏎}:·{⏎··label:·string;⏎··value?:·number·|·string;⏎`  prettier/prettier
+   27:22  error  Delete `{'·'}⏎·······`                                                                                                                           prettier/prettier
+  127:23  error  Replace `·label="S/L·Ratio"` with `⏎················label="S/L·Ratio"⏎···············`                                                           prettier/prettier
+  128:1   error  Insert `··`                                                                                                                                      prettier/prettier
+  129:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  130:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  131:15  error  Replace `}` with `··}⏎·············`                                                                                                             prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/layout/PrivateContent.tsx
+  26:8  error  'CommunityManager' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+✖ 18 problems (16 errors, 2 warnings)
+  12 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  873012ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  874020ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  874021ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 9 problems (7 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  874034ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  874034ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/admin/CommunityManager.tsx
+   33:13  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   43:13  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  114:51  error  Replace `Failed·to·load·communities.` with `⏎············Failed·to·load·communities.⏎··········`                                                                                               prettier/prettier
+  123:68  error  Replace `⏎··················Releases⏎················` with `Releases`                                                                                                                         prettier/prettier
+  191:14  error  Replace `·onSubmit={handleCreate}·className="p-4·flex·flex-wrap·gap-4·items-end"` with `⏎··········onSubmit={handleCreate}⏎··········className="p-4·flex·flex-wrap·gap-4·items-end"⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/admin/ForumCategoryControlPanel.tsx
+   29:16  error  Replace `·onSubmit={handleSave}·className="flex·gap-2·items-end·flex-wrap"` with `⏎············onSubmit={handleSave}⏎············className="flex·gap-2·items-end·flex-wrap"⏎··········`        prettier/prettier
+   31:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   40:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  135:51  error  Replace `⏎············Failed·to·load·categories.⏎··········` with `Failed·to·load·categories.`                                                                                                 prettier/prettier
+  142:72  error  Replace `⏎··················Sort⏎················` with `Sort`                                                                                                                                 prettier/prettier
+  160:39  error  Replace `(⏎··················<CategoryRow·key={c.id}·category={c}·/>⏎················)` with `<CategoryRow·key={c.id}·category={c}·/>`                                                         prettier/prettier
+  176:14  error  Replace `·onSubmit={handleCreate}·className="p-4·flex·gap-4·items-end·flex-wrap"` with `⏎··········onSubmit={handleCreate}⏎··········className="p-4·flex·gap-4·items-end·flex-wrap"⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+    8:19  error  Replace `·label,·value·}:·{·label:·string;·value?:·number·|·string·` with `⏎··label,⏎··value⏎}:·{⏎··label:·string;⏎··value?:·number·|·string;⏎`  prettier/prettier
+   27:22  error  Delete `{'·'}⏎·······`                                                                                                                           prettier/prettier
+  127:23  error  Replace `·label="S/L·Ratio"` with `⏎················label="S/L·Ratio"⏎···············`                                                           prettier/prettier
+  128:1   error  Insert `··`                                                                                                                                      prettier/prettier
+  129:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  130:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  131:15  error  Replace `}` with `··}⏎·············`                                                                                                             prettier/prettier
+
+✖ 22 problems (20 errors, 2 warnings)
+  15 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  884089ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  884690ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  884691ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 9 problems (7 errors, 2 warnings)
+  7 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  884710ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  884710ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/admin/CommunityManager.tsx
+   33:13  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   43:13  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  114:51  error  Replace `Failed·to·load·communities.` with `⏎············Failed·to·load·communities.⏎··········`                                                                                               prettier/prettier
+  123:68  error  Replace `⏎··················Releases⏎················` with `Releases`                                                                                                                         prettier/prettier
+  191:14  error  Replace `·onSubmit={handleCreate}·className="p-4·flex·flex-wrap·gap-4·items-end"` with `⏎··········onSubmit={handleCreate}⏎··········className="p-4·flex·flex-wrap·gap-4·items-end"⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/admin/ForumCategoryControlPanel.tsx
+   29:16  error  Replace `·onSubmit={handleSave}·className="flex·gap-2·items-end·flex-wrap"` with `⏎············onSubmit={handleSave}⏎············className="flex·gap-2·items-end·flex-wrap"⏎··········`        prettier/prettier
+   31:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   40:15  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  135:51  error  Replace `⏎············Failed·to·load·categories.⏎··········` with `Failed·to·load·categories.`                                                                                                 prettier/prettier
+  142:72  error  Replace `⏎··················Sort⏎················` with `Sort`                                                                                                                                 prettier/prettier
+  160:39  error  Replace `(⏎··················<CategoryRow·key={c.id}·category={c}·/>⏎················)` with `<CategoryRow·key={c.id}·category={c}·/>`                                                         prettier/prettier
+  176:14  error  Replace `·onSubmit={handleCreate}·className="p-4·flex·gap-4·items-end·flex-wrap"` with `⏎··········onSubmit={handleCreate}⏎··········className="p-4·flex·gap-4·items-end·flex-wrap"⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+    8:19  error  Replace `·label,·value·}:·{·label:·string;·value?:·number·|·string·` with `⏎··label,⏎··value⏎}:·{⏎··label:·string;⏎··value?:·number·|·string;⏎`  prettier/prettier
+   27:22  error  Delete `{'·'}⏎·······`                                                                                                                           prettier/prettier
+  127:23  error  Replace `·label="S/L·Ratio"` with `⏎················label="S/L·Ratio"⏎···············`                                                           prettier/prettier
+  128:1   error  Insert `··`                                                                                                                                      prettier/prettier
+  129:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  130:19  error  Insert `··`                                                                                                                                      prettier/prettier
+  131:15  error  Replace `}` with `··}⏎·············`                                                                                                             prettier/prettier
+
+✖ 22 problems (20 errors, 2 warnings)
+  15 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  894201ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  896250ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  896251ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 2 problems (0 errors, 2 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  896282ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  896282ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/admin/CommunityManager.tsx
+  33:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  43:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+/Users/kai/git/stellar-ui/src/components/admin/ForumCategoryControlPanel.tsx
+  34:15  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  43:15  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 5 problems (5 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  896825ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[  897530ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  897530ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+  3:42  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+  4:38  warning  '/Users/kai/git/stellar-ui/src/store/services/miscApi.ts' imported multiple times  import/no-duplicates
+
+✖ 2 problems (0 errors, 2 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:488
+[  897540ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[  897540ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/App.tsx
+  39:8  error  'Alert' is not defined  react/jsx-no-undef
+
+/Users/kai/git/stellar-ui/src/components/admin/CommunityManager.tsx
+  33:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  43:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+/Users/kai/git/stellar-ui/src/components/admin/ForumCategoryControlPanel.tsx
+  34:15  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  43:15  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 5 problems (5 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492

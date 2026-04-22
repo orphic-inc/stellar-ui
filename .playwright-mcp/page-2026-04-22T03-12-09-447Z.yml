@@ -1,0 +1,38 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "Stellar" [ref=e6] [cursor=pointer]:
+          - /url: /
+        - navigation [ref=e7]:
+          - link "Login" [ref=e8] [cursor=pointer]:
+            - /url: /login
+          - link "Register" [ref=e9] [cursor=pointer]:
+            - /url: /register
+    - main [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - heading "Stellar" [level=1] [ref=e13]
+          - paragraph [ref=e14]: Sign in to your account
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - generic [ref=e17]: Email
+            - textbox "you@example.com" [ref=e18]
+          - generic [ref=e19]:
+            - generic [ref=e20]: Password
+            - textbox "••••••••" [ref=e21]
+          - button "Sign In" [ref=e22]
+          - generic [ref=e23]:
+            - link "Forgot password?" [ref=e24] [cursor=pointer]:
+              - /url: /recovery
+            - text: ·
+            - link "Register" [ref=e25] [cursor=pointer]:
+              - /url: /register
+    - contentinfo [ref=e26]: © 2026 Stellar
+  - iframe [ref=e27]:
+    - generic [ref=f5e2]:
+      - generic [ref=f5e3]: "Compiled with problems:"
+      - button "Dismiss" [ref=f5e4] [cursor=pointer]: ×
+      - generic [ref=f5e6]:
+        - generic [ref=f5e7]: ERROR
+        - generic [ref=f5e8]: "[eslint] /Users/kai/git/stellar-ui/src/components/auth/Login.tsx 86:13 error A form label must be associated with a control jsx-a11y/label-has-associated-control 101:13 error A form label must be associated with a control jsx-a11y/label-has-associated-control ✖ 2 problems (2 errors, 0 warnings)"

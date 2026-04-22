@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import Alert from './layout/Alert';
 import PublicLayout from './pages/public/PublicLayout';
 import PublicLanding from './pages/public/PublicLanding';
 import Install from './pages/public/Install';
@@ -20,7 +19,6 @@ const App = () => {
   if (installStatus && !installStatus.installed) {
     return (
       <>
-        <Alert />
         <Routes>
           <Route
             path="/install"

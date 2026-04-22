@@ -23,6 +23,7 @@ import PermissionManager from '../../../admin/PermissionManager';
 import PermissionFormPage from '../../../admin/PermissionFormPage';
 import ForumCategoryControlPanel from '../../../admin/ForumCategoryControlPanel';
 import ForumControlPanel from '../../../admin/ForumControlPanel';
+import CommunityManager from '../../../admin/CommunityManager';
 
 const wrap = (Component: React.ComponentType) => (
   <ErrorBoundary FallbackComponent={FallbackComponent}>
@@ -52,6 +53,7 @@ const PrivateContent = () => (
       element={<ForumCategoryControlPanel />}
     />
     <Route path="staff/tools/forums" element={<ForumControlPanel />} />
+    <Route path="staff/tools/communities" element={<CommunityManager />} />
     <Route path="staff/tools" element={<Toolbox />} />
 
     <Route

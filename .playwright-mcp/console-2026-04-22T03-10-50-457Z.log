@@ -1,0 +1,143 @@
+[     980ms] [INFO] [webpack-dev-server] Server started: Hot Module Replacement enabled, Live Reloading enabled, Progress disabled, Overlay enabled. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[     984ms] [LOG] [HMR] Waiting for update signal from WDS... @ webpack-internal:///./node_modules/webpack/hot/log.js:38
+[    1285ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///./node_modules/react-dom/cjs/react-dom.development.js:29834
+[    1412ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[    1414ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/admin/ModBar.tsx
+   7:10  error  Replace `·to="/private/staff/tools"·className="hover:text-amber-200·transition-colors"` with `⏎······to="/private/staff/tools"⏎······className="hover:text-amber-200·transition-colors"⏎····`                          prettier/prettier
+  10:10  error  Replace `·to="/private/staff/tools/permissions"·className="hover:text-amber-200·transition-colors"` with `⏎······to="/private/staff/tools/permissions"⏎······className="hover:text-amber-200·transition-colors"⏎····`  prettier/prettier
+  13:10  error  Replace `·to="/private/staff/tools/categories"·className="hover:text-amber-200·transition-colors"` with `⏎······to="/private/staff/tools/categories"⏎······className="hover:text-amber-200·transition-colors"⏎····`    prettier/prettier
+  16:10  error  Replace `·to="/private/staff/tools/forums"·className="hover:text-amber-200·transition-colors"` with `⏎······to="/private/staff/tools/forums"⏎······className="hover:text-amber-200·transition-colors"⏎····`            prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/admin/PermissionFormPage.tsx
+  146:90  error  Replace `Details` with `⏎··············Details⏎············`                                                                                                                                                                 prettier/prettier
+  151:17  error  A form label must be associated with a control                                                                                                                                                                               jsx-a11y/label-has-associated-control
+  151:81  error  Replace `Name` with `⏎··················Name⏎················`                                                                                                                                                               prettier/prettier
+  159:17  error  A form label must be associated with a control                                                                                                                                                                               jsx-a11y/label-has-associated-control
+  159:81  error  Replace `Level` with `⏎··················Level⏎················`                                                                                                                                                             prettier/prettier
+  162:42  error  Replace `·required:·true,·valueAsNumber:·true` with `⏎····················required:·true,⏎····················valueAsNumber:·true⏎·················`                                                                         prettier/prettier
+  173:90  error  Replace `Permissions` with `⏎··············Permissions⏎············`                                                                                                                                                         prettier/prettier
+  183:27  error  Replace `·key={perm}·className="flex·items-center·gap-2·cursor-pointer·group"` with `⏎······················key={perm}⏎······················className="flex·items-center·gap-2·cursor-pointer·group"⏎····················`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/admin/PermissionManager.tsx
+  13:9   error  Replace `window.confirm('Are·you·sure·you·want·to·remove·this·permission·class?')` with `⏎······window.confirm('Are·you·sure·you·want·to·remove·this·permission·class?')⏎····`                             prettier/prettier
+  58:22  error  Replace `·colSpan={4}·className="px-4·py-6·text-center·text-gray-500"` with `⏎····················colSpan={4}⏎····················className="px-4·py-6·text-center·text-gray-500"⏎··················`      prettier/prettier
+  64:22  error  Replace `·key={p.id}·className="hover:bg-gray-700/30·transition-colors"` with `⏎····················key={p.id}⏎····················className="hover:bg-gray-700/30·transition-colors"⏎··················`  prettier/prettier
+  65:73  error  Replace `{p.name}` with `⏎······················{p.name}⏎····················`                                                                                                                             prettier/prettier
+  67:61  error  Replace `{p.userCount·??·0}` with `⏎······················{p.userCount·??·0}⏎····················`                                                                                                         prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/admin/Toolbox.tsx
+   15:84  error  Replace `{title}` with `⏎········{title}⏎······`                                                                                                                                                                       prettier/prettier
+   40:12  error  Replace `·label:·'Permissions·manager',·to:·'/private/staff/tools/permissions'` with `⏎············label:·'Permissions·manager',⏎············to:·'/private/staff/tools/permissions'⏎·········`                         prettier/prettier
+   41:12  error  Replace `·label:·'Staff·page·group·manager',·to:·'/private/staff/tools/staff-groups'` with `⏎············label:·'Staff·page·group·manager',⏎············to:·'/private/staff/tools/staff-groups'⏎·········`             prettier/prettier
+   42:12  error  Replace `·label:·'Torrent·client·whitelist',·to:·'/private/staff/tools/client-whitelist'` with `⏎············label:·'Torrent·client·whitelist',⏎············to:·'/private/staff/tools/client-whitelist'⏎·········`     prettier/prettier
+   43:12  error  Replace `·label:·'Database·encryption·key',·to:·'/private/staff/tools/encryption-key'` with `⏎············label:·'Database·encryption·key',⏎············to:·'/private/staff/tools/encryption-key'⏎·········`           prettier/prettier
+   44:12  error  Replace `·label:·'Auto-Enable·requests',·to:·'/private/staff/tools/auto-enable'` with `⏎············label:·'Auto-Enable·requests',⏎············to:·'/private/staff/tools/auto-enable'⏎·········`                       prettier/prettier
+   45:75  error  Delete `,`                                                                                                                                                                                                             prettier/prettier
+   53:12  error  Replace `·label:·'Global·notification',·to:·'/private/staff/tools/notification'` with `⏎············label:·'Global·notification',⏎············to:·'/private/staff/tools/notification'⏎·········`                       prettier/prettier
+   58:75  error  Delete `,`                                                                                                                                                                                                             prettier/prettier
+   67:12  error  Replace `·label:·'Forum·transition·manager',·to:·'/private/staff/tools/forum-transition'` with `⏎············label:·'Forum·transition·manager',⏎············to:·'/private/staff/tools/forum-transition'⏎·········`     prettier/prettier
+   68:67  error  Delete `,`                                                                                                                                                                                                             prettier/prettier
+   75:12  error  Replace `·label:·'Render·stylesheet·gallery',·to:·'/private/staff/tools/stylesheets'·},` with `⏎············label:·'Render·stylesheet·gallery',⏎············to:·'/private/staff/tools/stylesheets'⏎··········}`        prettier/prettier
+   85:12  error  Replace `·label:·'Registration·log',·to:·'/private/staff/tools/registration-log'` with `⏎············label:·'Registration·log',⏎············to:·'/private/staff/tools/registration-log'⏎·········`                     prettier/prettier
+   87:12  error  Replace `·label:·'Manage·invite·tree',·to:·'/private/staff/tools/invite-tree'·},` with `⏎············label:·'Manage·invite·tree',⏎············to:·'/private/staff/tools/invite-tree'⏎··········}`                      prettier/prettier
+   94:12  error  Replace `·label:·'Manage·bonus·points',·to:·'/private/staff/tools/bonus-points'` with `⏎············label:·'Manage·bonus·points',⏎············to:·'/private/staff/tools/bonus-points'⏎·········`                       prettier/prettier
+   96:12  error  Replace `·label:·'Manage·freeleech·tokens',·to:·'/private/staff/tools/freeleech-tokens'·},` with `⏎············label:·'Manage·freeleech·tokens',⏎············to:·'/private/staff/tools/freeleech-tokens'⏎··········}`  prettier/prettier
+  104:12  error  Replace `·label:·'Duplicate·IP·addresses',·to:·'/private/staff/tools/duplicate-ips'` with `⏎············label:·'Duplicate·IP·addresses',⏎············to:·'/private/staff/tools/duplicate-ips'⏎·········`               prettier/prettier
+  105:12  error  Replace `·label:·'Email·blacklist',·to:·'/private/staff/tools/email-blacklist'·},` with `⏎············label:·'Email·blacklist',⏎············to:·'/private/staff/tools/email-blacklist'⏎··········}`                    prettier/prettier
+  112:12  error  Replace `·label:·'Recommended·torrents',·to:·'/private/staff/tools/recommended'` with `⏎············label:·'Recommended·torrents',⏎············to:·'/private/staff/tools/recommended'⏎·········`                       prettier/prettier
+  113:12  error  Replace `·label:·'Collage·recovery',·to:·'/private/staff/tools/collage-recovery'` with `⏎············label:·'Collage·recovery',⏎············to:·'/private/staff/tools/collage-recovery'⏎·········`                     prettier/prettier
+  115:79  error  Delete `,`                                                                                                                                                                                                             prettier/prettier
+  123:79  error  Delete `,`                                                                                                                                                                                                             prettier/prettier
+  130:12  error  Replace `·label:·'Economic·stats',·to:·'/private/staff/tools/economic-stats'` with `⏎············label:·'Economic·stats',⏎············to:·'/private/staff/tools/economic-stats'⏎·········`                             prettier/prettier
+  133:12  error  Replace `·label:·'OS·and·browser·usage',·to:·'/private/staff/tools/browser-stats'·},` with `⏎············label:·'OS·and·browser·usage',⏎············to:·'/private/staff/tools/browser-stats'⏎··········}`              prettier/prettier
+  140:12  error  Replace `·label:·'Bitcoin·(balance)',·to:·'/private/staff/tools/bitcoin-balance'` with `⏎············label:·'Bitcoin·(balance)',⏎············to:·'/private/staff/tools/bitcoin-balance'⏎·········`                     prettier/prettier
+  141:12  error  Replace `·label:·'Bitcoin·(unprocessed)',·to:·'/private/staff/tools/bitcoin-unprocessed'` with `⏎············label:·'Bitcoin·(unprocessed)',⏎············to:·'/private/staff/tools/bitcoin-unprocessed'⏎·········`     prettier/prettier
+  143:79  error  Delete `,`                                                                                                                                                                                                             prettier/prettier
+  150:12  error  Replace `·label:·'Artist·Importance',·to:·'/private/staff/tools/artist-importance'` with `⏎············label:·'Artist·Importance',⏎············to:·'/private/staff/tools/artist-importance'⏎·········`                 prettier/prettier
+  151:81  error  Delete `,`                                                                                                                                                                                                             prettier/prettier
+  158:12  error  Replace `·label:·'Cache·key·management',·to:·'/private/staff/tools/cache-keys'` with `⏎············label:·'Cache·key·management',⏎············to:·'/private/staff/tools/cache-keys'⏎·········`                         prettier/prettier
+  166:12  error  Replace `·label:·'Update·drive·offsets',·to:·'/private/staff/tools/drive-offsets'·},` with `⏎············label:·'Update·drive·offsets',⏎············to:·'/private/staff/tools/drive-offsets'⏎··········}`              prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/auth/Login.tsx
+   79:49  error  Replace `{LOCKOUT_LIMIT·-·attempts·!==·1·?·'s'·:·''}·remaining·before` with `⏎··············{LOCKOUT_LIMIT·-·attempts·!==·1·?·'s'·:·''}·remaining·before⏎·············`                        prettier/prettier
+   84:13  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+   99:13  error  A form label must be associated with a control                                                                                                                                                 jsx-a11y/label-has-associated-control
+  123:18  error  Replace `·to="/recovery"·className="hover:text-gray-300·transition-colors"` with `⏎··············to="/recovery"⏎··············className="hover:text-gray-300·transition-colors"⏎············`  prettier/prettier
+  127:18  error  Replace `·to="/register"·className="hover:text-gray-300·transition-colors"` with `⏎··············to="/register"⏎··············className="hover:text-gray-300·transition-colors"⏎············`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/layout/Alert.tsx
+  29:92  error  Replace `TYPE_CLASSES[alertType]·??·TYPE_CLASSES.info` with `⏎············TYPE_CLASSES[alertType]·??·TYPE_CLASSES.info⏎··········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/PrivateHomepage.tsx
+   16:24  error  Insert `{'·'}⏎·········`                                                                                                                                                                                                                                                                           prettier/prettier
+   32:38  error  Replace `<Spinner·/>` with `⏎··················<Spinner·/>⏎················`                                                                                                                                                                                                                       prettier/prettier
+   37:23  error  Replace `·key={n.id}·className="flex·items-center·justify-between·px-4·py-3·hover:bg-gray-700/30·transition-colors"` with `⏎····················key={n.id}⏎····················className="flex·items-center·justify-between·px-4·py-3·hover:bg-gray-700/30·transition-colors"⏎··················`  prettier/prettier
+   38:73  error  Replace `{n.title}` with `⏎······················{n.title}⏎····················`                                                                                                                                                                                                                   prettier/prettier
+   51:91  error  Replace `Blog` with `⏎················Blog⏎··············`                                                                                                                                                                                                                                         prettier/prettier
+   55:38  error  Replace `<Spinner·/>` with `⏎··················<Spinner·/>⏎················`                                                                                                                                                                                                                       prettier/prettier
+   60:23  error  Replace `·key={b.id}·className="flex·items-center·justify-between·px-4·py-3·hover:bg-gray-700/30·transition-colors"` with `⏎····················key={b.id}⏎····················className="flex·items-center·justify-between·px-4·py-3·hover:bg-gray-700/30·transition-colors"⏎··················`  prettier/prettier
+   62:67  error  Replace `{b.title}` with `⏎························{b.title}⏎······················`                                                                                                                                                                                                               prettier/prettier
+   64:62  error  Replace `—·{b.user.username}` with `⏎··························—·{b.user.username}⏎························`                                                                                                                                                                                       prettier/prettier
+   81:91  error  Replace `Quick·Links` with `⏎················Quick·Links⏎··············`                                                                                                                                                                                                                           prettier/prettier
+   88:68  error  Delete `,`                                                                                                                                                                                                                                                                                         prettier/prettier
+  103:91  error  Replace `Your·Stats` with `⏎················Your·Stats⏎··············`                                                                                                                                                                                                                             prettier/prettier
+  108:49  error  Replace `{user?.userRank?.name·??·'—'}` with `⏎··················{user?.userRank?.name·??·'—'}⏎················`                                                                                                                                                                                   prettier/prettier
+  117:35  error  Replace `·?·new·Date(user.createdAt).toLocaleDateString()` with `⏎····················?·new·Date(user.createdAt).toLocaleDateString()⏎···················`                                                                                                                                         prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/layout/PrivateFooter.tsx
+  7:80  error  Replace `Home` with `⏎··········Home⏎········`                                                                                                                                                                                                       prettier/prettier
+  8:14  error  Replace `·to="/private/forums"·className="hover:text-gray-300·transition-colors">Forums` with `⏎··········to="/private/forums"⏎··········className="hover:text-gray-300·transition-colors"⏎········>⏎··········Forums⏎········`                      prettier/prettier
+  9:14  error  Replace `·to="/private/communities"·className="hover:text-gray-300·transition-colors">Communities` with `⏎··········to="/private/communities"⏎··········className="hover:text-gray-300·transition-colors"⏎········>⏎··········Communities⏎········`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/private/layout/PrivateHeader.tsx
+  16:46  error  Delete `,`  prettier/prettier
+
+/Users/kai/git/stellar-ui/src/components/pages/public/PublicLayout.tsx
+  21:16  error  Replace `·to="/login"·className="text-gray-400·hover:text-white·transition-colors"` with `⏎············to="/login"⏎············className="text-gray-400·hover:text-white·transition-colors"⏎··········`  prettier/prettier
+
+✖ 73 problems (73 errors, 0 warnings)
+  69 errors and 0 warnings potentially fixable with the `--fix` option.
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[    1430ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:9000/favicon.ico:0
+[    2331ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:9000/api/auth:0
+[    2382ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:9000/login:0
+[   27301ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[   30112ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[   30112ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/admin/PermissionFormPage.tsx
+  153:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  163:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+/Users/kai/git/stellar-ui/src/components/auth/Login.tsx
+   86:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  101:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 4 problems (4 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[   30225ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[   32310ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[   32311ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/admin/PermissionFormPage.tsx
+  153:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  163:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+/Users/kai/git/stellar-ui/src/components/auth/Login.tsx
+   86:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  101:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 4 problems (4 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[   49852ms] [INFO] [webpack-dev-server] App updated. Recompiling... @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:484
+[   51327ms] [ERROR] [webpack-dev-server] Errors while compiling. Reload prevented. @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492
+[   51327ms] [ERROR] [webpack-dev-server] ERROR
+[eslint] 
+/Users/kai/git/stellar-ui/src/components/auth/Login.tsx
+   86:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+  101:13  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 2 problems (2 errors, 0 warnings)
+ @ webpack-internal:///./node_modules/webpack-dev-server/client/modules/logger/index.js:492

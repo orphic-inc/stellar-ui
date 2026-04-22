@@ -180,6 +180,23 @@ export interface Collaborator {
   importance: string;
 }
 
+// ─── Site stats ─────────────────────────────────────────────────────────────
+
+export interface SiteStats {
+  maxUsers?: number;
+  enabledUsers?: number;
+  activeToday?: number;
+  activeThisWeek?: number;
+  activeThisMonth?: number;
+  communities?: number;
+  releases?: number;
+  artists?: number;
+  requests?: number;
+  seeders?: number;
+  leechers?: number;
+  peers?: number;
+}
+
 // ─── Redux state types ───────────────────────────────────────────────────────
 
 export interface AuthState {
