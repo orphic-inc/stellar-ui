@@ -11,14 +11,17 @@ const CommunityGroupPage = () => {
   const cId = parseInt(communityId!);
   const gId = parseInt(groupId!);
 
-  const { data: release, isLoading, error } = useGetReleaseByIdQuery({
+  const {
+    data: release,
+    isLoading,
+    error
+  } = useGetReleaseByIdQuery({
     communityId: cId,
     groupId: gId
   });
 
   if (isLoading) return <Spinner />;
-  if (error || !release)
-    return <div className="error">Release not found.</div>;
+  if (error || !release) return <div className="error">Release not found.</div>;
 
   return (
     <div className="thin">
@@ -34,20 +37,24 @@ const CommunityGroupPage = () => {
 
       <div className="box">
         <div className="head colhead_dark">
-          {release.artist && (
-            <span>{release.artist.name} — </span>
-          )}
+          {release.artist && <span>{release.artist.name} — </span>}
           {release.title}
           {release.year && <span> ({release.year})</span>}
         </div>
         <div className="pad">
           {release.image && (
             <div className="center" style={{ marginBottom: '1em' }}>
-              <img src={release.image} alt={release.title} style={{ maxWidth: 200 }} />
+              <img
+                src={release.image}
+                alt={release.title}
+                style={{ maxWidth: 200 }}
+              />
             </div>
           )}
           {release.type && (
-            <p><strong>Type:</strong> {release.type}</p>
+            <p>
+              <strong>Type:</strong> {release.type}
+            </p>
           )}
           {release.tags && release.tags.length > 0 && (
             <p>
@@ -55,9 +62,7 @@ const CommunityGroupPage = () => {
               {release.tags.map((t) => t.name).join(', ')}
             </p>
           )}
-          {release.description && (
-            <p>{release.description}</p>
-          )}
+          {release.description && <p>{release.description}</p>}
         </div>
       </div>
 

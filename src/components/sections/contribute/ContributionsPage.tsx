@@ -15,7 +15,10 @@ const ContributionsPage = () => {
       <h2>My Contributions</h2>
       {!contributions.length ? (
         <div className="box pad">
-          <p>No contributions yet. <Link to="/private/contribute">Upload something!</Link></p>
+          <p>
+            No contributions yet.{' '}
+            <Link to="/private/contribute">Upload something!</Link>
+          </p>
         </div>
       ) : (
         <div className="box">

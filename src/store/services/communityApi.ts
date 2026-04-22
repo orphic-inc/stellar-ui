@@ -1,5 +1,10 @@
 import { api } from '../api';
-import type { Community, Release, Contribution, PaginatedResponse } from '../../types';
+import type {
+  Community,
+  Release,
+  Contribution,
+  PaginatedResponse
+} from '../../types';
 
 interface ReleaseArgs {
   communityId: number;

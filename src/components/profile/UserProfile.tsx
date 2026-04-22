@@ -82,7 +82,9 @@ const UserProfile = () => {
             <div className="head colhead_dark">Profile</div>
             <div
               className="pad"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(profile.info) }}
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(profile.info)
+              }}
             />
           </div>
         </div>
