@@ -16,6 +16,7 @@ import NewTopicForm from '../../../sections/forum/NewTopicForm';
 
 import CommunitiesPage from '../../../sections/communities/CommunitiesPage';
 import CommunityPage from '../../../sections/communities/CommunityPage';
+import CommunityGroupPage from '../../../sections/communities/CommunityGroupPage';
 import ContributeForm from '../../../sections/contribute/ContributeForm';
 
 import Toolbox from '../../../admin/Toolbox';
@@ -65,6 +66,10 @@ const PrivateContent = () => (
     <Route path="forums/:forumId" element={wrap(ForumPage)} />
     <Route path="forums" element={wrap(ForumCategoryPage)} />
 
+    <Route
+      path="communities/:communityId/groups/:groupId"
+      element={wrap(CommunityGroupPage)}
+    />
     <Route path="communities/:communityId" element={wrap(CommunityPage)} />
     <Route path="communities" element={wrap(CommunitiesPage)} />
     <Route path="contribute" element={wrap(ContributeForm)} />

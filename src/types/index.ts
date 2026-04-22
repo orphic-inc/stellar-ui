@@ -74,11 +74,18 @@ export interface ForumPost {
   updatedAt: string;
 }
 
+export interface ForumPollVote {
+  id: number;
+  userId: number;
+  vote: number;
+}
+
 export interface ForumPoll {
   id: number;
   question: string;
-  answers: string[];
-  votes?: Record<string, number>;
+  answers: string; // JSON-encoded string[]
+  closed: boolean;
+  votes: ForumPollVote[];
 }
 
 // ─── Community ───────────────────────────────────────────────────────────────
@@ -105,12 +112,24 @@ export interface Community {
   numConsumers?: number;
 }
 
+export interface ReleaseContribution {
+  id: number;
+  user: { id: number; username: string };
+  releaseDescription?: string;
+  collaborators: Artist[];
+}
+
 export interface Release {
   id: number;
   title: string;
   year?: number;
   type?: string;
   communityId: number;
+  image?: string;
+  description?: string;
+  artist?: Artist;
+  tags?: { id: number; name: string }[];
+  contributions?: ReleaseContribution[];
 }
 
 // ─── Profile ─────────────────────────────────────────────────────────────────
