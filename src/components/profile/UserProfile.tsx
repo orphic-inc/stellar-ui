@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import DOMPurify from 'dompurify';
 import { useGetProfileByUserIdQuery } from '../../store/services/profileApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Spinner from '../layout/Spinner';
@@ -81,7 +82,7 @@ const UserProfile = () => {
             <div className="head colhead_dark">Profile</div>
             <div
               className="pad"
-              dangerouslySetInnerHTML={{ __html: profile.info }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(profile.info) }}
             />
           </div>
         </div>

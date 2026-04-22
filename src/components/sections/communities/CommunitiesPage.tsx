@@ -11,7 +11,7 @@ const CommunitiesPage = () => {
   return (
     <div className="thin">
       <h2>Communities</h2>
-      <CommunitiesTable communities={communities ?? []} />
+      <CommunitiesTable communities={communities?.data ?? []} />
     </div>
   );
 };

@@ -116,7 +116,7 @@ const ContributeForm = () => {
                   required
                 >
                   <option value="">Select a community</option>
-                  {communities?.map((c) => (
+                  {communities?.data?.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>

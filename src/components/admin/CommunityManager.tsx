@@ -166,7 +166,7 @@ const CommunityManager = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700/50">
-              {!communities?.length ? (
+              {!communities?.data?.length ? (
                 <tr>
                   <td
                     colSpan={5}
@@ -176,7 +176,7 @@ const CommunityManager = () => {
                   </td>
                 </tr>
               ) : (
-                communities.map((c) =>
+                communities.data.map((c) =>
                   editingId === c.id ? (
                     <EditRow
                       key={c.id}
