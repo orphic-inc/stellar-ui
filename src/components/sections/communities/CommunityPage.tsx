@@ -50,8 +50,8 @@ const CommunityPage = () => {
               </tr>
             </thead>
             <tbody>
-              {releases && releases.length > 0 ? (
-                releases.map((release) => (
+              {releases?.data && releases.data.length > 0 ? (
+                releases.data.map((release) => (
                   <tr key={release.id}>
                     <td>
                       <Link

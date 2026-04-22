@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { Community, Release } from '../../types';
+import type { Community, Release, PaginatedResponse } from '../../types';
 
 interface ReleaseArgs {
   communityId: number;
@@ -19,7 +19,7 @@ interface CreateContributionArgs {
 
 export const communityApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getCommunities: build.query<Community[], void>({
+    getCommunities: build.query<PaginatedResponse<Community>, void>({
       query: () => '/communities',
       providesTags: ['Community']
     }),
@@ -44,7 +44,7 @@ export const communityApi = api.injectEndpoints({
     }),
 
     // Releases (groups)
-    getReleasesByCommunity: build.query<Release[], number>({
+    getReleasesByCommunity: build.query<PaginatedResponse<Release>, number>({
       query: (communityId) => `/communities/${communityId}/groups`,
       providesTags: (_, __, id) => [{ type: 'Release', id }]
     }),
@@ -85,7 +85,7 @@ export const communityApi = api.injectEndpoints({
     }),
 
     // Contributions
-    getContributions: build.query<Release[], void>({
+    getContributions: build.query<PaginatedResponse<Release>, void>({
       query: () => '/contributions',
       providesTags: ['Contribution']
     }),

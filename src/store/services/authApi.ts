@@ -35,8 +35,14 @@ export const authApi = api.injectEndpoints({
       invalidatesTags: ['Auth']
     }),
     logout: build.mutation<void, void>({
-      query: () => ({ url: '/auth', method: 'DELETE' }),
-      invalidatesTags: ['Auth']
+      query: () => ({ url: '/auth/logout', method: 'POST' }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+        } finally {
+          dispatch(logoutAction());
+        }
+      }
     }),
     register: build.mutation<AuthUser, RegisterArgs>({
       query: (data) => ({ url: '/users', method: 'POST', body: data })

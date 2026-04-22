@@ -4,7 +4,8 @@ import type {
   Forum,
   ForumTopic,
   ForumPost,
-  ForumPoll
+  ForumPoll,
+  PaginatedResponse
 } from '../../types';
 
 interface TopicArgs {
@@ -84,7 +85,7 @@ export const forumApi = api.injectEndpoints({
     }),
 
     // Topics
-    getTopicsByForum: build.query<ForumTopic[], number>({
+    getTopicsByForum: build.query<PaginatedResponse<ForumTopic>, number>({
       query: (forumId) => `/forums/${forumId}/topics`,
       providesTags: (_, __, forumId) => [{ type: 'ForumTopic', id: forumId }]
     }),
@@ -117,7 +118,7 @@ export const forumApi = api.injectEndpoints({
     }),
 
     // Posts
-    getPostsByTopic: build.query<ForumPost[], TopicArgs>({
+    getPostsByTopic: build.query<PaginatedResponse<ForumPost>, TopicArgs>({
       query: ({ forumId, topicId }) =>
         `/forums/${forumId}/topics/${topicId}/posts`,
       providesTags: (_, __, { topicId }) => [{ type: 'ForumPost', id: topicId }]

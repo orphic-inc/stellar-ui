@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useLogoutMutation } from '../../store/services/authApi';
-import { logout as logoutAction } from '../../store/slices/authSlice';
+import { api } from '../../store/api';
 import type { AuthUser } from '../../types';
 
 interface Props {
@@ -16,9 +16,12 @@ const UserMenu = ({ user }: Props) => {
   const [logout] = useLogoutMutation();
 
   const handleLogout = async () => {
-    await logout();
-    dispatch(logoutAction());
-    navigate('/login');
+    try {
+      await logout().unwrap();
+    } finally {
+      dispatch(api.util.resetApiState());
+      navigate('/login');
+    }
   };
 
   return (

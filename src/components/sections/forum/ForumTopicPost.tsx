@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import Time from '../../layout/Time';
 import type { ForumPost } from '../../../types';
 
@@ -52,7 +53,7 @@ const ForumTopicPost = ({ post }: Props) => {
             <td className="body" valign="top">
               <div
                 className="post_content"
-                dangerouslySetInnerHTML={{ __html: body }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body) }}
               />
             </td>
           </tr>

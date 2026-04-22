@@ -30,8 +30,8 @@ const ForumTopicPage = () => {
   const [markRead] = useMarkTopicReadMutation();
 
   useEffect(() => {
-    if (posts?.length) {
-      markRead({ forumTopicId: tId, forumPostId: posts[posts.length - 1].id });
+    if (posts?.data?.length) {
+      markRead({ forumTopicId: tId, forumPostId: posts.data[posts.data.length - 1].id });
     }
   }, [posts, tId, markRead]);
 
@@ -56,13 +56,9 @@ const ForumTopicPage = () => {
         </div>
       </div>
 
-      {posts?.map((post) => (
+      {posts?.data?.map((post) => (
         <ErrorBoundary key={post.id} FallbackComponent={FallbackComponent}>
-          <ForumTopicPost
-            post={post}
-            forumId={forumId!}
-            topicId={forumTopicId!}
-          />
+          <ForumTopicPost post={post} />
         </ErrorBoundary>
       ))}
 
