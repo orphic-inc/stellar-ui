@@ -13,8 +13,8 @@ interface CommentBody {
   id?: number;
 }
 interface SubscribeArgs {
-  page: string;
-  subId: number;
+  topicId: number;
+  action: 'subscribe' | 'unsubscribe';
 }
 
 export const miscApi = api.injectEndpoints({
@@ -22,6 +22,22 @@ export const miscApi = api.injectEndpoints({
     getAnnouncements: build.query<AnnouncementsResponse, void>({
       query: () => '/announcements',
       providesTags: ['Announcement']
+    }),
+    createAnnouncement: build.mutation<void, { title: string; body: string }>({
+      query: (data) => ({ url: '/announcements', method: 'POST', body: data }),
+      invalidatesTags: ['Announcement']
+    }),
+    deleteAnnouncement: build.mutation<void, number>({
+      query: (id) => ({ url: `/announcements/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Announcement']
+    }),
+    createBlogPost: build.mutation<void, { title: string; body: string }>({
+      query: (data) => ({ url: '/announcements/blog', method: 'POST', body: data }),
+      invalidatesTags: ['Announcement']
+    }),
+    deleteBlogPost: build.mutation<void, number>({
+      query: (id) => ({ url: `/announcements/blog/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Announcement']
     }),
     getSiteStats: build.query<SiteStats, void>({
       query: () => '/stats',
@@ -34,7 +50,10 @@ export const miscApi = api.injectEndpoints({
       query: () => '/stylesheet',
       providesTags: ['Stylesheet']
     }),
-    getComments: build.query<{ id: number; body: string }[], CommentParams>({
+    getComments: build.query<
+      { id: number; body: string; authorId: number; author?: { id: number; username: string; avatar?: string }; createdAt: string }[],
+      CommentParams
+    >({
       query: (params) => ({ url: '/comments', params }),
       providesTags: ['Comment']
     }),
@@ -81,7 +100,7 @@ export const miscApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Subscription']
     }),
-    getSubscriptions: build.query<{ id: number }[], void>({
+    getSubscriptions: build.query<{ id: number; topicId: number }[], void>({
       query: () => '/subscriptions',
       providesTags: ['Subscription']
     })
@@ -90,6 +109,10 @@ export const miscApi = api.injectEndpoints({
 
 export const {
   useGetAnnouncementsQuery,
+  useCreateAnnouncementMutation,
+  useDeleteAnnouncementMutation,
+  useCreateBlogPostMutation,
+  useDeleteBlogPostMutation,
   useGetSiteStatsQuery,
   useGetStylesheetsQuery,
   useGetCommentsQuery,

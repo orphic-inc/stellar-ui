@@ -18,6 +18,7 @@ import CommunitiesPage from '../../../sections/communities/CommunitiesPage';
 import CommunityPage from '../../../sections/communities/CommunityPage';
 import CommunityGroupPage from '../../../sections/communities/CommunityGroupPage';
 import ContributeForm from '../../../sections/contribute/ContributeForm';
+import ContributionsPage from '../../../sections/contribute/ContributionsPage';
 
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
@@ -26,6 +27,7 @@ import PermissionFormPage from '../../../admin/PermissionFormPage';
 import ForumCategoryControlPanel from '../../../admin/ForumCategoryControlPanel';
 import ForumControlPanel from '../../../admin/ForumControlPanel';
 import CommunityManager from '../../../admin/CommunityManager';
+import NewsManager from '../../../admin/NewsManager';
 
 const wrap = (Component: React.ComponentType) => (
   <ErrorBoundary FallbackComponent={FallbackComponent}>
@@ -56,6 +58,7 @@ const PrivateContent = () => (
     />
     <Route path="staff/tools/forums" element={<ForumControlPanel />} />
     <Route path="staff/tools/communities" element={<CommunityManager />} />
+    <Route path="staff/tools/news" element={<NewsManager />} />
     <Route path="staff/tools" element={<Toolbox />} />
 
     <Route
@@ -72,6 +75,7 @@ const PrivateContent = () => (
     />
     <Route path="communities/:communityId" element={wrap(CommunityPage)} />
     <Route path="communities" element={wrap(CommunitiesPage)} />
+    <Route path="contribute/list" element={wrap(ContributionsPage)} />
     <Route path="contribute" element={wrap(ContributeForm)} />
 
     <Route path="" element={<PrivateHomepage />} />

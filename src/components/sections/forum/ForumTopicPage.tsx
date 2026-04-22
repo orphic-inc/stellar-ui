@@ -8,6 +8,10 @@ import {
   useGetPollByTopicQuery,
   useVotePollMutation
 } from '../../../store/services/forumApi';
+import {
+  useGetSubscriptionsQuery,
+  useSubscribeMutation
+} from '../../../store/services/miscApi';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import Spinner from '../../layout/Spinner';
 import PostBox from '../../layout/PostBox';
@@ -33,10 +37,14 @@ const ForumTopicPage = () => {
     topicId: tId
   });
   const { data: poll } = useGetPollByTopicQuery(tId);
+  const { data: subscriptions } = useGetSubscriptionsQuery();
   const [markRead] = useMarkTopicReadMutation();
   const [votePoll, { isLoading: voting }] = useVotePollMutation();
+  const [subscribe, { isLoading: subscribing }] = useSubscribeMutation();
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+
+  const isSubscribed = subscriptions?.some((s) => s.topicId === tId) ?? false;
 
   useEffect(() => {
     if (posts?.data?.length) {
@@ -75,10 +83,23 @@ const ForumTopicPage = () => {
       </div>
 
       <div className="box topic-header">
-        <div className="head colhead_dark">
-          <span>{topic.title}</span>
-          {topic.isLocked && <span className="topic-locked">[Locked]</span>}
-          {topic.isSticky && <span className="topic-sticky">[Sticky]</span>}
+        <div className="head colhead_dark" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>
+            {topic.title}
+            {topic.isLocked && <span className="topic-locked"> [Locked]</span>}
+            {topic.isSticky && <span className="topic-sticky"> [Sticky]</span>}
+          </span>
+          <button
+            type="button"
+            onClick={() =>
+              subscribe({ topicId: tId, action: isSubscribed ? 'unsubscribe' : 'subscribe' })
+            }
+            disabled={subscribing}
+            className="brackets btn-link"
+            style={{ fontSize: '0.85em' }}
+          >
+            {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+          </button>
         </div>
       </div>
 

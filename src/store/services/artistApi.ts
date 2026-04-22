@@ -23,6 +23,10 @@ export const artistApi = api.injectEndpoints({
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'Artist', id }]
     }),
+    deleteArtist: build.mutation<void, number>({
+      query: (id) => ({ url: `/artists/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Artist']
+    }),
     getArtistHistory: build.query<unknown[], number>({
       query: (artistId) => `/artists/history/${artistId}`
     }),
@@ -65,6 +69,7 @@ export const {
   useGetArtistByIdQuery,
   useCreateArtistMutation,
   useUpdateArtistMutation,
+  useDeleteArtistMutation,
   useGetArtistHistoryQuery,
   useRevertArtistMutation,
   useGetSimilarArtistsQuery,
