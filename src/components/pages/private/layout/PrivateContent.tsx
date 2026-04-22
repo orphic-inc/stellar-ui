@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import ErrorBoundary from '../../../layout/ErrorBoundary';
 import FallbackComponent from '../../../layout/FallbackComponent';
+import NotFound from '../../../layout/NotFound';
 
 import PrivateHomepage from '../PrivateHomepage';
 import UserProfile from '../../../profile/UserProfile';
@@ -68,7 +69,8 @@ const PrivateContent = () => (
     <Route path="communities" element={wrap(CommunitiesPage)} />
     <Route path="contribute" element={wrap(ContributeForm)} />
 
-    <Route path="*" element={<PrivateHomepage />} />
+    <Route path="" element={<PrivateHomepage />} />
+    <Route path="*" element={<NotFound />} />
   </Routes>
 );
 

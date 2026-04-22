@@ -1,6 +1,11 @@
 import { api } from '../api';
 import type { Profile } from '../../types';
 
+interface CreateInviteArgs {
+  email: string;
+  reason?: string;
+}
+
 export const profileApi = api.injectEndpoints({
   endpoints: (build) => ({
     getMyProfile: build.query<Profile, void>({
@@ -18,6 +23,13 @@ export const profileApi = api.injectEndpoints({
     deleteMyProfile: build.mutation<void, void>({
       query: () => ({ url: '/profile', method: 'DELETE' }),
       invalidatesTags: ['Profile', 'Auth']
+    }),
+    createInvite: build.mutation<void, CreateInviteArgs>({
+      query: (data) => ({
+        url: '/profile/referral/create-invite',
+        method: 'POST',
+        body: data
+      })
     })
   })
 });
@@ -26,5 +38,6 @@ export const {
   useGetMyProfileQuery,
   useGetProfileByUserIdQuery,
   useUpdateMyProfileMutation,
-  useDeleteMyProfileMutation
+  useDeleteMyProfileMutation,
+  useCreateInviteMutation
 } = profileApi;
