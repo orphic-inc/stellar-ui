@@ -8,6 +8,7 @@ import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 
 const dev = process.env.NODE_ENV === 'development';
+const apiUrl = process.env.STELLAR_API_URL || 'http://127.0.0.1:8080';
 
 const plugins = [
   new CleanPlugin(),
@@ -27,22 +28,29 @@ const plugins = [
 ];
 
 if (dev) {
-  plugins.push(new ESLintPlugin());
+  plugins.push(new ESLintPlugin({ extensions: ['js', 'ts', 'tsx'] }));
 }
+
 export default {
   mode: dev ? 'development' : 'production',
   devtool: dev ? 'eval-cheap-module-source-map' : 'cheap-module-source-map',
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   devServer: {
     compress: dev,
     open: true,
     historyApiFallback: true,
-    port: 9000
+    port: 9000,
+    proxy: {
+      '/api': {
+        target: apiUrl,
+        changeOrigin: true
+      }
+    }
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.[jt]sx?$/,
         exclude: /node_modules/,
         use: ['babel-loader']
       },
@@ -89,8 +97,8 @@ export default {
   },
   plugins,
   resolve: {
-    extensions: ['.js', '.json'],
-    modules: ['node_modules', 'src'],
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+    modules: ['node_modules', resolve(__dirname, 'src')],
     alias: {
       components: resolve(__dirname, 'src/components'),
       utils: resolve(__dirname, 'src/utils')

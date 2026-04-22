@@ -12,19 +12,28 @@ module.exports = {
     'plugin:prettier/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    'plugin:import/recommended'
+    'plugin:import/recommended',
+    'plugin:@typescript-eslint/recommended'
   ],
-  parser: '@babel/eslint-parser',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    requireConfigFile: false,
     ecmaFeatures: {
       jsx: true
     },
-    ecmaVersion: 12
+    ecmaVersion: 12,
+    sourceType: 'module'
   },
+  plugins: ['@typescript-eslint'],
   rules: {
+    'no-undef': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+    ],
     'react/jsx-uses-react': 0,
-    'react/react-in-jsx-scope': 0
+    'react/react-in-jsx-scope': 0,
+    'react/prop-types': 0
   },
   settings: {
     react: {
@@ -33,6 +42,9 @@ module.exports = {
     'import/resolver': {
       webpack: {
         config: path.join(__dirname, 'webpack.config.babel.js')
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx']
       }
     }
   }

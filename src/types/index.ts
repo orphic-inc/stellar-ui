@@ -1,0 +1,188 @@
+// ─── Auth / User ────────────────────────────────────────────────────────────
+
+export interface UserRank {
+  id: number;
+  level: number;
+  name: string;
+  permissions?: Record<string, boolean>;
+  color?: string;
+  badge?: string;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  avatar?: string;
+  inviteCount?: number;
+  userRankId?: number;
+  userRank?: UserRank;
+  createdAt: string;
+}
+
+// ─── Alert ──────────────────────────────────────────────────────────────────
+
+export type AlertType = 'success' | 'danger' | 'warning' | 'info';
+
+export interface Alert {
+  id: string;
+  msg: string;
+  alertType: AlertType;
+}
+
+// ─── Forum ───────────────────────────────────────────────────────────────────
+
+export interface ForumCategory {
+  id: number;
+  name: string;
+  sort: number;
+  forums?: Forum[];
+}
+
+export interface Forum {
+  id: number;
+  name: string;
+  description?: string;
+  sort: number;
+  minClassRead?: number;
+  minClassWrite?: number;
+  minClassCreate?: number;
+  numTopics: number;
+  numPosts: number;
+  forumCategory?: Pick<ForumCategory, 'id' | 'name'>;
+  topics?: ForumTopic[];
+  lastTopic?: Pick<ForumTopic, 'id' | 'title'>;
+}
+
+export interface ForumTopic {
+  id: number;
+  title: string;
+  isLocked: boolean;
+  isSticky: boolean;
+  numPosts: number;
+  author?: Pick<AuthUser, 'id' | 'username'>;
+  lastPost?: Pick<ForumPost, 'id' | 'createdAt'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ForumPost {
+  id: number;
+  body: string;
+  author?: Pick<AuthUser, 'id' | 'username' | 'avatar'>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ForumPoll {
+  id: number;
+  question: string;
+  answers: string[];
+  votes?: Record<string, number>;
+}
+
+// ─── Community ───────────────────────────────────────────────────────────────
+
+export interface Community {
+  id: number;
+  name: string;
+  description?: string;
+  numReleases?: number;
+  numContributors?: number;
+  numConsumers?: number;
+}
+
+export interface Release {
+  id: number;
+  title: string;
+  year?: number;
+  type?: string;
+  communityId: number;
+}
+
+// ─── Profile ─────────────────────────────────────────────────────────────────
+
+export interface InviteNode {
+  id: number;
+  username: string;
+  email: string;
+  joinedAt?: string;
+  lastSeen?: string;
+  uploaded?: string;
+  downloaded?: string;
+  ratio?: string;
+  children?: InviteNode[];
+}
+
+export interface Profile {
+  userId: number;
+  username: string;
+  avatar?: string;
+  info?: string;
+  joinedAt?: string;
+  lastSeen?: string;
+  inviteTree?: InviteNode[];
+}
+
+// ─── Settings ────────────────────────────────────────────────────────────────
+
+export interface UserSettings {
+  avatar?: string;
+  styleUrl?: string;
+  useOpenDyslexic?: boolean;
+  postsPerPage?: number;
+  autoloadCommunityStats?: boolean;
+}
+
+// ─── Permissions (UserRank admin) ────────────────────────────────────────────
+
+export interface Permission {
+  id: number;
+  name: string;
+  level: number;
+  permissions?: Record<string, boolean>;
+  userCount?: number;
+}
+
+// ─── Misc ────────────────────────────────────────────────────────────────────
+
+export interface Announcement {
+  id: number;
+  title: string;
+  body?: string;
+  createdAt: string;
+}
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  body?: string;
+  createdAt: string;
+  user?: Pick<AuthUser, 'id' | 'username'>;
+}
+
+export interface AnnouncementsResponse {
+  data: {
+    announcements: Announcement[];
+    blogPosts: BlogPost[];
+  };
+}
+
+export interface Artist {
+  id: number;
+  name: string;
+  image?: string;
+  body?: string;
+}
+
+export interface Collaborator {
+  artist: string;
+  importance: string;
+}
+
+// ─── Redux state types ───────────────────────────────────────────────────────
+
+export interface AuthState {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
+}
