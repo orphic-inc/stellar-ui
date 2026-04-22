@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { AnnouncementsResponse } from '../../types';
+import type { AnnouncementsResponse, SiteStats } from '../../types';
 
 interface CommentParams {
   page?: string;
@@ -22,6 +22,10 @@ export const miscApi = api.injectEndpoints({
     getAnnouncements: build.query<AnnouncementsResponse, void>({
       query: () => '/announcements',
       providesTags: ['Announcement']
+    }),
+    getSiteStats: build.query<SiteStats, void>({
+      query: () => '/stats',
+      providesTags: ['Stats']
     }),
     getStylesheets: build.query<
       { id: number; name: string; url?: string }[],
@@ -82,6 +86,7 @@ export const miscApi = api.injectEndpoints({
 
 export const {
   useGetAnnouncementsQuery,
+  useGetSiteStatsQuery,
   useGetStylesheetsQuery,
   useGetCommentsQuery,
   useCreateCommentMutation,

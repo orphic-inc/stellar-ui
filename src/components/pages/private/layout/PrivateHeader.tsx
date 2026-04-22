@@ -17,7 +17,7 @@ const navLinks = [
 ];
 
 const PrivateHeader = ({ user }: Props) => {
-  const isStaff = user.userRank?.permissions?.['admin_access'];
+  const isStaff = (user.userRank?.level ?? 0) >= 500;
 
   return (
     <header className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50">
@@ -53,7 +53,7 @@ const PrivateHeader = ({ user }: Props) => {
           ))}
           {isStaff && (
             <NavLink
-              to="/private/staff"
+              to="/private/staff/tools"
               className={({ isActive }) =>
                 `px-4 py-2 text-sm font-medium transition-colors border-b-2 ml-auto ${
                   isActive

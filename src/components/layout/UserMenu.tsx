@@ -1,17 +1,23 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { useLogoutMutation } from '../../store/services/authApi';
+import { logout as logoutAction } from '../../store/slices/authSlice';
 import type { AuthUser } from '../../types';
 
 interface Props {
   user: AuthUser;
 }
 
+const isStaffLevel = (user: AuthUser) => (user.userRank?.level ?? 0) >= 500;
+
 const UserMenu = ({ user }: Props) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
 
   const handleLogout = async () => {
     await logout();
+    dispatch(logoutAction());
     navigate('/login');
   };
 
@@ -35,7 +41,7 @@ const UserMenu = ({ user }: Props) => {
       >
         Invites ({user.inviteCount ?? 0})
       </Link>
-      {user.userRank?.permissions?.['admin_access'] && (
+      {isStaffLevel(user) && (
         <Link
           to="/private/staff/tools"
           className="px-3 py-1.5 rounded text-amber-400 hover:text-amber-300 hover:bg-white/10 transition-colors"

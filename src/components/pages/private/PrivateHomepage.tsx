@@ -1,27 +1,41 @@
-import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { useGetAnnouncementsQuery } from '../../../store/services/miscApi';
+import { useGetSiteStatsQuery } from '../../../store/services/miscApi';
 import Time from '../../layout/Time';
 import Spinner from '../../layout/Spinner';
 
+const StatRow = ({
+  label,
+  value
+}: {
+  label: string;
+  value?: number | string;
+}) => (
+  <div className="flex justify-between py-1 border-b border-gray-700/40 last:border-0">
+    <span className="text-gray-400 text-xs">{label}</span>
+    <span className="text-gray-200 text-xs font-medium">{value ?? '—'}</span>
+  </div>
+);
+
 const PrivateHomepage = () => {
   const user = useSelector(selectCurrentUser);
-  const { data, isLoading } = useGetAnnouncementsQuery();
+  const { data: announcements, isLoading } = useGetAnnouncementsQuery();
+  const { data: stats } = useGetSiteStatsQuery();
+
+  const blogPosts = announcements?.data?.blogPosts ?? [];
+  const aotm = blogPosts[0];
+  const vh = blogPosts[1];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">
-          Welcome back,{' '}
-          <span className="text-indigo-400">{user?.username}</span>.
-        </h1>
-      </div>
+      <h1 className="text-2xl font-bold text-white">
+        Welcome back, <span className="text-indigo-400">{user?.username}</span>.
+      </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main content */}
+        {/* Main — announcements */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Announcements */}
           <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
             <div className="bg-gray-700/50 px-4 py-2 border-b border-gray-700">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
@@ -33,10 +47,10 @@ const PrivateHomepage = () => {
                 <div className="p-4">
                   <Spinner />
                 </div>
-              ) : !data?.data?.announcements?.length ? (
+              ) : !announcements?.data?.announcements?.length ? (
                 <p className="p-4 text-sm text-gray-500">No announcements.</p>
               ) : (
-                data.data.announcements.map((n) => (
+                announcements.data.announcements.map((n) => (
                   <div
                     key={n.id}
                     className="flex items-center justify-between px-4 py-3 hover:bg-gray-700/30 transition-colors"
@@ -53,7 +67,6 @@ const PrivateHomepage = () => {
             </div>
           </div>
 
-          {/* Blog */}
           <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
             <div className="bg-gray-700/50 px-4 py-2 border-b border-gray-700">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
@@ -65,10 +78,10 @@ const PrivateHomepage = () => {
                 <div className="p-4">
                   <Spinner />
                 </div>
-              ) : !data?.data?.blogPosts?.length ? (
+              ) : !blogPosts.length ? (
                 <p className="p-4 text-sm text-gray-500">No blog posts.</p>
               ) : (
-                data.data.blogPosts.map((b) => (
+                blogPosts.map((b) => (
                   <div
                     key={b.id}
                     className="flex items-center justify-between px-4 py-3 hover:bg-gray-700/30 transition-colors"
@@ -95,55 +108,88 @@ const PrivateHomepage = () => {
 
         {/* Sidebar */}
         <div className="space-y-4">
+          {/* Stats */}
           <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
             <div className="bg-gray-700/50 px-4 py-2 border-b border-gray-700">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
-                Quick Links
+                Stats
               </h2>
             </div>
-            <div className="p-2">
-              {[
-                { label: 'Forums', to: '/private/forums' },
-                { label: 'Communities', to: '/private/communities' },
-                { label: 'Upload', to: '/private/contribute' },
-                { label: 'Invite a Friend', to: '/private/invite' }
-              ].map(({ label, to }) => (
-                <Link
-                  key={to}
-                  to={to}
-                  className="block px-3 py-2 rounded text-sm text-gray-300 hover:text-white hover:bg-gray-700/50 transition-colors"
-                >
-                  {label}
-                </Link>
-              ))}
+            <div className="px-4 py-3">
+              <StatRow label="Maximum users" value={stats?.maxUsers} />
+              <StatRow label="Enabled users" value={stats?.enabledUsers} />
+              <StatRow label="Active today" value={stats?.activeToday} />
+              <StatRow label="Active this week" value={stats?.activeThisWeek} />
+              <StatRow
+                label="Active this month"
+                value={stats?.activeThisMonth}
+              />
+              <StatRow label="Communities" value={stats?.communities} />
+              <StatRow label="Releases" value={stats?.releases} />
+              <StatRow label="Artists" value={stats?.artists} />
+              <StatRow label="Seeders" value={stats?.seeders} />
+              <StatRow label="Leechers" value={stats?.leechers} />
+              <StatRow
+                label="S/L Ratio"
+                value={
+                  stats?.seeders && stats?.leechers
+                    ? (stats.seeders / Math.max(stats.leechers, 1)).toFixed(2)
+                    : undefined
+                }
+              />
+              <StatRow label="Peers" value={stats?.peers} />
             </div>
           </div>
 
+          {/* Album of the Month */}
           <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-            <div className="bg-gray-700/50 px-4 py-2 border-b border-gray-700">
+            <div className="bg-gray-700/50 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
-                Your Stats
+                Album of the Month
               </h2>
+              {aotm && (
+                <span className="text-xs text-indigo-400 cursor-pointer hover:text-indigo-300">
+                  Discuss
+                </span>
+              )}
             </div>
-            <div className="p-4 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Rank</span>
-                <span className="text-gray-200">
-                  {user?.userRank?.name ?? '—'}
+            <div className="p-3">
+              {aotm ? (
+                <div className="flex gap-3 items-center">
+                  <div className="w-12 h-12 bg-gray-700 rounded shrink-0 flex items-center justify-center text-gray-600 text-xs">
+                    ♪
+                  </div>
+                  <span className="text-sm text-gray-300">{aotm.title}</span>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-600 italic">Not set.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Vanity House */}
+          <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+            <div className="bg-gray-700/50 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
+                Vanity House
+              </h2>
+              {vh && (
+                <span className="text-xs text-indigo-400 cursor-pointer hover:text-indigo-300">
+                  Discuss
                 </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Invites</span>
-                <span className="text-gray-200">{user?.inviteCount ?? 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Member since</span>
-                <span className="text-gray-200">
-                  {user?.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString()
-                    : '—'}
-                </span>
-              </div>
+              )}
+            </div>
+            <div className="p-3">
+              {vh ? (
+                <div className="flex gap-3 items-center">
+                  <div className="w-12 h-12 bg-gray-700 rounded shrink-0 flex items-center justify-center text-gray-600 text-xs">
+                    ♪
+                  </div>
+                  <span className="text-sm text-gray-300">{vh.title}</span>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-600 italic">Not set.</p>
+              )}
             </div>
           </div>
         </div>

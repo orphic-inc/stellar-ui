@@ -82,6 +82,10 @@ const Toolbox = () => (
       <Section
         title="Community"
         links={[
+          {
+            label: 'Community manager',
+            to: '/private/staff/tools/communities'
+          },
           { label: 'Category manager', to: '/private/staff/tools/categories' },
           { label: 'Forum manager', to: '/private/staff/tools/forums' },
           {
