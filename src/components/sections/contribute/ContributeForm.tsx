@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   useGetCommunitiesQuery,
   useCreateContributionMutation
 } from '../../../store/services/communityApi';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
+import { addAlert } from '../../../store/slices/alertSlice';
 import Spinner from '../../layout/Spinner';
 import type { Collaborator } from '../../../types';
 
@@ -30,6 +31,7 @@ type ContentType = (typeof CONTENT_TYPES)[number];
 
 const ContributeForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
   const { data: communities, isLoading: loadingCommunities } =
     useGetCommunitiesQuery();
@@ -94,8 +96,8 @@ const ContributeForm = () => {
         contributors: [user.id]
       }).unwrap();
       navigate('/private/communities');
-    } catch (err) {
-      console.error(err);
+    } catch {
+      dispatch(addAlert('Failed to submit contribution. Please try again.', 'danger'));
     }
   };
 

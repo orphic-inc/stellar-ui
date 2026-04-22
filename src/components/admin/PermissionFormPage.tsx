@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {
   useGetPermissionByIdQuery,
   useCreatePermissionMutation,
   useUpdatePermissionMutation
 } from '../../store/services/userApi';
+import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 
 const ALL_PERMISSIONS = [
@@ -84,6 +86,7 @@ const PermissionFormPage = () => {
   });
   const [createPermission] = useCreatePermissionMutation();
   const [updatePermission] = useUpdatePermissionMutation();
+  const dispatch = useDispatch();
 
   const { register, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: { level: 0, name: '', permissions: {} }
@@ -107,8 +110,13 @@ const PermissionFormPage = () => {
         await createPermission(data).unwrap();
       }
       navigate('/private/staff/tools/permissions');
-    } catch (err) {
-      console.error(err);
+    } catch {
+      dispatch(
+        addAlert(
+          `Failed to ${isEditing ? 'update' : 'create'} permission class.`,
+          'danger'
+        )
+      );
     }
   };
 

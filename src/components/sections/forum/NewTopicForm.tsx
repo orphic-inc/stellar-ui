@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetForumByIdQuery,
   useCreateTopicMutation
 } from '../../../store/services/forumApi';
+import { addAlert } from '../../../store/slices/alertSlice';
 
 const NewTopicForm = () => {
   const { forumId } = useParams<{ forumId: string }>();
   const navigate = useNavigate();
   const { data: forum } = useGetForumByIdQuery(parseInt(forumId!));
   const [createTopic, { isLoading }] = useCreateTopicMutation();
+  const dispatch = useDispatch();
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -41,8 +44,8 @@ const NewTopicForm = () => {
     try {
       const topic = await createTopic(payload).unwrap();
       navigate(`/private/forums/${forumId}/topics/${topic.id}`);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      dispatch(addAlert('Failed to create topic. Please try again.', 'danger'));
     }
   };
 
