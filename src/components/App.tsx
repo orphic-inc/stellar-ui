@@ -36,7 +36,6 @@ const App = () => {
 
   return (
     <>
-      <Alert />
       <Routes>
         <Route path="/install" element={<Navigate to="/" replace />} />
         <Route

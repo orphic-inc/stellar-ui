@@ -31,8 +31,14 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
             className="flex gap-2 items-end flex-wrap"
           >
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Sort</label>
+              <label
+                htmlFor={`edit-fc-sort-${category.id}`}
+                className="block text-xs text-gray-400 mb-1"
+              >
+                Sort
+              </label>
               <input
+                id={`edit-fc-sort-${category.id}`}
                 type="number"
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
@@ -40,8 +46,14 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-1">Name</label>
+              <label
+                htmlFor={`edit-fc-name-${category.id}`}
+                className="block text-xs text-gray-400 mb-1"
+              >
+                Name
+              </label>
               <input
+                id={`edit-fc-name-${category.id}`}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}

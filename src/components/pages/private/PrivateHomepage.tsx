@@ -1,7 +1,9 @@
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
-import { useGetAnnouncementsQuery } from '../../../store/services/miscApi';
-import { useGetSiteStatsQuery } from '../../../store/services/miscApi';
+import {
+  useGetAnnouncementsQuery,
+  useGetSiteStatsQuery
+} from '../../../store/services/miscApi';
 import Time from '../../layout/Time';
 import Spinner from '../../layout/Spinner';
 
