@@ -42,9 +42,8 @@ const Register = () => {
     } catch (err: unknown) {
       const errors = (err as { data?: { errors?: Record<string, string[]> } })
         ?.data?.errors;
-      const msg = errors
-        ? Object.values(errors).flat()[0] ?? 'Registration failed.'
-        : 'Registration failed.';
+      const firstError = errors && Object.values(errors).flat()[0];
+      const msg = firstError || 'Registration failed.';
       dispatch(addAlert(msg, 'danger'));
     }
   };
