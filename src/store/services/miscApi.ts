@@ -50,6 +50,10 @@ export const miscApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Comment']
     }),
+    deleteComment: build.mutation<void, number>({
+      query: (id) => ({ url: `/comments/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Comment']
+    }),
     getNotifications: build.query<
       { id: number; message: string; createdAt: string }[],
       void
@@ -91,6 +95,7 @@ export const {
   useGetCommentsQuery,
   useCreateCommentMutation,
   useUpdateCommentMutation,
+  useDeleteCommentMutation,
   useGetNotificationsQuery,
   useDeleteNotificationMutation,
   useSubscribeMutation,

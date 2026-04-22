@@ -158,12 +158,13 @@ export const forumApi = api.injectEndpoints({
     getPollByTopic: build.query<ForumPoll, number>({
       query: (topicId) => `/forums/polls/${topicId}`
     }),
-    votePoll: build.mutation<void, { topicId: number; answer: string }>({
+    votePoll: build.mutation<void, { forumPollId: number; vote: number }>({
       query: (data) => ({
         url: '/forums/poll-votes',
         method: 'POST',
         body: data
-      })
+      }),
+      invalidatesTags: ['Forum']
     }),
 
     // Last read
