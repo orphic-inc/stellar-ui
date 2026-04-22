@@ -65,6 +65,7 @@ export default {
               postcssOptions: {
                 ident: 'postcss',
                 plugins: [
+                  require('@tailwindcss/postcss'),
                   require('autoprefixer'),
                   require('postcss-flexbugs-fixes')
                 ],

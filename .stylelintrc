@@ -17,7 +17,11 @@
           "if",
           "include",
           "mixin",
-          "return"
+          "plugin",
+          "return",
+          "theme",
+          "utility",
+          "variant"
         ]
       }
     ],

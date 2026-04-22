@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useLoginMutation, useGetMeQuery } from '../../store/services/authApi';
 import { addAlert } from '../../store/slices/alertSlice';
@@ -12,12 +12,18 @@ interface FormState {
   password: string;
 }
 
+interface LocationState {
+  notice?: string;
+}
+
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const [login, { isLoading }] = useLoginMutation();
   const { data: me } = useGetMeQuery();
 
+  const notice = (location.state as LocationState)?.notice;
   const [form, setForm] = useState<FormState>({ email: '', password: '' });
   const [attempts, setAttempts] = useState(0);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
@@ -45,52 +51,99 @@ const Login = () => {
   };
 
   return (
-    <div className="auth">
-      <h1 className="large">Sign In</h1>
+    <div className="w-full max-w-sm">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-2">
+          Stellar
+        </h1>
+        <p className="text-gray-400 text-sm">Sign in to your account</p>
+      </div>
+
+      {notice && (
+        <div className="mb-4 bg-amber-900/40 border border-amber-700 text-amber-300 rounded-lg px-4 py-3 text-sm">
+          {notice}
+        </div>
+      )}
+
       {isLocked ? (
-        <p className="warning">Too many failed attempts. Try again later.</p>
+        <div className="bg-red-900/40 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm text-center">
+          Too many failed attempts. Try again later.
+        </div>
       ) : (
-        <form className="form" onSubmit={onSubmit}>
+        <form
+          onSubmit={onSubmit}
+          className="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4"
+        >
           {attempts > 0 && (
-            <p className="warning">
+            <div className="bg-yellow-900/40 border border-yellow-700 text-yellow-300 rounded px-3 py-2 text-sm">
               {LOCKOUT_LIMIT - attempts} attempt
               {LOCKOUT_LIMIT - attempts !== 1 ? 's' : ''} remaining before
               lockout.
-            </p>
+            </div>
           )}
-          <div className="form-group">
+
+          <div>
+            <label
+              htmlFor="login-email"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
+              Email
+            </label>
             <input
+              id="login-email"
               type="email"
               name="email"
-              placeholder="Email Address"
               value={form.email}
               onChange={onChange}
               required
+              placeholder="you@example.com"
+              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
             />
           </div>
-          <div className="form-group">
+
+          <div>
+            <label
+              htmlFor="login-password"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
+              Password
+            </label>
             <input
+              id="login-password"
               type="password"
               name="password"
-              placeholder="Password"
               value={form.password}
               onChange={onChange}
               minLength={6}
               required
+              placeholder="••••••••"
+              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
             />
           </div>
+
           <button
             type="submit"
-            className="btn btn-primary"
             disabled={isLoading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
           >
-            {isLoading ? 'Signing in…' : 'Login'}
+            {isLoading ? 'Signing in…' : 'Sign In'}
           </button>
-          <p>
-            <Link to="/recovery">Forgot password?</Link>
-            {' · '}
-            <Link to="/register">Register</Link>
-          </p>
+
+          <div className="text-center text-sm text-gray-500 space-x-2">
+            <Link
+              to="/recovery"
+              className="hover:text-gray-300 transition-colors"
+            >
+              Forgot password?
+            </Link>
+            <span>·</span>
+            <Link
+              to="/register"
+              className="hover:text-gray-300 transition-colors"
+            >
+              Register
+            </Link>
+          </div>
         </form>
       )}
     </div>
