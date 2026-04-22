@@ -1,5 +1,3 @@
-const path = require('path');
-
 module.exports = {
   env: {
     browser: true,
@@ -40,8 +38,8 @@ module.exports = {
       version: 'detect'
     },
     'import/resolver': {
-      webpack: {
-        config: path.join(__dirname, 'webpack.config.babel.js')
+      typescript: {
+        alwaysTryTypes: true
       },
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx']
