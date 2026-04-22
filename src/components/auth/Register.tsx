@@ -48,58 +48,114 @@ const Register = () => {
   };
 
   return (
-    <div className="auth">
-      <h1 className="large">Create Account</h1>
-      <form className="form" onSubmit={onSubmit}>
-        <div className="form-group">
+    <div className="w-full max-w-sm">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-2">
+          Stellar
+        </h1>
+        <p className="text-gray-400 text-sm">Create your account</p>
+      </div>
+
+      <form
+        onSubmit={onSubmit}
+        className="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4"
+      >
+        <div>
+          <label
+            htmlFor="reg-username"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Username
+          </label>
           <input
+            id="reg-username"
             type="text"
             name="username"
-            placeholder="Username"
             value={form.username}
             onChange={onChange}
             minLength={2}
             maxLength={30}
             required
+            placeholder="yourname"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
           />
         </div>
-        <div className="form-group">
+
+        <div>
+          <label
+            htmlFor="reg-email"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Email
+          </label>
           <input
+            id="reg-email"
             type="email"
             name="email"
-            placeholder="Email Address"
             value={form.email}
             onChange={onChange}
             required
+            placeholder="you@example.com"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
           />
         </div>
-        <div className="form-group">
+
+        <div>
+          <label
+            htmlFor="reg-password"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Password
+          </label>
           <input
+            id="reg-password"
             type="password"
             name="password"
-            placeholder="Password (6+ characters)"
             value={form.password}
             onChange={onChange}
             minLength={6}
             required
+            placeholder="6+ characters"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
           />
         </div>
-        <div className="form-group">
+
+        <div>
+          <label
+            htmlFor="reg-password2"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Confirm Password
+          </label>
           <input
+            id="reg-password2"
             type="password"
             name="password2"
-            placeholder="Confirm Password"
             value={form.password2}
             onChange={onChange}
             minLength={6}
             required
+            placeholder="••••••••"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
           />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={isLoading}>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+        >
           {isLoading ? 'Creating account…' : 'Register'}
         </button>
-        <p>
-          Already have an account? <Link to="/login">Sign in</Link>
+
+        <p className="text-center text-sm text-gray-500">
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            className="text-indigo-400 hover:text-indigo-300 transition-colors"
+          >
+            Sign in
+          </Link>
         </p>
       </form>
     </div>

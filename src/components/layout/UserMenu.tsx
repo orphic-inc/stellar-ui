@@ -16,35 +16,40 @@ const UserMenu = ({ user }: Props) => {
   };
 
   return (
-    <nav id="userinfo">
-      <ul>
-        <li>
-          <Link to={`/private/user/${user.id}`}>{user.username}</Link>
-        </li>
-        <li>
-          <Link to={`/private/user/edit/${user.id}`}>Settings</Link>
-        </li>
-        <li>
-          <Link to="/private/invite">Invites ({user.inviteCount ?? 0})</Link>
-        </li>
-        <li>
-          <Link to="/private/forums">Forums</Link>
-        </li>
-        <li>
-          <Link to="/private/communities">Communities</Link>
-        </li>
-        {user.userRank?.permissions?.['admin_access'] && (
-          <li>
-            <Link to="/private/staff/tools">Toolbox</Link>
-          </li>
-        )}
-        <li>
-          <button className="btn-link" onClick={handleLogout}>
-            Logout
-          </button>
-        </li>
-      </ul>
-    </nav>
+    <div className="flex items-center gap-1 text-sm">
+      <Link
+        to={`/private/user/${user.id}`}
+        className="px-3 py-1.5 rounded text-indigo-300 hover:text-white hover:bg-white/10 transition-colors font-medium"
+      >
+        {user.username}
+      </Link>
+      <Link
+        to={`/private/user/edit/${user.id}`}
+        className="px-3 py-1.5 rounded text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+      >
+        Settings
+      </Link>
+      <Link
+        to="/private/invite"
+        className="px-3 py-1.5 rounded text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+      >
+        Invites ({user.inviteCount ?? 0})
+      </Link>
+      {user.userRank?.permissions?.['admin_access'] && (
+        <Link
+          to="/private/staff/tools"
+          className="px-3 py-1.5 rounded text-amber-400 hover:text-amber-300 hover:bg-white/10 transition-colors"
+        >
+          Toolbox
+        </Link>
+      )}
+      <button
+        onClick={handleLogout}
+        className="px-3 py-1.5 rounded text-gray-400 hover:text-red-400 hover:bg-white/10 transition-colors"
+      >
+        Logout
+      </button>
+    </div>
   );
 };
 

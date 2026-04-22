@@ -19,9 +19,11 @@ const PrivateLayout = ({ children }: Props) => {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div id="site-wrapper">
+    <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
       <PrivateHeader user={user} />
-      <div id="content">{children}</div>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+        {children}
+      </main>
       <PrivateFooter />
     </div>
   );
