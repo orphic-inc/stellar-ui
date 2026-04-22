@@ -31,7 +31,8 @@ module.exports = {
     ],
     'react/jsx-uses-react': 0,
     'react/react-in-jsx-scope': 0,
-    'react/prop-types': 0
+    'react/prop-types': 0,
+    'import/no-unresolved': ['error', { ignore: ['dompurify'] }]
   },
   settings: {
     react: {
