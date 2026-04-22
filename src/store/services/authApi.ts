@@ -21,8 +21,11 @@ export const authApi = api.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           dispatch(setCredentials(data));
-        } catch {
-          dispatch(logoutAction());
+        } catch (err: unknown) {
+          const status = (err as { status?: number })?.status;
+          if (status === 401 || status === 403) {
+            dispatch(logoutAction());
+          }
         }
       }
     }),
@@ -32,7 +35,15 @@ export const authApi = api.injectEndpoints({
         method: 'POST',
         body: credentials
       }),
-      invalidatesTags: ['Auth']
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setCredentials(data));
+        } catch {
+          // login component handles the error display
+        }
+      }
     }),
     logout: build.mutation<void, void>({
       query: () => ({ url: '/auth/logout', method: 'POST' }),
@@ -45,7 +56,8 @@ export const authApi = api.injectEndpoints({
       }
     }),
     register: build.mutation<AuthUser, RegisterArgs>({
-      query: (data) => ({ url: '/users', method: 'POST', body: data })
+      query: (data) => ({ url: '/auth/register', method: 'POST', body: data }),
+      invalidatesTags: ['Auth']
     })
   })
 });

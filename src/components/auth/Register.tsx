@@ -40,9 +40,11 @@ const Register = () => {
       dispatch(addAlert('Account created! You can now log in.', 'success'));
       navigate('/login');
     } catch (err: unknown) {
-      const msg =
-        (err as { data?: { errors?: { msg: string }[] } })?.data?.errors?.[0]
-          ?.msg ?? 'Registration failed.';
+      const errors = (err as { data?: { errors?: Record<string, string[]> } })
+        ?.data?.errors;
+      const msg = errors
+        ? (Object.values(errors).flat()[0] ?? 'Registration failed.')
+        : 'Registration failed.';
       dispatch(addAlert(msg, 'danger'));
     }
   };

@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {
   useGetUserSettingsQuery,
   useUpdateUserSettingsMutation
 } from '../../../store/services/userApi';
+import { addAlert } from '../../../store/slices/alertSlice';
 import Spinner from '../../layout/Spinner';
 import type { UserSettings } from '../../../types';
 
@@ -14,6 +16,7 @@ const Settings = () => {
   const [updateSettings, { isLoading: isSaving }] =
     useUpdateUserSettingsMutation();
 
+  const dispatch = useDispatch();
   const { register, handleSubmit, reset } = useForm<UserSettings>();
 
   useEffect(() => {
@@ -23,8 +26,9 @@ const Settings = () => {
   const onSubmit = async (data: UserSettings) => {
     try {
       await updateSettings(data).unwrap();
-    } catch (err) {
-      console.error(err);
+      dispatch(addAlert('Settings saved.', 'success'));
+    } catch {
+      dispatch(addAlert('Failed to save settings.', 'danger'));
     }
   };
 
