@@ -36,12 +36,9 @@ const UserMenu = ({ user }: Props) => {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await logout().unwrap();
-    } finally {
-      dispatch(api.util.resetApiState());
-      navigate('/login');
-    }
+    await logout();
+    dispatch(api.util.resetApiState());
+    navigate('/login');
   };
 
   const count = notifications?.length ?? 0;
