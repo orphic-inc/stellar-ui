@@ -119,6 +119,15 @@ export interface ReleaseContribution {
   collaborators: Artist[];
 }
 
+export interface Contribution {
+  id: number;
+  user: { id: number; username: string };
+  release: { id: number; title: string; communityId?: number };
+  collaborators: { id: number; name: string }[];
+  releaseDescription?: string;
+  createdAt?: string;
+}
+
 export interface Release {
   id: number;
   title: string;

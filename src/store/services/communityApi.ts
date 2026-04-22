@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { Community, Release, PaginatedResponse } from '../../types';
+import type { Community, Release, Contribution, PaginatedResponse } from '../../types';
 
 interface ReleaseArgs {
   communityId: number;
@@ -85,7 +85,7 @@ export const communityApi = api.injectEndpoints({
     }),
 
     // Contributions
-    getContributions: build.query<PaginatedResponse<Release>, void>({
+    getContributions: build.query<PaginatedResponse<Contribution>, void>({
       query: () => '/contributions',
       providesTags: ['Contribution']
     }),
