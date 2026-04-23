@@ -1,18 +1,46 @@
 import { api } from '../api';
 
-interface CommentParams {
-  page?: string;
-  pageId?: number;
-}
+export type CommentPage =
+  | 'communities'
+  | 'artist'
+  | 'collages'
+  | 'requests'
+  | 'release';
 
-interface CommentBody {
-  page: string;
+type CommentQueryParams = {
+  page?: CommentPage;
+  pageId?: number;
+};
+
+type CommunityCommentBody = {
+  page: 'communities';
   body: string;
-  communityId?: number;
-  contributionId?: number;
-  artistId?: number;
-  releaseId?: number;
-}
+  communityId: number;
+};
+
+type ArtistCommentBody = {
+  page: 'artist';
+  body: string;
+  artistId: number;
+};
+
+type ContributionCommentBody = {
+  page: 'collages' | 'requests';
+  body: string;
+  contributionId: number;
+};
+
+type ReleaseCommentBody = {
+  page: 'release';
+  body: string;
+  releaseId: number;
+};
+
+type CommentBody =
+  | CommunityCommentBody
+  | ArtistCommentBody
+  | ContributionCommentBody
+  | ReleaseCommentBody;
 
 export const commentApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -24,7 +52,7 @@ export const commentApi = api.injectEndpoints({
         author?: { id: number; username: string; avatar?: string };
         createdAt: string;
       }[],
-      CommentParams
+      CommentQueryParams
     >({
       query: (params) => ({ url: '/comments', params }),
       providesTags: ['Comment']

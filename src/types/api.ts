@@ -216,12 +216,14 @@ export interface paths {
       };
       responses: {
         /** @description Installation complete */
-        200: {
+        201: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['MsgResponse'];
+            'application/json': {
+              user: components['schemas']['AuthUser'];
+            };
           };
         };
         /** @description Already installed or validation error */

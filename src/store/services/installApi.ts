@@ -11,9 +11,8 @@ interface InstallArgs {
   password: string;
 }
 
-interface InstallResponse {
+export interface InstallResponse {
   user: AuthUser;
-  token: string;
 }
 
 export const installApi = api.injectEndpoints({
