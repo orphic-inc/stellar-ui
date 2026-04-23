@@ -3,67 +3,29 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {
-  useGetPermissionByIdQuery,
-  useCreatePermissionMutation,
-  useUpdatePermissionMutation
+  useGetUserRankByIdQuery,
+  useCreateUserRankMutation,
+  useUpdateUserRankMutation
 } from '../../store/services/userApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 
-const ALL_PERMISSIONS = [
-  'site_leech',
-  'site_upload',
-  'site_vote',
-  'site_submit_requests',
-  'site_advanced_search',
-  'site_top10',
-  'site_album_votes',
-  'site_collages_create',
-  'site_collages_manage',
-  'site_make_bookmarks',
-  'site_edit_wiki',
-  'site_can_invite_always',
-  'site_send_unlimited_invites',
-  'site_moderate_forums',
-  'site_admin_forums',
-  'site_forums_double_post',
-  'site_view_flow',
-  'users_edit_usernames',
-  'users_edit_ratio',
-  'users_edit_profiles',
-  'users_view_invites',
-  'users_warn',
-  'users_disable_users',
-  'users_delete_users',
-  'users_mod',
-  'communities_edit',
-  'communities_delete',
-  'communities_freeleech',
-  'admin_manage_news',
-  'admin_manage_polls',
-  'admin_manage_forums',
-  'admin_reports',
-  'admin_create_users',
-  'admin_clear_cache',
-  'admin_manage_permissions'
-] as const;
-
 const PERM_GROUPS: { title: string; perms: string[] }[] = [
   {
-    title: 'Site',
-    perms: ALL_PERMISSIONS.filter((p) => p.startsWith('site_'))
-  },
-  {
-    title: 'Users',
-    perms: ALL_PERMISSIONS.filter((p) => p.startsWith('users_'))
+    title: 'Forums',
+    perms: ['forums_read', 'forums_post', 'forums_moderate', 'forums_manage']
   },
   {
     title: 'Communities',
-    perms: ALL_PERMISSIONS.filter((p) => p.startsWith('communities_'))
+    perms: ['communities_manage']
   },
   {
-    title: 'Admin',
-    perms: ALL_PERMISSIONS.filter((p) => p.startsWith('admin_'))
+    title: 'Users',
+    perms: ['users_edit', 'users_warn', 'users_disable', 'invites_manage']
+  },
+  {
+    title: 'System',
+    perms: ['news_manage', 'staff', 'admin']
   }
 ];
 
@@ -73,19 +35,18 @@ interface FormValues {
   permissions: Record<string, boolean>;
 }
 
-const formatPerm = (perm: string) =>
-  perm.replace(/^[^_]+_/, '').replace(/_/g, ' ');
+const formatPerm = (perm: string) => perm.replace(/_/g, ' ');
 
 const PermissionFormPage = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
 
-  const { data: existing, isLoading } = useGetPermissionByIdQuery(id!, {
+  const { data: existing, isLoading } = useGetUserRankByIdQuery(id!, {
     skip: !isEditing
   });
-  const [createPermission] = useCreatePermissionMutation();
-  const [updatePermission] = useUpdatePermissionMutation();
+  const [createUserRank] = useCreateUserRankMutation();
+  const [updateUserRank] = useUpdateUserRankMutation();
   const dispatch = useDispatch();
 
   const { register, handleSubmit, reset } = useForm<FormValues>({
@@ -105,9 +66,9 @@ const PermissionFormPage = () => {
   const onSubmit = async (data: FormValues) => {
     try {
       if (isEditing && id) {
-        await updatePermission({ id: parseInt(id), ...data }).unwrap();
+        await updateUserRank({ id: parseInt(id), ...data }).unwrap();
       } else {
-        await createPermission(data).unwrap();
+        await createUserRank(data).unwrap();
       }
       navigate('/private/staff/tools/permissions');
     } catch {

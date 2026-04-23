@@ -10,7 +10,7 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithLogout: typeof baseQuery = async (args, api, extra) => {
   const result = await baseQuery(args, api, extra);
-  if (result.error?.status === 401 || result.error?.status === 403) {
+  if (result.error?.status === 401) {
     (api.dispatch as AppDispatch)(logout());
   }
   return result;
@@ -36,7 +36,7 @@ export const api = createApi({
     'Announcement',
     'Stylesheet',
     'Contribution',
-    'Permission',
+    'UserRank',
     'Stats'
   ] as const,
   endpoints: () => ({})

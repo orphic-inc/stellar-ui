@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { Artist } from '../../types';
+import type { Artist, ArtistHistory } from '../../types';
 
 export const artistApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -27,7 +27,7 @@ export const artistApi = api.injectEndpoints({
       query: (id) => ({ url: `/artists/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Artist']
     }),
-    getArtistHistory: build.query<unknown[], number>({
+    getArtistHistory: build.query<ArtistHistory[], number>({
       query: (artistId) => `/artists/history/${artistId}`
     }),
     revertArtist: build.mutation<void, number>({
@@ -42,7 +42,7 @@ export const artistApi = api.injectEndpoints({
     }),
     addSimilarArtist: build.mutation<
       void,
-      { artistId: number; similarId: number }
+      { artistId: number; similarArtistId: number }
     >({
       query: (data) => ({
         url: '/artists/similar',
@@ -51,11 +51,14 @@ export const artistApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Artist']
     }),
-    addArtistAlias: build.mutation<void, { artistId: number; alias: string }>({
+    addArtistAlias: build.mutation<
+      void,
+      { artistId: number; redirectId: number }
+    >({
       query: (data) => ({ url: '/artists/alias', method: 'POST', body: data }),
       invalidatesTags: ['Artist']
     }),
-    tagArtist: build.mutation<void, { artistId: number; tag: string }>({
+    tagArtist: build.mutation<void, { artistId: number; tagId: number }>({
       query: (data) => ({ url: '/artists/tag', method: 'POST', body: data }),
       invalidatesTags: (_, __, { artistId }) => [
         { type: 'Artist', id: artistId }

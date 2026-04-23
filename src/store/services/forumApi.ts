@@ -83,6 +83,18 @@ export const forumApi = api.injectEndpoints({
       query: (data) => ({ url: '/forums', method: 'POST', body: data }),
       invalidatesTags: ['Forum', 'ForumCategory']
     }),
+    updateForum: build.mutation<Forum, { id: number } & Partial<Forum>>({
+      query: ({ id, ...data }) => ({
+        url: `/forums/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'Forum', id }, 'Forum']
+    }),
+    deleteForum: build.mutation<void, number>({
+      query: (id) => ({ url: `/forums/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Forum', 'ForumCategory']
+    }),
 
     // Topics
     getTopicsByForum: build.query<
@@ -120,6 +132,16 @@ export const forumApi = api.injectEndpoints({
       }),
       invalidatesTags: (_, __, { topicId }) => [
         { type: 'ForumTopic', id: topicId }
+      ]
+    }),
+    deleteTopic: build.mutation<void, TopicArgs>({
+      query: ({ forumId, topicId }) => ({
+        url: `/forums/${forumId}/topics/${topicId}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_, __, { forumId }) => [
+        { type: 'Forum', id: forumId },
+        'ForumTopic'
       ]
     }),
 
@@ -164,13 +186,18 @@ export const forumApi = api.injectEndpoints({
     getPollByTopic: build.query<ForumPoll, number>({
       query: (topicId) => `/forums/polls/${topicId}`
     }),
-    votePoll: build.mutation<void, { forumPollId: number; vote: number }>({
-      query: (data) => ({
+    votePoll: build.mutation<
+      void,
+      { forumPollId: number; vote: number; topicId: number }
+    >({
+      query: ({ forumPollId, vote }) => ({
         url: '/forums/poll-votes',
         method: 'POST',
-        body: data
+        body: { forumPollId, vote }
       }),
-      invalidatesTags: ['Forum']
+      invalidatesTags: (_, __, { topicId }) => [
+        { type: 'ForumTopic', id: topicId }
+      ]
     }),
 
     // Last read
@@ -192,10 +219,13 @@ export const {
   useGetForumsQuery,
   useGetForumByIdQuery,
   useCreateForumMutation,
+  useUpdateForumMutation,
+  useDeleteForumMutation,
   useGetTopicsByForumQuery,
   useGetTopicByIdQuery,
   useCreateTopicMutation,
   useUpdateTopicMutation,
+  useDeleteTopicMutation,
   useGetPostsByTopicQuery,
   useCreatePostMutation,
   useUpdatePostMutation,

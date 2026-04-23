@@ -79,7 +79,11 @@ const ForumTopicPage = () => {
   const handleVote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedAnswer === null || !poll) return;
-    await votePoll({ forumPollId: poll.id, vote: selectedAnswer });
+    await votePoll({
+      forumPollId: poll.id,
+      vote: selectedAnswer,
+      topicId: tId
+    });
   };
 
   return (

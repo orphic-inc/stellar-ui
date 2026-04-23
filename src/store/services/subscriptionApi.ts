@@ -5,6 +5,12 @@ interface SubscribeArgs {
   action: 'subscribe' | 'unsubscribe';
 }
 
+interface SubscribeCommentsArgs {
+  page: string;
+  pageId: number;
+  action: 'subscribe' | 'unsubscribe';
+}
+
 export const subscriptionApi = api.injectEndpoints({
   endpoints: (build) => ({
     getSubscriptions: build.query<{ id: number; topicId: number }[], void>({
@@ -19,7 +25,7 @@ export const subscriptionApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Subscription']
     }),
-    subscribeComments: build.mutation<void, SubscribeArgs>({
+    subscribeComments: build.mutation<void, SubscribeCommentsArgs>({
       query: (data) => ({
         url: '/subscriptions/subscribe-comments',
         method: 'POST',

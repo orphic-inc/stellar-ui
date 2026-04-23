@@ -98,7 +98,7 @@ const UserMenu = ({ user }: Props) => {
                     className="flex items-start gap-2 px-3 py-2 hover:bg-gray-700/40 transition-colors"
                   >
                     <span className="flex-1 text-sm text-gray-200 leading-snug">
-                      {n.message}
+                      {n.quoter.username} quoted you on {n.page} #{n.pageId}
                     </span>
                     <button
                       onClick={() => deleteNotification(n.id)}

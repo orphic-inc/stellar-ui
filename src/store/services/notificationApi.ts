@@ -3,7 +3,14 @@ import { api } from '../api';
 export const notificationApi = api.injectEndpoints({
   endpoints: (build) => ({
     getNotifications: build.query<
-      { id: number; message: string; createdAt: string }[],
+      {
+        id: number;
+        page: string;
+        pageId: number;
+        postId: number;
+        quoter: { id: number; username: string; avatar?: string };
+        createdAt: string;
+      }[],
       void
     >({
       query: () => '/notifications',

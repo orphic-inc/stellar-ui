@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCreateUserMutation } from '../../store/services/userApi';
-import { useLogoutMutation } from '../../store/services/authApi';
-import { useDispatch } from 'react-redux';
-import { logout as logoutAction } from '../../store/slices/authSlice';
 
 interface FormState {
   username: string;
@@ -13,9 +10,7 @@ interface FormState {
 
 const NewUserForm = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [createUser, { isLoading }] = useCreateUserMutation();
-  const [logoutMutation] = useLogoutMutation();
   const [formData, setFormData] = useState<FormState>({
     username: '',
     email: '',
@@ -31,15 +26,7 @@ const NewUserForm = () => {
     setError('');
     try {
       await createUser(formData).unwrap();
-      // The backend auto-logs in the new user, hijacking the admin session.
-      // Immediately destroy that session and force the admin to re-authenticate.
-      await logoutMutation();
-      dispatch(logoutAction());
-      navigate('/login', {
-        state: {
-          notice: `User "${formData.username}" created. Please log back in as yourself.`
-        }
-      });
+      navigate('/private/staff/tools');
     } catch (err: unknown) {
       setError(
         (err as { data?: { msg?: string } })?.data?.msg ??
@@ -124,10 +111,6 @@ const NewUserForm = () => {
             {error}
           </div>
         )}
-
-        <p className="text-xs text-yellow-400">
-          Note: creating a user will require you to log in again.
-        </p>
 
         <button
           type="submit"

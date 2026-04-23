@@ -1,10 +1,57 @@
-import type { components } from './api';
-
 // ─── Auth / User ────────────────────────────────────────────────────────────
 
-export type UserRank = components['schemas']['AuthUser']['userRank'];
+export interface UserRank {
+  id: number;
+  level: number;
+  name: string;
+  permissions?: Record<string, boolean>;
+  color?: string;
+  badge?: string;
+  userCount?: number;
+}
 
-export type AuthUser = components['schemas']['AuthUser'];
+export interface AuthUserRank {
+  level: number;
+  name: string;
+  permissions?: Record<string, boolean>;
+  color?: string;
+  badge?: string;
+}
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  email?: string;
+  avatar?: string | null;
+  inviteCount?: number;
+  userRankId?: number;
+  userRank?: AuthUserRank;
+  dateRegistered?: string;
+  lastLogin?: string | null;
+  isArtist?: boolean;
+  isDonor?: boolean;
+  canDownload?: boolean;
+}
+
+export interface PublicUser {
+  id: number;
+  username: string;
+  avatar?: string;
+  dateRegistered?: string;
+  isArtist?: boolean;
+  isDonor?: boolean;
+  userRank?: Pick<AuthUserRank, 'name' | 'color' | 'badge'>;
+  profile?: ProfileDetails;
+  userSettings?: { siteAppearance?: string; styledTooltips?: boolean };
+}
+
+export interface ArtistHistory {
+  id: number;
+  artistId: number;
+  editorId: number;
+  body?: string;
+  createdAt: string;
+}
 
 // ─── Alert ──────────────────────────────────────────────────────────────────
 
@@ -169,16 +216,6 @@ export interface UserSettings {
   styledTooltips?: boolean;
   paranoia?: number;
   avatar?: string;
-}
-
-// ─── Permissions (UserRank admin) ────────────────────────────────────────────
-
-export interface Permission {
-  id: number;
-  name: string;
-  level: number;
-  permissions?: Record<string, boolean>;
-  userCount?: number;
 }
 
 // ─── Misc ────────────────────────────────────────────────────────────────────
