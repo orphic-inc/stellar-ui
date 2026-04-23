@@ -7,17 +7,17 @@ import {
   useMarkTopicReadMutation,
   useGetPollByTopicQuery,
   useVotePollMutation
-} from '../../../store/services/forumApi';
+} from '../../store/services/forumApi';
 import {
   useGetSubscriptionsQuery,
   useSubscribeMutation
-} from '../../../store/services/subscriptionApi';
-import { selectCurrentUser } from '../../../store/slices/authSlice';
-import Spinner from '../../layout/Spinner';
-import PostBox from '../../layout/PostBox';
+} from '../../store/services/subscriptionApi';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import Spinner from '../layout/Spinner';
+import PostBox from '../layout/PostBox';
 import ForumTopicPost from './ForumTopicPost';
-import ErrorBoundary from '../../layout/ErrorBoundary';
-import FallbackComponent from '../../layout/FallbackComponent';
+import ErrorBoundary from '../layout/ErrorBoundary';
+import FallbackComponent from '../layout/FallbackComponent';
 
 const ForumTopicPage = () => {
   const { forumId, forumTopicId } = useParams<{

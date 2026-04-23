@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useGetForumCategoriesQuery } from '../../../store/services/forumApi';
-import Spinner from '../../layout/Spinner';
+import { useGetForumCategoriesQuery } from '../../store/services/forumApi';
+import Spinner from '../layout/Spinner';
 
 const ForumCategoryPage = () => {
   const { data: categories, isLoading, error } = useGetForumCategoriesQuery();

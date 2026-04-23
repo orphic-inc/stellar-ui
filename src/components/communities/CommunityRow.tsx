@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { Community } from '../../../types';
+import type { Community } from '../../types';
 
 interface Props {
   community: Community;

@@ -3,9 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import {
   useGetForumByIdQuery,
   useGetTopicsByForumQuery
-} from '../../../store/services/forumApi';
-import Spinner from '../../layout/Spinner';
-import Time from '../../layout/Time';
+} from '../../store/services/forumApi';
+import Spinner from '../layout/Spinner';
+import Time from '../layout/Time';
 
 const ForumPage = () => {
   const { forumId } = useParams<{ forumId: string }>();

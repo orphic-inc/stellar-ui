@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { useGetContributionsQuery } from '../../../store/services/communityApi';
-import Spinner from '../../layout/Spinner';
+import { useGetContributionsQuery } from '../../store/services/communityApi';
+import Spinner from '../layout/Spinner';
 
 const ContributionsPage = () => {
   const { data, isLoading, error } = useGetContributionsQuery();

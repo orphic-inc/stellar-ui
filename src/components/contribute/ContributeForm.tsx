@@ -4,11 +4,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   useGetCommunitiesQuery,
   useCreateContributionMutation
-} from '../../../store/services/communityApi';
-import { selectCurrentUser } from '../../../store/slices/authSlice';
-import { addAlert } from '../../../store/slices/alertSlice';
-import Spinner from '../../layout/Spinner';
-import type { Collaborator } from '../../../types';
+} from '../../store/services/communityApi';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import { addAlert } from '../../store/slices/alertSlice';
+import Spinner from '../layout/Spinner';
+import type { Collaborator } from '../../types';
 
 const ARTIST_TYPES = [
   'Main artist',

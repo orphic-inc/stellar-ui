@@ -1,5 +1,5 @@
-import { useGetCommunitiesQuery } from '../../../store/services/communityApi';
-import Spinner from '../../layout/Spinner';
+import { useGetCommunitiesQuery } from '../../store/services/communityApi';
+import Spinner from '../layout/Spinner';
 import CommunitiesTable from './CommunitiesTable';
 
 const CommunitiesPage = () => {
