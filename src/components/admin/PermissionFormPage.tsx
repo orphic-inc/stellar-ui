@@ -37,7 +37,7 @@ interface FormValues {
 
 const formatPerm = (perm: string) => perm.replace(/_/g, ' ');
 
-const PermissionFormPage = () => {
+const UserRankFormPage = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -74,7 +74,7 @@ const PermissionFormPage = () => {
     } catch {
       dispatch(
         addAlert(
-          `Failed to ${isEditing ? 'update' : 'create'} permission class.`,
+          `Failed to ${isEditing ? 'update' : 'create'} user rank.`,
           'danger'
         )
       );
@@ -92,7 +92,7 @@ const PermissionFormPage = () => {
               to="/private/staff/tools/permissions"
               className="text-indigo-400 hover:text-indigo-300 transition-colors"
             >
-              ← Permissions Manager
+              ← User Ranks
             </Link>
             <span className="text-gray-600">·</span>
             <Link
@@ -103,7 +103,7 @@ const PermissionFormPage = () => {
             </Link>
           </div>
           <h2 className="text-2xl font-bold text-white">
-            {isEditing ? 'Edit' : 'New'} Permission Class
+            {isEditing ? 'Edit' : 'New'} User Rank
           </h2>
         </div>
       </div>
@@ -157,7 +157,7 @@ const PermissionFormPage = () => {
         <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
           <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-              Permissions
+              Rank Permissions
             </h3>
           </div>
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -207,4 +207,4 @@ const PermissionFormPage = () => {
   );
 };
 
-export default PermissionFormPage;
+export default UserRankFormPage;
