@@ -1,12 +1,12 @@
 import { api } from '../api';
-import type { UserSettings, Permission, AuthUser } from '../../types';
+import type { UserSettings, UserRank, AuthUser, PublicUser } from '../../types';
 
 interface CreateUserArgs {
   username: string;
   email: string;
   password: string;
 }
-interface UpdatePermissionArgs {
+interface UpdateUserRankArgs {
   id: number;
   level?: number;
   name?: string;
@@ -15,7 +15,7 @@ interface UpdatePermissionArgs {
 
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getUserById: build.query<AuthUser, number>({
+    getUserById: build.query<PublicUser, number>({
       query: (id) => `/users/${id}`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),
@@ -32,40 +32,37 @@ export const userApi = api.injectEndpoints({
       invalidatesTags: ['User']
     }),
 
-    // Permissions (UserRank)
-    getPermissions: build.query<Permission[], void>({
+    // UserRanks (UserRank)
+    getUserRanks: build.query<UserRank[], void>({
       query: () => '/tools/permissions',
-      providesTags: ['Permission']
+      providesTags: ['UserRank']
     }),
-    getPermissionById: build.query<Permission, number | string>({
+    getUserRankById: build.query<UserRank, number | string>({
       query: (id) => `/tools/permissions/${id}`,
-      providesTags: (_, __, id) => [{ type: 'Permission', id: Number(id) }]
+      providesTags: (_, __, id) => [{ type: 'UserRank', id: Number(id) }]
     }),
-    createPermission: build.mutation<
-      Permission,
-      Omit<Permission, 'id' | 'userCount'>
+    createUserRank: build.mutation<
+      UserRank,
+      Omit<UserRank, 'id' | 'userCount'>
     >({
       query: (data) => ({
         url: '/tools/permissions',
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['Permission']
+      invalidatesTags: ['UserRank']
     }),
-    updatePermission: build.mutation<Permission, UpdatePermissionArgs>({
+    updateUserRank: build.mutation<UserRank, UpdateUserRankArgs>({
       query: ({ id, ...data }) => ({
         url: `/tools/permissions/${id}`,
         method: 'PUT',
         body: data
       }),
-      invalidatesTags: (_, __, { id }) => [
-        { type: 'Permission', id },
-        'Permission'
-      ]
+      invalidatesTags: (_, __, { id }) => [{ type: 'UserRank', id }, 'UserRank']
     }),
-    deletePermission: build.mutation<void, number>({
+    deleteUserRank: build.mutation<void, number>({
       query: (id) => ({ url: `/tools/permissions/${id}`, method: 'DELETE' }),
-      invalidatesTags: ['Permission']
+      invalidatesTags: ['UserRank']
     })
   })
 });
@@ -75,9 +72,9 @@ export const {
   useGetUserSettingsQuery,
   useUpdateUserSettingsMutation,
   useCreateUserMutation,
-  useGetPermissionsQuery,
-  useGetPermissionByIdQuery,
-  useCreatePermissionMutation,
-  useUpdatePermissionMutation,
-  useDeletePermissionMutation
+  useGetUserRanksQuery,
+  useGetUserRankByIdQuery,
+  useCreateUserRankMutation,
+  useUpdateUserRankMutation,
+  useDeleteUserRankMutation
 } = userApi;

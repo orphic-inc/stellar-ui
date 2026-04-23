@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 import {
-  useGetPermissionsQuery,
-  useDeletePermissionMutation
+  useGetUserRanksQuery,
+  useDeleteUserRankMutation
 } from '../../store/services/userApi';
 import Spinner from '../layout/Spinner';
 
 const PermissionManager = () => {
-  const { data: permissions, isLoading, error } = useGetPermissionsQuery();
-  const [deletePermission] = useDeletePermissionMutation();
+  const { data: permissions, isLoading, error } = useGetUserRanksQuery();
+  const [deleteUserRank] = useDeleteUserRankMutation();
 
   const handleDelete = async (id: number) => {
     if (
       window.confirm('Are you sure you want to remove this permission class?')
     ) {
-      await deletePermission(id);
+      await deleteUserRank(id);
     }
   };
 
@@ -65,35 +65,42 @@ const PermissionManager = () => {
                   </td>
                 </tr>
               ) : (
-                permissions.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="hover:bg-gray-700/30 transition-colors"
-                  >
-                    <td className="px-4 py-3 text-gray-200 font-medium">
-                      {p.name}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">{p.level}</td>
-                    <td className="px-4 py-3 text-gray-400">
-                      {p.userCount ?? 0}
-                    </td>
-                    <td className="px-4 py-3 flex gap-2">
-                      <Link
-                        to={`/private/staff/tools/permissions/${p.id}/edit`}
-                        className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(p.id)}
-                        className="text-red-400 hover:text-red-300 transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                permissions.map(
+                  (p: {
+                    id: number;
+                    name: string;
+                    level: number;
+                    userCount?: number;
+                  }) => (
+                    <tr
+                      key={p.id}
+                      className="hover:bg-gray-700/30 transition-colors"
+                    >
+                      <td className="px-4 py-3 text-gray-200 font-medium">
+                        {p.name}
+                      </td>
+                      <td className="px-4 py-3 text-gray-400">{p.level}</td>
+                      <td className="px-4 py-3 text-gray-400">
+                        {p.userCount ?? 0}
+                      </td>
+                      <td className="px-4 py-3 flex gap-2">
+                        <Link
+                          to={`/private/staff/tools/permissions/${p.id}/edit`}
+                          className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(p.id)}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                )
               )}
             </tbody>
           </table>
