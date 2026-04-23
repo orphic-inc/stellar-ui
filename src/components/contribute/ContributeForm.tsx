@@ -20,14 +20,26 @@ const ARTIST_TYPES = [
   'Producer'
 ];
 const CONTENT_TYPES = [
-  'music',
-  'applications',
-  'ebooks',
-  'audiobooks',
-  'comedy',
-  'comics'
+  'Music',
+  'Applications',
+  'EBooks',
+  'ELearningVideos',
+  'Audiobooks',
+  'Comedy',
+  'Comics'
 ] as const;
 type ContentType = (typeof CONTENT_TYPES)[number];
+const FILE_TYPES = [
+  'txt',
+  'wav',
+  'pdf',
+  'wmv',
+  'ogg',
+  'lua',
+  'jpg',
+  'png'
+] as const;
+type FileType = (typeof FILE_TYPES)[number];
 
 const ContributeForm = () => {
   const navigate = useNavigate();
@@ -38,7 +50,10 @@ const ContributeForm = () => {
   const [createContribution, { isLoading }] = useCreateContributionMutation();
 
   const [community, setCommunity] = useState('');
-  const [type, setType] = useState<ContentType>('music');
+  const [type, setType] = useState<ContentType>('Music');
+  const [year, setYear] = useState(new Date().getFullYear().toString());
+  const [fileType, setFileType] = useState<FileType>('wav');
+  const [sizeInBytes, setSizeInBytes] = useState('');
   const [title, setTitle] = useState('');
   const [album, setAlbum] = useState('');
   const [tags, setTags] = useState('');
@@ -50,10 +65,10 @@ const ContributeForm = () => {
   ]);
 
   useEffect(() => {
-    if (type === 'music') {
+    if (type === 'Music') {
       setCollaborators([{ artist: '', importance: 'Main artist' }]);
     } else {
-      setCollaborators([]);
+      setCollaborators([{ artist: '', importance: 'Creator' }]);
     }
   }, [type]);
 
@@ -87,15 +102,17 @@ const ContributeForm = () => {
       await createContribution({
         communityId: parseInt(community),
         type,
-        title: type === 'music' ? album : title,
+        title: type === 'Music' ? album : title,
+        year: parseInt(year, 10),
+        fileType,
+        sizeInBytes: parseInt(sizeInBytes, 10),
         tags,
         image,
         description,
-        releaseDescription: type === 'music' ? releaseDescription : undefined,
-        collaborators,
-        contributors: [user.id]
+        releaseDescription: type === 'Music' ? releaseDescription : undefined,
+        collaborators
       }).unwrap();
-      navigate('/private/communities');
+      navigate('/private/contribute/list');
     } catch {
       dispatch(
         addAlert('Failed to submit contribution. Please try again.', 'danger')
@@ -141,60 +158,108 @@ const ContributeForm = () => {
                 >
                   {CONTENT_TYPES.map((t) => (
                     <option key={t} value={t}>
-                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                      {t}
                     </option>
                   ))}
                 </select>
               </td>
             </tr>
-            {type === 'music' ? (
-              <>
-                <tr>
-                  <td className="label">Artist(s)</td>
-                  <td>
-                    {collaborators.map((c, i) => (
-                      <div key={i}>
-                        <input
-                          type="text"
-                          value={c.artist}
-                          size={40}
-                          onChange={(e) =>
-                            updateCollaborator(i, 'artist', e.target.value)
-                          }
-                          placeholder="Artist name"
-                        />
-                        <select
-                          value={c.importance}
-                          onChange={(e) =>
-                            updateCollaborator(i, 'importance', e.target.value)
-                          }
-                        >
-                          {ARTIST_TYPES.map((t) => (
-                            <option key={t} value={t}>
-                              {t}
-                            </option>
-                          ))}
-                        </select>
-                        {i > 0 && (
-                          <button
-                            type="button"
-                            onClick={(e) => removeCollaborator(e, i)}
-                            className="brackets btn-link"
-                          >
-                            −
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={addCollaborator}
-                      className="brackets btn-link"
+            <tr>
+              <td className="label">Year</td>
+              <td>
+                <input
+                  type="number"
+                  min="1900"
+                  max="2100"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="label">File type</td>
+              <td>
+                <select
+                  value={fileType}
+                  onChange={(e) => setFileType(e.target.value as FileType)}
+                >
+                  {FILE_TYPES.map((value) => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td className="label">File size (bytes)</td>
+              <td>
+                <input
+                  type="number"
+                  min="1"
+                  value={sizeInBytes}
+                  onChange={(e) => setSizeInBytes(e.target.value)}
+                  required
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="label">
+                {type === 'Music' ? 'Artist(s)' : 'Creator(s)'}
+              </td>
+              <td>
+                {collaborators.map((c, i) => (
+                  <div key={i}>
+                    <input
+                      type="text"
+                      value={c.artist}
+                      size={40}
+                      onChange={(e) =>
+                        updateCollaborator(i, 'artist', e.target.value)
+                      }
+                      placeholder={
+                        type === 'Music' ? 'Artist name' : 'Creator name'
+                      }
+                      required
+                    />
+                    <select
+                      value={c.importance}
+                      onChange={(e) =>
+                        updateCollaborator(i, 'importance', e.target.value)
+                      }
                     >
-                      +
-                    </button>
-                  </td>
-                </tr>
+                      {(type === 'Music'
+                        ? ARTIST_TYPES
+                        : ['Creator', 'Contributor', 'Editor']
+                      ).map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                    {i > 0 && (
+                      <button
+                        type="button"
+                        onClick={(e) => removeCollaborator(e, i)}
+                        className="brackets btn-link"
+                      >
+                        −
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addCollaborator}
+                  className="brackets btn-link"
+                >
+                  +
+                </button>
+              </td>
+            </tr>
+            {type === 'Music' ? (
+              <>
                 <tr>
                   <td className="label">Album title</td>
                   <td>
@@ -244,7 +309,7 @@ const ContributeForm = () => {
                 />
               </td>
             </tr>
-            {type === 'music' ? (
+            {type === 'Music' ? (
               <tr>
                 <td className="label">Release description (optional)</td>
                 <td>
@@ -265,6 +330,7 @@ const ContributeForm = () => {
                     rows={8}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    required
                   />
                 </td>
               </tr>

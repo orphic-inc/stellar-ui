@@ -1,21 +1,9 @@
 import { api } from '../api';
 import type { paths } from '../../types/api';
-import type { Contribution, PaginatedResponse } from '../../types';
 
 interface ReleaseArgs {
   communityId: number;
   releaseId: number;
-}
-interface CreateContributionArgs {
-  communityId: number;
-  type: string;
-  title: string;
-  tags?: string;
-  image?: string;
-  description?: string;
-  releaseDescription?: string;
-  collaborators?: { artist: string; importance: string }[];
-  contributors?: number[];
 }
 
 type CommunitiesResponse =
@@ -26,6 +14,13 @@ type CommunityReleasesResponse =
   paths['/communities/{id}/releases']['get']['responses'][200]['content']['application/json'];
 type ReleaseResponse =
   paths['/communities/{communityId}/releases/{releaseId}']['get']['responses'][200]['content']['application/json'];
+type ContributionsResponse =
+  paths['/contributions']['get']['responses'][200]['content']['application/json'];
+type CreateContributionArgs = NonNullable<
+  paths['/contributions']['post']['requestBody']
+>['content']['application/json'];
+type CreateContributionResponse =
+  paths['/contributions']['post']['responses'][201]['content']['application/json'];
 
 export const communityApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -101,20 +96,21 @@ export const communityApi = api.injectEndpoints({
     }),
 
     // Contributions
-    getContributions: build.query<PaginatedResponse<Contribution>, void>({
+    getContributions: build.query<ContributionsResponse, void>({
       query: () => '/contributions',
       providesTags: ['Contribution']
     }),
-    createContribution: build.mutation<ReleaseResponse, CreateContributionArgs>(
-      {
-        query: (data) => ({
-          url: '/contributions',
-          method: 'POST',
-          body: data
-        }),
-        invalidatesTags: ['Contribution', 'Release']
-      }
-    )
+    createContribution: build.mutation<
+      CreateContributionResponse,
+      CreateContributionArgs
+    >({
+      query: (data) => ({
+        url: '/contributions',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['Contribution', 'Release']
+    })
   })
 });
 

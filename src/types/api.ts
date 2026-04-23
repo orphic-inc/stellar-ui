@@ -953,9 +953,7 @@ export interface paths {
           content: {
             'application/json': {
               data: components['schemas']['ForumPost'][];
-              total: number;
-              page: number;
-              limit: number;
+              meta: components['schemas']['PaginationMeta'];
             };
           };
         };
@@ -1039,9 +1037,7 @@ export interface paths {
           content: {
             'application/json': {
               data: components['schemas']['Community'][];
-              total: number;
-              page: number;
-              limit: number;
+              meta: components['schemas']['PaginationMeta'];
             };
           };
         };
@@ -1127,9 +1123,7 @@ export interface paths {
           content: {
             'application/json': {
               data: components['schemas']['Release'][];
-              total: number;
-              page: number;
-              limit: number;
+              meta: components['schemas']['PaginationMeta'];
             };
           };
         };
@@ -1184,6 +1178,118 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/contributions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated contributions */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['Contribution'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            communityId: number;
+            /** @enum {string} */
+            type:
+              | 'Music'
+              | 'Applications'
+              | 'EBooks'
+              | 'ELearningVideos'
+              | 'Audiobooks'
+              | 'Comedy'
+              | 'Comics';
+            title: string;
+            year: number;
+            /** @enum {string} */
+            fileType:
+              | 'txt'
+              | 'wav'
+              | 'pdf'
+              | 'wmv'
+              | 'ogg'
+              | 'lua'
+              | 'jpg'
+              | 'png';
+            sizeInBytes: number;
+            tags?: string;
+            image?: string | '';
+            description?: string;
+            releaseDescription?: string;
+            collaborators: {
+              artist: string;
+              importance: string;
+            }[];
+            jsonFile?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Contribution submitted and release created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Contribution'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Community not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -1498,6 +1604,12 @@ export interface components {
         [key: string]: string[];
       };
     };
+    PaginationMeta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
     LoginBody: {
       /** Format: email */
       email: string;
@@ -1666,9 +1778,7 @@ export interface components {
     };
     PaginatedForumTopics: {
       data: components['schemas']['ForumTopic'][];
-      total: number;
-      page: number;
-      limit: number;
+      meta: components['schemas']['PaginationMeta'];
     };
     CommunityStaffMember: {
       id: number;
@@ -1708,6 +1818,24 @@ export interface components {
         vanityHouse?: boolean;
       }[];
       releaseDescription?: string | null;
+    };
+    Contribution: {
+      id: number;
+      user: {
+        id: number;
+        username: string;
+      };
+      release: {
+        id: number;
+        title: string;
+        communityId?: number | null;
+      };
+      collaborators: {
+        id: number;
+        name: string;
+      }[];
+      releaseDescription?: string | null;
+      createdAt?: string;
     };
     Release: {
       id: number;
