@@ -139,13 +139,24 @@ export interface InviteNode {
   children?: InviteNode[];
 }
 
+export interface ProfileDetails {
+  id: number;
+  avatar?: string;
+  avatarMouseoverText?: string;
+  profileTitle?: string;
+  profileInfo?: string;
+}
+
 export interface Profile {
-  userId: number;
+  id: number;
   username: string;
   avatar?: string;
-  info?: string;
-  joinedAt?: string;
-  lastSeen?: string;
+  dateRegistered?: string;
+  isArtist?: boolean;
+  isDonor?: boolean;
+  userRank?: { name: string; color: string; badge?: string };
+  profile?: ProfileDetails;
+  userSettings?: { siteAppearance?: string; styledTooltips?: boolean };
   inviteTree?: InviteNode[];
 }
 
