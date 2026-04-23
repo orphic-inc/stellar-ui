@@ -1,21 +1,51 @@
 import { api } from '../api';
-import type { Artist, ArtistHistory } from '../../types';
+import type { paths } from '../../types/api';
+
+type ArtistsResponse =
+  paths['/artists']['get']['responses'][200]['content']['application/json'];
+type CreateArtistArgs = NonNullable<
+  paths['/artists']['post']['requestBody']
+>['content']['application/json'];
+type CreateArtistResponse =
+  paths['/artists']['post']['responses'][201]['content']['application/json'];
+type ArtistResponse =
+  paths['/artists/{id}']['get']['responses'][200]['content']['application/json'];
+type UpdateArtistArgs = { id: number } & NonNullable<
+  paths['/artists/{id}']['put']['requestBody']
+>['content']['application/json'];
+type UpdateArtistResponse =
+  paths['/artists/{id}']['put']['responses'][200]['content']['application/json'];
+type ArtistHistoryResponse =
+  paths['/artists/history/{artistId}']['get']['responses'][200]['content']['application/json'];
+type RevertArtistResponse =
+  paths['/artists/revert/{historyId}']['post']['responses'][200]['content']['application/json'];
+type SimilarArtistsResponse =
+  paths['/artists/{id}/similar']['get']['responses'][200]['content']['application/json'];
+type AddSimilarArtistArgs = NonNullable<
+  paths['/artists/similar']['post']['requestBody']
+>['content']['application/json'];
+type AddArtistAliasArgs = NonNullable<
+  paths['/artists/alias']['post']['requestBody']
+>['content']['application/json'];
+type TagArtistArgs = NonNullable<
+  paths['/artists/tag']['post']['requestBody']
+>['content']['application/json'];
 
 export const artistApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getArtists: build.query<Artist[], void>({
+    getArtists: build.query<ArtistsResponse, void>({
       query: () => '/artists',
       providesTags: ['Artist']
     }),
-    getArtistById: build.query<Artist, number>({
+    getArtistById: build.query<ArtistResponse, number>({
       query: (id) => `/artists/${id}`,
       providesTags: (_, __, id) => [{ type: 'Artist', id }]
     }),
-    createArtist: build.mutation<Artist, Partial<Artist>>({
+    createArtist: build.mutation<CreateArtistResponse, CreateArtistArgs>({
       query: (data) => ({ url: '/artists', method: 'POST', body: data }),
       invalidatesTags: ['Artist']
     }),
-    updateArtist: build.mutation<Artist, { id: number } & Partial<Artist>>({
+    updateArtist: build.mutation<UpdateArtistResponse, UpdateArtistArgs>({
       query: ({ id, ...data }) => ({
         url: `/artists/${id}`,
         method: 'PUT',
@@ -27,22 +57,22 @@ export const artistApi = api.injectEndpoints({
       query: (id) => ({ url: `/artists/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Artist']
     }),
-    getArtistHistory: build.query<ArtistHistory[], number>({
+    getArtistHistory: build.query<ArtistHistoryResponse, number>({
       query: (artistId) => `/artists/history/${artistId}`
     }),
-    revertArtist: build.mutation<void, number>({
+    revertArtist: build.mutation<RevertArtistResponse, number>({
       query: (historyId) => ({
         url: `/artists/revert/${historyId}`,
         method: 'POST'
       }),
       invalidatesTags: ['Artist']
     }),
-    getSimilarArtists: build.query<Artist[], number>({
+    getSimilarArtists: build.query<SimilarArtistsResponse, number>({
       query: (id) => `/artists/${id}/similar`
     }),
     addSimilarArtist: build.mutation<
-      void,
-      { artistId: number; similarArtistId: number }
+      Record<string, unknown>,
+      AddSimilarArtistArgs
     >({
       query: (data) => ({
         url: '/artists/similar',
@@ -51,14 +81,17 @@ export const artistApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Artist']
     }),
-    addArtistAlias: build.mutation<
-      void,
-      { artistId: number; redirectId: number }
-    >({
-      query: (data) => ({ url: '/artists/alias', method: 'POST', body: data }),
-      invalidatesTags: ['Artist']
-    }),
-    tagArtist: build.mutation<void, { artistId: number; tagId: number }>({
+    addArtistAlias: build.mutation<Record<string, unknown>, AddArtistAliasArgs>(
+      {
+        query: (data) => ({
+          url: '/artists/alias',
+          method: 'POST',
+          body: data
+        }),
+        invalidatesTags: ['Artist']
+      }
+    ),
+    tagArtist: build.mutation<Record<string, unknown>, TagArtistArgs>({
       query: (data) => ({ url: '/artists/tag', method: 'POST', body: data }),
       invalidatesTags: (_, __, { artistId }) => [
         { type: 'Artist', id: artistId }
