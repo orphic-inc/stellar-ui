@@ -1,7 +1,7 @@
 import { api } from '../api';
 import { setCredentials, logout as logoutAction } from '../slices/authSlice';
 import type { AuthUser } from '../../types';
-import type { components } from '../../types/api';
+import type { paths } from '../../types/api';
 
 interface LoginArgs {
   email: string;
@@ -13,14 +13,14 @@ interface RegisterArgs {
   password: string;
 }
 
-type GeneratedAuthUser = components['schemas']['AuthUser'];
-type AuthResponse = {
-  user: GeneratedAuthUser & AuthUser;
-};
+type LoginResponse =
+  paths['/auth']['post']['responses'][200]['content']['application/json'];
+type RegisterResponse =
+  paths['/auth/register']['post']['responses'][200]['content']['application/json'];
 
 export const authApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getMe: build.query<GeneratedAuthUser & AuthUser, void>({
+    getMe: build.query<AuthUser, void>({
       query: () => '/auth',
       providesTags: ['Auth'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
@@ -35,7 +35,7 @@ export const authApi = api.injectEndpoints({
         }
       }
     }),
-    login: build.mutation<AuthResponse, LoginArgs>({
+    login: build.mutation<LoginResponse, LoginArgs>({
       query: (credentials) => ({
         url: '/auth',
         method: 'POST',
@@ -54,7 +54,7 @@ export const authApi = api.injectEndpoints({
     logout: build.mutation<void, void>({
       query: () => ({ url: '/auth/logout', method: 'POST' })
     }),
-    register: build.mutation<AuthResponse, RegisterArgs>({
+    register: build.mutation<RegisterResponse, RegisterArgs>({
       query: (data) => ({ url: '/auth/register', method: 'POST', body: data }),
       invalidatesTags: ['Auth'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
