@@ -2,24 +2,9 @@ import type { components } from './api';
 
 // ─── Auth / User ────────────────────────────────────────────────────────────
 
-export interface UserRank extends NonNullable<components['schemas']['AuthUser']['userRank']> {
-  id?: number;
-  level: number;
-  permissions?: Record<string, boolean>;
-  badge?: string;
-}
+export type UserRank = components['schemas']['AuthUser']['userRank'];
 
-export interface AuthUser extends Omit<components['schemas']['AuthUser'], 'userRank'> {
-  email?: string;
-  inviteCount?: number;
-  userRankId?: number;
-  userRank?: UserRank;
-  dateRegistered?: string;
-  lastLogin?: string | null;
-  isArtist?: boolean;
-  isDonor?: boolean;
-  canDownload?: boolean;
-}
+export type AuthUser = components['schemas']['AuthUser'];
 
 // ─── Alert ──────────────────────────────────────────────────────────────────
 
