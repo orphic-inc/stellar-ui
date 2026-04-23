@@ -1,19 +1,18 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
-interface SubscribeArgs {
-  topicId: number;
-  action: 'subscribe' | 'unsubscribe';
-}
-
-interface SubscribeCommentsArgs {
-  page: string;
-  pageId: number;
-  action: 'subscribe' | 'unsubscribe';
-}
+type SubscriptionsResponse =
+  paths['/subscriptions']['get']['responses'][200]['content']['application/json'];
+type SubscribeArgs = NonNullable<
+  paths['/subscriptions/subscribe']['post']['requestBody']
+>['content']['application/json'];
+type SubscribeCommentsArgs = NonNullable<
+  paths['/subscriptions/subscribe-comments']['post']['requestBody']
+>['content']['application/json'];
 
 export const subscriptionApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getSubscriptions: build.query<{ id: number; topicId: number }[], void>({
+    getSubscriptions: build.query<SubscriptionsResponse, void>({
       query: () => '/subscriptions',
       providesTags: ['Subscription']
     }),

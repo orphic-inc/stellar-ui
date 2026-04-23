@@ -1,18 +1,12 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
+
+type NotificationsResponse =
+  paths['/notifications']['get']['responses'][200]['content']['application/json'];
 
 export const notificationApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getNotifications: build.query<
-      {
-        id: number;
-        page: string;
-        pageId: number;
-        postId: number;
-        quoter: { id: number; username: string; avatar?: string };
-        createdAt: string;
-      }[],
-      void
-    >({
+    getNotifications: build.query<NotificationsResponse, void>({
       query: () => '/notifications',
       providesTags: ['Notification']
     }),
