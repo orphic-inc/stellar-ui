@@ -1,3 +1,17 @@
 @import "tailwindcss";
 
 @plugin "@tailwindcss/forms";
+
+/* Bare inputs (no Tailwind class) inside dark-themed layouts get dark styling */
+.bg-gray-950,
+.bg-gray-900 {
+  input:not([class]),
+  textarea:not([class]),
+  select:not([class]) {
+    background-color: rgb(55 65 81);
+    color: rgb(243 244 246);
+    border-color: rgb(75 85 99);
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.75rem;
+  }
+}

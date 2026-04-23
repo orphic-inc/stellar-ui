@@ -1,15 +1,24 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useGetForumByIdQuery } from '../../../store/services/forumApi';
+import {
+  useGetForumByIdQuery,
+  useGetTopicsByForumQuery
+} from '../../../store/services/forumApi';
 import Spinner from '../../layout/Spinner';
 import Time from '../../layout/Time';
 
 const ForumPage = () => {
   const { forumId } = useParams<{ forumId: string }>();
+  const [page, setPage] = useState(1);
+  const fId = parseInt(forumId ?? '0');
   const {
     data: forum,
-    isLoading,
+    isLoading: forumLoading,
     error
-  } = useGetForumByIdQuery(parseInt(forumId!));
+  } = useGetForumByIdQuery(fId);
+  const { data: topicsPage, isLoading: topicsLoading } =
+    useGetTopicsByForumQuery({ forumId: fId, page });
+  const isLoading = forumLoading || topicsLoading;
 
   if (isLoading) return <Spinner />;
   if (error || !forum) return <div className="error">Forum not found.</div>;
@@ -46,8 +55,8 @@ const ForumPage = () => {
             </tr>
           </thead>
           <tbody>
-            {forum.topics && forum.topics.length > 0 ? (
-              forum.topics.map((topic) => (
+            {topicsPage && topicsPage.data.length > 0 ? (
+              topicsPage.data.map((topic) => (
                 <tr
                   key={topic.id}
                   className={`forum-row${topic.isSticky ? ' sticky' : ''}`}
@@ -84,6 +93,26 @@ const ForumPage = () => {
             )}
           </tbody>
         </table>
+
+        {topicsPage && topicsPage.meta.totalPages > 1 && (
+          <div className="linkbox" style={{ textAlign: 'center' }}>
+            <button
+              className="brackets btn-link"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              &laquo; Prev
+            </button>{' '}
+            Page {page} of {topicsPage.meta.totalPages}{' '}
+            <button
+              className="brackets btn-link"
+              disabled={page >= topicsPage.meta.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next &raquo;
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

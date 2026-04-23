@@ -24,8 +24,8 @@ const ForumTopicPage = () => {
     forumId: string;
     forumTopicId: string;
   }>();
-  const fId = parseInt(forumId!);
-  const tId = parseInt(forumTopicId!);
+  const fId = parseInt(forumId ?? '0');
+  const tId = parseInt(forumTopicId ?? '0');
   const currentUser = useSelector(selectCurrentUser);
 
   const { data: topic, isLoading: topicLoading } = useGetTopicByIdQuery({

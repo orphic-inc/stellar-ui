@@ -10,7 +10,7 @@ import { addAlert } from '../../../store/slices/alertSlice';
 const NewTopicForm = () => {
   const { forumId } = useParams<{ forumId: string }>();
   const navigate = useNavigate();
-  const { data: forum } = useGetForumByIdQuery(parseInt(forumId!));
+  const { data: forum } = useGetForumByIdQuery(parseInt(forumId ?? '0'));
   const [createTopic, { isLoading }] = useCreateTopicMutation();
   const dispatch = useDispatch();
 
@@ -34,7 +34,7 @@ const NewTopicForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const payload: Parameters<typeof createTopic>[0] = {
-      forumId: parseInt(forumId!),
+      forumId: parseInt(forumId ?? '0'),
       title,
       body
     };

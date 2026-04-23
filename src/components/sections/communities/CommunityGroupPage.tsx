@@ -8,8 +8,8 @@ const CommunityGroupPage = () => {
     communityId: string;
     groupId: string;
   }>();
-  const cId = parseInt(communityId!);
-  const gId = parseInt(groupId!);
+  const cId = parseInt(communityId ?? '0');
+  const gId = parseInt(groupId ?? '0');
 
   const {
     data: release,

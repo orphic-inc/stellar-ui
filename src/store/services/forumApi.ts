@@ -85,9 +85,15 @@ export const forumApi = api.injectEndpoints({
     }),
 
     // Topics
-    getTopicsByForum: build.query<PaginatedResponse<ForumTopic>, number>({
-      query: (forumId) => `/forums/${forumId}/topics`,
-      providesTags: (_, __, forumId) => [{ type: 'ForumTopic', id: forumId }]
+    getTopicsByForum: build.query<
+      PaginatedResponse<ForumTopic>,
+      { forumId: number; page?: number }
+    >({
+      query: ({ forumId, page = 1 }) =>
+        `/forums/${forumId}/topics?page=${page}`,
+      providesTags: (_, __, { forumId }) => [
+        { type: 'ForumTopic', id: forumId }
+      ]
     }),
     getTopicById: build.query<ForumTopic, TopicArgs>({
       query: ({ forumId, topicId }) => `/forums/${forumId}/topics/${topicId}`,
@@ -103,7 +109,7 @@ export const forumApi = api.injectEndpoints({
       }),
       invalidatesTags: (_, __, { forumId }) => [
         { type: 'Forum', id: forumId },
-        { type: 'ForumTopic', id: forumId }
+        'ForumTopic'
       ]
     }),
     updateTopic: build.mutation<ForumTopic, TopicArgs & Partial<ForumTopic>>({
