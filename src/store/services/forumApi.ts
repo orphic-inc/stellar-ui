@@ -1,48 +1,107 @@
 import { api } from '../api';
-import type {
-  ForumCategory,
-  Forum,
-  ForumTopic,
-  ForumPost,
-  ForumPoll,
-  PaginatedResponse
-} from '../../types';
+import type { components, paths } from '../../types/api';
 
 interface TopicArgs {
   forumId: number;
   topicId: number;
 }
+
 interface PostArgs {
   forumId: number;
   topicId: number;
-  postId?: number;
+  postId: number;
 }
-interface CreateTopicArgs {
-  forumId: number;
-  title: string;
-  body: string;
-  poll?: { question: string; answers: string[] };
-}
-interface CreatePostArgs {
-  forumId: number;
-  topicId: number;
-  body: string;
-}
-interface MarkReadArgs {
-  forumTopicId: number;
-  forumPostId: number;
-}
+
+type ForumCategory = components['schemas']['ForumCategory'];
+type Forum = components['schemas']['Forum'];
+type ForumTopic = components['schemas']['ForumTopic'];
+type ForumPost = components['schemas']['ForumPost'];
+type ForumPoll = components['schemas']['ForumPoll'];
+
+type ForumCategoriesResponse =
+  paths['/forums/categories']['get']['responses'][200]['content']['application/json'];
+type CreateForumCategoryArgs = NonNullable<
+  paths['/forums/categories']['post']['requestBody']
+>['content']['application/json'];
+type CreateForumCategoryResponse =
+  paths['/forums/categories']['post']['responses'][201]['content']['application/json'];
+type UpdateForumCategoryArgs = { id: number } & NonNullable<
+  paths['/forums/categories/{id}']['put']['requestBody']
+>['content']['application/json'];
+type UpdateForumCategoryResponse =
+  paths['/forums/categories/{id}']['put']['responses'][200]['content']['application/json'];
+
+type ForumsResponse =
+  paths['/forums']['get']['responses'][200]['content']['application/json'];
+type ForumResponse =
+  paths['/forums/{id}']['get']['responses'][200]['content']['application/json'];
+type CreateForumArgs = NonNullable<
+  paths['/forums']['post']['requestBody']
+>['content']['application/json'];
+type CreateForumResponse =
+  paths['/forums']['post']['responses'][201]['content']['application/json'];
+type UpdateForumArgs = { id: number } & NonNullable<
+  paths['/forums/{id}']['put']['requestBody']
+>['content']['application/json'];
+type UpdateForumResponse =
+  paths['/forums/{id}']['put']['responses'][200]['content']['application/json'];
+
+type TopicsByForumResponse =
+  paths['/forums/{forumId}/topics']['get']['responses'][200]['content']['application/json'];
+type CreateTopicRequest = NonNullable<
+  paths['/forums/{forumId}/topics']['post']['requestBody']
+>['content']['application/json'];
+type CreateTopicArgs = { forumId: number } & CreateTopicRequest;
+type CreateTopicResponse =
+  paths['/forums/{forumId}/topics']['post']['responses'][201]['content']['application/json'];
+type TopicResponse =
+  paths['/forums/{forumId}/topics/{topicId}']['get']['responses'][200]['content']['application/json'];
+type UpdateTopicArgs = TopicArgs &
+  NonNullable<
+    paths['/forums/{forumId}/topics/{topicId}']['put']['requestBody']
+  >['content']['application/json'];
+type UpdateTopicResponse =
+  paths['/forums/{forumId}/topics/{topicId}']['put']['responses'][200]['content']['application/json'];
+
+type PostsByTopicResponse =
+  paths['/forums/{forumId}/topics/{topicId}/posts']['get']['responses'][200]['content']['application/json'];
+type CreatePostArgs = { forumId: number; topicId: number } & NonNullable<
+  paths['/forums/{forumId}/topics/{topicId}/posts']['post']['requestBody']
+>['content']['application/json'];
+type CreatePostResponse =
+  paths['/forums/{forumId}/topics/{topicId}/posts']['post']['responses'][201]['content']['application/json'];
+type UpdatePostArgs = PostArgs &
+  NonNullable<
+    paths['/forums/{forumId}/topics/{topicId}/posts/{id}']['put']['requestBody']
+  >['content']['application/json'];
+type UpdatePostResponse =
+  paths['/forums/{forumId}/topics/{topicId}/posts/{id}']['put']['responses'][200]['content']['application/json'];
+
+type PollResponse =
+  paths['/forums/polls/{topicId}']['get']['responses'][200]['content']['application/json'];
+type VotePollArgs = NonNullable<
+  paths['/forums/poll-votes']['post']['requestBody']
+>['content']['application/json'] & { topicId: number };
+type VotePollResponse =
+  paths['/forums/poll-votes']['post']['responses'][200]['content']['application/json'];
+
+type MarkReadArgs = NonNullable<
+  paths['/forums/last-read']['post']['requestBody']
+>['content']['application/json'];
+type MarkReadResponse =
+  paths['/forums/last-read']['post']['responses'][200]['content']['application/json'];
+
+export type { CreateTopicArgs };
 
 export const forumApi = api.injectEndpoints({
   endpoints: (build) => ({
-    // Categories
-    getForumCategories: build.query<ForumCategory[], void>({
+    getForumCategories: build.query<ForumCategoriesResponse, void>({
       query: () => '/forums/categories',
       providesTags: ['ForumCategory']
     }),
     createForumCategory: build.mutation<
-      ForumCategory,
-      { name: string; sort?: number }
+      CreateForumCategoryResponse,
+      CreateForumCategoryArgs
     >({
       query: (data) => ({
         url: '/forums/categories',
@@ -52,8 +111,8 @@ export const forumApi = api.injectEndpoints({
       invalidatesTags: ['ForumCategory']
     }),
     updateForumCategory: build.mutation<
-      ForumCategory,
-      { id: number; name?: string; sort?: number }
+      UpdateForumCategoryResponse,
+      UpdateForumCategoryArgs
     >({
       query: ({ id, ...data }) => ({
         url: `/forums/categories/${id}`,
@@ -67,23 +126,19 @@ export const forumApi = api.injectEndpoints({
       invalidatesTags: ['ForumCategory']
     }),
 
-    // Forums
-    getForums: build.query<Forum[], void>({
+    getForums: build.query<ForumsResponse, void>({
       query: () => '/forums',
       providesTags: ['Forum']
     }),
-    getForumById: build.query<Forum, number>({
+    getForumById: build.query<ForumResponse, number>({
       query: (id) => `/forums/${id}`,
       providesTags: (_, __, id) => [{ type: 'Forum', id }]
     }),
-    createForum: build.mutation<
-      Forum,
-      Partial<Forum> & { forumCategoryId: number }
-    >({
+    createForum: build.mutation<CreateForumResponse, CreateForumArgs>({
       query: (data) => ({ url: '/forums', method: 'POST', body: data }),
       invalidatesTags: ['Forum', 'ForumCategory']
     }),
-    updateForum: build.mutation<Forum, { id: number } & Partial<Forum>>({
+    updateForum: build.mutation<UpdateForumResponse, UpdateForumArgs>({
       query: ({ id, ...data }) => ({
         url: `/forums/${id}`,
         method: 'PUT',
@@ -96,9 +151,8 @@ export const forumApi = api.injectEndpoints({
       invalidatesTags: ['Forum', 'ForumCategory']
     }),
 
-    // Topics
     getTopicsByForum: build.query<
-      PaginatedResponse<ForumTopic>,
+      TopicsByForumResponse,
       { forumId: number; page?: number }
     >({
       query: ({ forumId, page = 1 }) =>
@@ -107,13 +161,13 @@ export const forumApi = api.injectEndpoints({
         { type: 'ForumTopic', id: forumId }
       ]
     }),
-    getTopicById: build.query<ForumTopic, TopicArgs>({
+    getTopicById: build.query<TopicResponse, TopicArgs>({
       query: ({ forumId, topicId }) => `/forums/${forumId}/topics/${topicId}`,
       providesTags: (_, __, { topicId }) => [
         { type: 'ForumTopic', id: topicId }
       ]
     }),
-    createTopic: build.mutation<ForumTopic, CreateTopicArgs>({
+    createTopic: build.mutation<CreateTopicResponse, CreateTopicArgs>({
       query: ({ forumId, ...data }) => ({
         url: `/forums/${forumId}/topics`,
         method: 'POST',
@@ -124,7 +178,7 @@ export const forumApi = api.injectEndpoints({
         'ForumTopic'
       ]
     }),
-    updateTopic: build.mutation<ForumTopic, TopicArgs & Partial<ForumTopic>>({
+    updateTopic: build.mutation<UpdateTopicResponse, UpdateTopicArgs>({
       query: ({ forumId, topicId, ...data }) => ({
         url: `/forums/${forumId}/topics/${topicId}`,
         method: 'PUT',
@@ -145,13 +199,12 @@ export const forumApi = api.injectEndpoints({
       ]
     }),
 
-    // Posts
-    getPostsByTopic: build.query<PaginatedResponse<ForumPost>, TopicArgs>({
+    getPostsByTopic: build.query<PostsByTopicResponse, TopicArgs>({
       query: ({ forumId, topicId }) =>
         `/forums/${forumId}/topics/${topicId}/posts`,
       providesTags: (_, __, { topicId }) => [{ type: 'ForumPost', id: topicId }]
     }),
-    createPost: build.mutation<ForumPost, CreatePostArgs>({
+    createPost: build.mutation<CreatePostResponse, CreatePostArgs>({
       query: ({ forumId, topicId, ...data }) => ({
         url: `/forums/${forumId}/topics/${topicId}/posts`,
         method: 'POST',
@@ -162,7 +215,7 @@ export const forumApi = api.injectEndpoints({
         { type: 'Forum', id: forumId }
       ]
     }),
-    updatePost: build.mutation<ForumPost, PostArgs & { body: string }>({
+    updatePost: build.mutation<UpdatePostResponse, UpdatePostArgs>({
       query: ({ forumId, topicId, postId, ...data }) => ({
         url: `/forums/${forumId}/topics/${topicId}/posts/${postId}`,
         method: 'PUT',
@@ -172,7 +225,7 @@ export const forumApi = api.injectEndpoints({
         { type: 'ForumPost', id: topicId }
       ]
     }),
-    deletePost: build.mutation<void, Required<PostArgs>>({
+    deletePost: build.mutation<void, PostArgs>({
       query: ({ forumId, topicId, postId }) => ({
         url: `/forums/${forumId}/topics/${topicId}/posts/${postId}`,
         method: 'DELETE'
@@ -182,26 +235,21 @@ export const forumApi = api.injectEndpoints({
       ]
     }),
 
-    // Polls
-    getPollByTopic: build.query<ForumPoll, number>({
+    getPollByTopic: build.query<PollResponse, number>({
       query: (topicId) => `/forums/polls/${topicId}`
     }),
-    votePoll: build.mutation<
-      void,
-      { forumPollId: number; vote: number; topicId: number }
-    >({
-      query: ({ forumPollId, vote }) => ({
+    votePoll: build.mutation<VotePollResponse, VotePollArgs>({
+      query: ({ topicId: _topicId, ...data }) => ({
         url: '/forums/poll-votes',
         method: 'POST',
-        body: { forumPollId, vote }
+        body: data
       }),
       invalidatesTags: (_, __, { topicId }) => [
         { type: 'ForumTopic', id: topicId }
       ]
     }),
 
-    // Last read
-    markTopicRead: build.mutation<void, MarkReadArgs>({
+    markTopicRead: build.mutation<MarkReadResponse, MarkReadArgs>({
       query: (data) => ({
         url: '/forums/last-read',
         method: 'POST',

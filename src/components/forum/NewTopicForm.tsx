@@ -3,7 +3,8 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
   useGetForumByIdQuery,
-  useCreateTopicMutation
+  useCreateTopicMutation,
+  type CreateTopicArgs
 } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
 
@@ -33,13 +34,15 @@ const NewTopicForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload: Parameters<typeof createTopic>[0] = {
+    const payload: CreateTopicArgs = {
       forumId: parseInt(forumId ?? '0'),
       title,
       body
     };
-    if (showPoll && question) {
-      payload.poll = { question, answers: answers.filter((a) => a.trim()) };
+    const filteredAnswers = answers.filter((answer) => answer.trim());
+    if (showPoll && question && filteredAnswers.length > 0) {
+      payload.question = question;
+      payload.answers = JSON.stringify(filteredAnswers);
     }
     try {
       const topic = await createTopic(payload).unwrap();
