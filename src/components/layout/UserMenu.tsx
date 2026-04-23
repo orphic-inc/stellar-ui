@@ -5,7 +5,7 @@ import { useLogoutMutation } from '../../store/services/authApi';
 import {
   useGetNotificationsQuery,
   useDeleteNotificationMutation
-} from '../../store/services/miscApi';
+} from '../../store/services/notificationApi';
 import { api } from '../../store/api';
 import { logout as logoutAction } from '../../store/slices/authSlice';
 import type { AuthUser } from '../../types';

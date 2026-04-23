@@ -11,7 +11,7 @@ import {
 import {
   useGetSubscriptionsQuery,
   useSubscribeMutation
-} from '../../../store/services/miscApi';
+} from '../../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import Spinner from '../../layout/Spinner';
 import PostBox from '../../layout/PostBox';
