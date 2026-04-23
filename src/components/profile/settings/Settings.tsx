@@ -61,13 +61,17 @@ const Settings = () => {
               <tr>
                 <td className="label">Custom stylesheet URL</td>
                 <td>
-                  <input type="text" size={50} {...register('styleUrl')} />
+                  <input
+                    type="text"
+                    size={50}
+                    {...register('externalStylesheet')}
+                  />
                 </td>
               </tr>
               <tr>
-                <td className="label">Use OpenDyslexic font</td>
+                <td className="label">Styled tooltips</td>
                 <td>
-                  <input type="checkbox" {...register('useOpenDyslexic')} />
+                  <input type="checkbox" {...register('styledTooltips')} />
                 </td>
               </tr>
             </tbody>
@@ -75,28 +79,23 @@ const Settings = () => {
         </div>
 
         <div className="box">
-          <div className="head colhead_dark">Forum</div>
+          <div className="head colhead_dark">Privacy</div>
           <table className="layout">
             <tbody>
               <tr>
-                <td className="label">Posts per page</td>
+                <td className="label">Paranoia level</td>
                 <td>
                   <input
                     type="number"
                     size={5}
-                    min={1}
-                    max={100}
-                    {...register('postsPerPage', { valueAsNumber: true })}
+                    min={0}
+                    max={3}
+                    {...register('paranoia', { valueAsNumber: true })}
                   />
-                </td>
-              </tr>
-              <tr>
-                <td className="label">Autoload community stats</td>
-                <td>
-                  <input
-                    type="checkbox"
-                    {...register('autoloadCommunityStats')}
-                  />
+                  <span className="label">
+                    {' '}
+                    (0 = public, 3 = maximum privacy)
+                  </span>
                 </td>
               </tr>
             </tbody>

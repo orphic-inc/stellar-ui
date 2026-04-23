@@ -51,7 +51,7 @@ export const communityApi = api.injectEndpoints({
     // Releases (groups)
     getReleasesByCommunity: build.query<PaginatedResponse<Release>, number>({
       query: (communityId) => `/communities/${communityId}/groups`,
-      providesTags: (_, __, id) => [{ type: 'Release', id }]
+      providesTags: [{ type: 'Release', id: 'LIST' }]
     }),
     getReleaseById: build.query<Release, ReleaseArgs>({
       query: ({ communityId, groupId }) =>
@@ -67,9 +67,7 @@ export const communityApi = api.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: (_, __, { communityId }) => [
-        { type: 'Release', id: communityId }
-      ]
+      invalidatesTags: [{ type: 'Release', id: 'LIST' }]
     }),
     updateRelease: build.mutation<Release, ReleaseArgs & Partial<Release>>({
       query: ({ communityId, groupId, ...data }) => ({

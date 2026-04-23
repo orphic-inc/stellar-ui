@@ -19,9 +19,9 @@ const CommunityRow = ({ community }: Props) => (
         <div className="forum-description">{community.description}</div>
       )}
     </td>
-    <td className="number_column">{community.numReleases ?? 0}</td>
-    <td className="number_column">{community.numContributors ?? 0}</td>
-    <td className="number_column">{community.numConsumers ?? 0}</td>
+    <td className="number_column">{community._count?.releases ?? 0}</td>
+    <td className="number_column">{community._count?.contributors ?? 0}</td>
+    <td className="number_column">{community._count?.consumers ?? 0}</td>
   </tr>
 );
 

@@ -4,13 +4,15 @@ import type { AnnouncementsResponse, SiteStats } from '../../types';
 interface CommentParams {
   page?: string;
   type?: string;
-  id?: number;
+  pageId?: number;
 }
 interface CommentBody {
   page: string;
   type: string;
   body: string;
-  id?: number;
+  communityId?: number;
+  contributionId?: number;
+  artistId?: number;
 }
 interface SubscribeArgs {
   topicId: number;

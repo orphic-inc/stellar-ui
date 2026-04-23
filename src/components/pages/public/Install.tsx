@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { useInstallMutation } from '../../../store/services/installApi';
+import {
+  installApi,
+  useInstallMutation
+} from '../../../store/services/installApi';
 import { useAppDispatch } from '../../../store/hooks';
 import { setCredentials } from '../../../store/slices/authSlice';
 import { addAlert } from '../../../store/slices/alertSlice';
@@ -34,6 +37,11 @@ const Install = () => {
       }).unwrap();
 
       dispatch(setCredentials(user));
+      dispatch(
+        installApi.util.updateQueryData('getInstallStatus', undefined, () => ({
+          installed: true
+        }))
+      );
       dispatch(addAlert('Installation complete. Welcome, SysOp.', 'success'));
       navigate('/private');
     } catch (err: unknown) {

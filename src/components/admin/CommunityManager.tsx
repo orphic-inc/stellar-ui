@@ -203,7 +203,7 @@ const CommunityManager = () => {
                         {c.description ?? '—'}
                       </td>
                       <td className="px-4 py-2 text-gray-400 text-right">
-                        {c.numReleases ?? 0}
+                        {c._count?.releases ?? 0}
                       </td>
                       <td className="px-4 py-2 text-center">
                         <button
