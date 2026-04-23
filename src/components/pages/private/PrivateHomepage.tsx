@@ -124,7 +124,7 @@ const PrivateHomepage = () => {
               </h2>
             </div>
             <div className="px-4 py-3">
-              <StatRow label="Maximum users" value={stats?.maxUsers} />
+              <StatRow label="Total users" value={stats?.totalUsers} />
               <StatRow label="Enabled users" value={stats?.enabledUsers} />
               <StatRow label="Active today" value={stats?.activeToday} />
               <StatRow label="Active this week" value={stats?.activeThisWeek} />
@@ -135,17 +135,17 @@ const PrivateHomepage = () => {
               <StatRow label="Communities" value={stats?.communities} />
               <StatRow label="Releases" value={stats?.releases} />
               <StatRow label="Artists" value={stats?.artists} />
-              <StatRow label="Seeders" value={stats?.seeders} />
-              <StatRow label="Leechers" value={stats?.leechers} />
               <StatRow
-                label="S/L Ratio"
-                value={
-                  stats?.seeders && stats?.leechers
-                    ? (stats.seeders / Math.max(stats.leechers, 1)).toFixed(2)
-                    : undefined
-                }
+                label="Contributed links"
+                value={stats?.contributedLinks}
               />
-              <StatRow label="Peers" value={stats?.peers} />
+              <StatRow
+                label="Link downloads"
+                value={stats?.contributedLinkDownloads}
+              />
+              <StatRow label="Announcements" value={stats?.announcements} />
+              <StatRow label="Blog posts" value={stats?.blogPosts} />
+              <StatRow label="Comments" value={stats?.comments} />
             </div>
           </div>
 
