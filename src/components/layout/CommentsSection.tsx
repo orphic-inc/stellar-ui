@@ -2,14 +2,13 @@ import { useState } from 'react';
 import DOMPurify from 'dompurify';
 import { useSelector } from 'react-redux';
 import {
+  type CommentPage,
   useGetCommentsQuery,
   useCreateCommentMutation,
   useDeleteCommentMutation
-} from '../../store/services/miscApi';
+} from '../../store/services/commentApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Time from './Time';
-
-type CommentPage = 'artist' | 'collages' | 'requests' | 'communities';
 
 interface Props {
   page: CommentPage;
@@ -18,10 +17,7 @@ interface Props {
 
 const CommentsSection = ({ page, pageId }: Props) => {
   const currentUser = useSelector(selectCurrentUser);
-  const { data: comments, isLoading } = useGetCommentsQuery({
-    page,
-    pageId
-  });
+  const { data: comments, isLoading } = useGetCommentsQuery({ page, pageId });
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
 
@@ -30,20 +26,15 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    let targetKey:
-      | { communityId: number }
-      | { artistId: number }
-      | { contributionId: number };
-
     if (page === 'communities') {
-      targetKey = { communityId: pageId };
+      await createComment({ page, body, communityId: pageId });
     } else if (page === 'artist') {
-      targetKey = { artistId: pageId };
+      await createComment({ page, body, artistId: pageId });
+    } else if (page === 'release') {
+      await createComment({ page, body, releaseId: pageId });
     } else {
-      targetKey = { contributionId: pageId };
+      await createComment({ page, body, contributionId: pageId });
     }
-
-    await createComment({ page, body, ...targetKey });
     setBody('');
   };
 

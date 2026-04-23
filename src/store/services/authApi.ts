@@ -1,18 +1,11 @@
 import { api } from '../api';
 import { setCredentials, logout as logoutAction } from '../slices/authSlice';
-import type { AuthUser } from '../../types';
-import type { paths } from '../../types/api';
+import type { components, paths } from '../../types/api';
 
-interface LoginArgs {
-  email: string;
-  password: string;
-}
-interface RegisterArgs {
-  username: string;
-  email: string;
-  password: string;
-}
-
+type LoginArgs = components['schemas']['LoginBody'];
+type RegisterArgs = components['schemas']['RegisterBody'];
+type CurrentUserResponse =
+  paths['/auth']['get']['responses'][200]['content']['application/json'];
 type LoginResponse =
   paths['/auth']['post']['responses'][200]['content']['application/json'];
 type RegisterResponse =
@@ -20,7 +13,7 @@ type RegisterResponse =
 
 export const authApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getMe: build.query<AuthUser, void>({
+    getMe: build.query<CurrentUserResponse, void>({
       query: () => '/auth',
       providesTags: ['Auth'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
@@ -56,15 +49,7 @@ export const authApi = api.injectEndpoints({
     }),
     register: build.mutation<RegisterResponse, RegisterArgs>({
       query: (data) => ({ url: '/auth/register', method: 'POST', body: data }),
-      invalidatesTags: ['Auth'],
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setCredentials(data.user));
-        } catch {
-          // register component handles the error display
-        }
-      }
+      invalidatesTags: ['Auth']
     })
   })
 });
