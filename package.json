@@ -5,6 +5,10 @@
   "author": "ayan4m1 <andrew@bulletlogic.com>",
   "license": "MIT",
   "scripts": {
+    "api:generate": "npm --prefix ../stellar-api run openapi:export && openapi-typescript ../stellar-api/openapi.json -o src/types/api.ts",
+    "prebuild": "npm run api:generate",
+    "prestart": "npm run api:generate",
+    "pretypecheck": "npm run api:generate",
     "build": "cross-env NODE_ENV=production webpack",
     "start": "cross-env NODE_ENV=development webpack serve",
     "typecheck": "tsc --noEmit"
@@ -64,6 +68,7 @@
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
     "mini-css-extract-plugin": "^2.7.6",
+    "openapi-typescript": "^7.13.0",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^7.3.3",
     "postcss-scss": "^4.0.6",
