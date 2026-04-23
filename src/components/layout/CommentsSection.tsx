@@ -30,12 +30,18 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    const targetKey =
-      page === 'communities'
-        ? { communityId: pageId }
-        : page === 'artist'
-        ? { artistId: pageId }
-        : { contributionId: pageId };
+    let targetKey:
+      | { communityId: number }
+      | { artistId: number }
+      | { contributionId: number };
+
+    if (page === 'communities') {
+      targetKey = { communityId: pageId };
+    } else if (page === 'artist') {
+      targetKey = { artistId: pageId };
+    } else {
+      targetKey = { contributionId: pageId };
+    }
 
     await createComment({ page, body, ...targetKey });
     setBody('');
