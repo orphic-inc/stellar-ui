@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { useSelector } from 'react-redux';
 import {
   useGetCommentsQuery,
@@ -17,7 +18,7 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const currentUser = useSelector(selectCurrentUser);
   const { data: comments, isLoading } = useGetCommentsQuery({
     page,
-    id: pageId
+    pageId
   });
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
@@ -27,7 +28,7 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    await createComment({ page, type: page, body, id: pageId });
+    await createComment({ page, type: page, body, communityId: pageId });
     setBody('');
   };
 
@@ -53,7 +54,11 @@ const CommentsSection = ({ page, pageId }: Props) => {
                     <Time date={c.createdAt} />
                   </span>
                 </td>
-                <td dangerouslySetInnerHTML={{ __html: c.body }} />
+                <td
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(c.body)
+                  }}
+                />
                 <td
                   style={{
                     width: 40,

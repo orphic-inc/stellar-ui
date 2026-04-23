@@ -9,7 +9,7 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithLogout: typeof baseQuery = async (args, api, extra) => {
   const result = await baseQuery(args, api, extra);
-  if (result.error?.status === 401) {
+  if (result.error?.status === 401 || result.error?.status === 403) {
     (api.dispatch as AppDispatch)(logout());
   }
   return result;
