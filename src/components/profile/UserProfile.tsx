@@ -14,25 +14,20 @@ const UserProfile = () => {
   if (isLoading) return <Spinner />;
   if (error || !profile) return <div className="error">User not found.</div>;
 
-  const isOwnProfile = currentUser?.id === profile.userId;
+  const isOwnProfile = currentUser?.id === profile.id;
 
   return (
     <div className="thin">
       <div className="header">
         <h2>
           <strong>
-            <Link to={`/private/user/${profile.userId}`}>
-              {profile.username}
-            </Link>
+            <Link to={`/private/user/${profile.id}`}>{profile.username}</Link>
           </strong>
         </h2>
       </div>
       <div className="linkbox">
         {isOwnProfile && (
-          <Link
-            to={`/private/user/edit/${profile.userId}`}
-            className="brackets"
-          >
+          <Link to={`/private/user/edit/${profile.id}`} className="brackets">
             Settings
           </Link>
         )}
@@ -47,7 +42,11 @@ const UserProfile = () => {
                 width={150}
                 alt={`${profile.username}'s avatar`}
                 className="avatar_0"
-                src={profile.avatar ?? '/static/common/avatars/default.png'}
+                src={
+                  profile.profile?.avatar ??
+                  profile.avatar ??
+                  '/static/common/avatars/default.png'
+                }
               />
             </div>
           </div>
@@ -56,19 +55,19 @@ const UserProfile = () => {
         <div className="box box_info">
           <div className="head colhead_dark">Stats</div>
           <ul className="stats nobullet">
-            {profile.joinedAt && (
+            {profile.dateRegistered && (
               <li>
                 Joined:{' '}
                 <span>
-                  <Time date={profile.joinedAt} />
+                  <Time date={profile.dateRegistered} />
                 </span>
               </li>
             )}
-            {profile.lastSeen && (
+            {profile.userRank && (
               <li>
-                Last seen:{' '}
-                <span>
-                  <Time date={profile.lastSeen} />
+                Class:{' '}
+                <span style={{ color: profile.userRank.color }}>
+                  {profile.userRank.name}
                 </span>
               </li>
             )}
@@ -76,14 +75,14 @@ const UserProfile = () => {
         </div>
       </div>
 
-      {profile.info && (
+      {profile.profile?.profileInfo && (
         <div className="main_column">
           <div className="box">
             <div className="head colhead_dark">Profile</div>
             <div
               className="pad"
               dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(profile.info)
+                __html: DOMPurify.sanitize(profile.profile.profileInfo)
               }}
             />
           </div>

@@ -11,9 +11,25 @@ import PrivateContent from './pages/private/layout/PrivateContent';
 import { useGetInstallStatusQuery } from '../store/services/installApi';
 
 const App = () => {
-  const { data: installStatus, isLoading } = useGetInstallStatusQuery();
+  const {
+    data: installStatus,
+    isLoading,
+    isError
+  } = useGetInstallStatusQuery();
 
-  if (isLoading) return null;
+  if (isLoading)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-gray-400">
+        Loading…
+      </div>
+    );
+
+  if (isError)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-red-400">
+        Could not reach server. Please try again later.
+      </div>
+    );
 
   // Redirect everything to /install until setup is complete
   if (installStatus && !installStatus.installed) {

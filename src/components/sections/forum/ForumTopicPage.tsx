@@ -58,15 +58,16 @@ const ForumTopicPage = () => {
   if (topicLoading || postsLoading) return <Spinner />;
   if (!topic) return <div className="error">Topic not found.</div>;
 
-  const answers: string[] = poll
-    ? (() => {
-        try {
-          return JSON.parse(poll.answers);
-        } catch {
-          return [];
-        }
-      })()
-    : [];
+  let answers: string[] = [];
+  let pollParseError = false;
+  if (poll) {
+    try {
+      answers = JSON.parse(poll.answers);
+    } catch {
+      pollParseError = true;
+      console.error('Failed to parse poll answers:', poll.answers);
+    }
+  }
 
   const myVote = poll?.votes.find((v) => v.userId === currentUser?.id);
   const totalVotes = poll?.votes.length ?? 0;
@@ -122,7 +123,11 @@ const ForumTopicPage = () => {
         </div>
       </div>
 
-      {poll && answers.length > 0 && (
+      {poll && pollParseError && (
+        <div className="box pad error">Poll data is unavailable.</div>
+      )}
+
+      {poll && !pollParseError && answers.length > 0 && (
         <div className="box pad">
           <strong>{poll.question}</strong>
           {myVote !== undefined || poll.closed ? (
