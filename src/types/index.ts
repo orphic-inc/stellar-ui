@@ -93,9 +93,7 @@ export interface Community {
   description?: string;
   type?: CommunityType;
   registrationStatus?: RegistrationStatus;
-  numReleases?: number;
-  numContributors?: number;
-  numConsumers?: number;
+  _count?: { releases: number; contributors: number; consumers: number };
 }
 
 export interface ReleaseContribution {
@@ -154,11 +152,12 @@ export interface Profile {
 // ─── Settings ────────────────────────────────────────────────────────────────
 
 export interface UserSettings {
+  id?: number;
+  siteAppearance?: string;
+  externalStylesheet?: string;
+  styledTooltips?: boolean;
+  paranoia?: number;
   avatar?: string;
-  styleUrl?: string;
-  useOpenDyslexic?: boolean;
-  postsPerPage?: number;
-  autoloadCommunityStats?: boolean;
 }
 
 // ─── Permissions (UserRank admin) ────────────────────────────────────────────

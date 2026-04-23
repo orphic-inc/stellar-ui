@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { useSelector } from 'react-redux';
 import {
   useGetCommentsQuery,
@@ -62,7 +63,11 @@ const CommentsSection = ({ page, pageId }: Props) => {
                     <Time date={c.createdAt} />
                   </span>
                 </td>
-                <td dangerouslySetInnerHTML={{ __html: c.body }} />
+                <td
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(c.body)
+                  }}
+                />
                 <td
                   style={{
                     width: 40,

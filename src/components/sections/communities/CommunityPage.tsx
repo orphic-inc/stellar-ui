@@ -7,7 +7,7 @@ import Spinner from '../../layout/Spinner';
 
 const CommunityPage = () => {
   const { communityId } = useParams<{ communityId: string }>();
-  const id = parseInt(communityId!);
+  const id = parseInt(communityId ?? '0');
 
   const {
     data: community,
