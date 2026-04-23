@@ -1,7 +1,9 @@
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { useGetAnnouncementsQuery } from '../../../store/services/announcementApi';
+import { useGetHomepageFeaturedQuery } from '../../../store/services/homeApi';
 import { useGetSiteStatsQuery } from '../../../store/services/miscApi';
+import { Link } from 'react-router-dom';
 import Time from '../../layout/Time';
 import Spinner from '../../layout/Spinner';
 
@@ -22,10 +24,16 @@ const PrivateHomepage = () => {
   const user = useSelector(selectCurrentUser);
   const { data: announcements, isLoading } = useGetAnnouncementsQuery();
   const { data: stats } = useGetSiteStatsQuery();
+  const { data: featured } = useGetHomepageFeaturedQuery();
 
   const blogPosts = announcements?.data?.blogPosts ?? [];
-  const aotm = blogPosts[0];
-  const vh = blogPosts[1];
+  const aotm = featured?.albumOfTheMonth;
+  const vanityHouse = featured?.vanityHouse;
+
+  const releaseLink = (communityId?: number | null, releaseId?: number) =>
+    communityId && releaseId
+      ? `/private/communities/${communityId}/groups/${releaseId}`
+      : undefined;
 
   return (
     <div className="space-y-6">
@@ -147,19 +155,39 @@ const PrivateHomepage = () => {
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
                 Album of the Month
               </h2>
-              {aotm && (
-                <span className="text-xs text-indigo-400 cursor-pointer hover:text-indigo-300">
-                  Discuss
-                </span>
-              )}
+              {aotm &&
+                releaseLink(aotm.release.communityId, aotm.release.id) && (
+                  <Link
+                    to={releaseLink(aotm.release.communityId, aotm.release.id)!}
+                    className="text-xs text-indigo-400 hover:text-indigo-300"
+                  >
+                    View release
+                  </Link>
+                )}
             </div>
             <div className="p-3">
               {aotm ? (
                 <div className="flex gap-3 items-center">
-                  <div className="w-12 h-12 bg-gray-700 rounded shrink-0 flex items-center justify-center text-gray-600 text-xs">
-                    ♪
+                  <div className="w-12 h-12 bg-gray-700 rounded shrink-0 overflow-hidden flex items-center justify-center text-gray-600 text-xs">
+                    {aotm.release.image ? (
+                      <img
+                        src={aotm.release.image}
+                        alt={aotm.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      '♪'
+                    )}
                   </div>
-                  <span className="text-sm text-gray-300">{aotm.title}</span>
+                  <div className="min-w-0">
+                    <div className="text-sm text-gray-200 font-medium truncate">
+                      {aotm.title}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {aotm.release.artist?.name ?? 'Unknown artist'}
+                      {aotm.release.year ? ` • ${aotm.release.year}` : ''}
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <p className="text-xs text-gray-600 italic">Not set.</p>
@@ -173,19 +201,39 @@ const PrivateHomepage = () => {
               <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-300">
                 Vanity House
               </h2>
-              {vh && (
-                <span className="text-xs text-indigo-400 cursor-pointer hover:text-indigo-300">
-                  Discuss
-                </span>
-              )}
+              {vanityHouse &&
+                releaseLink(vanityHouse.communityId, vanityHouse.id) && (
+                  <Link
+                    to={releaseLink(vanityHouse.communityId, vanityHouse.id)!}
+                    className="text-xs text-indigo-400 hover:text-indigo-300"
+                  >
+                    View release
+                  </Link>
+                )}
             </div>
             <div className="p-3">
-              {vh ? (
+              {vanityHouse ? (
                 <div className="flex gap-3 items-center">
-                  <div className="w-12 h-12 bg-gray-700 rounded shrink-0 flex items-center justify-center text-gray-600 text-xs">
-                    ♪
+                  <div className="w-12 h-12 bg-gray-700 rounded shrink-0 overflow-hidden flex items-center justify-center text-gray-600 text-xs">
+                    {vanityHouse.image ? (
+                      <img
+                        src={vanityHouse.image}
+                        alt={vanityHouse.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      '♪'
+                    )}
                   </div>
-                  <span className="text-sm text-gray-300">{vh.title}</span>
+                  <div className="min-w-0">
+                    <div className="text-sm text-gray-200 font-medium truncate">
+                      {vanityHouse.artist?.name ?? 'Unknown artist'}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {vanityHouse.title}
+                      {vanityHouse.year ? ` • ${vanityHouse.year}` : ''}
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <p className="text-xs text-gray-600 italic">Not set.</p>
