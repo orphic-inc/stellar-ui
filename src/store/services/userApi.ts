@@ -48,11 +48,11 @@ export const userApi = api.injectEndpoints({
 
     // UserRanks (UserRank)
     getUserRanks: build.query<UserRank[], void>({
-      query: () => '/tools/permissions',
+      query: () => '/tools/user-ranks',
       providesTags: ['UserRank']
     }),
     getUserRankById: build.query<UserRank, number | string>({
-      query: (id) => `/tools/permissions/${id}`,
+      query: (id) => `/tools/user-ranks/${id}`,
       providesTags: (_, __, id) => [{ type: 'UserRank', id: Number(id) }]
     }),
     createUserRank: build.mutation<
@@ -60,7 +60,7 @@ export const userApi = api.injectEndpoints({
       Omit<UserRank, 'id' | 'userCount'>
     >({
       query: (data) => ({
-        url: '/tools/permissions',
+        url: '/tools/user-ranks',
         method: 'POST',
         body: data
       }),
@@ -68,14 +68,14 @@ export const userApi = api.injectEndpoints({
     }),
     updateUserRank: build.mutation<UserRank, UpdateUserRankArgs>({
       query: ({ id, ...data }) => ({
-        url: `/tools/permissions/${id}`,
+        url: `/tools/user-ranks/${id}`,
         method: 'PUT',
         body: data
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'UserRank', id }, 'UserRank']
     }),
     deleteUserRank: build.mutation<void, number>({
-      query: (id) => ({ url: `/tools/permissions/${id}`, method: 'DELETE' }),
+      query: (id) => ({ url: `/tools/user-ranks/${id}`, method: 'DELETE' }),
       invalidatesTags: ['UserRank']
     })
   })

@@ -21,7 +21,7 @@ const UserRankManager = () => {
         <h2 className="text-2xl font-bold text-white">User Ranks</h2>
         <div className="flex gap-3 text-sm">
           <Link
-            to="/private/staff/tools/permissions/new"
+            to="/private/staff/tools/user-ranks/new"
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors"
           >
             + New User Rank
@@ -83,7 +83,7 @@ const UserRankManager = () => {
                       </td>
                       <td className="px-4 py-3 flex gap-2">
                         <Link
-                          to={`/private/staff/tools/permissions/${rank.id}/edit`}
+                          to={`/private/staff/tools/user-ranks/${rank.id}/edit`}
                           className="text-indigo-400 hover:text-indigo-300 transition-colors"
                         >
                           Edit
