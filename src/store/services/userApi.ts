@@ -1,6 +1,5 @@
 import { api } from '../api';
-import type { UserRank } from '../../types';
-import type { paths } from '../../types/api';
+import type { components, paths } from '../../types/api';
 
 interface UpdateUserRankArgs {
   id: number;
@@ -23,6 +22,11 @@ type CreateUserArgs = NonNullable<
 >['content']['application/json'];
 type CreateUserResponse =
   paths['/users']['post']['responses'][201]['content']['application/json'];
+type UserRank = components['schemas']['UserRank'];
+type UserRanksResponse =
+  paths['/tools/user-ranks']['get']['responses'][200]['content']['application/json'];
+type UserRankResponse =
+  paths['/tools/user-ranks/{id}']['get']['responses'][200]['content']['application/json'];
 
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -47,11 +51,11 @@ export const userApi = api.injectEndpoints({
     }),
 
     // UserRanks (UserRank)
-    getUserRanks: build.query<UserRank[], void>({
+    getUserRanks: build.query<UserRanksResponse, void>({
       query: () => '/tools/user-ranks',
       providesTags: ['UserRank']
     }),
-    getUserRankById: build.query<UserRank, number | string>({
+    getUserRankById: build.query<UserRankResponse, number | string>({
       query: (id) => `/tools/user-ranks/${id}`,
       providesTags: (_, __, id) => [{ type: 'UserRank', id: Number(id) }]
     }),
