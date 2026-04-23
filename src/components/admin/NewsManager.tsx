@@ -6,7 +6,7 @@ import {
   useDeleteAnnouncementMutation,
   useCreateBlogPostMutation,
   useDeleteBlogPostMutation
-} from '../../store/services/miscApi';
+} from '../../store/services/announcementApi';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 
