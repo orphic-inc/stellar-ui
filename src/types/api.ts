@@ -4,14 +4,42 @@
  */
 
 export interface paths {
-  '/auth/login': {
+  '/auth': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Current user */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AuthUser'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     put?: never;
     post: {
       parameters: {
@@ -33,7 +61,6 @@ export interface paths {
           };
           content: {
             'application/json': {
-              token: string;
               user: components['schemas']['AuthUser'];
             };
           };
@@ -84,7 +111,6 @@ export interface paths {
           };
           content: {
             'application/json': {
-              token: string;
               user: components['schemas']['AuthUser'];
             };
           };
@@ -135,50 +161,6 @@ export interface paths {
         };
       };
     };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/auth/me': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Current user */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['AuthUser'];
-          };
-        };
-        /** @description Not authenticated */
-        401: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -984,10 +966,23 @@ export interface components {
     AuthUser: {
       id: number;
       username: string;
+      /** Format: email */
+      email?: string;
       avatar: string | null;
+      inviteCount?: number;
+      dateRegistered?: string;
+      lastLogin?: string | null;
+      isArtist?: boolean;
+      isDonor?: boolean;
+      canDownload?: boolean;
       userRank: {
+        level: number;
         name: string;
         color: string;
+        badge?: string;
+        permissions?: {
+          [key: string]: boolean;
+        };
       };
     };
     PublicUser: {

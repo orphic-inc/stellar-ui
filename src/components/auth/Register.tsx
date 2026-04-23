@@ -37,8 +37,8 @@ const Register = () => {
         email: form.email,
         password: form.password
       }).unwrap();
-      dispatch(addAlert('Account created! You can now log in.', 'success'));
-      navigate('/login');
+      dispatch(addAlert('Account created.', 'success'));
+      navigate('/private');
     } catch (err: unknown) {
       const errors = (err as { data?: { errors?: Record<string, string[]> } })
         ?.data?.errors;

@@ -9,8 +9,10 @@ import {
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Time from './Time';
 
+type CommentPage = 'artist' | 'collages' | 'requests' | 'communities';
+
 interface Props {
-  page: string;
+  page: CommentPage;
   pageId: number;
 }
 
@@ -28,7 +30,20 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    await createComment({ page, type: page, body, communityId: pageId });
+    let targetKey:
+      | { communityId: number }
+      | { artistId: number }
+      | { contributionId: number };
+
+    if (page === 'communities') {
+      targetKey = { communityId: pageId };
+    } else if (page === 'artist') {
+      targetKey = { artistId: pageId };
+    } else {
+      targetKey = { contributionId: pageId };
+    }
+
+    await createComment({ page, body, ...targetKey });
     setBody('');
   };
 

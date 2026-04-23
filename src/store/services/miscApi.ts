@@ -1,14 +1,14 @@
 import { api } from '../api';
 import type { AnnouncementsResponse, SiteStats } from '../../types';
 
+type CommentPage = 'artist' | 'collages' | 'requests' | 'communities';
+
 interface CommentParams {
-  page?: string;
-  type?: string;
+  page?: CommentPage;
   pageId?: number;
 }
 interface CommentBody {
-  page: string;
-  type: string;
+  page: CommentPage;
   body: string;
   communityId?: number;
   contributionId?: number;
