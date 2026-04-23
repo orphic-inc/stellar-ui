@@ -1,5 +1,8 @@
 import { api } from '../api';
-import type { AnnouncementsResponse } from '../../types';
+import type { paths } from '../../types/api';
+
+type AnnouncementsResponse =
+  paths['/announcements']['get']['responses'][200]['content']['application/json'];
 
 export const announcementApi = api.injectEndpoints({
   endpoints: (build) => ({
