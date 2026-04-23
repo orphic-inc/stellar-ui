@@ -1,9 +1,12 @@
 import { api } from '../api';
-import type { HomepageFeaturedContent } from '../../types';
+import type { paths } from '../../types/api';
+
+type HomepageFeaturedResponse =
+  paths['/home/featured']['get']['responses'][200]['content']['application/json'];
 
 export const homeApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getHomepageFeatured: build.query<HomepageFeaturedContent, void>({
+    getHomepageFeatured: build.query<HomepageFeaturedResponse, void>({
       query: () => '/home/featured'
     })
   })

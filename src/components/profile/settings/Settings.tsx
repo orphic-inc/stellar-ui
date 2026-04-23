@@ -8,7 +8,20 @@ import {
 } from '../../../store/services/userApi';
 import { addAlert } from '../../../store/slices/alertSlice';
 import Spinner from '../../layout/Spinner';
-import type { UserSettings } from '../../../types';
+import type { paths } from '../../../types/api';
+
+type UserSettingsForm = NonNullable<
+  paths['/users/settings']['put']['requestBody']
+>['content']['application/json'];
+type UserSettingsResponse =
+  paths['/users/settings']['get']['responses'][200]['content']['application/json'];
+
+const toSettingsForm = (settings: UserSettingsResponse): UserSettingsForm => ({
+  siteAppearance: settings.siteAppearance,
+  externalStylesheet: settings.externalStylesheet ?? '',
+  styledTooltips: settings.styledTooltips,
+  paranoia: settings.paranoia
+});
 
 const Settings = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,13 +30,13 @@ const Settings = () => {
     useUpdateUserSettingsMutation();
 
   const dispatch = useDispatch();
-  const { register, handleSubmit, reset } = useForm<UserSettings>();
+  const { register, handleSubmit, reset } = useForm<UserSettingsForm>();
 
   useEffect(() => {
-    if (settings) reset(settings);
+    if (settings) reset(toSettingsForm(settings));
   }, [settings, reset]);
 
-  const onSubmit = async (data: UserSettings) => {
+  const onSubmit = async (data: UserSettingsForm) => {
     try {
       await updateSettings(data).unwrap();
       dispatch(addAlert('Settings saved.', 'success'));

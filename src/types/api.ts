@@ -289,6 +289,423 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/users/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Current user settings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserSettings'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            siteAppearance?: string;
+            externalStylesheet?: string | '';
+            styledTooltips?: boolean;
+            paranoia?: number;
+            avatar?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated current user settings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserSettings'] & {
+              avatar?: string;
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            username: string;
+            /** Format: email */
+            email: string;
+            password: string;
+            userRankId?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Created user */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AdminCreatedUser'];
+          };
+        };
+        /** @description Validation error or duplicate user */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Current user profile */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MyProfile'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Profile not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            avatar?: string | '';
+            avatarMouseoverText?: string;
+            profileTitle?: string;
+            profileInfo?: string;
+            siteAppearance?: string;
+            externalStylesheet?: string | '';
+            styledTooltips?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated current user profile */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MyProfile'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Profile not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/user/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Public profile */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PublicProfile'];
+          };
+        };
+        /** @description Profile not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/referral/create-invite': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            /** Format: email */
+            email: string;
+            reason?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Invite created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+              inviteKey: string;
+            };
+          };
+        };
+        /** @description No invites remaining */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invite already exists */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/home/featured': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Homepage featured content */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              albumOfTheMonth: components['schemas']['HomepageFeaturedAlbum'] &
+                unknown;
+              vanityHouse: components['schemas']['HomepageFeaturedRelease'] &
+                unknown;
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/announcements': {
     parameters: {
       query?: never;
@@ -998,6 +1415,95 @@ export interface components {
         name: string;
         color: string;
       };
+      profile: {
+        id: number;
+        avatar?: string | null;
+        avatarMouseoverText?: string | null;
+        profileTitle?: string | null;
+        profileInfo?: string | null;
+      };
+    };
+    ProfileDetails: {
+      id: number;
+      avatar?: string | null;
+      avatarMouseoverText?: string | null;
+      profileTitle?: string | null;
+      profileInfo?: string | null;
+    };
+    UserRankSummary: {
+      name: string;
+      color: string;
+      badge?: string;
+    };
+    UserSettings: {
+      id: number;
+      siteAppearance: string;
+      externalStylesheet?: string | null;
+      styledTooltips: boolean;
+      paranoia: number;
+    };
+    InviteNode: {
+      id: number;
+      username: string;
+      /** Format: email */
+      email: string;
+      joinedAt: string;
+      lastSeen?: string | null;
+      uploaded?: string;
+      downloaded?: string;
+      ratio?: string;
+      children?: components['schemas']['InviteNode'][];
+    };
+    PublicProfile: {
+      id: number;
+      username: string;
+      avatar: string | null;
+      dateRegistered: string;
+      isArtist: boolean;
+      isDonor: boolean;
+      userRank: components['schemas']['UserRankSummary'];
+      profile: components['schemas']['ProfileDetails'];
+      userSettings: {
+        siteAppearance?: string;
+        styledTooltips?: boolean;
+      };
+    };
+    MyProfile: {
+      id: number;
+      username: string;
+      avatar: string | null;
+      profile: components['schemas']['ProfileDetails'];
+      userSettings: components['schemas']['UserSettings'];
+      userRank: {
+        name: string;
+        color: string;
+      };
+      inviteTree: components['schemas']['InviteNode'][];
+    };
+    AdminCreatedUser: {
+      id: number;
+      username: string;
+      /** Format: email */
+      email: string;
+    };
+    HomepageFeaturedRelease: {
+      id: number;
+      title: string;
+      year?: number | null;
+      image?: string | null;
+      communityId: number;
+      artist?: {
+        id: number;
+        name: string;
+      } | null;
+    };
+    HomepageFeaturedAlbum: {
+      id: number;
+      title: string;
+      started: string;
+      ended: string;
+      threadId?: number | null;
+      release: components['schemas']['HomepageFeaturedRelease'];
     };
     Announcement: {
       id: number;

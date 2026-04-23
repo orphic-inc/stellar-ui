@@ -179,7 +179,7 @@ export interface InviteNode {
   username: string;
   email: string;
   joinedAt?: string;
-  lastSeen?: string;
+  lastSeen?: string | null;
   uploaded?: string;
   downloaded?: string;
   ratio?: string;

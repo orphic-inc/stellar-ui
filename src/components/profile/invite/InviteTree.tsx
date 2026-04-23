@@ -1,6 +1,7 @@
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
-import { useGetProfileByUserIdQuery } from '../../../store/services/profileApi';
+import { useGetMyProfileQuery } from '../../../store/services/profileApi';
 import Spinner from '../../layout/Spinner';
 import Time from '../../layout/Time';
 import type { InviteNode } from '../../../types';
@@ -20,14 +21,11 @@ const renderNode = (node: InviteNode): React.ReactNode => (
   </React.Fragment>
 );
 
-import React from 'react';
-
 const InviteTree = () => {
   const user = useSelector(selectCurrentUser);
-  const { data: profile, isLoading } = useGetProfileByUserIdQuery(
-    user?.id ?? 0,
-    { skip: !user?.id }
-  );
+  const { data: profile, isLoading } = useGetMyProfileQuery(undefined, {
+    skip: !user?.id
+  });
 
   return (
     <div className="thin">

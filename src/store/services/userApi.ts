@@ -1,11 +1,7 @@
 import { api } from '../api';
-import type { UserSettings, UserRank, AuthUser, PublicUser } from '../../types';
+import type { UserRank } from '../../types';
+import type { paths } from '../../types/api';
 
-interface CreateUserArgs {
-  username: string;
-  email: string;
-  password: string;
-}
 interface UpdateUserRankArgs {
   id: number;
   level?: number;
@@ -13,21 +9,39 @@ interface UpdateUserRankArgs {
   permissions?: Record<string, boolean>;
 }
 
+type PublicUserResponse =
+  paths['/users/{id}']['get']['responses'][200]['content']['application/json'];
+type UserSettingsResponse =
+  paths['/users/settings']['get']['responses'][200]['content']['application/json'];
+type UpdateUserSettingsArgs = NonNullable<
+  paths['/users/settings']['put']['requestBody']
+>['content']['application/json'];
+type UpdateUserSettingsResponse =
+  paths['/users/settings']['put']['responses'][200]['content']['application/json'];
+type CreateUserArgs = NonNullable<
+  paths['/users']['post']['requestBody']
+>['content']['application/json'];
+type CreateUserResponse =
+  paths['/users']['post']['responses'][201]['content']['application/json'];
+
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getUserById: build.query<PublicUser, number>({
+    getUserById: build.query<PublicUserResponse, number>({
       query: (id) => `/users/${id}`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),
-    getUserSettings: build.query<UserSettings, void>({
+    getUserSettings: build.query<UserSettingsResponse, void>({
       query: () => '/users/settings',
       providesTags: ['User']
     }),
-    updateUserSettings: build.mutation<UserSettings, Partial<UserSettings>>({
+    updateUserSettings: build.mutation<
+      UpdateUserSettingsResponse,
+      UpdateUserSettingsArgs
+    >({
       query: (data) => ({ url: '/users/settings', method: 'PUT', body: data }),
       invalidatesTags: ['User', 'Auth']
     }),
-    createUser: build.mutation<AuthUser, CreateUserArgs>({
+    createUser: build.mutation<CreateUserResponse, CreateUserArgs>({
       query: (data) => ({ url: '/users', method: 'POST', body: data }),
       invalidatesTags: ['User']
     }),
