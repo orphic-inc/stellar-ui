@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import CommentsSection from '../../layout/CommentsSection';
 import { useGetReleaseByIdQuery } from '../../../store/services/communityApi';
 import Spinner from '../../layout/Spinner';
 
@@ -94,6 +95,8 @@ const CommunityGroupPage = () => {
           </table>
         </div>
       )}
+
+      <CommentsSection page="release" pageId={gId} />
     </div>
   );
 };
