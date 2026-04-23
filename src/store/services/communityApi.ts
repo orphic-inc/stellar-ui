@@ -8,7 +8,7 @@ import type {
 
 interface ReleaseArgs {
   communityId: number;
-  groupId: number;
+  releaseId: number;
 }
 interface CreateContributionArgs {
   communityId: number;
@@ -48,40 +48,42 @@ export const communityApi = api.injectEndpoints({
       invalidatesTags: (_, __, { id }) => [{ type: 'Community', id }]
     }),
 
-    // Releases (groups)
+    // Releases
     getReleasesByCommunity: build.query<PaginatedResponse<Release>, number>({
-      query: (communityId) => `/communities/${communityId}/groups`,
+      query: (communityId) => `/communities/${communityId}/releases`,
       providesTags: [{ type: 'Release', id: 'LIST' }]
     }),
     getReleaseById: build.query<Release, ReleaseArgs>({
-      query: ({ communityId, groupId }) =>
-        `/communities/${communityId}/groups/${groupId}`,
-      providesTags: (_, __, { groupId }) => [{ type: 'Release', id: groupId }]
+      query: ({ communityId, releaseId }) =>
+        `/communities/${communityId}/releases/${releaseId}`,
+      providesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId }
+      ]
     }),
     createRelease: build.mutation<
       Release,
       { communityId: number } & Partial<Release>
     >({
       query: ({ communityId, ...data }) => ({
-        url: `/communities/${communityId}/groups`,
+        url: `/communities/${communityId}/releases`,
         method: 'POST',
         body: data
       }),
       invalidatesTags: [{ type: 'Release', id: 'LIST' }]
     }),
     updateRelease: build.mutation<Release, ReleaseArgs & Partial<Release>>({
-      query: ({ communityId, groupId, ...data }) => ({
-        url: `/communities/${communityId}/groups/${groupId}`,
+      query: ({ communityId, releaseId, ...data }) => ({
+        url: `/communities/${communityId}/releases/${releaseId}`,
         method: 'PUT',
         body: data
       }),
-      invalidatesTags: (_, __, { groupId }) => [
-        { type: 'Release', id: groupId }
+      invalidatesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId }
       ]
     }),
     deleteRelease: build.mutation<void, ReleaseArgs>({
-      query: ({ communityId, groupId }) => ({
-        url: `/communities/${communityId}/groups/${groupId}`,
+      query: ({ communityId, releaseId }) => ({
+        url: `/communities/${communityId}/releases/${releaseId}`,
         method: 'DELETE'
       }),
       invalidatesTags: ['Release']

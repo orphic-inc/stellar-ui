@@ -3,13 +3,13 @@ import CommentsSection from '../layout/CommentsSection';
 import { useGetReleaseByIdQuery } from '../../store/services/communityApi';
 import Spinner from '../layout/Spinner';
 
-const ReleaseGroupPage = () => {
-  const { communityId, groupId } = useParams<{
+const ReleasePage = () => {
+  const { communityId, releaseId } = useParams<{
     communityId: string;
-    groupId: string;
+    releaseId: string;
   }>();
   const cId = parseInt(communityId ?? '0');
-  const gId = parseInt(groupId ?? '0');
+  const rId = parseInt(releaseId ?? '0');
 
   const {
     data: release,
@@ -17,7 +17,7 @@ const ReleaseGroupPage = () => {
     error
   } = useGetReleaseByIdQuery({
     communityId: cId,
-    groupId: gId
+    releaseId: rId
   });
 
   if (isLoading) return <Spinner />;
@@ -96,9 +96,9 @@ const ReleaseGroupPage = () => {
         </div>
       )}
 
-      <CommentsSection page="release" pageId={gId} />
+      <CommentsSection page="release" pageId={rId} />
     </div>
   );
 };
 
-export default ReleaseGroupPage;
+export default ReleasePage;
