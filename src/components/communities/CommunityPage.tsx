@@ -55,7 +55,7 @@ const CommunityPage = () => {
                   <tr key={release.id}>
                     <td>
                       <Link
-                        to={`/private/communities/${communityId}/groups/${release.id}`}
+                        to={`/private/communities/${communityId}/releases/${release.id}`}
                       >
                         {release.title}
                       </Link>

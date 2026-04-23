@@ -32,7 +32,7 @@ const PrivateHomepage = () => {
 
   const releaseLink = (communityId?: number | null, releaseId?: number) =>
     communityId && releaseId
-      ? `/private/communities/${communityId}/groups/${releaseId}`
+      ? `/private/communities/${communityId}/releases/${releaseId}`
       : undefined;
 
   return (

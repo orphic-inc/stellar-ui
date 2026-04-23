@@ -1101,7 +1101,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/communities/{id}/groups': {
+  '/communities/{id}/releases': {
     parameters: {
       query?: never;
       header?: never;

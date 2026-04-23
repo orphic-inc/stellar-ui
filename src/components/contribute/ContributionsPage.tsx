@@ -36,7 +36,7 @@ const ContributionsPage = () => {
                   <td>
                     {c.release.communityId ? (
                       <Link
-                        to={`/private/communities/${c.release.communityId}/groups/${c.release.id}`}
+                        to={`/private/communities/${c.release.communityId}/releases/${c.release.id}`}
                       >
                         {c.release.title}
                       </Link>
