@@ -728,18 +728,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': {
-              /** @enum {string} */
-              status: 'success';
-              data: {
-                announcements: components['schemas']['Announcement'][];
-                blogPosts: {
-                  id: number;
-                  title: string;
-                  createdAt: string;
-                }[];
-              };
-            };
+            'application/json': components['schemas']['AnnouncementsResponse'];
           };
         };
       };
@@ -2516,6 +2505,20 @@ export interface components {
       title: string;
       body: string;
       createdAt: string;
+    };
+    BlogPost: {
+      id: number;
+      title: string;
+      body?: string;
+      createdAt: string;
+      user?: {
+        username: string;
+        avatar?: string | null;
+      };
+    };
+    AnnouncementsResponse: {
+      announcements: components['schemas']['Announcement'][];
+      blogPosts: components['schemas']['BlogPost'][];
     };
     Forum: {
       id: number;

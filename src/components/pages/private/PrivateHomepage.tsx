@@ -26,7 +26,7 @@ const PrivateHomepage = () => {
   const { data: stats } = useGetSiteStatsQuery();
   const { data: featured } = useGetHomepageFeaturedQuery();
 
-  const blogPosts = announcements?.data?.blogPosts ?? [];
+  const blogPosts = announcements?.blogPosts ?? [];
   const aotm = featured?.albumOfTheMonth;
   const vanityHouse = featured?.vanityHouse;
 
@@ -55,10 +55,10 @@ const PrivateHomepage = () => {
                 <div className="p-4">
                   <Spinner />
                 </div>
-              ) : !announcements?.data?.announcements?.length ? (
+              ) : !announcements?.announcements?.length ? (
                 <p className="p-4 text-sm text-gray-500">No announcements.</p>
               ) : (
-                announcements.data.announcements.map((n) => (
+                announcements.announcements.map((n) => (
                   <div
                     key={n.id}
                     className="flex items-center justify-between px-4 py-3 hover:bg-gray-700/30 transition-colors"

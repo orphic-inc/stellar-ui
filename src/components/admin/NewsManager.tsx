@@ -72,7 +72,7 @@ const NewsManager = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700/50">
-              {!announcements?.data?.announcements?.length ? (
+              {!announcements?.announcements?.length ? (
                 <tr>
                   <td
                     colSpan={3}
@@ -82,7 +82,7 @@ const NewsManager = () => {
                   </td>
                 </tr>
               ) : (
-                announcements.data.announcements.map((n) => (
+                announcements.announcements.map((n) => (
                   <tr
                     key={n.id}
                     className="hover:bg-gray-700/30 transition-colors"
@@ -162,7 +162,7 @@ const NewsManager = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700/50">
-              {!announcements?.data?.blogPosts?.length ? (
+              {!announcements?.blogPosts?.length ? (
                 <tr>
                   <td
                     colSpan={4}
@@ -172,7 +172,7 @@ const NewsManager = () => {
                   </td>
                 </tr>
               ) : (
-                announcements.data.blogPosts.map((b) => (
+                announcements.blogPosts.map((b) => (
                   <tr
                     key={b.id}
                     className="hover:bg-gray-700/30 transition-colors"
