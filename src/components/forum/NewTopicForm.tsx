@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux';
 import {
   useGetForumByIdQuery,
   useCreateTopicMutation
-} from '../../../store/services/forumApi';
-import { addAlert } from '../../../store/slices/alertSlice';
+} from '../../store/services/forumApi';
+import { addAlert } from '../../store/slices/alertSlice';
 
 const NewTopicForm = () => {
   const { forumId } = useParams<{ forumId: string }>();

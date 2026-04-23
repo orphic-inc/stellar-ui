@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import Time from '../../layout/Time';
-import type { ForumPost } from '../../../types';
+import Time from '../layout/Time';
+import type { ForumPost } from '../../types';
 
 interface Props {
   post: ForumPost;

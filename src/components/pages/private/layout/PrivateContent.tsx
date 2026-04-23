@@ -9,16 +9,16 @@ import Settings from '../../../profile/settings/Settings';
 import InviteForm from '../../../profile/invite/InviteForm';
 import InviteTree from '../../../profile/invite/InviteTree';
 
-import ForumCategoryPage from '../../../sections/forum/ForumCategoryPage';
-import ForumPage from '../../../sections/forum/ForumPage';
-import ForumTopicPage from '../../../sections/forum/ForumTopicPage';
-import NewTopicForm from '../../../sections/forum/NewTopicForm';
+import ForumCategoryPage from '../../../forum/ForumCategoryPage';
+import ForumPage from '../../../forum/ForumPage';
+import ForumTopicPage from '../../../forum/ForumTopicPage';
+import NewTopicForm from '../../../forum/NewTopicForm';
 
-import CommunitiesPage from '../../../sections/communities/CommunitiesPage';
-import CommunityPage from '../../../sections/communities/CommunityPage';
-import CommunityGroupPage from '../../../sections/communities/CommunityGroupPage';
-import ContributeForm from '../../../sections/contribute/ContributeForm';
-import ContributionsPage from '../../../sections/contribute/ContributionsPage';
+import CommunitiesPage from '../../../communities/CommunitiesPage';
+import CommunityPage from '../../../communities/CommunityPage';
+import ReleaseGroupPage from '../../../communities/ReleaseGroupPage';
+import ContributeForm from '../../../contribute/ContributeForm';
+import ContributionsPage from '../../../contribute/ContributionsPage';
 
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
@@ -71,7 +71,7 @@ const PrivateContent = () => (
 
     <Route
       path="communities/:communityId/groups/:groupId"
-      element={wrap(CommunityGroupPage)}
+      element={wrap(ReleaseGroupPage)}
     />
     <Route path="communities/:communityId" element={wrap(CommunityPage)} />
     <Route path="communities" element={wrap(CommunitiesPage)} />

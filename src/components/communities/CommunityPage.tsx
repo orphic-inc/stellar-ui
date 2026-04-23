@@ -2,8 +2,8 @@ import { Link, useParams } from 'react-router-dom';
 import {
   useGetCommunityByIdQuery,
   useGetReleasesByCommunityQuery
-} from '../../../store/services/communityApi';
-import Spinner from '../../layout/Spinner';
+} from '../../store/services/communityApi';
+import Spinner from '../layout/Spinner';
 
 const CommunityPage = () => {
   const { communityId } = useParams<{ communityId: string }>();

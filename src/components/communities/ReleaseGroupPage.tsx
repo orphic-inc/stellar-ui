@@ -1,9 +1,9 @@
 import { Link, useParams } from 'react-router-dom';
-import CommentsSection from '../../layout/CommentsSection';
-import { useGetReleaseByIdQuery } from '../../../store/services/communityApi';
-import Spinner from '../../layout/Spinner';
+import CommentsSection from '../layout/CommentsSection';
+import { useGetReleaseByIdQuery } from '../../store/services/communityApi';
+import Spinner from '../layout/Spinner';
 
-const CommunityGroupPage = () => {
+const ReleaseGroupPage = () => {
   const { communityId, groupId } = useParams<{
     communityId: string;
     groupId: string;
@@ -101,4 +101,4 @@ const CommunityGroupPage = () => {
   );
 };
 
-export default CommunityGroupPage;
+export default ReleaseGroupPage;
