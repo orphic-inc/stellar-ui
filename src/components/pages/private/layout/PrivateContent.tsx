@@ -22,8 +22,8 @@ import ContributionsPage from '../../../contribute/ContributionsPage';
 
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
-import UserRankManager from '../../../admin/PermissionManager';
-import UserRankFormPage from '../../../admin/PermissionFormPage';
+import UserRankManager from '../../../admin/UserRankManager';
+import UserRankFormPage from '../../../admin/UserRankFormPage';
 import ForumCategoryControlPanel from '../../../admin/ForumCategoryControlPanel';
 import ForumControlPanel from '../../../admin/ForumControlPanel';
 import CommunityManager from '../../../admin/CommunityManager';
