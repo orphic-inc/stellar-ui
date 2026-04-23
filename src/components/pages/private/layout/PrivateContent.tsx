@@ -43,12 +43,12 @@ const PrivateContent = () => (
     <Route path="invite" element={<InviteForm />} />
 
     <Route path="staff/tools/user/new" element={<NewUserForm />} />
-    <Route path="staff/tools/permissions/new" element={<UserRankFormPage />} />
+    <Route path="staff/tools/user-ranks/new" element={<UserRankFormPage />} />
     <Route
-      path="staff/tools/permissions/:id/edit"
+      path="staff/tools/user-ranks/:id/edit"
       element={<UserRankFormPage />}
     />
-    <Route path="staff/tools/permissions" element={<UserRankManager />} />
+    <Route path="staff/tools/user-ranks" element={<UserRankManager />} />
     <Route
       path="staff/tools/categories"
       element={<ForumCategoryControlPanel />}

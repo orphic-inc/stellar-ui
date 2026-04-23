@@ -41,7 +41,7 @@ const Toolbox = () => (
         links={[
           {
             label: 'User ranks',
-            to: '/private/staff/tools/permissions'
+            to: '/private/staff/tools/user-ranks'
           }
         ]}
       />
