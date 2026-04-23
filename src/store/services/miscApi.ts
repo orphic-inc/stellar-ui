@@ -1,16 +1,18 @@
 import { api } from '../api';
-import type { SiteStats } from '../../types';
+import type { paths } from '../../types/api';
+
+type SiteStatsResponse =
+  paths['/stats']['get']['responses'][200]['content']['application/json'];
+type StylesheetsResponse =
+  paths['/stylesheet']['get']['responses'][200]['content']['application/json'];
 
 export const miscApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getSiteStats: build.query<SiteStats, void>({
+    getSiteStats: build.query<SiteStatsResponse, void>({
       query: () => '/stats',
       providesTags: ['Stats']
     }),
-    getStylesheets: build.query<
-      { id: number; name: string; cssUrl: string }[],
-      void
-    >({
+    getStylesheets: build.query<StylesheetsResponse, void>({
       query: () => '/stylesheet',
       providesTags: ['Stylesheet']
     })
