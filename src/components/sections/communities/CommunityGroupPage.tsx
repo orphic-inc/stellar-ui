@@ -1,7 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useGetReleaseByIdQuery } from '../../../store/services/communityApi';
 import Spinner from '../../layout/Spinner';
-import CommentsSection from '../../layout/CommentsSection';
 
 const CommunityGroupPage = () => {
   const { communityId, groupId } = useParams<{
@@ -95,8 +94,6 @@ const CommunityGroupPage = () => {
           </table>
         </div>
       )}
-
-      <CommentsSection page="torrent" pageId={gId} />
     </div>
   );
 };

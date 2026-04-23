@@ -8,8 +8,10 @@ import {
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Time from './Time';
 
+type CommentPage = 'artist' | 'collages' | 'requests' | 'communities';
+
 interface Props {
-  page: string;
+  page: CommentPage;
   pageId: number;
 }
 
@@ -17,7 +19,7 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const currentUser = useSelector(selectCurrentUser);
   const { data: comments, isLoading } = useGetCommentsQuery({
     page,
-    id: pageId
+    pageId
   });
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
@@ -27,7 +29,14 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    await createComment({ page, type: page, body, id: pageId });
+    const targetKey =
+      page === 'communities'
+        ? { communityId: pageId }
+        : page === 'artist'
+        ? { artistId: pageId }
+        : { contributionId: pageId };
+
+    await createComment({ page, body, ...targetKey });
     setBody('');
   };
 

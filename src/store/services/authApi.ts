@@ -1,6 +1,7 @@
 import { api } from '../api';
 import { setCredentials, logout as logoutAction } from '../slices/authSlice';
 import type { AuthUser } from '../../types';
+import type { components } from '../../types/api';
 
 interface LoginArgs {
   email: string;
@@ -12,9 +13,14 @@ interface RegisterArgs {
   password: string;
 }
 
+type GeneratedAuthUser = components['schemas']['AuthUser'];
+type AuthResponse = {
+  user: GeneratedAuthUser & AuthUser;
+};
+
 export const authApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getMe: build.query<AuthUser, void>({
+    getMe: build.query<GeneratedAuthUser & AuthUser, void>({
       query: () => '/auth',
       providesTags: ['Auth'],
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
@@ -29,7 +35,7 @@ export const authApi = api.injectEndpoints({
         }
       }
     }),
-    login: build.mutation<AuthUser, LoginArgs>({
+    login: build.mutation<AuthResponse, LoginArgs>({
       query: (credentials) => ({
         url: '/auth',
         method: 'POST',
@@ -39,7 +45,7 @@ export const authApi = api.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          dispatch(setCredentials(data));
+          dispatch(setCredentials(data.user));
         } catch {
           // login component handles the error display
         }
@@ -48,9 +54,17 @@ export const authApi = api.injectEndpoints({
     logout: build.mutation<void, void>({
       query: () => ({ url: '/auth/logout', method: 'POST' })
     }),
-    register: build.mutation<AuthUser, RegisterArgs>({
+    register: build.mutation<AuthResponse, RegisterArgs>({
       query: (data) => ({ url: '/auth/register', method: 'POST', body: data }),
-      invalidatesTags: ['Auth']
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setCredentials(data.user));
+        } catch {
+          // register component handles the error display
+        }
+      }
     })
   })
 });
