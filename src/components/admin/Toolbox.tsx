@@ -1,8 +1,16 @@
 import { Link } from 'react-router-dom';
+import { useAppSelector } from '../../store/hooks';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import {
+  hasAnyPermission,
+  hasPermission,
+  type Permission
+} from '../../utils/permissions';
 
 interface SectionLink {
   label: string;
   to: string;
+  permissions: Permission[];
 }
 interface SectionProps {
   title: string;
@@ -31,44 +39,82 @@ const Section = ({ title, links }: SectionProps) => (
   </div>
 );
 
-const Toolbox = () => (
-  <div className="space-y-4">
-    <h2 className="text-2xl font-bold text-white">Staff Toolbox</h2>
+const sections: SectionProps[] = [
+  {
+    title: 'Administration',
+    links: [
+      {
+        label: 'User ranks',
+        to: '/private/staff/tools/user-ranks',
+        permissions: ['admin']
+      },
+      {
+        label: 'Create user',
+        to: '/private/staff/tools/user/new',
+        permissions: ['users_edit']
+      }
+    ]
+  },
+  {
+    title: 'Announcements',
+    links: [
+      {
+        label: 'News post',
+        to: '/private/staff/tools/news',
+        permissions: ['news_manage']
+      }
+    ]
+  },
+  {
+    title: 'Community',
+    links: [
+      {
+        label: 'Community manager',
+        to: '/private/staff/tools/communities',
+        permissions: ['communities_manage']
+      },
+      {
+        label: 'Category manager',
+        to: '/private/staff/tools/categories',
+        permissions: ['forums_manage']
+      },
+      {
+        label: 'Forum manager',
+        to: '/private/staff/tools/forums',
+        permissions: ['forums_manage']
+      }
+    ]
+  }
+];
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      <Section
-        title="Administration"
-        links={[
-          {
-            label: 'User ranks',
-            to: '/private/staff/tools/user-ranks'
-          }
-        ]}
-      />
+const Toolbox = () => {
+  const user = useAppSelector(selectCurrentUser);
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      links: section.links.filter((link) =>
+        hasAnyPermission(user, link.permissions)
+      )
+    }))
+    .filter((section) => section.links.length > 0);
 
-      <Section
-        title="Announcements"
-        links={[{ label: 'News post', to: '/private/staff/tools/news' }]}
-      />
+  return (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-white">Staff Toolbox</h2>
 
-      <Section
-        title="Community"
-        links={[
-          {
-            label: 'Community manager',
-            to: '/private/staff/tools/communities'
-          },
-          { label: 'Category manager', to: '/private/staff/tools/categories' },
-          { label: 'Forum manager', to: '/private/staff/tools/forums' }
-        ]}
-      />
-
-      <Section
-        title="User Management"
-        links={[{ label: 'Create user', to: '/private/staff/tools/user/new' }]}
-      />
+      {!hasPermission(user, 'admin') && visibleSections.length === 0 ? (
+        <div className="rounded-lg border border-gray-700 bg-gray-800 px-4 py-5 text-sm text-gray-400">
+          Your account does not currently have any staff tools assigned.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {visibleSections.map((section) => (
+            <Section key={section.title} {...section} />
+          ))}
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default Toolbox;

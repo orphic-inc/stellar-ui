@@ -1,4 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
+import type { ReactElement } from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import ErrorBoundary from '../../../layout/ErrorBoundary';
 import FallbackComponent from '../../../layout/FallbackComponent';
 import NotFound from '../../../layout/NotFound';
@@ -28,12 +30,33 @@ import ForumCategoryControlPanel from '../../../admin/ForumCategoryControlPanel'
 import ForumControlPanel from '../../../admin/ForumControlPanel';
 import CommunityManager from '../../../admin/CommunityManager';
 import NewsManager from '../../../admin/NewsManager';
+import { selectCurrentUser } from '../../../../store/slices/authSlice';
+import {
+  hasAnyPermission,
+  type Permission
+} from '../../../../utils/permissions';
 
 const wrap = (Component: React.ComponentType) => (
   <ErrorBoundary FallbackComponent={FallbackComponent}>
     <Component />
   </ErrorBoundary>
 );
+
+const StaffGate = ({
+  permissions,
+  children
+}: {
+  permissions: Permission[];
+  children: ReactElement;
+}) => {
+  const user = useSelector(selectCurrentUser);
+
+  if (!hasAnyPermission(user, permissions)) {
+    return <Navigate to="/private" replace />;
+  }
+
+  return children;
+};
 
 const PrivateContent = () => (
   <Routes>
@@ -42,21 +65,88 @@ const PrivateContent = () => (
     <Route path="user/invite-tree" element={<InviteTree />} />
     <Route path="invite" element={<InviteForm />} />
 
-    <Route path="staff/tools/user/new" element={<NewUserForm />} />
-    <Route path="staff/tools/user-ranks/new" element={<UserRankFormPage />} />
+    <Route
+      path="staff/tools/user/new"
+      element={
+        <StaffGate permissions={['users_edit']}>
+          <NewUserForm />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools/user-ranks/new"
+      element={
+        <StaffGate permissions={['admin']}>
+          <UserRankFormPage />
+        </StaffGate>
+      }
+    />
     <Route
       path="staff/tools/user-ranks/:id/edit"
-      element={<UserRankFormPage />}
+      element={
+        <StaffGate permissions={['admin']}>
+          <UserRankFormPage />
+        </StaffGate>
+      }
     />
-    <Route path="staff/tools/user-ranks" element={<UserRankManager />} />
+    <Route
+      path="staff/tools/user-ranks"
+      element={
+        <StaffGate permissions={['admin']}>
+          <UserRankManager />
+        </StaffGate>
+      }
+    />
     <Route
       path="staff/tools/categories"
-      element={<ForumCategoryControlPanel />}
+      element={
+        <StaffGate permissions={['forums_manage']}>
+          <ForumCategoryControlPanel />
+        </StaffGate>
+      }
     />
-    <Route path="staff/tools/forums" element={<ForumControlPanel />} />
-    <Route path="staff/tools/communities" element={<CommunityManager />} />
-    <Route path="staff/tools/news" element={<NewsManager />} />
-    <Route path="staff/tools" element={<Toolbox />} />
+    <Route
+      path="staff/tools/forums"
+      element={
+        <StaffGate permissions={['forums_manage']}>
+          <ForumControlPanel />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools/communities"
+      element={
+        <StaffGate permissions={['communities_manage']}>
+          <CommunityManager />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools/news"
+      element={
+        <StaffGate permissions={['news_manage']}>
+          <NewsManager />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools"
+      element={
+        <StaffGate
+          permissions={[
+            'staff',
+            'admin',
+            'forums_manage',
+            'forums_moderate',
+            'communities_manage',
+            'news_manage',
+            'users_edit'
+          ]}
+        >
+          <Toolbox />
+        </StaffGate>
+      }
+    />
 
     <Route
       path="forums/:forumId/topics/:forumTopicId"

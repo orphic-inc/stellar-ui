@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { components, paths } from '../../types/api';
+import type { paths } from '../../types/api';
 
 interface TopicArgs {
   forumId: number;
@@ -11,12 +11,6 @@ interface PostArgs {
   topicId: number;
   postId: number;
 }
-
-type ForumCategory = components['schemas']['ForumCategory'];
-type Forum = components['schemas']['Forum'];
-type ForumTopic = components['schemas']['ForumTopic'];
-type ForumPost = components['schemas']['ForumPost'];
-type ForumPoll = components['schemas']['ForumPoll'];
 
 type ForumCategoriesResponse =
   paths['/forums/categories']['get']['responses'][200]['content']['application/json'];
