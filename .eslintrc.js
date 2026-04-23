@@ -32,7 +32,16 @@ module.exports = {
     'react/jsx-uses-react': 0,
     'react/react-in-jsx-scope': 0,
     'react/prop-types': 0,
-    'import/no-unresolved': ['error', { ignore: ['dompurify'] }]
+    'import/no-unresolved': [
+      'error',
+      {
+        ignore: [
+          'dompurify',
+          '^@reduxjs/toolkit/query$',
+          '^@reduxjs/toolkit/query/react$'
+        ]
+      }
+    ]
   },
   settings: {
     react: {
