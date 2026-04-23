@@ -9,12 +9,11 @@ import {
 import { api } from '../../store/api';
 import { logout as logoutAction } from '../../store/slices/authSlice';
 import type { AuthUser } from '../../types';
+import { isStaffUser } from '../../utils/permissions';
 
 interface Props {
   user: AuthUser;
 }
-
-const isStaffLevel = (user: AuthUser) => (user.userRank?.level ?? 0) >= 500;
 
 const UserMenu = ({ user }: Props) => {
   const navigate = useNavigate();
@@ -115,7 +114,7 @@ const UserMenu = ({ user }: Props) => {
         )}
       </div>
 
-      {isStaffLevel(user) && (
+      {isStaffUser(user) && (
         <Link
           to="/private/staff/tools"
           className="px-3 py-1.5 rounded text-amber-400 hover:text-amber-300 hover:bg-white/10 transition-colors"
