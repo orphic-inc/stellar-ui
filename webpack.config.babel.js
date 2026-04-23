@@ -8,7 +8,7 @@ import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 
 const dev = process.env.NODE_ENV === 'development';
-const apiUrl = process.env.STELLAR_API_URL || 'http://127.0.0.1:8080';
+const apiUrl = process.env.STELLAR_API_URL || 'http://localhost:8080';
 
 const plugins = [
   new CleanPlugin(),

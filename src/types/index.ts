@@ -271,6 +271,29 @@ export interface SiteStats {
   peers?: number;
 }
 
+export interface HomepageFeaturedRelease {
+  id: number;
+  title: string;
+  year?: number;
+  image?: string | null;
+  communityId?: number | null;
+  artist?: { id: number; name: string };
+}
+
+export interface HomepageFeaturedAlbum {
+  id: number;
+  title: string;
+  started: string;
+  ended: string;
+  threadId?: number | null;
+  release: HomepageFeaturedRelease;
+}
+
+export interface HomepageFeaturedContent {
+  albumOfTheMonth: HomepageFeaturedAlbum | null;
+  vanityHouse: HomepageFeaturedRelease | null;
+}
+
 // ─── Pagination ──────────────────────────────────────────────────────────────
 
 export interface PaginatedResponse<T> {
