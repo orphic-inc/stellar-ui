@@ -1,3 +1,5 @@
+import type { components } from './api';
+
 // ─── Auth / User ────────────────────────────────────────────────────────────
 
 export interface UserRank {
@@ -45,13 +47,7 @@ export interface PublicUser {
   userSettings?: { siteAppearance?: string; styledTooltips?: boolean };
 }
 
-export interface ArtistHistory {
-  id: number;
-  artistId: number;
-  editorId: number;
-  body?: string;
-  createdAt: string;
-}
+export type ArtistHistory = components['schemas']['ArtistHistory'];
 
 // ─── Alert ──────────────────────────────────────────────────────────────────
 
@@ -65,61 +61,12 @@ export interface Alert {
 
 // ─── Forum ───────────────────────────────────────────────────────────────────
 
-export interface ForumCategory {
-  id: number;
-  name: string;
-  sort: number;
-  forums?: Forum[];
-}
-
-export interface Forum {
-  id: number;
-  name: string;
-  description?: string;
-  sort: number;
-  minClassRead?: number;
-  minClassWrite?: number;
-  minClassCreate?: number;
-  numTopics: number;
-  numPosts: number;
-  forumCategory?: Pick<ForumCategory, 'id' | 'name'>;
-  topics?: ForumTopic[];
-  lastTopic?: Pick<ForumTopic, 'id' | 'title'>;
-}
-
-export interface ForumTopic {
-  id: number;
-  title: string;
-  isLocked: boolean;
-  isSticky: boolean;
-  numPosts: number;
-  author?: Pick<AuthUser, 'id' | 'username'>;
-  lastPost?: Pick<ForumPost, 'id' | 'createdAt'>;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ForumPost {
-  id: number;
-  body: string;
-  author?: Pick<AuthUser, 'id' | 'username' | 'avatar'>;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ForumPollVote {
-  id: number;
-  userId: number;
-  vote: number;
-}
-
-export interface ForumPoll {
-  id: number;
-  question: string;
-  answers: string; // JSON-encoded string[]
-  closed: boolean;
-  votes: ForumPollVote[];
-}
+export type ForumCategory = components['schemas']['ForumCategory'];
+export type Forum = components['schemas']['Forum'];
+export type ForumTopic = components['schemas']['ForumTopic'];
+export type ForumPost = components['schemas']['ForumPost'];
+export type ForumPollVote = components['schemas']['ForumPollVote'];
+export type ForumPoll = components['schemas']['ForumPoll'];
 
 // ─── Community ───────────────────────────────────────────────────────────────
 
@@ -134,44 +81,10 @@ export type CommunityType =
 
 export type RegistrationStatus = 'open' | 'invite' | 'closed';
 
-export interface Community {
-  id: number;
-  name: string;
-  description?: string | null;
-  type?: CommunityType | string | null;
-  registrationStatus?: RegistrationStatus | string | null;
-  image?: string | null;
-  _count?: { releases: number; contributors: number; consumers: number };
-}
-
-export interface ReleaseContribution {
-  id: number;
-  user: { id: number; username: string };
-  releaseDescription?: string;
-  collaborators: Artist[];
-}
-
-export interface Contribution {
-  id: number;
-  user: { id: number; username: string };
-  release: { id: number; title: string; communityId?: number };
-  collaborators: { id: number; name: string }[];
-  releaseDescription?: string;
-  createdAt?: string;
-}
-
-export interface Release {
-  id: number;
-  title: string;
-  year?: number;
-  type?: string;
-  communityId: number;
-  image?: string;
-  description?: string;
-  artist?: Artist;
-  tags?: { id: number; name: string }[];
-  contributions?: ReleaseContribution[];
-}
+export type Community = components['schemas']['Community'];
+export type ReleaseContribution = components['schemas']['ReleaseContribution'];
+export type Contribution = components['schemas']['Contribution'];
+export type Release = components['schemas']['Release'];
 
 // ─── Profile ─────────────────────────────────────────────────────────────────
 
@@ -236,19 +149,9 @@ export interface BlogPost {
   user?: Pick<AuthUser, 'id' | 'username'>;
 }
 
-export interface AnnouncementsResponse {
-  data: {
-    announcements: Announcement[];
-    blogPosts: BlogPost[];
-  };
-}
-
-export interface Artist {
-  id: number;
-  name: string;
-  image?: string;
-  body?: string;
-}
+export type AnnouncementsResponse =
+  components['schemas']['AnnouncementsResponse'];
+export type Artist = components['schemas']['Artist'];
 
 export interface Collaborator {
   artist: string;
@@ -257,20 +160,7 @@ export interface Collaborator {
 
 // ─── Site stats ─────────────────────────────────────────────────────────────
 
-export interface SiteStats {
-  maxUsers?: number;
-  enabledUsers?: number;
-  activeToday?: number;
-  activeThisWeek?: number;
-  activeThisMonth?: number;
-  communities?: number;
-  releases?: number;
-  artists?: number;
-  requests?: number;
-  seeders?: number;
-  leechers?: number;
-  peers?: number;
-}
+export type SiteStats = components['schemas']['SiteStats'];
 
 export interface HomepageFeaturedRelease {
   id: number;
