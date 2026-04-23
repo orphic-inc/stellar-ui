@@ -14,7 +14,7 @@ const ModBar = () => (
       to="/private/staff/tools/permissions"
       className="hover:text-amber-200 transition-colors"
     >
-      Permissions
+      User Ranks
     </Link>
     <Link
       to="/private/staff/tools/categories"

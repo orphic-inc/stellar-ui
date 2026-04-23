@@ -22,8 +22,8 @@ import ContributionsPage from '../../../contribute/ContributionsPage';
 
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
-import PermissionManager from '../../../admin/PermissionManager';
-import PermissionFormPage from '../../../admin/PermissionFormPage';
+import UserRankManager from '../../../admin/PermissionManager';
+import UserRankFormPage from '../../../admin/PermissionFormPage';
 import ForumCategoryControlPanel from '../../../admin/ForumCategoryControlPanel';
 import ForumControlPanel from '../../../admin/ForumControlPanel';
 import CommunityManager from '../../../admin/CommunityManager';
@@ -43,15 +43,12 @@ const PrivateContent = () => (
     <Route path="invite" element={<InviteForm />} />
 
     <Route path="staff/tools/user/new" element={<NewUserForm />} />
-    <Route
-      path="staff/tools/permissions/new"
-      element={<PermissionFormPage />}
-    />
+    <Route path="staff/tools/permissions/new" element={<UserRankFormPage />} />
     <Route
       path="staff/tools/permissions/:id/edit"
-      element={<PermissionFormPage />}
+      element={<UserRankFormPage />}
     />
-    <Route path="staff/tools/permissions" element={<PermissionManager />} />
+    <Route path="staff/tools/permissions" element={<UserRankManager />} />
     <Route
       path="staff/tools/categories"
       element={<ForumCategoryControlPanel />}

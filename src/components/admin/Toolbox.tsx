@@ -40,7 +40,7 @@ const Toolbox = () => (
         title="Administration"
         links={[
           {
-            label: 'Permissions manager',
+            label: 'User ranks',
             to: '/private/staff/tools/permissions'
           }
         ]}
