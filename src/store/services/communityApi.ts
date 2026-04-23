@@ -1,10 +1,6 @@
 import { api } from '../api';
-import type {
-  Community,
-  Release,
-  Contribution,
-  PaginatedResponse
-} from '../../types';
+import type { paths } from '../../types/api';
+import type { Contribution, PaginatedResponse } from '../../types';
 
 interface ReleaseArgs {
   communityId: number;
@@ -22,23 +18,35 @@ interface CreateContributionArgs {
   contributors?: number[];
 }
 
+type CommunitiesResponse =
+  paths['/communities']['get']['responses'][200]['content']['application/json'];
+type CommunityResponse =
+  paths['/communities/{id}']['get']['responses'][200]['content']['application/json'];
+type CommunityReleasesResponse =
+  paths['/communities/{id}/releases']['get']['responses'][200]['content']['application/json'];
+type ReleaseResponse =
+  paths['/communities/{communityId}/releases/{releaseId}']['get']['responses'][200]['content']['application/json'];
+
 export const communityApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getCommunities: build.query<PaginatedResponse<Community>, void>({
+    getCommunities: build.query<CommunitiesResponse, void>({
       query: () => '/communities',
       providesTags: ['Community']
     }),
-    getCommunityById: build.query<Community, number>({
+    getCommunityById: build.query<CommunityResponse, number>({
       query: (id) => `/communities/${id}`,
       providesTags: (_, __, id) => [{ type: 'Community', id }]
     }),
-    createCommunity: build.mutation<Community, Partial<Community>>({
+    createCommunity: build.mutation<
+      CommunityResponse,
+      Partial<CommunityResponse>
+    >({
       query: (data) => ({ url: '/communities', method: 'POST', body: data }),
       invalidatesTags: ['Community']
     }),
     updateCommunity: build.mutation<
-      Community,
-      { id: number } & Partial<Community>
+      CommunityResponse,
+      { id: number } & Partial<CommunityResponse>
     >({
       query: ({ id, ...data }) => ({
         url: `/communities/${id}`,
@@ -49,11 +57,11 @@ export const communityApi = api.injectEndpoints({
     }),
 
     // Releases
-    getReleasesByCommunity: build.query<PaginatedResponse<Release>, number>({
+    getReleasesByCommunity: build.query<CommunityReleasesResponse, number>({
       query: (communityId) => `/communities/${communityId}/releases`,
       providesTags: [{ type: 'Release', id: 'LIST' }]
     }),
-    getReleaseById: build.query<Release, ReleaseArgs>({
+    getReleaseById: build.query<ReleaseResponse, ReleaseArgs>({
       query: ({ communityId, releaseId }) =>
         `/communities/${communityId}/releases/${releaseId}`,
       providesTags: (_, __, { releaseId }) => [
@@ -61,8 +69,8 @@ export const communityApi = api.injectEndpoints({
       ]
     }),
     createRelease: build.mutation<
-      Release,
-      { communityId: number } & Partial<Release>
+      ReleaseResponse,
+      { communityId: number } & Partial<ReleaseResponse>
     >({
       query: ({ communityId, ...data }) => ({
         url: `/communities/${communityId}/releases`,
@@ -71,7 +79,10 @@ export const communityApi = api.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Release', id: 'LIST' }]
     }),
-    updateRelease: build.mutation<Release, ReleaseArgs & Partial<Release>>({
+    updateRelease: build.mutation<
+      ReleaseResponse,
+      ReleaseArgs & Partial<ReleaseResponse>
+    >({
       query: ({ communityId, releaseId, ...data }) => ({
         url: `/communities/${communityId}/releases/${releaseId}`,
         method: 'PUT',
@@ -94,10 +105,16 @@ export const communityApi = api.injectEndpoints({
       query: () => '/contributions',
       providesTags: ['Contribution']
     }),
-    createContribution: build.mutation<Release, CreateContributionArgs>({
-      query: (data) => ({ url: '/contributions', method: 'POST', body: data }),
-      invalidatesTags: ['Contribution', 'Release']
-    })
+    createContribution: build.mutation<ReleaseResponse, CreateContributionArgs>(
+      {
+        query: (data) => ({
+          url: '/contributions',
+          method: 'POST',
+          body: data
+        }),
+        invalidatesTags: ['Contribution', 'Release']
+      }
+    )
   })
 });
 

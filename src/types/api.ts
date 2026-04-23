@@ -1143,6 +1143,134 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{communityId}/releases/{releaseId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Release */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Release'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/tools/user-ranks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description User ranks */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserRank'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/tools/user-ranks/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description User rank */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserRank'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/comments': {
     parameters: {
       query?: never;
@@ -1542,23 +1670,68 @@ export interface components {
       page: number;
       limit: number;
     };
+    CommunityStaffMember: {
+      id: number;
+      username: string;
+    };
     Community: {
       id: number;
       name: string;
-      type: string;
+      description?: string | null;
+      type?: string | null;
+      registrationStatus?: string | null;
+      image?: string | null;
+      staff?: components['schemas']['CommunityStaffMember'][];
       _count?: {
         releases: number;
         contributors: number;
         consumers: number;
       };
     };
+    ReleaseTag: {
+      id: number;
+      name: string;
+    };
+    ReleaseArtist: {
+      id: number;
+      name: string;
+    };
+    ReleaseContribution: {
+      id: number;
+      user: {
+        id: number;
+        username: string;
+      };
+      collaborators: {
+        id: number;
+        name: string;
+        vanityHouse?: boolean;
+      }[];
+      releaseDescription?: string | null;
+    };
     Release: {
       id: number;
       title: string;
       communityId: number | null;
-      year: number;
-      type: string;
-      createdAt: string;
+      year?: number | null;
+      type?: string | null;
+      image?: string | null;
+      description?: string | null;
+      createdAt?: string;
+      artist?: components['schemas']['ReleaseArtist'];
+      tags?: components['schemas']['ReleaseTag'][];
+      contributions?: components['schemas']['ReleaseContribution'][];
+    };
+    UserRank: {
+      id: number;
+      name: string;
+      level: number;
+      permissions?: {
+        [key: string]: boolean;
+      };
+      color?: string;
+      badge?: string;
+      userCount?: number;
     };
     Comment: {
       id: number;

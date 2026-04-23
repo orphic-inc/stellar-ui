@@ -137,9 +137,10 @@ export type RegistrationStatus = 'open' | 'invite' | 'closed';
 export interface Community {
   id: number;
   name: string;
-  description?: string;
-  type?: CommunityType;
-  registrationStatus?: RegistrationStatus;
+  description?: string | null;
+  type?: CommunityType | string | null;
+  registrationStatus?: RegistrationStatus | string | null;
+  image?: string | null;
   _count?: { releases: number; contributors: number; consumers: number };
 }
 
