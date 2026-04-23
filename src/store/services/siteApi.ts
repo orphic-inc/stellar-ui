@@ -6,7 +6,7 @@ type SiteStatsResponse =
 type StylesheetsResponse =
   paths['/stylesheet']['get']['responses'][200]['content']['application/json'];
 
-export const miscApi = api.injectEndpoints({
+export const siteApi = api.injectEndpoints({
   endpoints: (build) => ({
     getSiteStats: build.query<SiteStatsResponse, void>({
       query: () => '/stats',
@@ -19,4 +19,4 @@ export const miscApi = api.injectEndpoints({
   })
 });
 
-export const { useGetSiteStatsQuery, useGetStylesheetsQuery } = miscApi;
+export const { useGetSiteStatsQuery, useGetStylesheetsQuery } = siteApi;

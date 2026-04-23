@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { useGetAnnouncementsQuery } from '../../../store/services/announcementApi';
 import { useGetHomepageFeaturedQuery } from '../../../store/services/homeApi';
-import { useGetSiteStatsQuery } from '../../../store/services/miscApi';
+import { useGetSiteStatsQuery } from '../../../store/services/siteApi';
 import { Link } from 'react-router-dom';
 import Time from '../../layout/Time';
 import Spinner from '../../layout/Spinner';
