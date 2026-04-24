@@ -151,13 +151,11 @@ export interface paths {
       requestBody?: never;
       responses: {
         /** @description Logged out */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
       };
     };
@@ -593,6 +591,48 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/profile': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Account disabled */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/profile/referral/create-invite': {
     parameters: {
       query?: never;
@@ -626,7 +666,6 @@ export interface paths {
           };
           content: {
             'application/json': {
-              msg: string;
               inviteKey: string;
             };
           };
@@ -734,8 +773,182 @@ export interface paths {
       };
     };
     put?: never;
-    post?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title: string;
+            body: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Announcement created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Announcement'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+      };
+    };
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/announcements/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Announcement deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/announcements/blog': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title: string;
+            body: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Blog post created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['BlogPost'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/announcements/blog/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Blog post deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -899,13 +1112,11 @@ export interface paths {
       requestBody?: never;
       responses: {
         /** @description Stylesheet removed */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
         /** @description Not found */
         404: {
@@ -980,13 +1191,11 @@ export interface paths {
       requestBody?: never;
       responses: {
         /** @description Notification removed */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
         /** @description Not found */
         404: {
@@ -1066,22 +1275,11 @@ export interface paths {
       };
       responses: {
         /** @description Subscription updated */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-        /** @description Subscription created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
       };
     };
@@ -1120,22 +1318,11 @@ export interface paths {
       };
       responses: {
         /** @description Comment subscription updated */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-        /** @description Comment subscription created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
       };
     };
@@ -1676,13 +1863,11 @@ export interface paths {
       requestBody?: never;
       responses: {
         /** @description Topic removed */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
         /** @description Not found */
         404: {
@@ -1883,13 +2068,11 @@ export interface paths {
       requestBody?: never;
       responses: {
         /** @description Post removed */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
         /** @description Not found */
         404: {
@@ -2530,7 +2713,44 @@ export interface paths {
     };
     put?: never;
     post?: never;
-    delete?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description User rank deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rank still assigned to users */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -2546,8 +2766,8 @@ export interface paths {
     get: {
       parameters: {
         query?: {
-          page?: string;
-          pageId?: string;
+          page?: 'artist' | 'collages' | 'requests' | 'communities' | 'release';
+          pageId?: number;
         };
         header?: never;
         path?: never;
@@ -2561,7 +2781,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['Comment'][];
+            'application/json': components['schemas']['PaginatedComments'];
           };
         };
       };
@@ -2577,11 +2797,18 @@ export interface paths {
       requestBody?: {
         content: {
           'application/json': {
-            page: string;
+            /** @enum {string} */
+            page:
+              | 'artist'
+              | 'collages'
+              | 'requests'
+              | 'communities'
+              | 'release';
             body: string;
             communityId?: number;
             contributionId?: number;
             artistId?: number;
+            releaseId?: number;
           };
         };
       };
@@ -2620,7 +2847,52 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    put?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            body: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Comment updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Comment'];
+          };
+        };
+        /** @description Not authorized */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     post?: never;
     delete: {
       parameters: {
@@ -2634,13 +2906,11 @@ export interface paths {
       requestBody?: never;
       responses: {
         /** @description Comment deleted */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
         /** @description Not authorized */
         403: {
@@ -2829,13 +3099,11 @@ export interface paths {
       requestBody?: never;
       responses: {
         /** @description Artist deleted */
-        200: {
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
+          content?: never;
         };
         /** @description Not found */
         404: {
@@ -3494,6 +3762,15 @@ export interface components {
       body: string;
       authorId: number;
       createdAt: string;
+      author?: {
+        id: number;
+        username: string;
+        avatar?: string | null;
+      };
+    };
+    PaginatedComments: {
+      data: components['schemas']['Comment'][];
+      meta: components['schemas']['PaginationMeta'];
     };
     Artist: {
       id: number;
