@@ -2675,7 +2675,47 @@ export interface paths {
       };
     };
     put?: never;
-    post?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+            level: number;
+            permissions?: {
+              [key: string]: boolean;
+            };
+            color?: string;
+            badge?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description User rank created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserRank'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -2720,7 +2760,49 @@ export interface paths {
         };
       };
     };
-    put?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name?: string;
+            level?: number;
+            permissions?: {
+              [key: string]: boolean;
+            };
+            color?: string;
+            badge?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description User rank updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserRank'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     post?: never;
     delete: {
       parameters: {

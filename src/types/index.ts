@@ -48,49 +48,7 @@ export type Release = components['schemas']['Release'];
 
 // ─── Profile ─────────────────────────────────────────────────────────────────
 
-export interface InviteNode {
-  id: number;
-  username: string;
-  email: string;
-  joinedAt?: string;
-  lastSeen?: string | null;
-  uploaded?: string;
-  downloaded?: string;
-  ratio?: string;
-  children?: InviteNode[];
-}
-
-export interface ProfileDetails {
-  id: number;
-  avatar?: string;
-  avatarMouseoverText?: string;
-  profileTitle?: string;
-  profileInfo?: string;
-}
-
-export interface Profile {
-  id: number;
-  username: string;
-  avatar?: string;
-  dateRegistered?: string;
-  isArtist?: boolean;
-  isDonor?: boolean;
-  userRank?: { name: string; color: string; badge?: string };
-  profile?: ProfileDetails;
-  userSettings?: { siteAppearance?: string; styledTooltips?: boolean };
-  inviteTree?: InviteNode[];
-}
-
-// ─── Settings ────────────────────────────────────────────────────────────────
-
-export interface UserSettings {
-  id?: number;
-  siteAppearance?: string;
-  externalStylesheet?: string;
-  styledTooltips?: boolean;
-  paranoia?: number;
-  avatar?: string;
-}
+export type InviteNode = components['schemas']['InviteNode'];
 
 // ─── Misc ────────────────────────────────────────────────────────────────────
 
@@ -108,41 +66,6 @@ export interface Collaborator {
 // ─── Site stats ─────────────────────────────────────────────────────────────
 
 export type SiteStats = components['schemas']['SiteStats'];
-
-export interface HomepageFeaturedRelease {
-  id: number;
-  title: string;
-  year?: number;
-  image?: string | null;
-  communityId?: number | null;
-  artist?: { id: number; name: string };
-}
-
-export interface HomepageFeaturedAlbum {
-  id: number;
-  title: string;
-  started: string;
-  ended: string;
-  threadId?: number | null;
-  release: HomepageFeaturedRelease;
-}
-
-export interface HomepageFeaturedContent {
-  albumOfTheMonth: HomepageFeaturedAlbum | null;
-  vanityHouse: HomepageFeaturedRelease | null;
-}
-
-// ─── Pagination ──────────────────────────────────────────────────────────────
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
 
 // ─── Redux state types ───────────────────────────────────────────────────────
 

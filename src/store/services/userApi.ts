@@ -1,12 +1,5 @@
 import { api } from '../api';
-import type { components, paths } from '../../types/api';
-
-interface UpdateUserRankArgs {
-  id: number;
-  level?: number;
-  name?: string;
-  permissions?: Record<string, boolean>;
-}
+import type { paths } from '../../types/api';
 
 type PublicUserResponse =
   paths['/users/{id}']['get']['responses'][200]['content']['application/json'];
@@ -22,11 +15,21 @@ type CreateUserArgs = NonNullable<
 >['content']['application/json'];
 type CreateUserResponse =
   paths['/users']['post']['responses'][201]['content']['application/json'];
-type UserRank = components['schemas']['UserRank'];
 type UserRanksResponse =
   paths['/tools/user-ranks']['get']['responses'][200]['content']['application/json'];
 type UserRankResponse =
   paths['/tools/user-ranks/{id}']['get']['responses'][200]['content']['application/json'];
+type CreateUserRankArgs = NonNullable<
+  paths['/tools/user-ranks']['post']['requestBody']
+>['content']['application/json'];
+type CreateUserRankResponse =
+  paths['/tools/user-ranks']['post']['responses'][201]['content']['application/json'];
+type UpdateUserRankBody = NonNullable<
+  paths['/tools/user-ranks/{id}']['put']['requestBody']
+>['content']['application/json'];
+type UpdateUserRankArgs = { id: number } & UpdateUserRankBody;
+type UpdateUserRankResponse =
+  paths['/tools/user-ranks/{id}']['put']['responses'][200]['content']['application/json'];
 
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -59,10 +62,7 @@ export const userApi = api.injectEndpoints({
       query: (id) => `/tools/user-ranks/${id}`,
       providesTags: (_, __, id) => [{ type: 'UserRank', id: Number(id) }]
     }),
-    createUserRank: build.mutation<
-      UserRank,
-      Omit<UserRank, 'id' | 'userCount'>
-    >({
+    createUserRank: build.mutation<CreateUserRankResponse, CreateUserRankArgs>({
       query: (data) => ({
         url: '/tools/user-ranks',
         method: 'POST',
@@ -70,7 +70,7 @@ export const userApi = api.injectEndpoints({
       }),
       invalidatesTags: ['UserRank']
     }),
-    updateUserRank: build.mutation<UserRank, UpdateUserRankArgs>({
+    updateUserRank: build.mutation<UpdateUserRankResponse, UpdateUserRankArgs>({
       query: ({ id, ...data }) => ({
         url: `/tools/user-ranks/${id}`,
         method: 'PUT',
