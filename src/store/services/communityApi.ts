@@ -21,6 +21,12 @@ type CreateContributionArgs = NonNullable<
 >['content']['application/json'];
 type CreateContributionResponse =
   paths['/contributions']['post']['responses'][201]['content']['application/json'];
+type AddContributionToReleaseArgs = ReleaseArgs &
+  NonNullable<
+    paths['/communities/{communityId}/releases/{releaseId}/contributions']['post']['requestBody']
+  >['content']['application/json'];
+type AddContributionToReleaseResponse =
+  paths['/communities/{communityId}/releases/{releaseId}/contributions']['post']['responses'][201]['content']['application/json'];
 
 export const communityApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -110,6 +116,20 @@ export const communityApi = api.injectEndpoints({
         body: data
       }),
       invalidatesTags: ['Contribution', 'Release']
+    }),
+    addContributionToRelease: build.mutation<
+      AddContributionToReleaseResponse,
+      AddContributionToReleaseArgs
+    >({
+      query: ({ communityId, releaseId, ...data }) => ({
+        url: `/communities/${communityId}/releases/${releaseId}/contributions`,
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId },
+        'Contribution'
+      ]
     })
   })
 });
@@ -125,5 +145,6 @@ export const {
   useUpdateReleaseMutation,
   useDeleteReleaseMutation,
   useGetContributionsQuery,
-  useCreateContributionMutation
+  useCreateContributionMutation,
+  useAddContributionToReleaseMutation
 } = communityApi;
