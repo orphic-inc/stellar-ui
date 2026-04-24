@@ -74,6 +74,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Account disabled */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -115,13 +124,13 @@ export interface paths {
             };
           };
         };
-        /** @description Validation error or already exists */
+        /** @description User already exists */
         400: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ValidationError'];
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -426,13 +435,13 @@ export interface paths {
             'application/json': components['schemas']['AdminCreatedUser'];
           };
         };
-        /** @description Validation error or duplicate user */
+        /** @description User already exists */
         400: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ValidationError'];
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
