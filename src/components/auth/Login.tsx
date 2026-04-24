@@ -39,10 +39,12 @@ const Login = () => {
       navigate('/private');
     } catch (err) {
       const status = (err as { status?: number })?.status;
+      const authErrorMessage =
+        getApiErrorMessage(err) ?? 'Invalid email or password.';
       const msg =
         status === 429
           ? 'Too many attempts, try again later.'
-          : getApiErrorMessage(err) ?? 'Invalid email or password.';
+          : authErrorMessage;
       dispatch(addAlert(msg, 'danger'));
     }
   };
