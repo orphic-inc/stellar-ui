@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCreateUserMutation } from '../../store/services/userApi';
+import { getMsgError } from '../../utils/apiError';
 
 interface FormState {
   username: string;
@@ -28,10 +29,7 @@ const NewUserForm = () => {
       await createUser(formData).unwrap();
       navigate('/private/staff/tools');
     } catch (err: unknown) {
-      setError(
-        (err as { data?: { msg?: string } })?.data?.msg ??
-          'Failed to create user.'
-      );
+      setError(getMsgError(err) ?? 'Failed to create user.');
     }
   };
 

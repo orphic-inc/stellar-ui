@@ -94,21 +94,8 @@ export interface UserSettings {
 
 // ─── Misc ────────────────────────────────────────────────────────────────────
 
-export interface Announcement {
-  id: number;
-  title: string;
-  body?: string;
-  createdAt: string;
-}
-
-export interface BlogPost {
-  id: number;
-  title: string;
-  body?: string;
-  createdAt: string;
-  user?: Pick<AuthUser, 'id' | 'username'>;
-}
-
+export type Announcement = components['schemas']['Announcement'];
+export type BlogPost = components['schemas']['BlogPost'];
 export type AnnouncementsResponse =
   components['schemas']['AnnouncementsResponse'];
 export type Artist = components['schemas']['Artist'];
