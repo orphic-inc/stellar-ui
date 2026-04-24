@@ -3779,7 +3779,14 @@ export interface paths {
         path?: never;
         cookie?: never;
       };
-      requestBody?: never;
+      requestBody?: {
+        content: {
+          'application/json': {
+            forumTopicId: number;
+            body: string;
+          };
+        };
+      };
       responses: {
         /** @description Note created */
         201: {
@@ -4136,6 +4143,7 @@ export interface components {
       forumTopicId: number;
       authorId: number;
       body: string;
+      edits: unknown[];
       author?: {
         id: number;
         username: string;
@@ -4146,6 +4154,7 @@ export interface components {
     };
     ForumPollVote: {
       id: number;
+      forumPollId: number;
       userId: number;
       vote: number;
     };
@@ -4154,6 +4163,7 @@ export interface components {
       forumTopicId: number;
       question: string;
       answers: string;
+      /** Format: date-time */
       featured?: string | null;
       closed: boolean;
       votes: components['schemas']['ForumPollVote'][];
