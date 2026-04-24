@@ -65,7 +65,6 @@ const ForumTopicPage = () => {
       answers = JSON.parse(poll.answers);
     } catch {
       pollParseError = true;
-      console.error('Failed to parse poll answers:', poll.answers);
     }
   }
 
