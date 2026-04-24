@@ -26,8 +26,10 @@ const ContributionsPage = () => {
             <thead>
               <tr className="colhead">
                 <td>Release</td>
+                <td>Format</td>
                 <td>Collaborators</td>
                 <td>Notes</td>
+                <td>Download</td>
               </tr>
             </thead>
             <tbody>
@@ -44,12 +46,23 @@ const ContributionsPage = () => {
                       c.release.title
                     )}
                   </td>
+                  <td className="small">{c.type}</td>
                   <td>
                     {c.collaborators.length
                       ? c.collaborators.map((a) => a.name).join(', ')
                       : '—'}
                   </td>
                   <td>{c.releaseDescription ?? '—'}</td>
+                  <td>
+                    <a
+                      href={c.downloadUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="brackets"
+                    >
+                      Download
+                    </a>
+                  </td>
                 </tr>
               ))}
             </tbody>

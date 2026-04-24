@@ -31,14 +31,30 @@ const CONTENT_TYPES = [
 ] as const;
 type ContentType = (typeof CONTENT_TYPES)[number];
 const FILE_TYPES = [
-  'txt',
+  'mp3',
+  'flac',
   'wav',
-  'pdf',
-  'wmv',
   'ogg',
-  'lua',
+  'aac',
+  'm4a',
+  'm4b',
+  'mp4',
+  'mkv',
+  'avi',
+  'mov',
+  'zip',
+  'exe',
+  'dmg',
+  'apk',
+  'pdf',
+  'epub',
+  'mobi',
+  'cbz',
+  'cbr',
   'jpg',
-  'png'
+  'png',
+  'gif',
+  'txt'
 ] as const;
 type FileType = (typeof FILE_TYPES)[number];
 
@@ -53,7 +69,8 @@ const ContributeForm = () => {
   const [community, setCommunity] = useState('');
   const [type, setType] = useState<ContentType>('Music');
   const [year, setYear] = useState(new Date().getFullYear().toString());
-  const [fileType, setFileType] = useState<FileType>('wav');
+  const [fileType, setFileType] = useState<FileType>('mp3');
+  const [downloadUrl, setDownloadUrl] = useState('');
   const [sizeInBytes, setSizeInBytes] = useState('');
   const [title, setTitle] = useState('');
   const [album, setAlbum] = useState('');
@@ -106,7 +123,8 @@ const ContributeForm = () => {
         title: type === 'Music' ? album : title,
         year: parseInt(year, 10),
         fileType,
-        sizeInBytes: parseInt(sizeInBytes, 10),
+        downloadUrl,
+        sizeInBytes: sizeInBytes ? parseInt(sizeInBytes, 10) : undefined,
         tags,
         image,
         description,
@@ -198,14 +216,30 @@ const ContributeForm = () => {
               </td>
             </tr>
             <tr>
-              <td className="label">File size (bytes)</td>
+              <td className="label">Download URL</td>
+              <td>
+                <input
+                  type="url"
+                  size={60}
+                  value={downloadUrl}
+                  onChange={(e) => setDownloadUrl(e.target.value)}
+                  placeholder="https://example.com/files/my-release.zip"
+                  required
+                />
+                <div className="small">
+                  Link to where the file is hosted (e.g. GitHub, Google Drive,
+                  your own server)
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td className="label">File size (bytes, optional)</td>
               <td>
                 <input
                   type="number"
                   min="1"
                   value={sizeInBytes}
                   onChange={(e) => setSizeInBytes(e.target.value)}
-                  required
                 />
               </td>
             </tr>
