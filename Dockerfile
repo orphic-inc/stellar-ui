@@ -1,15 +1,11 @@
 FROM node:lts-alpine AS build
 
-ARG GATSBY_API_URL
-ARG GATSBY_HCAPTCHA_SITEKEY
-ARG GA_TRACKING_ID
-
 WORKDIR /usr/src/stellar-ui
 
-COPY . .
-
+COPY package*.json ./
 RUN npm ci
 
+COPY . .
 RUN npm run build
 
 FROM nginx:alpine
