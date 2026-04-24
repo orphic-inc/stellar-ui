@@ -1,71 +1,44 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
-export type CommentPage =
-  | 'communities'
-  | 'artist'
-  | 'collages'
-  | 'requests'
-  | 'release';
+export type CommentPage = NonNullable<
+  paths['/comments']['get']['parameters']['query']
+>['page'] extends infer T
+  ? Exclude<T, undefined>
+  : never;
 
-type CommentQueryParams = {
-  page?: CommentPage;
-  pageId?: number;
-};
-
-type CommunityCommentBody = {
-  page: 'communities';
-  body: string;
-  communityId: number;
-};
-
-type ArtistCommentBody = {
-  page: 'artist';
-  body: string;
-  artistId: number;
-};
-
-type ContributionCommentBody = {
-  page: 'collages' | 'requests';
-  body: string;
-  contributionId: number;
-};
-
-type ReleaseCommentBody = {
-  page: 'release';
-  body: string;
-  releaseId: number;
-};
-
-type CommentBody =
-  | CommunityCommentBody
-  | ArtistCommentBody
-  | ContributionCommentBody
-  | ReleaseCommentBody;
+type CommentQueryParams = NonNullable<
+  paths['/comments']['get']['parameters']['query']
+>;
+type CommentsResponse =
+  paths['/comments']['get']['responses'][200]['content']['application/json'];
+type CommentListItem = CommentsResponse['data'][number];
+type CreateCommentBody = NonNullable<
+  paths['/comments']['post']['requestBody']
+>['content']['application/json'];
+type UpdateCommentBody = NonNullable<
+  paths['/comments/{id}']['put']['requestBody']
+>['content']['application/json'];
 
 export const commentApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getComments: build.query<
-      {
-        id: number;
-        body: string;
-        authorId: number;
-        author?: { id: number; username: string; avatar?: string };
-        createdAt: string;
-      }[],
-      CommentQueryParams
-    >({
+    getComments: build.query<CommentListItem[], CommentQueryParams>({
       query: (params) => ({ url: '/comments', params }),
+      transformResponse: (response: CommentsResponse) => response.data,
       providesTags: ['Comment']
     }),
-    createComment: build.mutation<{ id: number }, CommentBody>({
+    createComment: build.mutation<CommentListItem, CreateCommentBody>({
       query: (data) => ({ url: '/comments', method: 'POST', body: data }),
       invalidatesTags: ['Comment']
     }),
-    updateComment: build.mutation<void, { id: number; body: string }>({
+    updateComment: build.mutation<
+      CommentListItem,
+      { id: number; body: string }
+    >({
       query: ({ id, ...data }) => ({
         url: `/comments/${id}`,
         method: 'PUT',
-        body: data
+        body: data as UpdateCommentBody
       }),
       invalidatesTags: ['Comment']
     }),
