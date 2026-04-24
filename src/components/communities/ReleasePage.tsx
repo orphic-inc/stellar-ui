@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import CommentsSection from '../layout/CommentsSection';
 import { useGetReleaseByIdQuery } from '../../store/services/communityApi';
 import Spinner from '../layout/Spinner';
@@ -10,6 +10,7 @@ const ReleasePage = () => {
   }>();
   const cId = parseInt(communityId ?? '0');
   const rId = parseInt(releaseId ?? '0');
+  const navigate = useNavigate();
 
   const {
     data: release,
@@ -66,9 +67,30 @@ const ReleasePage = () => {
         </div>
       </div>
 
-      {release.contributions && release.contributions.length > 0 && (
-        <div className="box">
-          <div className="head colhead_dark">Contributions</div>
+      <div className="box">
+        <div
+          className="head colhead_dark"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
+          <span>Contributions</span>
+          <button
+            type="button"
+            className="brackets btn-link"
+            style={{ fontSize: '0.85em' }}
+            onClick={() =>
+              navigate(
+                `/private/communities/${communityId}/releases/${releaseId}/contribute`
+              )
+            }
+          >
+            + Add your version
+          </button>
+        </div>
+        {release.contributions && release.contributions.length > 0 ? (
           <table className="m_table">
             <thead>
               <tr className="colhead">
@@ -106,8 +128,23 @@ const ReleasePage = () => {
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+        ) : (
+          <div className="pad small">
+            No contributions yet.{' '}
+            <button
+              type="button"
+              className="btn-link"
+              onClick={() =>
+                navigate(
+                  `/private/communities/${communityId}/releases/${releaseId}/contribute`
+                )
+              }
+            >
+              Be the first to contribute a file.
+            </button>
+          </div>
+        )}
+      </div>
 
       <CommentsSection page="release" pageId={rId} />
     </div>
