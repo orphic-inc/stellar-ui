@@ -19,6 +19,7 @@ import NewTopicForm from '../../../forum/NewTopicForm';
 import CommunitiesPage from '../../../communities/CommunitiesPage';
 import CommunityPage from '../../../communities/CommunityPage';
 import ReleasePage from '../../../communities/ReleasePage';
+import AddContributionForm from '../../../communities/AddContributionForm';
 import ContributeForm from '../../../contribute/ContributeForm';
 import ContributionsPage from '../../../contribute/ContributionsPage';
 
@@ -156,6 +157,10 @@ const PrivateContent = () => (
     <Route path="forums/:forumId" element={wrap(ForumPage)} />
     <Route path="forums" element={wrap(ForumCategoryPage)} />
 
+    <Route
+      path="communities/:communityId/releases/:releaseId/contribute"
+      element={wrap(AddContributionForm)}
+    />
     <Route
       path="communities/:communityId/releases/:releaseId"
       element={wrap(ReleasePage)}
