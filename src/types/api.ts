@@ -3502,7 +3502,16 @@ export interface paths {
         path?: never;
         cookie?: never;
       };
-      requestBody?: never;
+      requestBody?: {
+        content: {
+          'application/json': {
+            title: string;
+            text: string;
+            category: string;
+            tags?: string[];
+          };
+        };
+      };
       responses: {
         /** @description Post created */
         201: {
@@ -3613,7 +3622,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/posts/comment/{id}': {
+  '/posts/{id}/comments': {
     parameters: {
       query?: never;
       header?: never;
@@ -3631,19 +3640,21 @@ export interface paths {
         };
         cookie?: never;
       };
-      requestBody?: never;
+      requestBody?: {
+        content: {
+          'application/json': {
+            text: string;
+          };
+        };
+      };
       responses: {
-        /** @description Comment added; returns updated comments list */
+        /** @description Comment created */
         201: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': {
-              userId: number;
-              text: string;
-              date: string;
-            }[];
+            'application/json': components['schemas']['PostComment'];
           };
         };
         /** @description Post not found */
@@ -3663,7 +3674,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/posts/comment/{id}/{commentIdx}': {
+  '/posts/{id}/comments/{commentId}': {
     parameters: {
       query?: never;
       header?: never;
@@ -3679,7 +3690,7 @@ export interface paths {
         header?: never;
         path: {
           id: string;
-          commentIdx: string;
+          commentId: string;
         };
         cookie?: never;
       };
@@ -3701,7 +3712,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Post or comment not found */
+        /** @description Comment not found */
         404: {
           headers: {
             [name: string]: unknown;
@@ -4138,12 +4149,23 @@ export interface components {
       createdAt: string;
       updatedAt: string;
     };
+    ForumPostEdit: {
+      id: number;
+      forumPostId: number;
+      editorId: number;
+      previousBody: string;
+      editedAt: string;
+      editor?: {
+        id: number;
+        username: string;
+      };
+    };
     ForumPost: {
       id: number;
       forumTopicId: number;
       authorId: number;
       body: string;
-      edits: unknown[];
+      edits: components['schemas']['ForumPostEdit'][];
       author?: {
         id: number;
         username: string;
@@ -4322,6 +4344,18 @@ export interface components {
         name: string;
       };
     };
+    PostComment: {
+      id: number;
+      postId: number;
+      userId: number;
+      text: string;
+      createdAt: string;
+      user?: {
+        id: number;
+        username: string;
+        avatar?: string | null;
+      };
+    };
     Post: {
       id: number;
       userId: number;
@@ -4329,11 +4363,7 @@ export interface components {
       text: string;
       category: string;
       tags: string[];
-      comments: {
-        userId: number;
-        text: string;
-        date: string;
-      }[];
+      comments: components['schemas']['PostComment'][];
       createdAt: string;
       user?: {
         id: number;
