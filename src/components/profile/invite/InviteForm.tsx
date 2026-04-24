@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { useCreateInviteMutation } from '../../../store/services/profileApi';
 import { addAlert } from '../../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../../utils/apiError';
 
 const InviteForm = () => {
   const dispatch = useDispatch();
@@ -19,8 +20,13 @@ const InviteForm = () => {
       dispatch(addAlert('Invitation sent successfully.', 'success'));
       setEmail('');
       setReason('');
-    } catch {
-      dispatch(addAlert('Failed to send invite. Please try again.', 'danger'));
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to send invite. Please try again.',
+          'danger'
+        )
+      );
     }
   };
 

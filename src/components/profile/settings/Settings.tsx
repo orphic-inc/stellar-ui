@@ -7,6 +7,7 @@ import {
   useUpdateUserSettingsMutation
 } from '../../../store/services/userApi';
 import { addAlert } from '../../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../../utils/apiError';
 import Spinner from '../../layout/Spinner';
 import type { paths } from '../../../types/api';
 
@@ -40,8 +41,13 @@ const Settings = () => {
     try {
       await updateSettings(data).unwrap();
       dispatch(addAlert('Settings saved.', 'success'));
-    } catch {
-      dispatch(addAlert('Failed to save settings.', 'danger'));
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to save settings.',
+          'danger'
+        )
+      );
     }
   };
 

@@ -3898,6 +3898,7 @@ export interface components {
       error: string;
     };
     ValidationError: {
+      msg: string;
       errors: {
         [key: string]: string[];
       };

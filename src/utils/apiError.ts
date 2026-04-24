@@ -12,3 +12,9 @@ export function getFieldErrors(
 ): Record<string, string[]> | undefined {
   return (err as { data?: ValidationError })?.data?.errors;
 }
+
+export function getApiErrorMessage(err: unknown): string | undefined {
+  const fieldErrors = getFieldErrors(err);
+  const firstFieldError = fieldErrors && Object.values(fieldErrors).flat()[0];
+  return firstFieldError ?? getMsgError(err);
+}

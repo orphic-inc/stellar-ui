@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLoginMutation } from '../../store/services/authApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 interface FormState {
   email: string;
@@ -41,7 +42,7 @@ const Login = () => {
       const msg =
         status === 429
           ? 'Too many attempts, try again later.'
-          : 'Invalid email or password.';
+          : getApiErrorMessage(err) ?? 'Invalid email or password.';
       dispatch(addAlert(msg, 'danger'));
     }
   };

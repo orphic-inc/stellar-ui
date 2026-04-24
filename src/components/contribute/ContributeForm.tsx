@@ -7,6 +7,7 @@ import {
 } from '../../store/services/communityApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import type { Collaborator } from '../../types';
 
@@ -113,9 +114,13 @@ const ContributeForm = () => {
         collaborators
       }).unwrap();
       navigate('/private/contribute/list');
-    } catch {
+    } catch (err) {
       dispatch(
-        addAlert('Failed to submit contribution. Please try again.', 'danger')
+        addAlert(
+          getApiErrorMessage(err) ??
+            'Failed to submit contribution. Please try again.',
+          'danger'
+        )
       );
     }
   };
