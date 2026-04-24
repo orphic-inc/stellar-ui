@@ -14,7 +14,11 @@ const inputClass =
   'rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
 
 const NewsManager = () => {
-  const { data: announcements, isLoading } = useGetAnnouncementsQuery();
+  const {
+    data: announcements,
+    isLoading,
+    error: announcementsError
+  } = useGetAnnouncementsQuery();
   const [createAnnouncement, { isLoading: creatingNews }] =
     useCreateAnnouncementMutation();
   const [deleteAnnouncement] = useDeleteAnnouncementMutation();
@@ -62,6 +66,10 @@ const NewsManager = () => {
         </div>
         {isLoading ? (
           <Spinner />
+        ) : announcementsError ? (
+          <p className="p-4 text-sm text-red-400">
+            Failed to load announcements.
+          </p>
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -151,6 +159,8 @@ const NewsManager = () => {
         </div>
         {isLoading ? (
           <Spinner />
+        ) : announcementsError ? (
+          <p className="p-4 text-sm text-red-400">Failed to load blog posts.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>

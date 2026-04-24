@@ -37,7 +37,8 @@ export const profileApi = api.injectEndpoints({
         url: '/profile/referral/create-invite',
         method: 'POST',
         body: data
-      })
+      }),
+      invalidatesTags: ['Profile']
     })
   })
 });

@@ -8,9 +8,16 @@ import {
 import Spinner from '../layout/Spinner';
 
 const ForumControlPanel = () => {
-  const { data: categories, isLoading: loadingCategories } =
-    useGetForumCategoriesQuery();
-  const { data: forums, isLoading: loadingForums } = useGetForumsQuery();
+  const {
+    data: categories,
+    isLoading: loadingCategories,
+    error: categoriesError
+  } = useGetForumCategoriesQuery();
+  const {
+    data: forums,
+    isLoading: loadingForums,
+    error: forumsError
+  } = useGetForumsQuery();
   const [createForum, { isLoading: isCreating }] = useCreateForumMutation();
 
   const [categoryId, setCategoryId] = useState('');
@@ -62,6 +69,8 @@ const ForumControlPanel = () => {
         </div>
         {loadingCategories || loadingForums ? (
           <Spinner />
+        ) : categoriesError || forumsError ? (
+          <p className="p-4 text-sm text-red-400">Failed to load forums.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
