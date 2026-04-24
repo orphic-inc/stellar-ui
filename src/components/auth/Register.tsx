@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useRegisterMutation } from '../../store/services/authApi';
 import { addAlert } from '../../store/slices/alertSlice';
-import { getFieldErrors } from '../../utils/apiError';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 interface FormState {
   username: string;
@@ -41,9 +41,9 @@ const Register = () => {
       dispatch(addAlert('Account created.', 'success'));
       navigate('/private');
     } catch (err: unknown) {
-      const errors = getFieldErrors(err);
-      const firstError = errors && Object.values(errors).flat()[0];
-      dispatch(addAlert(firstError ?? 'Registration failed.', 'danger'));
+      dispatch(
+        addAlert(getApiErrorMessage(err) ?? 'Registration failed.', 'danger')
+      );
     }
   };
 

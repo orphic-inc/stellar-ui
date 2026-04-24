@@ -7,6 +7,7 @@ import {
 import { useAppDispatch } from '../../../store/hooks';
 import { setCredentials } from '../../../store/slices/authSlice';
 import { addAlert } from '../../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../../utils/apiError';
 
 interface FormValues {
   username: string;
@@ -45,10 +46,9 @@ const Install = () => {
       dispatch(addAlert('Installation complete. Welcome, SysOp.', 'success'));
       navigate('/private');
     } catch (err: unknown) {
-      const msg =
-        (err as { data?: { msg?: string } })?.data?.msg ??
-        'Installation failed';
-      dispatch(addAlert(msg, 'danger'));
+      dispatch(
+        addAlert(getApiErrorMessage(err) ?? 'Installation failed', 'danger')
+      );
     }
   };
 

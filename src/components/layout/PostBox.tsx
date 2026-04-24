@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useCreatePostMutation } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 interface Props {
   forumId: string;
@@ -23,8 +24,10 @@ const PostBox = ({ forumId, topicId }: Props) => {
         body
       }).unwrap();
       setBody('');
-    } catch {
-      dispatch(addAlert('Failed to post reply.', 'danger'));
+    } catch (err) {
+      dispatch(
+        addAlert(getApiErrorMessage(err) ?? 'Failed to post reply.', 'danger')
+      );
     }
   };
 

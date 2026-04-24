@@ -7,6 +7,7 @@ import {
   type CreateTopicArgs
 } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 const NewTopicForm = () => {
   const { forumId } = useParams<{ forumId: string }>();
@@ -47,8 +48,14 @@ const NewTopicForm = () => {
     try {
       const topic = await createTopic(payload).unwrap();
       navigate(`/private/forums/${forumId}/topics/${topic.id}`);
-    } catch {
-      dispatch(addAlert('Failed to create topic. Please try again.', 'danger'));
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ??
+            'Failed to create topic. Please try again.',
+          'danger'
+        )
+      );
     }
   };
 
