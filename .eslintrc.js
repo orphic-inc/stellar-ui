@@ -36,6 +36,7 @@ module.exports = {
       'error',
       {
         ignore: [
+          '^@reduxjs/toolkit$',
           'dompurify',
           '^@reduxjs/toolkit/query$',
           '^@reduxjs/toolkit/query/react$'
