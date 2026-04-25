@@ -7,9 +7,22 @@
   "scripts": {
     "api:generate": "npm --prefix ../stellar-api run openapi:export && npx --no-install openapi-typescript ../stellar-api/openapi.json -o src/types/api.ts && npx --no-install prettier --write src/types/api.ts",
     "build": "cross-env NODE_ENV=production webpack",
+    "clean": "rm -rf dist",
     "start": "cross-env NODE_ENV=development webpack serve",
     "typecheck": "tsc --noEmit",
-    "test": "jest --runInBand"
+    "lint": "eslint src --ext .ts,.tsx",
+    "format": "prettier --write src",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,scss,css}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.22.6",
