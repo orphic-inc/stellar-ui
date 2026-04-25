@@ -107,6 +107,18 @@ export interface RequestsListResponse {
 
 // ─── Ratio ───────────────────────────────────────────────────────────────────
 
+export type RatioPolicyStatus = 'OK' | 'WATCH' | 'LEECH_DISABLED';
+
+export interface PolicyStateView {
+  userId: number;
+  status: RatioPolicyStatus;
+  watchStartedAt: string | null;
+  watchExpiresAt: string | null;
+  downloadedAtWatchStart: string | null;
+  leechDisabledAt: string | null;
+  lastEvaluatedAt: string;
+}
+
 export interface RatioBracket {
   label: string;
   maxRequired: number;
@@ -122,6 +134,7 @@ export interface RatioStats {
   contributionCoverage: number;
   requiredRatio: number;
   meetsRequirement: boolean;
+  policy: PolicyStateView;
 }
 
 // ─── Downloads ───────────────────────────────────────────────────────────────

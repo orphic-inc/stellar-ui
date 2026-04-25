@@ -9,6 +9,13 @@ const formatBytes = (bytesStr: string): string => {
   return `${bytes} B`;
 };
 
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
 const RatioStats = () => {
   const { data: stats, isLoading } = useGetMyRatioStatsQuery();
 
@@ -16,10 +23,36 @@ const RatioStats = () => {
   if (!stats) return null;
 
   const ratioColor = stats.meetsRequirement ? 'text-green-400' : 'text-red-400';
+  const { policy } = stats;
 
   return (
     <div className="box box_info mt-4">
       <div className="head colhead_dark">Upload / Download</div>
+
+      {policy.status === 'LEECH_DISABLED' && (
+        <div className="box_warning p-3 text-sm">
+          <strong>Downloads disabled.</strong> Your ratio fell below the
+          required threshold and your download access has been suspended.
+          Contact staff to appeal.
+          {policy.leechDisabledAt && (
+            <span className="text-gray-400 ml-1">
+              (since {formatDate(policy.leechDisabledAt)})
+            </span>
+          )}
+        </div>
+      )}
+
+      {policy.status === 'WATCH' && (
+        <div className="box_warning p-3 text-sm">
+          <strong>Ratio watch active.</strong> Your ratio is below the required
+          minimum. Improve your ratio before{' '}
+          {policy.watchExpiresAt
+            ? formatDate(policy.watchExpiresAt)
+            : 'the deadline'}{' '}
+          to avoid download suspension.
+        </div>
+      )}
+
       <ul className="stats nobullet">
         <li>
           Uploaded:{' '}
