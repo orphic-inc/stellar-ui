@@ -1,5 +1,6 @@
 import { api } from '../api';
 import type { paths } from '../../types/api';
+import type { RatioStats } from '../../types';
 
 type MyProfileResponse =
   paths['/profile/me']['get']['responses'][200]['content']['application/json'];
@@ -39,6 +40,10 @@ export const profileApi = api.injectEndpoints({
         body: data
       }),
       invalidatesTags: ['Profile']
+    }),
+    getMyRatioStats: build.query<RatioStats, void>({
+      query: () => '/profile/me/ratio',
+      providesTags: ['Profile']
     })
   })
 });
@@ -48,5 +53,6 @@ export const {
   useGetProfileByUserIdQuery,
   useUpdateMyProfileMutation,
   useDeleteMyProfileMutation,
-  useCreateInviteMutation
+  useCreateInviteMutation,
+  useGetMyRatioStatsQuery
 } = profileApi;

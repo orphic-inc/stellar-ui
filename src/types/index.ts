@@ -105,6 +105,25 @@ export interface RequestsListResponse {
   meta: { total: number; page: number; limit: number; totalPages: number };
 }
 
+// ─── Ratio ───────────────────────────────────────────────────────────────────
+
+export interface RatioBracket {
+  label: string;
+  maxRequired: number;
+  minRequired: number;
+}
+
+export interface RatioStats {
+  ratio: number;
+  totalEarned: string;
+  downloaded: string;
+  bracket: RatioBracket;
+  eligibleContributionBytes: string;
+  contributionCoverage: number;
+  requiredRatio: number;
+  meetsRequirement: boolean;
+}
+
 // ─── Downloads ───────────────────────────────────────────────────────────────
 
 export type DownloadGrantStatus = 'COMPLETED' | 'REVERSED';
