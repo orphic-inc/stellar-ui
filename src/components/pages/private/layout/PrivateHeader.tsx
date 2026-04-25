@@ -13,6 +13,7 @@ const navLinks = [
   { label: 'Communities', to: '/private/communities' },
   { label: 'Forums', to: '/private/forums' },
   { label: 'Upload', to: '/private/contribute' },
+  { label: 'Requests', to: '/private/requests' },
   { label: 'Invites', to: '/private/invite' }
 ];
 

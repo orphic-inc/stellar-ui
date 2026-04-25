@@ -23,6 +23,9 @@ import AddContributionForm from '../../../communities/AddContributionForm';
 import ContributeForm from '../../../contribute/ContributeForm';
 import ContributionsPage from '../../../contribute/ContributionsPage';
 
+import RequestsPage from '../../../requests/RequestsPage';
+import RequestDetailPage from '../../../requests/RequestDetailPage';
+import CreateRequestForm from '../../../requests/CreateRequestForm';
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
 import UserRankManager from '../../../admin/UserRankManager';
@@ -169,6 +172,10 @@ const PrivateContent = () => (
     <Route path="communities" element={wrap(CommunitiesPage)} />
     <Route path="contribute/list" element={wrap(ContributionsPage)} />
     <Route path="contribute" element={wrap(ContributeForm)} />
+
+    <Route path="requests/new" element={wrap(CreateRequestForm)} />
+    <Route path="requests/:id" element={wrap(RequestDetailPage)} />
+    <Route path="requests" element={wrap(RequestsPage)} />
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />

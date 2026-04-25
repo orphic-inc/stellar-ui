@@ -63,6 +63,60 @@ export interface Collaborator {
   importance: string;
 }
 
+// ─── Requests & Bounty ──────────────────────────────────────────────────────
+
+export type RequestStatus = 'open' | 'filled';
+
+export interface RequestBounty {
+  id: number;
+  requestId: number;
+  userId: number;
+  amount: string; // BigInt serialized to string on the wire
+  createdAt: string;
+  user?: { id: number; username: string };
+}
+
+export interface RequestItem {
+  id: number;
+  communityId: number;
+  userId: number;
+  title: string;
+  description: string;
+  type: string;
+  year: number | null;
+  image: string | null;
+  status: RequestStatus;
+  fillerId: number | null;
+  filledAt: string | null;
+  filledContributionId: number | null;
+  totalBounty: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  user?: { id: number; username: string };
+  filler?: { id: number; username: string } | null;
+  community?: { id: number; name: string };
+  bounties?: RequestBounty[];
+  artists?: Array<{ artistId: number; artist: { id: number; name: string } }>;
+}
+
+export interface RequestsListResponse {
+  data: RequestItem[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
+// ─── Downloads ───────────────────────────────────────────────────────────────
+
+export type DownloadGrantStatus = 'COMPLETED' | 'REVERSED';
+
+export interface DownloadGrant {
+  grantId: number;
+  downloadUrl: string;
+  amountBytes: string;
+  status: DownloadGrantStatus;
+  createdAt: string;
+}
+
 // ─── Site stats ─────────────────────────────────────────────────────────────
 
 export type SiteStats = components['schemas']['SiteStats'];
