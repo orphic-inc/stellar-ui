@@ -37,7 +37,9 @@ export const api = createApi({
     'Stylesheet',
     'Contribution',
     'UserRank',
-    'Stats'
+    'Stats',
+    'Request',
+    'Download'
   ] as const,
   endpoints: () => ({})
 });

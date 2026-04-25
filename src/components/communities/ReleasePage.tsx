@@ -1,7 +1,10 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import CommentsSection from '../layout/CommentsSection';
 import { useGetReleaseByIdQuery } from '../../store/services/communityApi';
 import Spinner from '../layout/Spinner';
+import DownloadButton from './DownloadButton';
 
 const ReleasePage = () => {
   const { communityId, releaseId } = useParams<{
@@ -11,6 +14,7 @@ const ReleasePage = () => {
   const cId = parseInt(communityId ?? '0');
   const rId = parseInt(releaseId ?? '0');
   const navigate = useNavigate();
+  const user = useSelector(selectCurrentUser);
 
   const {
     data: release,
@@ -115,14 +119,10 @@ const ReleasePage = () => {
                   </td>
                   <td>{c.releaseDescription ?? '—'}</td>
                   <td>
-                    <a
-                      href={c.downloadUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="brackets"
-                    >
-                      Download
-                    </a>
+                    <DownloadButton
+                      contributionId={c.id}
+                      canDownload={user?.canDownload ?? false}
+                    />
                   </td>
                 </tr>
               ))}
