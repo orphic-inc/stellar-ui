@@ -24,8 +24,23 @@ export const downloadApi = api.injectEndpoints({
         method: 'POST',
         body: reason ? { reason } : {}
       })
+    }),
+
+    reportContribution: builder.mutation<
+      { msg: string },
+      { contributionId: number; reason: string }
+    >({
+      query: ({ contributionId, reason }) => ({
+        url: `/contributions/${contributionId}/report`,
+        method: 'POST',
+        body: { reason }
+      })
     })
   })
 });
 
-export const { useGrantAccessMutation, useReverseGrantMutation } = downloadApi;
+export const {
+  useGrantAccessMutation,
+  useReverseGrantMutation,
+  useReportContributionMutation
+} = downloadApi;
