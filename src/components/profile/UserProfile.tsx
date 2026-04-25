@@ -5,6 +5,7 @@ import { useGetProfileByUserIdQuery } from '../../store/services/profileApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
+import RatioStats from './RatioStats';
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -73,6 +74,8 @@ const UserProfile = () => {
             )}
           </ul>
         </div>
+
+        {isOwnProfile && <RatioStats />}
       </div>
 
       {profile.profile?.profileInfo && (
