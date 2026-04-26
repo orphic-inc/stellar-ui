@@ -84,6 +84,21 @@ const sections: SectionProps[] = [
         permissions: ['forums_manage']
       }
     ]
+  },
+  {
+    title: 'Support',
+    links: [
+      {
+        label: 'Staff inbox',
+        to: '/private/staff/inbox',
+        permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Canned responses',
+        to: '/private/staff/inbox/responses',
+        permissions: ['staff', 'admin']
+      }
+    ]
   }
 ];
 

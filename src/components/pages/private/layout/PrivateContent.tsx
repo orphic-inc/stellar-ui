@@ -30,6 +30,15 @@ import CollageBrowse from '../../../collages/CollageBrowse';
 import CollageCreate from '../../../collages/CollageCreate';
 import CollageDetail from '../../../collages/CollageDetail';
 import CollageEdit from '../../../collages/CollageEdit';
+import InboxPage from '../../../messages/InboxPage';
+import SentboxPage from '../../../messages/SentboxPage';
+import ComposeForm from '../../../messages/ComposeForm';
+import ConversationView from '../../../messages/ConversationView';
+import MyTicketsPage from '../../../staffInbox/MyTicketsPage';
+import NewTicketForm from '../../../staffInbox/NewTicketForm';
+import TicketView from '../../../staffInbox/TicketView';
+import StaffInboxPage from '../../../staffInbox/StaffInboxPage';
+import CannedResponsesPage from '../../../staffInbox/CannedResponsesPage';
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
 import UserRankManager from '../../../admin/UserRankManager';
@@ -185,6 +194,31 @@ const PrivateContent = () => (
     <Route path="collages/:id/edit" element={wrap(CollageEdit)} />
     <Route path="collages/:id" element={wrap(CollageDetail)} />
     <Route path="collages" element={wrap(CollageBrowse)} />
+
+    <Route path="messages/new" element={wrap(ComposeForm)} />
+    <Route path="messages/sent" element={wrap(SentboxPage)} />
+    <Route path="messages/:id" element={wrap(ConversationView)} />
+    <Route path="messages" element={wrap(InboxPage)} />
+
+    <Route path="staff/inbox/new" element={wrap(NewTicketForm)} />
+    <Route
+      path="staff/inbox/responses"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <CannedResponsesPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/inbox"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <StaffInboxPage />
+        </StaffGate>
+      }
+    />
+    <Route path="staff/inbox/my-tickets" element={wrap(MyTicketsPage)} />
+    <Route path="staff/inbox/:id" element={wrap(TicketView)} />
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />
