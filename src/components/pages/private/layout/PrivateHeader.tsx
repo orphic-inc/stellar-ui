@@ -11,6 +11,7 @@ interface Props {
 const navLinks = [
   { label: 'Home', to: '/private/' },
   { label: 'Communities', to: '/private/communities' },
+  { label: 'Collages', to: '/private/collages' },
   { label: 'Forums', to: '/private/forums' },
   { label: 'Upload', to: '/private/contribute' },
   { label: 'Requests', to: '/private/requests' },

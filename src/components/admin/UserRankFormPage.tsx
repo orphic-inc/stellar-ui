@@ -20,6 +20,10 @@ const PERM_GROUPS: { title: string; perms: string[] }[] = [
     perms: ['communities_manage']
   },
   {
+    title: 'Collages',
+    perms: ['collages_manage', 'collages_moderate']
+  },
+  {
     title: 'Users',
     perms: ['users_edit', 'users_warn', 'users_disable', 'invites_manage']
   },

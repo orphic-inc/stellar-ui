@@ -26,6 +26,10 @@ import ContributionsPage from '../../../contribute/ContributionsPage';
 import RequestsPage from '../../../requests/RequestsPage';
 import RequestDetailPage from '../../../requests/RequestDetailPage';
 import CreateRequestForm from '../../../requests/CreateRequestForm';
+import CollageBrowse from '../../../collages/CollageBrowse';
+import CollageCreate from '../../../collages/CollageCreate';
+import CollageDetail from '../../../collages/CollageDetail';
+import CollageEdit from '../../../collages/CollageEdit';
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
 import UserRankManager from '../../../admin/UserRankManager';
@@ -176,6 +180,11 @@ const PrivateContent = () => (
     <Route path="requests/new" element={wrap(CreateRequestForm)} />
     <Route path="requests/:id" element={wrap(RequestDetailPage)} />
     <Route path="requests" element={wrap(RequestsPage)} />
+
+    <Route path="collages/new" element={wrap(CollageCreate)} />
+    <Route path="collages/:id/edit" element={wrap(CollageEdit)} />
+    <Route path="collages/:id" element={wrap(CollageDetail)} />
+    <Route path="collages" element={wrap(CollageBrowse)} />
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />

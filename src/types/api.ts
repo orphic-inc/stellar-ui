@@ -3008,6 +3008,7 @@ export interface paths {
             contributionId?: number;
             artistId?: number;
             releaseId?: number;
+            collageId?: number;
           };
         };
       };
@@ -4608,6 +4609,7 @@ export interface components {
       page: string;
       body: string;
       authorId: number;
+      collageId?: number | null;
       createdAt: string;
       author?: {
         id: number;

@@ -39,7 +39,8 @@ export const api = createApi({
     'UserRank',
     'Stats',
     'Request',
-    'Download'
+    'Download',
+    'Collage'
   ] as const,
   endpoints: () => ({})
 });

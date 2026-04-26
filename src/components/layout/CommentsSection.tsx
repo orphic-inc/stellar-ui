@@ -32,6 +32,8 @@ const CommentsSection = ({ page, pageId }: Props) => {
       await createComment({ page, body, artistId: pageId });
     } else if (page === 'release') {
       await createComment({ page, body, releaseId: pageId });
+    } else if (page === 'collages') {
+      await createComment({ page, body, collageId: pageId });
     } else {
       await createComment({ page, body, contributionId: pageId });
     }
