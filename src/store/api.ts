@@ -40,7 +40,10 @@ export const api = createApi({
     'Stats',
     'Request',
     'Download',
-    'Collage'
+    'Collage',
+    'PrivateMessage',
+    'StaffInbox',
+    'StaffInboxResponse'
   ] as const,
   endpoints: () => ({})
 });
