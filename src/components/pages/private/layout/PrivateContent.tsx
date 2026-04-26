@@ -39,6 +39,10 @@ import NewTicketForm from '../../../staffInbox/NewTicketForm';
 import TicketView from '../../../staffInbox/TicketView';
 import StaffInboxPage from '../../../staffInbox/StaffInboxPage';
 import CannedResponsesPage from '../../../staffInbox/CannedResponsesPage';
+import ReportsQueuePage from '../../../reports/ReportsQueuePage';
+import ReportDetailPage from '../../../reports/ReportDetailPage';
+import MyReportsPage from '../../../reports/MyReportsPage';
+import ReportForm from '../../../reports/ReportForm';
 import Toolbox from '../../../admin/Toolbox';
 import NewUserForm from '../../../admin/NewUserForm';
 import UserRankManager from '../../../admin/UserRankManager';
@@ -219,6 +223,20 @@ const PrivateContent = () => (
     />
     <Route path="staff/inbox/my-tickets" element={wrap(MyTicketsPage)} />
     <Route path="staff/inbox/:id" element={wrap(TicketView)} />
+
+    <Route
+      path="staff/reports"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <ReportsQueuePage />
+        </StaffGate>
+      }
+    />
+    <Route path="staff/reports/:id" element={wrap(ReportDetailPage)} />
+
+    <Route path="reports/new" element={wrap(ReportForm)} />
+    <Route path="reports/mine" element={wrap(MyReportsPage)} />
+    <Route path="reports/:id" element={wrap(ReportDetailPage)} />
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />
