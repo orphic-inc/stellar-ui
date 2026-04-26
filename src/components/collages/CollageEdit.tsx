@@ -100,8 +100,14 @@ const CollageEdit = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {(isStaff || collage.categoryId === 0) && (
           <div>
-            <label className="block text-sm text-gray-300 mb-1">Name</label>
+            <label
+              htmlFor="edit-name"
+              className="block text-sm text-gray-300 mb-1"
+            >
+              Name
+            </label>
             <input
+              id="edit-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -114,10 +120,14 @@ const CollageEdit = () => {
         )}
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label
+            htmlFor="edit-description"
+            className="block text-sm text-gray-300 mb-1"
+          >
             Description
           </label>
           <textarea
+            id="edit-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
@@ -128,10 +138,14 @@ const CollageEdit = () => {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label
+            htmlFor="edit-tags"
+            className="block text-sm text-gray-300 mb-1"
+          >
             Tags <span className="text-gray-500">(comma-separated)</span>
           </label>
           <input
+            id="edit-tags"
             type="text"
             value={tagsInput}
             onChange={(e) => setTagsInput(e.target.value)}
@@ -175,11 +189,15 @@ const CollageEdit = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-300 mb-1">
+                <label
+                  htmlFor="edit-max-entries"
+                  className="block text-sm text-gray-300 mb-1"
+                >
                   Max Entries{' '}
                   <span className="text-gray-500">(0 = unlimited)</span>
                 </label>
                 <input
+                  id="edit-max-entries"
                   type="number"
                   min={0}
                   value={maxEntries}
@@ -188,11 +206,15 @@ const CollageEdit = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-300 mb-1">
+                <label
+                  htmlFor="edit-max-per-user"
+                  className="block text-sm text-gray-300 mb-1"
+                >
                   Max Per User{' '}
                   <span className="text-gray-500">(0 = unlimited)</span>
                 </label>
                 <input
+                  id="edit-max-per-user"
                   type="number"
                   min={0}
                   value={maxEntriesPerUser}

@@ -57,8 +57,14 @@ const CollageCreate = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm text-gray-300 mb-1">Name</label>
+          <label
+            htmlFor="collage-name"
+            className="block text-sm text-gray-300 mb-1"
+          >
+            Name
+          </label>
           <input
+            id="collage-name"
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -70,8 +76,14 @@ const CollageCreate = () => {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">Category</label>
+          <label
+            htmlFor="collage-category"
+            className="block text-sm text-gray-300 mb-1"
+          >
+            Category
+          </label>
           <select
+            id="collage-category"
             value={categoryId}
             onChange={(e) => setCategoryId(Number(e.target.value))}
             className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-blue-500"
@@ -85,10 +97,14 @@ const CollageCreate = () => {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label
+            htmlFor="collage-description"
+            className="block text-sm text-gray-300 mb-1"
+          >
             Description
           </label>
           <textarea
+            id="collage-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
@@ -99,10 +115,14 @@ const CollageCreate = () => {
         </div>
 
         <div>
-          <label className="block text-sm text-gray-300 mb-1">
+          <label
+            htmlFor="collage-tags"
+            className="block text-sm text-gray-300 mb-1"
+          >
             Tags <span className="text-gray-500">(comma-separated)</span>
           </label>
           <input
+            id="collage-tags"
             type="text"
             value={tagsInput}
             onChange={(e) => setTagsInput(e.target.value)}
