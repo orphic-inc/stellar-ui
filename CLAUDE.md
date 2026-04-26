@@ -102,8 +102,9 @@ The 12 valid backend permissions: `forums_read`, `forums_post`, `forums_moderate
 
 1. `npx tsc --noEmit` — must be clean
 2. `npx prettier --write <changed files>`
-3. Commit with descriptive message following existing log style
-4. Push to current feature branch (`phase-3-misc`)
+3. `npm run lint` — must be clean on new/changed files (pre-existing errors in other files are acceptable)
+4. Commit with descriptive message following existing log style
+5. Push to current feature branch (`feature/pm-and-staff-inbox`)
 
 ## Audit history
 
