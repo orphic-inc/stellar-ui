@@ -172,6 +172,80 @@ export interface DownloadGrant {
 
 export type SiteStats = components['schemas']['SiteStats'];
 
+// ─── Collage ─────────────────────────────────────────────────────────────────
+
+export interface CollageEntryRelease {
+  id: number;
+  title: string;
+  image: string | null;
+  year: number;
+  releaseType: string;
+  artist: { id: number; name: string };
+}
+
+export interface CollageEntry {
+  id: number;
+  collageId: number;
+  releaseId: number;
+  userId: number;
+  sort: number;
+  addedAt: string;
+  release?: CollageEntryRelease;
+  user?: { id: number; username: string };
+}
+
+export interface CollageCounts {
+  entries: number;
+  subscriptions: number;
+  bookmarks: number;
+}
+
+export interface Collage {
+  id: number;
+  name: string;
+  description: string;
+  userId: number;
+  categoryId: number;
+  tags: string[];
+  isLocked: boolean;
+  isDeleted: boolean;
+  maxEntries: number;
+  maxEntriesPerUser: number;
+  isFeatured: boolean;
+  numEntries: number;
+  numSubscribers: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  user?: { id: number; username: string; avatar: string | null };
+  _count?: CollageCounts;
+  entries?: CollageEntry[];
+  isSubscribed?: boolean;
+  isBookmarked?: boolean;
+}
+
+export interface CollageListResponse {
+  data: Collage[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
+export type CollageOrderBy =
+  | 'createdAt'
+  | 'updatedAt'
+  | 'name'
+  | 'numEntries'
+  | 'numSubscribers';
+
+export interface ListCollagesQuery {
+  page?: number;
+  search?: string;
+  categoryId?: number;
+  userId?: number;
+  bookmarked?: 'true' | 'false';
+  orderBy?: CollageOrderBy;
+  order?: 'asc' | 'desc';
+}
+
 // ─── Redux state types ───────────────────────────────────────────────────────
 
 export interface AuthState {
