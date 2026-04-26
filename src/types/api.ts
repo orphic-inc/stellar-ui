@@ -4978,6 +4978,506 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/counts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Open and claimed report counts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            open: number;
+                            claimed: number;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User's submitted reports */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            total: number;
+                            page: number;
+                            pageSize: number;
+                            reports: {
+                                id: number;
+                                targetType: string;
+                                targetId: number;
+                                category: string;
+                                status: string;
+                                createdAt: string;
+                                resolvedAt: string | null;
+                                resolution: string | null;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Paginated staff report queue */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            total: number;
+                            page: number;
+                            pageSize: number;
+                            reports: {
+                                id: number;
+                                reporterId: number;
+                                reporter: {
+                                    id: number;
+                                    username: string;
+                                    avatar: string | null;
+                                };
+                                /** @enum {string} */
+                                targetType: "User" | "Release" | "Artist" | "ForumTopic" | "ForumPost" | "Comment" | "Collage" | "Post";
+                                targetId: number;
+                                category: string;
+                                reason: string;
+                                evidence: string | null;
+                                /** @enum {string} */
+                                status: "Open" | "Claimed" | "Resolved";
+                                claimedById: number | null;
+                                claimedBy: {
+                                    id: number;
+                                    username: string;
+                                    avatar: string | null;
+                                } | null;
+                                claimedAt: string | null;
+                                resolvedById: number | null;
+                                resolvedBy: {
+                                    id: number;
+                                    username: string;
+                                    avatar: string | null;
+                                } | null;
+                                resolvedAt: string | null;
+                                resolution: string | null;
+                                /** @enum {string|null} */
+                                resolutionAction: "Dismissed" | "ContentRemoved" | "UserWarned" | "UserDisabled" | "MetadataFixed" | "Other" | null;
+                                notes: {
+                                    id: number;
+                                    reportId: number;
+                                    authorId: number;
+                                    author: {
+                                        id: number;
+                                        username: string;
+                                        avatar: string | null;
+                                    };
+                                    body: string;
+                                    createdAt: string;
+                                }[];
+                                createdAt: string;
+                                updatedAt: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        targetType: string;
+                        targetId: number;
+                        category: string;
+                        reason: string;
+                        evidence?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Report created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: number;
+                            reporterId: number;
+                            reporter: {
+                                id: number;
+                                username: string;
+                                avatar: string | null;
+                            };
+                            /** @enum {string} */
+                            targetType: "User" | "Release" | "Artist" | "ForumTopic" | "ForumPost" | "Comment" | "Collage" | "Post";
+                            targetId: number;
+                            category: string;
+                            reason: string;
+                            evidence: string | null;
+                            /** @enum {string} */
+                            status: "Open" | "Claimed" | "Resolved";
+                            claimedById: number | null;
+                            claimedBy: {
+                                id: number;
+                                username: string;
+                                avatar: string | null;
+                            } | null;
+                            claimedAt: string | null;
+                            resolvedById: number | null;
+                            resolvedBy: {
+                                id: number;
+                                username: string;
+                                avatar: string | null;
+                            } | null;
+                            resolvedAt: string | null;
+                            resolution: string | null;
+                            /** @enum {string|null} */
+                            resolutionAction: "Dismissed" | "ContentRemoved" | "UserWarned" | "UserDisabled" | "MetadataFixed" | "Other" | null;
+                            notes: {
+                                id: number;
+                                reportId: number;
+                                authorId: number;
+                                author: {
+                                    id: number;
+                                    username: string;
+                                    avatar: string | null;
+                                };
+                                body: string;
+                                createdAt: string;
+                            }[];
+                            createdAt: string;
+                            updatedAt: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Report detail */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: number;
+                            reporterId: number;
+                            reporter: {
+                                id: number;
+                                username: string;
+                                avatar: string | null;
+                            };
+                            /** @enum {string} */
+                            targetType: "User" | "Release" | "Artist" | "ForumTopic" | "ForumPost" | "Comment" | "Collage" | "Post";
+                            targetId: number;
+                            category: string;
+                            reason: string;
+                            evidence: string | null;
+                            /** @enum {string} */
+                            status: "Open" | "Claimed" | "Resolved";
+                            claimedById: number | null;
+                            claimedBy: {
+                                id: number;
+                                username: string;
+                                avatar: string | null;
+                            } | null;
+                            claimedAt: string | null;
+                            resolvedById: number | null;
+                            resolvedBy: {
+                                id: number;
+                                username: string;
+                                avatar: string | null;
+                            } | null;
+                            resolvedAt: string | null;
+                            resolution: string | null;
+                            /** @enum {string|null} */
+                            resolutionAction: "Dismissed" | "ContentRemoved" | "UserWarned" | "UserDisabled" | "MetadataFixed" | "Other" | null;
+                            notes: {
+                                id: number;
+                                reportId: number;
+                                authorId: number;
+                                author: {
+                                    id: number;
+                                    username: string;
+                                    avatar: string | null;
+                                };
+                                body: string;
+                                createdAt: string;
+                            }[];
+                            createdAt: string;
+                            updatedAt: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Claimed */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{id}/unclaim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Unclaimed */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        resolution: string;
+                        resolutionAction: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Resolved */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reports/{id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        body: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Note added */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: number;
+                            reportId: number;
+                            authorId: number;
+                            author: {
+                                id: number;
+                                username: string;
+                                avatar: string | null;
+                            };
+                            body: string;
+                            createdAt: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {

@@ -97,6 +97,11 @@ const sections: SectionProps[] = [
         label: 'Canned responses',
         to: '/private/staff/inbox/responses',
         permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Reports queue',
+        to: '/private/staff/reports',
+        permissions: ['staff', 'admin']
       }
     ]
   }
