@@ -6,6 +6,7 @@ import {
   useGetNotificationsQuery,
   useDeleteNotificationMutation
 } from '../../store/services/notificationApi';
+import { useGetUnreadCountQuery } from '../../store/services/messagesApi';
 import { api } from '../../store/api';
 import { logout as logoutAction } from '../../store/slices/authSlice';
 import type { AuthUser } from '../../types';
@@ -42,7 +43,9 @@ const UserMenu = ({ user }: Props) => {
     navigate('/login');
   };
 
-  const count = notifications?.length ?? 0;
+  const { data: pmUnread } = useGetUnreadCountQuery();
+  const pmCount = pmUnread?.count ?? 0;
+  const notifCount = notifications?.length ?? 0;
 
   return (
     <div className="flex items-center gap-1 text-sm">
@@ -58,6 +61,26 @@ const UserMenu = ({ user }: Props) => {
       >
         Settings
       </Link>
+
+      <Link
+        to="/private/messages"
+        className="relative px-3 py-1.5 rounded text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+      >
+        Messages
+        {pmCount > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center leading-none">
+            {pmCount > 9 ? '9+' : pmCount}
+          </span>
+        )}
+      </Link>
+
+      <Link
+        to="/private/staff/inbox/my-tickets"
+        className="px-3 py-1.5 rounded text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+      >
+        Support
+      </Link>
+
       <Link
         to="/private/invite"
         className="px-3 py-1.5 rounded text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
@@ -73,9 +96,9 @@ const UserMenu = ({ user }: Props) => {
           aria-label="Notifications"
         >
           🔔
-          {count > 0 && (
+          {notifCount > 0 && (
             <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center leading-none">
-              {count > 9 ? '9+' : count}
+              {notifCount > 9 ? '9+' : notifCount}
             </span>
           )}
         </button>
@@ -85,7 +108,7 @@ const UserMenu = ({ user }: Props) => {
             <div className="px-3 py-2 bg-gray-700/60 border-b border-gray-700 text-xs font-semibold uppercase tracking-wider text-gray-300">
               Notifications
             </div>
-            {count === 0 ? (
+            {notifCount === 0 ? (
               <p className="px-3 py-4 text-sm text-gray-500 text-center">
                 No notifications
               </p>
