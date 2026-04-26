@@ -3,6 +3,7 @@ import UserMenu from '../../../layout/UserMenu';
 import Alert from '../../../layout/Alert';
 import ModBar from '../../../admin/ModBar';
 import type { AuthUser } from '../../../../types';
+import { isStaffUser } from '../../../../utils/permissions';
 
 interface Props {
   user: AuthUser;
@@ -19,7 +20,7 @@ const navLinks = [
 ];
 
 const PrivateHeader = ({ user }: Props) => {
-  const isStaff = (user.userRank?.level ?? 0) >= 500;
+  const isStaff = isStaffUser(user);
 
   return (
     <header className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50">
