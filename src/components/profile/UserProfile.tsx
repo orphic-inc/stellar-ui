@@ -40,6 +40,14 @@ const UserProfile = () => {
             Send Message
           </Link>
         )}
+        {!isOwnProfile && (
+          <Link
+            to={`/private/reports/new?targetType=User&targetId=${profile.id}`}
+            className="brackets"
+          >
+            Report User
+          </Link>
+        )}
       </div>
 
       <div className="sidebar">

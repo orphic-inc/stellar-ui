@@ -32,7 +32,10 @@ const ForumTopicPost = ({ post }: Props) => {
                 </Link>
               </div>
               <div style={{ float: 'right' }}>
-                <Link to="#" className="brackets">
+                <Link
+                  to={`/private/reports/new?targetType=ForumPost&targetId=${id}`}
+                  className="brackets"
+                >
                   Report
                 </Link>{' '}
                 <Link to="#top">↑</Link>

@@ -35,6 +35,11 @@ const ReportForm = () => {
     (searchParams.get('targetType') as (typeof TARGET_TYPES)[number]) ??
     'ForumPost';
   const defaultId = searchParams.get('targetId') ?? '';
+  // When both params arrive from a contextual link, lock the target fields
+  // so users never interact with raw numeric IDs.
+  const lockedFromUrl = !!(
+    searchParams.get('targetType') && searchParams.get('targetId')
+  );
 
   const [targetType, setTargetType] = useState<string>(defaultType);
   const [targetId, setTargetId] = useState(defaultId);
@@ -77,50 +82,57 @@ const ReportForm = () => {
       <h2 className="text-xl font-semibold mb-4">File a Report</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label
-              htmlFor="target-type"
-              className="block text-sm text-gray-400 mb-1"
-            >
-              Report type
-            </label>
-            <select
-              id="target-type"
-              value={targetType}
-              onChange={(e) => {
-                setTargetType(e.target.value);
-                setCategory('');
-              }}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
-            >
-              {TARGET_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
+        {lockedFromUrl ? (
+          <p className="text-sm text-gray-400">
+            Reporting:{' '}
+            <span className="text-gray-200 font-medium">{targetType}</span>
+          </p>
+        ) : (
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label
+                htmlFor="target-type"
+                className="block text-sm text-gray-400 mb-1"
+              >
+                Report type
+              </label>
+              <select
+                id="target-type"
+                value={targetType}
+                onChange={(e) => {
+                  setTargetType(e.target.value);
+                  setCategory('');
+                }}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+              >
+                {TARGET_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex-1">
-            <label
-              htmlFor="target-id"
-              className="block text-sm text-gray-400 mb-1"
-            >
-              Target ID
-            </label>
-            <input
-              id="target-id"
-              type="number"
-              value={targetId}
-              onChange={(e) => setTargetId(e.target.value)}
-              required
-              min={1}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
-              placeholder="e.g. 42"
-            />
+            <div className="flex-1">
+              <label
+                htmlFor="target-id"
+                className="block text-sm text-gray-400 mb-1"
+              >
+                Target ID
+              </label>
+              <input
+                id="target-id"
+                type="number"
+                value={targetId}
+                onChange={(e) => setTargetId(e.target.value)}
+                required
+                min={1}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+                placeholder="e.g. 42"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <label
