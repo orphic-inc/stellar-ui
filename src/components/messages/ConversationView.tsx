@@ -43,7 +43,7 @@ const ConversationView = () => {
 
   const [replyBody, setReplyBody] = useState('');
   const [selectedCanned, setSelectedCanned] = useState('');
-  const [assignUserId, setAssignUserId] = useState('');
+  const [assignUsername, setAssignUsername] = useState('');
 
   const handleReply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,10 +84,16 @@ const ConversationView = () => {
 
   const handleAssign = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = assignUserId ? parseInt(assignUserId, 10) : null;
     try {
-      await assignTicket({ id: convId, assignedUserId: parsed }).unwrap();
-      setAssignUserId('');
+      if (assignUsername.trim()) {
+        await assignTicket({
+          id: convId,
+          assignedUsername: assignUsername.trim()
+        }).unwrap();
+      } else {
+        await assignTicket({ id: convId, assignedUserId: null }).unwrap();
+      }
+      setAssignUsername('');
       dispatch(addAlert('Ticket assigned.', 'success'));
     } catch {
       dispatch(addAlert('Failed to assign ticket.', 'danger'));
@@ -114,11 +120,18 @@ const ConversationView = () => {
 
   const isTicket = conv.isStaffTicket;
   const isResolved = conv.ticketStatus === 'Resolved';
-  const ownerParticipant = conv.participants?.find((p) => p.inSentbox);
-  const isOwner = ownerParticipant?.userId === currentUser?.id;
+  // For tickets the submitter has inInbox:true (works for both new and existing rows).
+  // For regular PMs the sender has inSentbox:true.
+  const ownerParticipant = isTicket
+    ? conv.participants?.find((p) => p.inInbox)
+    : conv.participants?.find((p) => p.inSentbox);
   const myParticipant = conv.participants?.find(
     (p) => p.userId === currentUser?.id
   );
+  // For tickets, any participant record means the user is the submitter.
+  const isOwner = isTicket
+    ? !!myParticipant
+    : ownerParticipant?.userId === currentUser?.id;
   const otherParticipants =
     conv.participants?.filter((p) => p.userId !== currentUser?.id) ?? [];
 
@@ -247,14 +260,14 @@ const ConversationView = () => {
             htmlFor="assign-user"
             className="self-center text-gray-400 whitespace-nowrap"
           >
-            Assign to user ID:
+            Assign to:
           </label>
           <input
             id="assign-user"
-            type="number"
-            value={assignUserId}
-            onChange={(e) => setAssignUserId(e.target.value)}
-            placeholder="User ID (blank to unassign)"
+            type="text"
+            value={assignUsername}
+            onChange={(e) => setAssignUsername(e.target.value)}
+            placeholder="Staff username (blank to unassign)"
             className="flex-1 px-2 py-1 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
           />
           <button

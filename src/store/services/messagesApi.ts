@@ -122,11 +122,21 @@ export const messagesApi = api.injectEndpoints({
 
     getTicketQueue: build.query<
       TicketQueueResponse,
-      { page?: number; status?: string; assignedToMe?: boolean }
+      {
+        page?: number;
+        status?: string;
+        assignedToMe?: boolean;
+        unassigned?: boolean;
+      }
     >({
-      query: ({ page = 1, status = 'all', assignedToMe = false } = {}) => ({
+      query: ({
+        page = 1,
+        status = 'all',
+        assignedToMe = false,
+        unassigned = false
+      } = {}) => ({
         url: '/messages/ticket-queue',
-        params: { page, status, assignedToMe }
+        params: { page, status, assignedToMe, unassigned }
       }),
       providesTags: ['PrivateMessage']
     }),

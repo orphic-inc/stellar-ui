@@ -27,7 +27,9 @@ const navLinks = [
 const PrivateHeader = ({ user }: Props) => {
   const isStaff = isStaffUser(user);
   const { data: inboxData } = useGetUnreadCountQuery();
-  const { data: ticketData } = useGetTicketUnreadCountQuery();
+  const { data: ticketData } = useGetTicketUnreadCountQuery(undefined, {
+    skip: !isStaff
+  });
   const inboxUnread = inboxData?.count ?? 0;
   const ticketUnread = ticketData?.count ?? 0;
 

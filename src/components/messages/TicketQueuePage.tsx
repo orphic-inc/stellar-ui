@@ -23,12 +23,14 @@ const TicketQueuePage = () => {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('all');
   const [assignedToMe, setAssignedToMe] = useState(false);
+  const [unassigned, setUnassigned] = useState(false);
   const [selected, setSelected] = useState<number[]>([]);
 
   const { data, isLoading, error } = useGetTicketQueueQuery({
     page,
     status,
-    assignedToMe
+    assignedToMe,
+    unassigned
   });
   const [bulkResolve] = useBulkResolveTicketsMutation();
 
@@ -97,11 +99,25 @@ const TicketQueuePage = () => {
             checked={assignedToMe}
             onChange={(e) => {
               setAssignedToMe(e.target.checked);
+              if (e.target.checked) setUnassigned(false);
               setPage(1);
             }}
             className="accent-blue-500"
           />
           Assigned to me
+        </label>
+        <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={unassigned}
+            onChange={(e) => {
+              setUnassigned(e.target.checked);
+              if (e.target.checked) setAssignedToMe(false);
+              setPage(1);
+            }}
+            className="accent-blue-500"
+          />
+          Unassigned only
         </label>
       </div>
 

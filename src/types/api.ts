@@ -4608,6 +4608,7 @@ export interface paths {
           page?: number;
           status?: 'all' | 'Unanswered' | 'Open' | 'Resolved';
           assignedToMe?: boolean | null;
+          unassigned?: boolean | null;
         };
         header?: never;
         path?: never;
@@ -4762,7 +4763,8 @@ export interface paths {
       requestBody?: {
         content: {
           'application/json': {
-            assignedUserId: number | null;
+            assignedUserId?: number | null;
+            assignedUsername?: string;
           };
         };
       };
