@@ -91,6 +91,16 @@ const sections: SectionProps[] = [
     ]
   },
   {
+    title: 'Users',
+    links: [
+      {
+        label: 'Ratio policy override',
+        to: '/private/staff/tools/ratio-policy',
+        permissions: ['staff', 'admin']
+      }
+    ]
+  },
+  {
     title: 'Support',
     links: [
       {

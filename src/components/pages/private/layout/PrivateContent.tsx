@@ -52,6 +52,7 @@ import ForumControlPanel from '../../../admin/ForumControlPanel';
 import CommunityManager from '../../../admin/CommunityManager';
 import NewsManager from '../../../admin/NewsManager';
 import SiteSettingsPage from '../../../admin/SiteSettingsPage';
+import RatioPolicyPanel from '../../../admin/RatioPolicyPanel';
 import { selectCurrentUser } from '../../../../store/slices/authSlice';
 import {
   hasAnyPermission,
@@ -156,6 +157,14 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['admin']}>
           <SiteSettingsPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools/ratio-policy"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <RatioPolicyPanel />
         </StaffGate>
       }
     />
