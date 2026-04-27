@@ -18,6 +18,7 @@ const TARGET_OPTIONS = [
   { value: 'User', label: 'User' },
   { value: 'Release', label: 'Release' },
   { value: 'Artist', label: 'Artist' },
+  { value: 'Contribution', label: 'Contribution' },
   { value: 'ForumTopic', label: 'Forum Topic' },
   { value: 'ForumPost', label: 'Forum Post' },
   { value: 'Comment', label: 'Comment' },
