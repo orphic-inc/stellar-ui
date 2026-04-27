@@ -51,6 +51,7 @@ import ForumCategoryControlPanel from '../../../admin/ForumCategoryControlPanel'
 import ForumControlPanel from '../../../admin/ForumControlPanel';
 import CommunityManager from '../../../admin/CommunityManager';
 import NewsManager from '../../../admin/NewsManager';
+import SiteSettingsPage from '../../../admin/SiteSettingsPage';
 import { selectCurrentUser } from '../../../../store/slices/authSlice';
 import {
   hasAnyPermission,
@@ -147,6 +148,14 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['news_manage']}>
           <NewsManager />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools/settings"
+      element={
+        <StaffGate permissions={['admin']}>
+          <SiteSettingsPage />
         </StaffGate>
       }
     />

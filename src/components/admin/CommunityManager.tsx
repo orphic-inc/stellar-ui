@@ -37,10 +37,18 @@ const EditRow = ({
   const [updateCommunity] = useUpdateCommunityMutation();
   const [name, setName] = useState(community.name);
   const [description, setDescription] = useState(community.description ?? '');
+  const [allowDuplicateFormats, setAllowDuplicateFormats] = useState(
+    community.allowDuplicateFormats
+  );
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateCommunity({ id: community.id, name, description });
+    await updateCommunity({
+      id: community.id,
+      name,
+      description,
+      allowDuplicateFormats
+    });
     onDone();
   };
 
@@ -79,6 +87,21 @@ const EditRow = ({
               className="w-full rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
           </div>
+          <div className="flex items-center gap-2 self-end pb-1">
+            <input
+              id={`edit-cm-dupeformats-${community.id}`}
+              type="checkbox"
+              checked={allowDuplicateFormats}
+              onChange={(e) => setAllowDuplicateFormats(e.target.checked)}
+              className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+            />
+            <label
+              htmlFor={`edit-cm-dupeformats-${community.id}`}
+              className="text-xs text-gray-400 whitespace-nowrap"
+            >
+              Allow duplicate formats
+            </label>
+          </div>
           <button
             type="submit"
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm"
@@ -108,6 +131,8 @@ const CommunityManager = () => {
   const [newDescription, setNewDescription] = useState('');
   const [newType, setNewType] = useState<CommunityType>('Music');
   const [newStatus, setNewStatus] = useState<RegistrationStatus>('open');
+  const [newAllowDuplicateFormats, setNewAllowDuplicateFormats] =
+    useState(true);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,12 +140,14 @@ const CommunityManager = () => {
       name: newName,
       description: newDescription,
       type: newType,
-      registrationStatus: newStatus
+      registrationStatus: newStatus,
+      allowDuplicateFormats: newAllowDuplicateFormats
     });
     setNewName('');
     setNewDescription('');
     setNewType('Music');
     setNewStatus('open');
+    setNewAllowDuplicateFormats(true);
   };
 
   return (
@@ -308,6 +335,21 @@ const CommunityManager = () => {
               placeholder="Optional description"
               className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+          <div className="flex items-center gap-2 self-end pb-2.5">
+            <input
+              id="cm-allow-duplicate-formats"
+              type="checkbox"
+              checked={newAllowDuplicateFormats}
+              onChange={(e) => setNewAllowDuplicateFormats(e.target.checked)}
+              className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+            />
+            <label
+              htmlFor="cm-allow-duplicate-formats"
+              className="text-sm text-gray-300 whitespace-nowrap"
+            >
+              Allow duplicate formats
+            </label>
           </div>
           <button
             type="submit"

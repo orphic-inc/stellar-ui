@@ -20,6 +20,7 @@ const RESOLUTION_ACTIONS = [
   { value: 'UserWarned', label: 'User warned' },
   { value: 'UserDisabled', label: 'User disabled' },
   { value: 'MetadataFixed', label: 'Metadata fixed' },
+  { value: 'MarkedDuplicate', label: 'Marked as duplicate' },
   { value: 'Other', label: 'Other' }
 ];
 

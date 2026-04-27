@@ -5174,6 +5174,7 @@ export interface paths {
                   | 'User'
                   | 'Release'
                   | 'Artist'
+                  | 'Contribution'
                   | 'ForumTopic'
                   | 'ForumPost'
                   | 'Comment'
@@ -5207,6 +5208,7 @@ export interface paths {
                   | 'UserWarned'
                   | 'UserDisabled'
                   | 'MetadataFixed'
+                  | 'MarkedDuplicate'
                   | 'Other'
                   | null;
                 notes: {
@@ -5268,6 +5270,7 @@ export interface paths {
                 | 'User'
                 | 'Release'
                 | 'Artist'
+                | 'Contribution'
                 | 'ForumTopic'
                 | 'ForumPost'
                 | 'Comment'
@@ -5301,6 +5304,7 @@ export interface paths {
                 | 'UserWarned'
                 | 'UserDisabled'
                 | 'MetadataFixed'
+                | 'MarkedDuplicate'
                 | 'Other'
                 | null;
               notes: {
@@ -5365,6 +5369,7 @@ export interface paths {
                 | 'User'
                 | 'Release'
                 | 'Artist'
+                | 'Contribution'
                 | 'ForumTopic'
                 | 'ForumPost'
                 | 'Comment'
@@ -5398,6 +5403,7 @@ export interface paths {
                 | 'UserWarned'
                 | 'UserDisabled'
                 | 'MetadataFixed'
+                | 'MarkedDuplicate'
                 | 'Other'
                 | null;
               notes: {
@@ -5587,6 +5593,69 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Site settings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SiteSettings'];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            approvedDomains?: string[];
+            /** @enum {string} */
+            registrationStatus?: 'open' | 'invite' | 'closed';
+            maxUsers?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated site settings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SiteSettings'];
+          };
+        };
+      };
+    };
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -5918,6 +5987,7 @@ export interface components {
       type?: string | null;
       registrationStatus?: string | null;
       image?: string | null;
+      allowDuplicateFormats: boolean;
       staff?: components['schemas']['CommunityStaffMember'][];
       _count?: {
         releases: number;
@@ -6168,6 +6238,14 @@ export interface components {
       name: string;
       body: string;
       createdAt: string;
+      updatedAt: string;
+    };
+    SiteSettings: {
+      id: number;
+      approvedDomains: string[];
+      /** @enum {string} */
+      registrationStatus: 'open' | 'invite' | 'closed';
+      maxUsers: number;
       updatedAt: string;
     };
   };

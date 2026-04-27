@@ -52,6 +52,11 @@ const sections: SectionProps[] = [
         label: 'Create user',
         to: '/private/staff/tools/user/new',
         permissions: ['users_edit']
+      },
+      {
+        label: 'Site settings',
+        to: '/private/staff/tools/settings',
+        permissions: ['admin']
       }
     ]
   },

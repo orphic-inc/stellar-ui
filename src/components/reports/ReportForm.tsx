@@ -8,6 +8,7 @@ const TARGET_TYPES = [
   'User',
   'Release',
   'Artist',
+  'Contribution',
   'ForumTopic',
   'ForumPost',
   'Comment',
@@ -19,6 +20,12 @@ const CATEGORIES_BY_TYPE: Record<string, string[]> = {
   User: ['Harassment', 'Spam account', 'Impersonation', 'Other'],
   Release: ['Bad metadata', 'Duplicate', 'Improper format', 'Other'],
   Artist: ['Bad metadata', 'Duplicate', 'Other'],
+  Contribution: [
+    'Dead link',
+    'Duplicate format',
+    'Misleading content',
+    'Other'
+  ],
   ForumTopic: ['Spam', 'Off-topic', 'Harassment', 'Other'],
   ForumPost: ['Spam', 'Harassment', 'Rules violation', 'Other'],
   Comment: ['Spam', 'Harassment', 'Rules violation', 'Other'],
