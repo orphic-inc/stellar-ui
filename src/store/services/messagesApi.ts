@@ -7,8 +7,16 @@ type SentboxResponse =
   paths['/messages/sent']['get']['responses'][200]['content']['application/json'];
 type ConversationResponse =
   paths['/messages/{id}']['get']['responses'][200]['content']['application/json'];
+type TicketListResponse =
+  paths['/messages/tickets']['get']['responses'][200]['content']['application/json'];
 type ComposeBody = NonNullable<
   paths['/messages']['post']['requestBody']
+>['content']['application/json'];
+type CreateTicketBody = NonNullable<
+  paths['/messages/tickets']['post']['requestBody']
+>['content']['application/json'];
+type AssignTicketBody = NonNullable<
+  paths['/messages/{id}/assign']['post']['requestBody']
 >['content']['application/json'];
 type ReplyBody = NonNullable<
   paths['/messages/{id}/reply']['post']['requestBody']
@@ -19,10 +27,17 @@ type UpdateFlagsBody = NonNullable<
 type BulkBody = NonNullable<
   paths['/messages/bulk']['post']['requestBody']
 >['content']['application/json'];
+type BulkResolveBody = NonNullable<
+  paths['/messages/bulk-resolve']['post']['requestBody']
+>['content']['application/json'];
 type ReplyResponse =
   paths['/messages/{id}/reply']['post']['responses'][201]['content']['application/json'];
 type UnreadCountResponse =
   paths['/messages/unread-count']['get']['responses'][200]['content']['application/json'];
+type TicketUnreadCountResponse =
+  paths['/messages/ticket-unread-count']['get']['responses'][200]['content']['application/json'];
+type TicketQueueResponse =
+  paths['/messages/ticket-queue']['get']['responses'][200]['content']['application/json'];
 
 export const messagesApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -95,6 +110,75 @@ export const messagesApi = api.injectEndpoints({
     bulkUpdateConversations: build.mutation<void, BulkBody>({
       query: (body) => ({ url: '/messages/bulk', method: 'POST', body }),
       invalidatesTags: ['PrivateMessage']
+    }),
+
+    getMyTickets: build.query<TicketListResponse, { page?: number }>({
+      query: ({ page = 1 } = {}) => ({
+        url: '/messages/tickets',
+        params: { page }
+      }),
+      providesTags: ['PrivateMessage']
+    }),
+
+    getTicketQueue: build.query<
+      TicketQueueResponse,
+      { page?: number; status?: string; assignedToMe?: boolean }
+    >({
+      query: ({ page = 1, status = 'all', assignedToMe = false } = {}) => ({
+        url: '/messages/ticket-queue',
+        params: { page, status, assignedToMe }
+      }),
+      providesTags: ['PrivateMessage']
+    }),
+
+    getTicketUnreadCount: build.query<TicketUnreadCountResponse, void>({
+      query: () => '/messages/ticket-unread-count',
+      providesTags: ['PrivateMessage']
+    }),
+
+    createTicket: build.mutation<ConversationResponse, CreateTicketBody>({
+      query: (body) => ({ url: '/messages/tickets', method: 'POST', body }),
+      invalidatesTags: ['PrivateMessage']
+    }),
+
+    resolveTicket: build.mutation<void, number>({
+      query: (id) => ({ url: `/messages/${id}/resolve`, method: 'POST' }),
+      invalidatesTags: (_r, _e, id) => [
+        { type: 'PrivateMessage', id },
+        'PrivateMessage'
+      ]
+    }),
+
+    unresolveTicket: build.mutation<void, number>({
+      query: (id) => ({ url: `/messages/${id}/unresolve`, method: 'POST' }),
+      invalidatesTags: (_r, _e, id) => [
+        { type: 'PrivateMessage', id },
+        'PrivateMessage'
+      ]
+    }),
+
+    assignTicket: build.mutation<void, { id: number } & AssignTicketBody>({
+      query: ({ id, ...body }) => ({
+        url: `/messages/${id}/assign`,
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: 'PrivateMessage', id },
+        'PrivateMessage'
+      ]
+    }),
+
+    bulkResolveTickets: build.mutation<
+      { ok: boolean; resolved: number },
+      BulkResolveBody
+    >({
+      query: (body) => ({
+        url: '/messages/bulk-resolve',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['PrivateMessage']
     })
   })
 });
@@ -108,5 +192,13 @@ export const {
   useReplyToConversationMutation,
   useUpdateConversationFlagsMutation,
   useDeleteConversationMutation,
-  useBulkUpdateConversationsMutation
+  useBulkUpdateConversationsMutation,
+  useGetMyTicketsQuery,
+  useGetTicketQueueQuery,
+  useGetTicketUnreadCountQuery,
+  useCreateTicketMutation,
+  useResolveTicketMutation,
+  useUnresolveTicketMutation,
+  useAssignTicketMutation,
+  useBulkResolveTicketsMutation
 } = messagesApi;

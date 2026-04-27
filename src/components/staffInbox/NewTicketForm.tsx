@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCreateTicketMutation } from '../../store/services/staffInboxApi';
+import { useCreateTicketMutation } from '../../store/services/messagesApi';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 
@@ -15,7 +15,7 @@ const NewTicketForm = () => {
     e.preventDefault();
     try {
       const ticket = await createTicket({ subject, body }).unwrap();
-      navigate(`/private/tickets/${ticket.id}`);
+      navigate(`/private/messages/${ticket.id}`);
     } catch (err: unknown) {
       const msg =
         (err as { data?: { msg?: string } })?.data?.msg ??
@@ -73,7 +73,7 @@ const NewTicketForm = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/private/tickets/mine')}
+            onClick={() => navigate('/private/messages/tickets')}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
           >
             Cancel

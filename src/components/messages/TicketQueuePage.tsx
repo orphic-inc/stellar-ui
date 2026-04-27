@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  useGetStaffTicketsQuery,
+  useGetTicketQueueQuery,
   useBulkResolveTicketsMutation
-} from '../../store/services/staffInboxApi';
+} from '../../store/services/messagesApi';
 import Spinner from '../layout/Spinner';
 
 const STATUS_OPTIONS = [
@@ -19,13 +19,13 @@ const STATUS_BADGE: Record<string, string> = {
   Resolved: 'bg-gray-700 text-gray-400'
 };
 
-const StaffInboxPage = () => {
+const TicketQueuePage = () => {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('all');
   const [assignedToMe, setAssignedToMe] = useState(false);
   const [selected, setSelected] = useState<number[]>([]);
 
-  const { data, isLoading, error } = useGetStaffTicketsQuery({
+  const { data, isLoading, error } = useGetTicketQueueQuery({
     page,
     status,
     assignedToMe
@@ -56,12 +56,12 @@ const StaffInboxPage = () => {
 
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load staff inbox.</div>;
+    return <div className="p-4 text-red-400">Failed to load ticket queue.</div>;
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Staff Inbox</h2>
+        <h2 className="text-xl font-semibold">Ticket Queue</h2>
         <Link
           to="/private/staff/inbox/responses"
           className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
@@ -141,47 +141,53 @@ const StaffInboxPage = () => {
             </tr>
           </thead>
           <tbody>
-            {tickets.map((ticket) => (
-              <tr key={ticket.id} className="border-b border-gray-800">
-                <td className="py-2 pr-3">
-                  <input
-                    type="checkbox"
-                    checked={selected.includes(ticket.id)}
-                    onChange={() => toggleSelect(ticket.id)}
-                    className="accent-blue-500"
-                  />
-                </td>
-                <td className="py-2 pr-3">
-                  <Link
-                    to={`/private/staff/inbox/${ticket.id}`}
-                    className="hover:underline text-blue-400"
-                  >
-                    {ticket.status === 'Unanswered' && (
-                      <span className="mr-1 text-yellow-400">●</span>
+            {tickets.map((ticket) => {
+              const owner = ticket.participants?.[0]?.user;
+              return (
+                <tr key={ticket.id} className="border-b border-gray-800">
+                  <td className="py-2 pr-3">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(ticket.id)}
+                      onChange={() => toggleSelect(ticket.id)}
+                      className="accent-blue-500"
+                    />
+                  </td>
+                  <td className="py-2 pr-3">
+                    <Link
+                      to={`/private/messages/${ticket.id}`}
+                      className="hover:underline text-blue-400"
+                    >
+                      {ticket.ticketStatus === 'Unanswered' && (
+                        <span className="mr-1 text-yellow-400">●</span>
+                      )}
+                      {ticket.subject}
+                    </Link>
+                  </td>
+                  <td className="py-2 pr-3 text-gray-300">
+                    {owner?.username ?? '—'}
+                  </td>
+                  <td className="py-2 pr-3">
+                    {ticket.ticketStatus && (
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded ${
+                          STATUS_BADGE[ticket.ticketStatus] ??
+                          'bg-gray-700 text-gray-400'
+                        }`}
+                      >
+                        {ticket.ticketStatus}
+                      </span>
                     )}
-                    {ticket.subject}
-                  </Link>
-                </td>
-                <td className="py-2 pr-3 text-gray-300">
-                  {ticket.user.username}
-                </td>
-                <td className="py-2 pr-3">
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded ${
-                      STATUS_BADGE[ticket.status] ?? 'bg-gray-700 text-gray-400'
-                    }`}
-                  >
-                    {ticket.status}
-                  </span>
-                </td>
-                <td className="py-2 pr-3 text-gray-400">
-                  {ticket.assignedUser?.username ?? '—'}
-                </td>
-                <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
-                  {new Date(ticket.updatedAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="py-2 pr-3 text-gray-400">
+                    {ticket.assignedStaff?.username ?? '—'}
+                  </td>
+                  <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
+                    {new Date(ticket.updatedAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
@@ -211,4 +217,4 @@ const StaffInboxPage = () => {
   );
 };
 
-export default StaffInboxPage;
+export default TicketQueuePage;

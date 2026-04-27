@@ -104,8 +104,8 @@ const sections: SectionProps[] = [
     title: 'Support',
     links: [
       {
-        label: 'Staff inbox',
-        to: '/private/staff/inbox',
+        label: 'Ticket queue',
+        to: '/private/staff/tickets',
         permissions: ['staff', 'admin']
       },
       {

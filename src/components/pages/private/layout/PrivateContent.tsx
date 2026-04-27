@@ -36,8 +36,6 @@ import ComposeForm from '../../../messages/ComposeForm';
 import ConversationView from '../../../messages/ConversationView';
 import MyTicketsPage from '../../../staffInbox/MyTicketsPage';
 import NewTicketForm from '../../../staffInbox/NewTicketForm';
-import TicketView from '../../../staffInbox/TicketView';
-import StaffInboxPage from '../../../staffInbox/StaffInboxPage';
 import CannedResponsesPage from '../../../staffInbox/CannedResponsesPage';
 import ReportsQueuePage from '../../../reports/ReportsQueuePage';
 import ReportDetailPage from '../../../reports/ReportDetailPage';
@@ -53,6 +51,7 @@ import CommunityManager from '../../../admin/CommunityManager';
 import NewsManager from '../../../admin/NewsManager';
 import SiteSettingsPage from '../../../admin/SiteSettingsPage';
 import RatioPolicyPanel from '../../../admin/RatioPolicyPanel';
+import TicketQueuePage from '../../../messages/TicketQueuePage';
 import { selectCurrentUser } from '../../../../store/slices/authSlice';
 import {
   hasAnyPermission,
@@ -217,12 +216,21 @@ const PrivateContent = () => (
     <Route path="collages/:id" element={wrap(CollageDetail)} />
     <Route path="collages" element={wrap(CollageBrowse)} />
 
+    <Route path="messages/tickets/new" element={wrap(NewTicketForm)} />
+    <Route path="messages/tickets" element={wrap(MyTicketsPage)} />
     <Route path="messages/new" element={wrap(ComposeForm)} />
     <Route path="messages/sent" element={wrap(SentboxPage)} />
     <Route path="messages/:id" element={wrap(ConversationView)} />
     <Route path="messages" element={wrap(InboxPage)} />
 
-    <Route path="staff/inbox/new" element={wrap(NewTicketForm)} />
+    <Route
+      path="staff/tickets"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <TicketQueuePage />
+        </StaffGate>
+      }
+    />
     <Route
       path="staff/inbox/responses"
       element={
@@ -231,22 +239,6 @@ const PrivateContent = () => (
         </StaffGate>
       }
     />
-    <Route
-      path="staff/inbox"
-      element={
-        <StaffGate permissions={['staff', 'admin']}>
-          <StaffInboxPage />
-        </StaffGate>
-      }
-    />
-    <Route path="staff/inbox/my-tickets" element={wrap(MyTicketsPage)} />
-    <Route path="staff/inbox/:id" element={wrap(TicketView)} />
-
-    {/* User-facing ticket routes (non-staff) */}
-    <Route path="tickets/mine" element={wrap(MyTicketsPage)} />
-    <Route path="tickets/new" element={wrap(NewTicketForm)} />
-    <Route path="tickets/:id" element={wrap(TicketView)} />
-    {/* Staff ticket management remains under /staff/inbox */}
 
     <Route
       path="staff/reports"

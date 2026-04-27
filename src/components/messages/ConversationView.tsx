@@ -5,25 +5,45 @@ import {
   useGetConversationQuery,
   useReplyToConversationMutation,
   useUpdateConversationFlagsMutation,
-  useDeleteConversationMutation
+  useDeleteConversationMutation,
+  useResolveTicketMutation,
+  useUnresolveTicketMutation,
+  useAssignTicketMutation
 } from '../../store/services/messagesApi';
+import { useGetCannedResponsesQuery } from '../../store/services/staffInboxApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
+import { hasAnyPermission } from '../../utils/permissions';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
+
+const STATUS_BADGE: Record<string, string> = {
+  Unanswered: 'bg-yellow-800 text-yellow-200',
+  Open: 'bg-blue-800 text-blue-200',
+  Resolved: 'bg-gray-700 text-gray-400'
+};
 
 const ConversationView = () => {
   const { id } = useParams<{ id: string }>();
   const convId = Number(id);
   const dispatch = useAppDispatch();
   const currentUser = useSelector(selectCurrentUser);
+  const isStaff = hasAnyPermission(currentUser, ['staff', 'admin']);
 
   const { data: conv, isLoading, error } = useGetConversationQuery(convId);
+  const { data: cannedResponses } = useGetCannedResponsesQuery(undefined, {
+    skip: !isStaff || !conv?.isStaffTicket
+  });
   const [reply, { isLoading: replying }] = useReplyToConversationMutation();
   const [updateFlags] = useUpdateConversationFlagsMutation();
   const [deleteConv] = useDeleteConversationMutation();
+  const [resolveTicket, { isLoading: resolving }] = useResolveTicketMutation();
+  const [unresolveTicket] = useUnresolveTicketMutation();
+  const [assignTicket] = useAssignTicketMutation();
 
   const [replyBody, setReplyBody] = useState('');
+  const [selectedCanned, setSelectedCanned] = useState('');
+  const [assignUserId, setAssignUserId] = useState('');
 
   const handleReply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,8 +51,46 @@ const ConversationView = () => {
     try {
       await reply({ id: convId, body: replyBody }).unwrap();
       setReplyBody('');
+      setSelectedCanned('');
     } catch {
       dispatch(addAlert('Failed to send reply.', 'danger'));
+    }
+  };
+
+  const handleCannedSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedCanned(val);
+    if (val) {
+      const resp = cannedResponses?.find((r) => r.id === Number(val));
+      if (resp) setReplyBody(resp.body);
+    }
+  };
+
+  const handleResolve = async () => {
+    try {
+      await resolveTicket(convId).unwrap();
+    } catch {
+      dispatch(addAlert('Failed to resolve ticket.', 'danger'));
+    }
+  };
+
+  const handleUnresolve = async () => {
+    try {
+      await unresolveTicket(convId).unwrap();
+    } catch {
+      dispatch(addAlert('Failed to unresolve ticket.', 'danger'));
+    }
+  };
+
+  const handleAssign = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = assignUserId ? parseInt(assignUserId, 10) : null;
+    try {
+      await assignTicket({ id: convId, assignedUserId: parsed }).unwrap();
+      setAssignUserId('');
+      dispatch(addAlert('Ticket assigned.', 'success'));
+    } catch {
+      dispatch(addAlert('Failed to assign ticket.', 'danger'));
     }
   };
 
@@ -54,24 +112,58 @@ const ConversationView = () => {
   if (error || !conv)
     return <div className="p-4 text-red-400">Conversation not found.</div>;
 
+  const isTicket = conv.isStaffTicket;
+  const isResolved = conv.ticketStatus === 'Resolved';
+  const ownerParticipant = conv.participants?.find((p) => p.inSentbox);
+  const isOwner = ownerParticipant?.userId === currentUser?.id;
   const myParticipant = conv.participants?.find(
     (p) => p.userId === currentUser?.id
   );
   const otherParticipants =
     conv.participants?.filter((p) => p.userId !== currentUser?.id) ?? [];
 
+  const backLink =
+    isTicket && isStaff
+      ? '/private/staff/tickets'
+      : isTicket
+      ? '/private/messages/tickets'
+      : '/private/messages';
+
+  const backLabel =
+    isTicket && isStaff
+      ? '← Ticket Queue'
+      : isTicket
+      ? '← My Tickets'
+      : '← Inbox';
+
   return (
     <div className="thin">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-start justify-between mb-4 gap-4">
         <div>
-          <Link
-            to="/private/messages"
-            className="text-blue-400 text-sm hover:underline"
-          >
-            ← Inbox
+          <Link to={backLink} className="text-blue-400 text-sm hover:underline">
+            {backLabel}
           </Link>
-          <h2 className="text-xl font-semibold mt-1">{conv.subject}</h2>
-          {otherParticipants.length > 0 && (
+          <div className="flex items-center gap-3 mt-1">
+            <h2 className="text-xl font-semibold">{conv.subject}</h2>
+            {isTicket && conv.ticketStatus && (
+              <span
+                className={`text-xs px-2 py-0.5 rounded font-medium ${
+                  STATUS_BADGE[conv.ticketStatus] ?? 'bg-gray-700 text-gray-400'
+                }`}
+              >
+                {conv.ticketStatus}
+              </span>
+            )}
+          </div>
+          {isTicket && conv.assignedStaff && (
+            <p className="text-sm text-gray-400 mt-0.5">
+              Assigned to:{' '}
+              <span className="text-gray-200">
+                {conv.assignedStaff.username}
+              </span>
+            </p>
+          )}
+          {!isTicket && otherParticipants.length > 0 && (
             <p className="text-sm text-gray-400">
               With:{' '}
               {otherParticipants.map((p) =>
@@ -92,46 +184,105 @@ const ConversationView = () => {
             </p>
           )}
         </div>
-        <div className="flex gap-2 text-sm">
-          <button
-            onClick={handleSticky}
-            className={`px-2 py-1 rounded ${
-              myParticipant?.isSticky
-                ? 'bg-yellow-700 text-yellow-200'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-            title="Toggle sticky"
-          >
-            ★
-          </button>
-          <button
-            onClick={handleMarkUnread}
-            className="px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600"
-            title="Mark unread"
-          >
-            Unread
-          </button>
-          <button
-            onClick={handleDelete}
-            className="px-2 py-1 rounded bg-gray-700 text-red-400 hover:bg-gray-600"
-            title="Delete conversation"
-          >
-            Delete
-          </button>
+
+        <div className="flex gap-2 text-sm shrink-0">
+          {isTicket ? (
+            <>
+              {!isResolved && (isStaff || isOwner) && (
+                <button
+                  onClick={handleResolve}
+                  disabled={resolving}
+                  className="px-3 py-1.5 bg-green-800 hover:bg-green-700 text-white rounded disabled:opacity-50"
+                >
+                  Resolve
+                </button>
+              )}
+              {isResolved && isStaff && (
+                <button
+                  onClick={handleUnresolve}
+                  className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded"
+                >
+                  Unresolve
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                onClick={handleSticky}
+                className={`px-2 py-1 rounded ${
+                  myParticipant?.isSticky
+                    ? 'bg-yellow-700 text-yellow-200'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+                title="Toggle sticky"
+              >
+                ★
+              </button>
+              <button
+                onClick={handleMarkUnread}
+                className="px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600"
+                title="Mark unread"
+              >
+                Unread
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-2 py-1 rounded bg-gray-700 text-red-400 hover:bg-gray-600"
+                title="Delete conversation"
+              >
+                Delete
+              </button>
+            </>
+          )}
         </div>
       </div>
+
+      {isTicket && isStaff && (
+        <form
+          onSubmit={handleAssign}
+          className="flex gap-2 mb-6 p-3 bg-gray-800 rounded text-sm"
+        >
+          <label
+            htmlFor="assign-user"
+            className="self-center text-gray-400 whitespace-nowrap"
+          >
+            Assign to user ID:
+          </label>
+          <input
+            id="assign-user"
+            type="number"
+            value={assignUserId}
+            onChange={(e) => setAssignUserId(e.target.value)}
+            placeholder="User ID (blank to unassign)"
+            className="flex-1 px-2 py-1 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+          />
+          <button
+            type="submit"
+            className="px-3 py-1 bg-blue-700 hover:bg-blue-600 text-white rounded"
+          >
+            Assign
+          </button>
+        </form>
+      )}
 
       <div className="space-y-4 mb-6">
         {(conv.messages ?? []).map((msg) => {
           const isMine = msg.sender?.id === currentUser?.id;
+          const isStaffMsg =
+            isTicket && msg.sender?.id !== ownerParticipant?.userId;
           return (
             <div
               key={msg.id}
-              className={`rounded p-3 ${
-                isMine
-                  ? 'bg-gray-800 ml-8'
-                  : 'bg-gray-850 border border-gray-700 mr-8'
-              }`}
+              className={`rounded p-3 border ${
+                isTicket
+                  ? isStaffMsg
+                    ? 'bg-gray-800 border-blue-900 ml-4'
+                    : 'bg-gray-900 border-gray-700'
+                  : isMine
+                  ? 'bg-gray-800 border-gray-700 ml-8'
+                  : 'bg-gray-900 border-gray-700 mr-8'
+              } ${isMine && !isTicket ? 'opacity-90' : ''}`}
             >
               <div className="flex items-center gap-2 mb-2 text-sm">
                 {msg.sender ? (
@@ -143,6 +294,11 @@ const ConversationView = () => {
                   </Link>
                 ) : (
                   <span className="font-medium text-gray-400">System</span>
+                )}
+                {isTicket && isStaffMsg && (
+                  <span className="text-xs px-1.5 py-0.5 bg-blue-900 text-blue-300 rounded">
+                    Staff
+                  </span>
                 )}
                 <span className="text-gray-600 text-xs">
                   {new Date(msg.createdAt).toLocaleString()}
@@ -156,27 +312,55 @@ const ConversationView = () => {
         })}
       </div>
 
-      <form onSubmit={handleReply} className="flex flex-col gap-3">
-        <label htmlFor="conv-reply" className="text-sm text-gray-400">
-          Reply
-        </label>
-        <textarea
-          id="conv-reply"
-          value={replyBody}
-          onChange={(e) => setReplyBody(e.target.value)}
-          rows={5}
-          required
-          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
-          placeholder="Write a reply…"
-        />
-        <button
-          type="submit"
-          disabled={replying}
-          className="self-start px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
-        >
-          {replying ? 'Sending…' : 'Send Reply'}
-        </button>
-      </form>
+      {(!isTicket || !isResolved) && (
+        <form onSubmit={handleReply} className="flex flex-col gap-3">
+          {isTicket &&
+            isStaff &&
+            cannedResponses &&
+            cannedResponses.length > 0 && (
+              <div>
+                <label
+                  htmlFor="canned-select"
+                  className="block text-sm text-gray-400 mb-1"
+                >
+                  Use canned response
+                </label>
+                <select
+                  id="canned-select"
+                  value={selectedCanned}
+                  onChange={handleCannedSelect}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+                >
+                  <option value="">— Select a template —</option>
+                  {cannedResponses.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          <label htmlFor="conv-reply" className="text-sm text-gray-400">
+            Reply
+          </label>
+          <textarea
+            id="conv-reply"
+            value={replyBody}
+            onChange={(e) => setReplyBody(e.target.value)}
+            rows={5}
+            required
+            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+            placeholder="Write a reply…"
+          />
+          <button
+            type="submit"
+            disabled={replying}
+            className="self-start px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
+          >
+            {replying ? 'Sending…' : 'Send Reply'}
+          </button>
+        </form>
+      )}
     </div>
   );
 };
