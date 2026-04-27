@@ -15,7 +15,7 @@ const NewTicketForm = () => {
     e.preventDefault();
     try {
       const ticket = await createTicket({ subject, body }).unwrap();
-      navigate(`/private/staff/inbox/${ticket.id}`);
+      navigate(`/private/tickets/${ticket.id}`);
     } catch (err: unknown) {
       const msg =
         (err as { data?: { msg?: string } })?.data?.msg ??
@@ -73,7 +73,7 @@ const NewTicketForm = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/private/staff/inbox/my-tickets')}
+            onClick={() => navigate('/private/tickets/mine')}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
           >
             Cancel

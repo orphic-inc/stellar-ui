@@ -224,6 +224,12 @@ const PrivateContent = () => (
     <Route path="staff/inbox/my-tickets" element={wrap(MyTicketsPage)} />
     <Route path="staff/inbox/:id" element={wrap(TicketView)} />
 
+    {/* User-facing ticket routes (non-staff) */}
+    <Route path="tickets/mine" element={wrap(MyTicketsPage)} />
+    <Route path="tickets/new" element={wrap(NewTicketForm)} />
+    <Route path="tickets/:id" element={wrap(TicketView)} />
+    {/* Staff ticket management remains under /staff/inbox */}
+
     <Route
       path="staff/reports"
       element={

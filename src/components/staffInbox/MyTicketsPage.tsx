@@ -27,7 +27,7 @@ const MyTicketsPage = () => {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">My Support Tickets</h2>
         <Link
-          to="/private/staff/inbox/new"
+          to="/private/tickets/new"
           className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
         >
           New Ticket
@@ -51,7 +51,7 @@ const MyTicketsPage = () => {
               <tr key={ticket.id} className="border-b border-gray-800">
                 <td className="py-2 pr-3">
                   <Link
-                    to={`/private/staff/inbox/${ticket.id}`}
+                    to={`/private/tickets/${ticket.id}`}
                     className="hover:underline text-blue-400"
                   >
                     {!ticket.isReadByUser && ticket.status !== 'Unanswered' && (

@@ -32,6 +32,14 @@ const UserProfile = () => {
             Settings
           </Link>
         )}
+        {!isOwnProfile && (
+          <Link
+            to={`/private/messages/new?to=${profile.username}`}
+            className="brackets"
+          >
+            Send Message
+          </Link>
+        )}
       </div>
 
       <div className="sidebar">

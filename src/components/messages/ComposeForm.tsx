@@ -9,7 +9,8 @@ const ComposeForm = () => {
   const [params] = useSearchParams();
   const dispatch = useAppDispatch();
 
-  const [toUserId, setToUserId] = useState(params.get('to') ?? '');
+  // `to` query param accepts a username (not a numeric userId)
+  const [toUsername, setToUsername] = useState(params.get('to') ?? '');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
 
@@ -17,14 +18,13 @@ const ComposeForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsedId = parseInt(toUserId, 10);
-    if (!parsedId || isNaN(parsedId)) {
-      dispatch(addAlert('Recipient user ID is required.', 'danger'));
+    if (!toUsername.trim()) {
+      dispatch(addAlert('Recipient username is required.', 'danger'));
       return;
     }
     try {
       const conv = await compose({
-        toUserId: parsedId,
+        toUsername: toUsername.trim(),
         subject,
         body
       }).unwrap();
@@ -46,16 +46,16 @@ const ComposeForm = () => {
             htmlFor="compose-to"
             className="block text-sm text-gray-400 mb-1"
           >
-            To (user ID)
+            To (username)
           </label>
           <input
             id="compose-to"
-            type="number"
-            value={toUserId}
-            onChange={(e) => setToUserId(e.target.value)}
+            type="text"
+            value={toUsername}
+            onChange={(e) => setToUsername(e.target.value)}
             required
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
-            placeholder="Enter user ID"
+            placeholder="Enter username"
           />
         </div>
         <div>

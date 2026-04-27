@@ -99,9 +99,7 @@ const TicketView = () => {
   const isResolved = ticket.status === 'Resolved';
   const isOwner = ticket.user.id === currentUser?.id;
 
-  const backLink = isStaff
-    ? '/private/staff/inbox'
-    : '/private/staff/inbox/my-tickets';
+  const backLink = isStaff ? '/private/staff/inbox' : '/private/tickets/mine';
 
   return (
     <div className="thin">
