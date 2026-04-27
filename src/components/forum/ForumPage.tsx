@@ -75,7 +75,7 @@ const ForumPage = () => {
                   </td>
                   <td className="forum-replies">{topic.numPosts}</td>
                   <td className="forum-author">
-                    <Link to={`/private/user/${topic.author?.id}`}>
+                    <Link to={`/private/user/${topic.author?.username}`}>
                       {topic.author?.username}
                     </Link>
                   </td>

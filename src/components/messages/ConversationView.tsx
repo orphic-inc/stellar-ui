@@ -74,15 +74,21 @@ const ConversationView = () => {
           {otherParticipants.length > 0 && (
             <p className="text-sm text-gray-400">
               With:{' '}
-              {otherParticipants.map((p) => (
-                <Link
-                  key={p.userId}
-                  to={`/private/user/${p.userId}`}
-                  className="text-blue-400 hover:underline"
-                >
-                  {p.user?.username ?? `User ${p.userId}`}
-                </Link>
-              ))}
+              {otherParticipants.map((p) =>
+                p.user?.username ? (
+                  <Link
+                    key={p.userId}
+                    to={`/private/user/${p.user.username}`}
+                    className="text-blue-400 hover:underline"
+                  >
+                    {p.user.username}
+                  </Link>
+                ) : (
+                  <span key={p.userId} className="text-gray-400">
+                    {`User ${p.userId}`}
+                  </span>
+                )
+              )}
             </p>
           )}
         </div>
@@ -130,7 +136,7 @@ const ConversationView = () => {
               <div className="flex items-center gap-2 mb-2 text-sm">
                 {msg.sender ? (
                   <Link
-                    to={`/private/user/${msg.sender.id}`}
+                    to={`/private/user/${msg.sender.username}`}
                     className="font-medium text-blue-400 hover:underline"
                   >
                     {msg.sender.username}

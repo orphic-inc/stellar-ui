@@ -130,7 +130,7 @@ const RequestDetailPage = () => {
             <span>
               By{' '}
               <Link
-                to={`/private/user/${req.user.id}`}
+                to={`/private/user/${req.user.username}`}
                 className="text-blue-400 hover:underline"
               >
                 {req.user.username}
@@ -166,7 +166,7 @@ const RequestDetailPage = () => {
                   <td className="py-1">
                     {b.user ? (
                       <Link
-                        to={`/private/user/${b.user.id}`}
+                        to={`/private/user/${b.user.username}`}
                         className="text-blue-400 hover:underline"
                       >
                         {b.user.username}
@@ -211,7 +211,7 @@ const RequestDetailPage = () => {
             Filled by{' '}
             {req.filler ? (
               <Link
-                to={`/private/user/${req.filler.id}`}
+                to={`/private/user/${req.filler.username}`}
                 className="text-blue-400 hover:underline"
               >
                 {req.filler.username}

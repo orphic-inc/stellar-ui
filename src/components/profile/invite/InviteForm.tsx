@@ -34,7 +34,7 @@ const InviteForm = () => {
     <div className="thin">
       <div className="header">
         <h2>
-          <Link to={`/private/user/${user?.id}`}>{user?.username}</Link>
+          <Link to={`/private/user/${user?.username}`}>{user?.username}</Link>
           {' › '}
           Invites
         </h2>

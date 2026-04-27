@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {
   useGetUserSettingsQuery,
   useUpdateUserSettingsMutation
 } from '../../../store/services/userApi';
 import { addAlert } from '../../../store/slices/alertSlice';
+import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
 import Spinner from '../../layout/Spinner';
 import type { paths } from '../../../types/api';
@@ -25,7 +26,7 @@ const toSettingsForm = (settings: UserSettingsResponse): UserSettingsForm => ({
 });
 
 const Settings = () => {
-  const { id } = useParams<{ id: string }>();
+  const currentUser = useSelector(selectCurrentUser);
   const { data: settings, isLoading } = useGetUserSettingsQuery();
   const [updateSettings, { isLoading: isSaving }] =
     useUpdateUserSettingsMutation();
@@ -61,7 +62,10 @@ const Settings = () => {
         </h2>
       </div>
       <div className="linkbox">
-        <Link to={`/private/user/${id}`} className="brackets">
+        <Link
+          to={`/private/user/${currentUser?.username}`}
+          className="brackets"
+        >
           Profile
         </Link>
       </div>

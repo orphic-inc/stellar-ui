@@ -22,7 +22,9 @@ const UserProfile = () => {
       <div className="header">
         <h2>
           <strong>
-            <Link to={`/private/user/${profile.id}`}>{profile.username}</Link>
+            <Link to={`/private/user/${profile.username}`}>
+              {profile.username}
+            </Link>
           </strong>
         </h2>
       </div>

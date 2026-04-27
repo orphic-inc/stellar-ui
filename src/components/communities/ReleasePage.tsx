@@ -181,7 +181,7 @@ const ReleasePage = () => {
                 return (
                   <tr key={c.id}>
                     <td>
-                      <Link to={`/private/user/${c.user.id}`}>
+                      <Link to={`/private/user/${c.user.username}`}>
                         {c.user.username}
                       </Link>
                     </td>

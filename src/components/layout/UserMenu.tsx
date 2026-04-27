@@ -50,7 +50,7 @@ const UserMenu = ({ user }: Props) => {
   return (
     <div className="flex items-center gap-1 text-sm">
       <Link
-        to={`/private/user/${user.id}`}
+        to={`/private/user/${user.username}`}
         className="px-3 py-1.5 rounded text-indigo-300 hover:text-white hover:bg-white/10 transition-colors font-medium"
       >
         {user.username}

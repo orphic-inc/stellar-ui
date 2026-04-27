@@ -21,7 +21,7 @@ const ForumTopicPost = ({ post }: Props) => {
                   #{id}
                 </Link>{' '}
                 <strong>
-                  <Link to={`/private/user/${author?.id}`}>
+                  <Link to={`/private/user/${author?.username}`}>
                     {author?.username}
                   </Link>
                 </strong>{' '}

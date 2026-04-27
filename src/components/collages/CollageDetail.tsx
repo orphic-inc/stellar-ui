@@ -132,7 +132,7 @@ const CollageDetail = () => {
           <div className="text-xs text-gray-500">
             {CATEGORY_LABELS[collage.categoryId] ?? 'Unknown'} · by{' '}
             <Link
-              to={`/private/user/${collage.userId}`}
+              to={`/private/user/${collage.user?.username ?? collage.userId}`}
               className="text-blue-400 hover:underline"
             >
               {collage.user?.username ?? '—'}
