@@ -1,5 +1,6 @@
 import { test as setup, request as playwrightRequest } from '@playwright/test';
 import fs from 'fs';
+import path from 'path';
 import { AUTH_USER, AUTH_STAFF } from './auth-paths';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';

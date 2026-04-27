@@ -3,7 +3,7 @@
  *
  * P-08a  Regular user creates a support ticket.
  * P-08b  Ticket appears in user's My Tickets list with Unanswered status.
- * P-09a  Staff sees the ticket in Staff Inbox.
+ * P-09a  Staff sees the ticket in Staff Ticket Queue.
  * P-09b  Staff replies → ticket status advances to Open.
  * P-09c  Staff resolves → ticket status becomes Resolved.
  */
@@ -22,7 +22,7 @@ test.describe('as regular user', () => {
   test('P-08a: create ticket via contact form', async ({ page }) => {
     ticketSubject = `E2E Ticket ${Date.now()}`;
 
-    await page.goto('/private/tickets/new');
+    await page.goto('/private/messages/tickets/new');
     await expect(
       page.getByRole('heading', { name: /contact staff/i })
     ).toBeVisible();
@@ -34,7 +34,7 @@ test.describe('as regular user', () => {
     await page.getByRole('button', { name: /submit ticket/i }).click();
 
     // Redirected to the ticket conversation view
-    await page.waitForURL(/\/private\/tickets\/\d+/);
+    await page.waitForURL(/\/private\/messages\/\d+/);
     ticketId = page.url().split('/').pop() ?? '';
 
     // Status badge shows Unanswered
@@ -42,7 +42,7 @@ test.describe('as regular user', () => {
   });
 
   test('P-08b: ticket appears in My Tickets list', async ({ page }) => {
-    await page.goto('/private/tickets/mine');
+    await page.goto('/private/messages/tickets');
 
     const subjectLink = page.getByRole('link', { name: ticketSubject });
     await expect(subjectLink).toBeVisible();
@@ -58,13 +58,13 @@ test.describe('as regular user', () => {
 test.describe('as staff user', () => {
   test.use({ storageState: AUTH_STAFF });
 
-  test('P-09a: ticket appears in Staff Inbox', async ({ page }) => {
-    await page.goto('/private/staff/inbox');
+  test('P-09a: ticket appears in Staff Ticket Queue', async ({ page }) => {
+    await page.goto('/private/staff/tickets');
     await expect(page.getByRole('link', { name: ticketSubject })).toBeVisible();
   });
 
   test('P-09b: staff replies and status advances to Open', async ({ page }) => {
-    await page.goto(`/private/staff/inbox/${ticketId}`);
+    await page.goto(`/private/messages/${ticketId}`);
 
     // Ticket subject should be visible in the heading
     await expect(
@@ -75,7 +75,7 @@ test.describe('as staff user', () => {
     await expect(page.getByText('Unanswered')).toBeVisible();
 
     // Reply as staff
-    await page.locator('#ticket-reply').fill('E2E staff reply — test.');
+    await page.locator('#conv-reply').fill('E2E staff reply — test.');
     await page.getByRole('button', { name: /send reply/i }).click();
 
     // Status badge updates to Open after staff reply
@@ -85,7 +85,7 @@ test.describe('as staff user', () => {
   });
 
   test('P-09c: staff resolves ticket', async ({ page }) => {
-    await page.goto(`/private/staff/inbox/${ticketId}`);
+    await page.goto(`/private/messages/${ticketId}`);
 
     await page.getByRole('button', { name: /^resolve$/i }).click();
 

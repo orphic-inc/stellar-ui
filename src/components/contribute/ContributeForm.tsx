@@ -155,6 +155,7 @@ const ContributeForm = () => {
               <td className="label">Community</td>
               <td>
                 <select
+                  id="contribute-community"
                   value={community}
                   onChange={(e) => setCommunity(e.target.value)}
                   required
@@ -204,6 +205,7 @@ const ContributeForm = () => {
               <td className="label">File type</td>
               <td>
                 <select
+                  id="contribute-filetype"
                   value={fileType}
                   onChange={(e) => setFileType(e.target.value as FileType)}
                 >
@@ -303,6 +305,7 @@ const ContributeForm = () => {
                   <td className="label">Album title</td>
                   <td>
                     <input
+                      id="contribute-album"
                       type="text"
                       size={60}
                       value={album}

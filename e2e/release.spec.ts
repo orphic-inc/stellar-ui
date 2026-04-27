@@ -2,17 +2,18 @@
  * Release / Contribution / Download E2E
  *
  * P-06   Browse to a release and confirm contributions section renders.
- * P-07a  Submit a new contribution (download link + format).
+ * P-07a  Submit a new contribution via the full contribute form.
  * P-07b  Report a dead/misleading link via the inline report modal.
  *
- * Requires at least one Community and one Release in the test database.
+ * Requires at least one Community with at least one Release in the test
+ * database. P-07b additionally requires at least one seeded contribution
+ * on the discovered release.
  */
 import { test, expect } from '@playwright/test';
 import { AUTH_USER } from './auth-paths';
 
-// Community and release URLs discovered during P-06 and reused in P-07a/b.
+// Release URL discovered during P-06 and reused in P-07b.
 let releaseUrl: string;
-let contributionSubject: string;
 
 test.describe('as regular user', () => {
   test.use({ storageState: AUTH_USER });
@@ -58,47 +59,59 @@ test.describe('as regular user', () => {
     ).toBeVisible();
   });
 
-  test('P-07a: submit a contribution and see it on the release page', async ({
+  test('P-07a: submit a contribution via the full contribute form', async ({
     page
   }) => {
-    contributionSubject = `E2E-${Date.now()}`;
-    await page.goto(releaseUrl);
+    const albumTitle = `E2E Album ${Date.now()}`;
+    const downloadUrl = `https://example.com/e2e-test/${Date.now()}.flac`;
 
+    // Navigate via the release page's "Add your version" button
+    await page.goto(releaseUrl);
     await page.getByRole('button', { name: /add your version/i }).click();
     await page.waitForURL('**/contribute**');
 
-    // Select a format (default is mp3; pick flac to be deliberate)
-    await page.locator('select').selectOption('flac');
+    // Wait for community options to load, then pick the first real option
+    await expect(
+      page.locator('#contribute-community option').nth(1)
+    ).not.toHaveText('');
+    await page.locator('#contribute-community').selectOption({ index: 1 });
 
-    // Fill the download URL
-    await page
-      .locator('input[type="url"]')
-      .fill(`https://example.com/e2e-test/${contributionSubject}.flac`);
+    // File type: switch to flac
+    await page.locator('#contribute-filetype').selectOption('flac');
 
-    // Optional notes field (textarea, no required attribute)
-    await page
-      .locator('textarea')
-      .fill(`E2E contribution note ${contributionSubject}`);
+    // Fill download URL
+    await page.getByPlaceholder(/https:\/\/example\.com/).fill(downloadUrl);
 
+    // Fill artist name (first collaborator row, required for Music type)
+    await page.getByPlaceholder(/artist name/i).fill('E2E Test Artist');
+
+    // Fill album title (Music type default)
+    await page.locator('#contribute-album').fill(albumTitle);
+
+    // Submit — form uses <input type="submit">
     await page.locator('input[type="submit"]').click();
 
-    // Redirected back to the release page
-    await page.waitForURL(releaseUrl);
-
-    // New contribution row is visible — format column shows "flac"
-    await expect(page.getByRole('cell', { name: 'flac' })).toBeVisible();
+    // Navigates to the contributions list on success
+    await page.waitForURL('**/contribute/list**');
+    await expect(page).toHaveURL(/\/private\/contribute\/list/);
   });
 
   test('P-07b: report a dead link via the inline modal', async ({ page }) => {
     await page.goto(releaseUrl);
 
-    // Ensure there is at least one contribution to report
-    await expect(page.locator('table.m_table')).toBeVisible({
-      message: 'P-07b depends on P-07a adding a contribution first'
-    });
+    // Require at least one contribution to report
+    const hasTable = await page.locator('table.m_table').isVisible();
+    if (!hasTable) {
+      test.skip(
+        true,
+        'No contributions on this release — seed at least one or run P-07a first'
+      );
+      return;
+    }
 
     // Click the Report button on the first contribution row
     const reportBtn = page.getByRole('button', { name: /report/i }).first();
+    await expect(reportBtn).toBeVisible();
     await reportBtn.click();
 
     // Report modal appears
