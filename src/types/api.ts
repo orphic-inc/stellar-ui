@@ -4607,8 +4607,8 @@ export interface paths {
         query?: {
           page?: number;
           status?: 'all' | 'Unanswered' | 'Open' | 'Resolved';
-          assignedToMe?: boolean | null;
-          unassigned?: boolean | null;
+          assignedToMe?: 'true' | 'false';
+          unassigned?: 'true' | 'false';
         };
         header?: never;
         path?: never;
@@ -5034,6 +5034,7 @@ export interface paths {
                 createdAt: string;
                 resolvedAt: string | null;
                 resolution: string | null;
+                sourceUrl: string | null;
               }[];
             };
           };
@@ -5138,6 +5139,7 @@ export interface paths {
                 }[];
                 createdAt: string;
                 updatedAt: string;
+                sourceUrl: string | null;
               }[];
             };
           };
@@ -5234,6 +5236,7 @@ export interface paths {
               }[];
               createdAt: string;
               updatedAt: string;
+              sourceUrl: string | null;
             };
           };
         };
@@ -5333,6 +5336,7 @@ export interface paths {
               }[];
               createdAt: string;
               updatedAt: string;
+              sourceUrl: string | null;
             };
           };
         };

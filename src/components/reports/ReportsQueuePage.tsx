@@ -6,11 +6,6 @@ import {
 } from '../../store/services/reportsApi';
 import Spinner from '../layout/Spinner';
 
-function buildSourceLink(targetType: string, targetId: number): string | null {
-  if (targetType === 'Collage') return `/private/collages/${targetId}`;
-  return null;
-}
-
 const STATUS_OPTIONS = [
   { value: 'Open', label: 'Open' },
   { value: 'Claimed', label: 'Claimed' },
@@ -63,7 +58,7 @@ const ReportsQueuePage = () => {
     );
 
   return (
-    <div className="thin">
+    <div className="max-w-5xl mx-auto px-4 py-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Reports Queue</h2>
         {counts && (
@@ -155,58 +150,49 @@ const ReportsQueuePage = () => {
             </tr>
           </thead>
           <tbody>
-            {reports.map((report) => {
-              const sourceHref = buildSourceLink(
-                report.targetType,
-                report.targetId
-              );
-              return (
-                <tr key={report.id} className="border-b border-gray-800">
-                  <td className="py-2 pr-3 text-gray-400">
-                    {report.targetType}
-                  </td>
-                  <td className="py-2 pr-3 text-gray-500 text-xs">
-                    {sourceHref ? (
-                      <Link
-                        to={sourceHref}
-                        className="text-blue-400 hover:underline"
-                      >
-                        #{report.targetId}
-                      </Link>
-                    ) : (
-                      <span>#{report.targetId}</span>
-                    )}
-                  </td>
-                  <td className="py-2 pr-3">
+            {reports.map((report) => (
+              <tr key={report.id} className="border-b border-gray-800">
+                <td className="py-2 pr-3 text-gray-400">{report.targetType}</td>
+                <td className="py-2 pr-3 text-gray-500 text-xs">
+                  {report.sourceUrl ? (
                     <Link
-                      to={`/private/staff/reports/${report.id}`}
-                      className="hover:underline text-blue-400"
+                      to={report.sourceUrl}
+                      className="text-blue-400 hover:underline"
                     >
-                      {report.category}
+                      #{report.targetId}
                     </Link>
-                  </td>
-                  <td className="py-2 pr-3 text-gray-300">
-                    {report.reporter.username}
-                  </td>
-                  <td className="py-2 pr-3">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded ${
-                        STATUS_BADGE[report.status] ??
-                        'bg-gray-700 text-gray-400'
-                      }`}
-                    >
-                      {report.status}
-                    </span>
-                  </td>
-                  <td className="py-2 pr-3 text-gray-400">
-                    {report.claimedBy?.username ?? '—'}
-                  </td>
-                  <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
-                    {new Date(report.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              );
-            })}
+                  ) : (
+                    <span>#{report.targetId}</span>
+                  )}
+                </td>
+                <td className="py-2 pr-3">
+                  <Link
+                    to={`/private/staff/reports/${report.id}`}
+                    className="hover:underline text-blue-400"
+                  >
+                    {report.category}
+                  </Link>
+                </td>
+                <td className="py-2 pr-3 text-gray-300">
+                  {report.reporter.username}
+                </td>
+                <td className="py-2 pr-3">
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded ${
+                      STATUS_BADGE[report.status] ?? 'bg-gray-700 text-gray-400'
+                    }`}
+                  >
+                    {report.status}
+                  </span>
+                </td>
+                <td className="py-2 pr-3 text-gray-400">
+                  {report.claimedBy?.username ?? '—'}
+                </td>
+                <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
+                  {new Date(report.createdAt).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}

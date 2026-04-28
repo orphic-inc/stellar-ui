@@ -21,37 +21,46 @@ const ForumPage = () => {
   const isLoading = forumLoading || topicsLoading;
 
   if (isLoading) return <Spinner />;
-  if (error || !forum) return <div className="error">Forum not found.</div>;
+  if (error || !forum)
+    return <div className="p-4 text-red-400">Forum not found.</div>;
 
   return (
-    <div className="thin">
-      <div className="linkbox">
-        <Link to="/private/forums">Forums</Link>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      <nav className="text-sm text-gray-500 mb-4">
+        <Link to="/private/forums" className="hover:text-gray-300">
+          Forums
+        </Link>
         {' › '}
-        <span>{forum.forumCategory?.name}</span>
-        {' › '}
-        <strong>{forum.name}</strong>
-      </div>
+        {forum.forumCategory && (
+          <>
+            <span className="text-gray-400">{forum.forumCategory.name}</span>
+            {' › '}
+          </>
+        )}
+        <strong className="text-gray-200">{forum.name}</strong>
+      </nav>
 
-      <div className="box">
-        <div className="head colhead_dark">
-          <span>{forum.name}</span>
+      <div className="rounded border border-gray-700 bg-gray-900">
+        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t flex items-center justify-between">
+          <span className="text-sm font-semibold text-gray-200">
+            {forum.name}
+          </span>
           <Link
             to={`/private/forums/${forumId}/new`}
-            className="btn btn-small float-right"
+            className="text-xs text-indigo-400 hover:text-indigo-300"
           >
-            New Topic
+            + New Topic
           </Link>
         </div>
 
-        <table className="forum_index m_table">
+        <table className="w-full text-sm">
           <thead>
-            <tr className="colhead">
-              <td className="forum-status" />
-              <td className="forum-topic">Topic</td>
-              <td className="forum-replies">Replies</td>
-              <td className="forum-author">Author</td>
-              <td className="forum-latest">Latest</td>
+            <tr className="border-b border-gray-700 text-left text-gray-400">
+              <th className="px-4 py-2 font-medium w-8" />
+              <th className="px-4 py-2 font-medium">Topic</th>
+              <th className="px-4 py-2 font-medium text-right">Replies</th>
+              <th className="px-4 py-2 font-medium">Author</th>
+              <th className="px-4 py-2 font-medium">Latest</th>
             </tr>
           </thead>
           <tbody>
@@ -59,34 +68,49 @@ const ForumPage = () => {
               topicsPage.data.map((topic) => (
                 <tr
                   key={topic.id}
-                  className={`forum-row${topic.isSticky ? ' sticky' : ''}`}
+                  className={`border-b border-gray-800 hover:bg-gray-800/30 ${
+                    topic.isSticky ? 'bg-gray-800/20' : ''
+                  }`}
                 >
-                  <td className="forum-status">
-                    {topic.isLocked && <span title="Locked">🔒</span>}
-                    {topic.isSticky && <span title="Sticky">📌</span>}
+                  <td className="px-4 py-3 text-center">
+                    {topic.isLocked && (
+                      <span title="Locked" className="text-xs">
+                        🔒
+                      </span>
+                    )}
+                    {topic.isSticky && (
+                      <span title="Sticky" className="text-xs">
+                        📌
+                      </span>
+                    )}
                   </td>
-                  <td>
+                  <td className="px-4 py-3">
                     <Link
                       to={`/private/forums/${forumId}/topics/${topic.id}`}
-                      className="topic-title"
+                      className="text-indigo-400 hover:text-indigo-300 font-medium"
                     >
                       {topic.title}
                     </Link>
                   </td>
-                  <td className="forum-replies">{topic.numPosts}</td>
-                  <td className="forum-author">
-                    <Link to={`/private/user/${topic.author?.username}`}>
+                  <td className="px-4 py-3 text-gray-400 text-right">
+                    {topic.numPosts}
+                  </td>
+                  <td className="px-4 py-3 text-gray-400">
+                    <Link
+                      to={`/private/user/${topic.author?.username}`}
+                      className="hover:text-gray-200"
+                    >
                       {topic.author?.username}
                     </Link>
                   </td>
-                  <td className="forum-latest">
+                  <td className="px-4 py-3 text-gray-500 text-xs">
                     {topic.lastPost && <Time date={topic.lastPost.createdAt} />}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="forum-empty">
+                <td colSpan={5} className="px-4 py-6 text-gray-500 text-center">
                   No topics yet.
                 </td>
               </tr>
@@ -95,21 +119,23 @@ const ForumPage = () => {
         </table>
 
         {topicsPage && topicsPage.meta.totalPages > 1 && (
-          <div className="linkbox" style={{ textAlign: 'center' }}>
+          <div className="flex justify-center items-center gap-3 px-4 py-3 border-t border-gray-800 text-sm text-gray-400">
             <button
-              className="brackets btn-link"
+              className="hover:text-gray-200 disabled:opacity-40"
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
             >
-              &laquo; Prev
-            </button>{' '}
-            Page {page} of {topicsPage.meta.totalPages}{' '}
+              ‹ Prev
+            </button>
+            <span>
+              Page {page} of {topicsPage.meta.totalPages}
+            </span>
             <button
-              className="brackets btn-link"
+              className="hover:text-gray-200 disabled:opacity-40"
               disabled={page >= topicsPage.meta.totalPages}
               onClick={() => setPage((p) => p + 1)}
             >
-              Next &raquo;
+              Next ›
             </button>
           </div>
         )}

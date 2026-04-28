@@ -6,22 +6,29 @@ interface Props {
 }
 
 const CommunityRow = ({ community }: Props) => (
-  <tr className="torrent">
-    <td className="td_info big_info">
+  <tr className="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
+    <td className="py-3 pr-3">
       <Link
         to={`/private/communities/${community.id}`}
-        className="tooltip"
-        dir="ltr"
+        className="text-indigo-400 hover:text-indigo-300 font-medium"
       >
         {community.name}
       </Link>
       {community.description && (
-        <div className="forum-description">{community.description}</div>
+        <div className="text-xs text-gray-500 mt-0.5">
+          {community.description}
+        </div>
       )}
     </td>
-    <td className="number_column">{community._count?.releases ?? 0}</td>
-    <td className="number_column">{community._count?.contributors ?? 0}</td>
-    <td className="number_column">{community._count?.consumers ?? 0}</td>
+    <td className="py-3 pr-3 text-gray-400 text-right">
+      {community._count?.releases ?? 0}
+    </td>
+    <td className="py-3 pr-3 text-gray-400 text-right">
+      {community._count?.contributors ?? 0}
+    </td>
+    <td className="py-3 text-gray-400 text-right">
+      {community._count?.consumers ?? 0}
+    </td>
   </tr>
 );
 

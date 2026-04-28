@@ -19,54 +19,77 @@ const CommunityPage = () => {
 
   if (loadingCommunity) return <Spinner />;
   if (error || !community)
-    return <div className="error">Community not found.</div>;
+    return <div className="p-4 text-red-400">Community not found.</div>;
 
   return (
-    <div className="thin">
-      <div className="linkbox">
-        <Link to="/private/communities">Communities</Link>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      <nav className="text-sm text-gray-500 mb-4">
+        <Link to="/private/communities" className="hover:text-gray-300">
+          Communities
+        </Link>
         {' › '}
-        <strong>{community.name}</strong>
-      </div>
+        <strong className="text-gray-200">{community.name}</strong>
+      </nav>
 
-      <div className="box">
-        <div className="head colhead_dark">{community.name}</div>
+      <div className="rounded border border-gray-700 bg-gray-900 mb-4">
+        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t text-sm font-semibold text-gray-200">
+          {community.name}
+        </div>
         {community.description && (
-          <div className="pad">{community.description}</div>
+          <div className="px-4 py-3 text-sm text-gray-400">
+            {community.description}
+          </div>
         )}
       </div>
 
-      <div className="box">
-        <div className="head colhead_dark">Releases</div>
+      <div className="rounded border border-gray-700 bg-gray-900">
+        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t text-sm font-semibold text-gray-200">
+          Releases
+        </div>
         {loadingReleases ? (
-          <Spinner />
+          <div className="p-4">
+            <Spinner />
+          </div>
         ) : (
-          <table className="m_table">
+          <table className="w-full text-sm">
             <thead>
-              <tr className="colhead">
-                <td>Title</td>
-                <td>Year</td>
-                <td>Type</td>
+              <tr className="border-b border-gray-700 text-left text-gray-400">
+                <th className="px-4 py-2 font-medium">Title</th>
+                <th className="px-4 py-2 font-medium">Year</th>
+                <th className="px-4 py-2 font-medium">Type</th>
               </tr>
             </thead>
             <tbody>
               {releases?.data && releases.data.length > 0 ? (
                 releases.data.map((release) => (
-                  <tr key={release.id}>
-                    <td>
+                  <tr
+                    key={release.id}
+                    className="border-b border-gray-800 hover:bg-gray-800/30"
+                  >
+                    <td className="px-4 py-2">
                       <Link
                         to={`/private/communities/${communityId}/releases/${release.id}`}
+                        className="text-indigo-400 hover:text-indigo-300"
                       >
                         {release.title}
                       </Link>
                     </td>
-                    <td>{release.year}</td>
-                    <td>{release.type}</td>
+                    <td className="px-4 py-2 text-gray-400">
+                      {release.year ?? '—'}
+                    </td>
+                    <td className="px-4 py-2 text-gray-400">
+                      {release.type ?? '—'}
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3}>No releases yet.</td>
+                  <td
+                    colSpan={3}
+                    className="px-4 py-4 text-gray-500 text-center"
+                  >
+                    No releases yet.
+                  </td>
                 </tr>
               )}
             </tbody>

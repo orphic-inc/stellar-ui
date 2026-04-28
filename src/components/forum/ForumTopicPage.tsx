@@ -56,7 +56,7 @@ const ForumTopicPage = () => {
   }, [posts, tId, markRead]);
 
   if (topicLoading || postsLoading) return <Spinner />;
-  if (!topic) return <div className="error">Topic not found.</div>;
+  if (!topic) return <div className="p-4 text-red-400">Topic not found.</div>;
 
   let answers: string[] = [];
   let pollParseError = false;
@@ -86,28 +86,33 @@ const ForumTopicPage = () => {
   };
 
   return (
-    <div className="thin">
-      <div className="linkbox">
-        <Link to="/private/forums">Forums</Link>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      <nav className="text-sm text-gray-500 mb-4">
+        <Link to="/private/forums" className="hover:text-gray-300">
+          Forums
+        </Link>
         {' › '}
-        <Link to={`/private/forums/${forumId}`}>Forum</Link>
+        <Link to={`/private/forums/${forumId}`} className="hover:text-gray-300">
+          Forum
+        </Link>
         {' › '}
-        <strong>{topic.title}</strong>
-      </div>
+        <strong className="text-gray-200">{topic.title}</strong>
+      </nav>
 
-      <div className="box topic-header">
-        <div
-          className="head colhead_dark"
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
-          <span>
+      <div className="rounded border border-gray-700 bg-gray-900 mb-4">
+        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t flex items-center justify-between">
+          <span className="text-sm font-semibold text-gray-200">
             {topic.title}
-            {topic.isLocked && <span className="topic-locked"> [Locked]</span>}
-            {topic.isSticky && <span className="topic-sticky"> [Sticky]</span>}
+            {topic.isLocked && (
+              <span className="ml-2 text-xs text-yellow-500 font-normal">
+                [Locked]
+              </span>
+            )}
+            {topic.isSticky && (
+              <span className="ml-2 text-xs text-blue-400 font-normal">
+                [Sticky]
+              </span>
+            )}
           </span>
           <button
             type="button"
@@ -118,8 +123,7 @@ const ForumTopicPage = () => {
               })
             }
             disabled={subscribing}
-            className="brackets btn-link"
-            style={{ fontSize: '0.85em' }}
+            className="text-xs text-gray-400 hover:text-gray-200"
           >
             {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
           </button>
@@ -127,41 +131,36 @@ const ForumTopicPage = () => {
       </div>
 
       {poll && pollParseError && (
-        <div className="box pad error">Poll data is unavailable.</div>
+        <div className="rounded border border-red-800 bg-red-900/20 px-4 py-3 text-sm text-red-400 mb-4">
+          Poll data is unavailable.
+        </div>
       )}
 
       {poll && !pollParseError && answers.length > 0 && (
-        <div className="box pad">
-          <strong>{poll.question}</strong>
+        <div className="rounded border border-gray-700 bg-gray-900 mb-4 p-4">
+          <strong className="text-sm text-gray-200">{poll.question}</strong>
           {myVote !== undefined || poll.closed ? (
-            <table className="m_table" style={{ marginTop: '0.5em' }}>
+            <table className="w-full text-sm mt-3">
               <tbody>
                 {answers.map((answer, i) => {
                   const count = voteCounts[i];
                   const pct =
                     totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
                   return (
-                    <tr key={i} className={myVote?.vote === i ? 'row1' : ''}>
-                      <td>{answer}</td>
-                      <td style={{ width: '60%' }}>
-                        <div
-                          style={{
-                            background: '#334',
-                            height: 14,
-                            borderRadius: 3
-                          }}
-                        >
+                    <tr
+                      key={i}
+                      className={myVote?.vote === i ? 'font-medium' : ''}
+                    >
+                      <td className="py-1 pr-3 text-gray-300 w-40">{answer}</td>
+                      <td className="py-1 pr-3">
+                        <div className="bg-gray-700 h-3 rounded overflow-hidden">
                           <div
-                            style={{
-                              background: '#6366f1',
-                              height: '100%',
-                              width: `${pct}%`,
-                              borderRadius: 3
-                            }}
+                            className="bg-indigo-500 h-full rounded"
+                            style={{ width: `${pct}%` }}
                           />
                         </div>
                       </td>
-                      <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <td className="py-1 text-gray-400 text-right whitespace-nowrap text-xs">
                         {count} ({pct}%)
                       </td>
                     </tr>
@@ -170,28 +169,32 @@ const ForumTopicPage = () => {
               </tbody>
             </table>
           ) : (
-            <form onSubmit={handleVote} style={{ marginTop: '0.5em' }}>
+            <form onSubmit={handleVote} className="mt-3 space-y-1">
               {answers.map((answer, i) => (
-                <div key={i}>
-                  <label>
-                    <input
-                      type="radio"
-                      name="poll-answer"
-                      value={i}
-                      onChange={() => setSelectedAnswer(i)}
-                      checked={selectedAnswer === i}
-                    />{' '}
-                    {answer}
-                  </label>
-                </div>
+                <label
+                  key={i}
+                  className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
+                >
+                  <input
+                    type="radio"
+                    name="poll-answer"
+                    value={i}
+                    onChange={() => setSelectedAnswer(i)}
+                    checked={selectedAnswer === i}
+                    className="accent-indigo-500"
+                  />
+                  {answer}
+                </label>
               ))}
-              <div style={{ marginTop: '0.5em' }}>
-                <input
+              <div className="mt-2 flex items-center gap-3">
+                <button
                   type="submit"
-                  value="Vote"
+                  className="px-3 py-1 text-sm rounded bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50"
                   disabled={selectedAnswer === null || voting}
-                />
-                <span className="small" style={{ marginLeft: '0.5em' }}>
+                >
+                  Vote
+                </button>
+                <span className="text-xs text-gray-500">
                   {totalVotes} vote{totalVotes !== 1 ? 's' : ''}
                 </span>
               </div>
