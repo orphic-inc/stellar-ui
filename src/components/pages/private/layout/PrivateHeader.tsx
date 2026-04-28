@@ -18,9 +18,8 @@ const navLinks = [
   { label: 'Home', to: '/private/' },
   { label: 'Communities', to: '/private/communities' },
   { label: 'Collages', to: '/private/collages' },
-  { label: 'Forums', to: '/private/forums' },
-  { label: 'Upload', to: '/private/contribute' },
   { label: 'Requests', to: '/private/requests' },
+  { label: 'Forums', to: '/private/forums' },
   { label: 'Invites', to: '/private/invite' }
 ];
 
@@ -82,28 +81,24 @@ const PrivateHeader = ({ user }: Props) => {
                 </span>
               )}
             </Link>
-            <Link
-              to="/private/messages/tickets"
-              className="hover:text-gray-200 transition-colors"
-            >
-              Tickets
-              {ticketUnread > 0 && (
-                <span className="ml-1 bg-indigo-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
-                  {ticketUnread}
-                </span>
-              )}
-            </Link>
+            {isStaff && (
+              <Link
+                to="/private/staff/tickets"
+                className="hover:text-gray-200 transition-colors"
+              >
+                Staff Inbox
+                {ticketUnread > 0 && (
+                  <span className="ml-1 bg-amber-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+                    {ticketUnread}
+                  </span>
+                )}
+              </Link>
+            )}
             <Link
               to="/private/contribute/list"
               className="hover:text-gray-200 transition-colors"
             >
               Contributions
-            </Link>
-            <Link
-              to="/private/notifications"
-              className="hover:text-gray-200 transition-colors"
-            >
-              Notifications
             </Link>
           </div>
         </div>
@@ -128,20 +123,6 @@ const PrivateHeader = ({ user }: Props) => {
               {label}
             </NavLink>
           ))}
-          {isStaff && (
-            <NavLink
-              to="/private/staff/tools"
-              className={({ isActive }) =>
-                `px-4 py-2 text-sm font-medium transition-colors border-b-2 ml-auto ${
-                  isActive
-                    ? 'border-amber-500 text-amber-300'
-                    : 'border-transparent text-amber-500/70 hover:text-amber-400 hover:border-amber-700'
-                }`
-              }
-            >
-              Staff
-            </NavLink>
-          )}
         </div>
       </nav>
 

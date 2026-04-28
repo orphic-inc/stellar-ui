@@ -5,6 +5,7 @@ import { useGetMeQuery } from '../../../../store/services/authApi';
 import { selectCurrentUser } from '../../../../store/slices/authSlice';
 import PrivateHeader from './PrivateHeader';
 import PrivateFooter from './PrivateFooter';
+import NotificationCorner from '../../../layout/NotificationCorner';
 import Spinner from '../../../layout/Spinner';
 
 interface Props {
@@ -25,6 +26,7 @@ const PrivateLayout = ({ children }: Props) => {
         {children}
       </main>
       <PrivateFooter />
+      <NotificationCorner />
     </div>
   );
 };

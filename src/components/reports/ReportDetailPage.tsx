@@ -30,6 +30,37 @@ const STATUS_BADGE: Record<string, string> = {
   Resolved: 'bg-gray-700 text-gray-400'
 };
 
+function buildSourceLink(
+  targetType: string,
+  targetId: number
+): { href: string; label: string } | { label: string } {
+  switch (targetType) {
+    case 'Collage':
+      return {
+        href: `/private/collages/${targetId}`,
+        label: `Collage #${targetId}`
+      };
+    case 'ForumTopic':
+      return { label: `Forum Topic #${targetId}` };
+    case 'ForumPost':
+      return { label: `Forum Post #${targetId}` };
+    case 'Release':
+      return { label: `Release #${targetId}` };
+    case 'Contribution':
+      return { label: `Contribution #${targetId}` };
+    case 'Artist':
+      return { label: `Artist #${targetId}` };
+    case 'User':
+      return { label: `User #${targetId}` };
+    case 'Comment':
+      return { label: `Comment #${targetId}` };
+    case 'Post':
+      return { label: `Post #${targetId}` };
+    default:
+      return { label: `${targetType} #${targetId}` };
+  }
+}
+
 const ReportDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const reportId = Number(id);
@@ -129,7 +160,16 @@ const ReportDetailPage = () => {
               Filed by{' '}
               <span className="text-gray-200">{report.reporter.username}</span>
             </span>
-            <span>Target ID: {report.targetId}</span>
+            {(() => {
+              const src = buildSourceLink(report.targetType, report.targetId);
+              return 'href' in src ? (
+                <Link to={src.href} className="text-blue-400 hover:underline">
+                  {src.label} →
+                </Link>
+              ) : (
+                <span className="text-gray-300">{src.label}</span>
+              );
+            })()}
             <span
               className={`text-xs px-2 py-0.5 rounded ${
                 STATUS_BADGE[report.status] ?? 'bg-gray-700 text-gray-400'
