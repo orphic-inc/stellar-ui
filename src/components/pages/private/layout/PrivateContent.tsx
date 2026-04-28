@@ -248,7 +248,14 @@ const PrivateContent = () => (
         </StaffGate>
       }
     />
-    <Route path="staff/reports/:id" element={wrap(ReportDetailPage)} />
+    <Route
+      path="staff/reports/:id"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <ReportDetailPage />
+        </StaffGate>
+      }
+    />
 
     <Route path="reports/new" element={wrap(ReportForm)} />
     <Route path="reports/mine" element={wrap(MyReportsPage)} />

@@ -37,6 +37,10 @@ const FILE_TYPES = [
 ] as const;
 type FileType = (typeof FILE_TYPES)[number];
 
+const inputClass =
+  'w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-indigo-500';
+const labelClass = 'block text-sm text-gray-400 mb-1';
+
 const AddContributionForm = () => {
   const { communityId, releaseId } = useParams<{
     communityId: string;
@@ -57,7 +61,7 @@ const AddContributionForm = () => {
 
   const [fileType, setFileType] = useState<FileType>('mp3');
   const [downloadUrl, setDownloadUrl] = useState('');
-  const [sizeInBytes, setSizeInBytes] = useState('');
+  const [sizeMB, setSizeMB] = useState('');
   const [releaseDescription, setReleaseDescription] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,7 +72,9 @@ const AddContributionForm = () => {
         releaseId: rId,
         fileType,
         downloadUrl,
-        sizeInBytes: sizeInBytes ? parseInt(sizeInBytes, 10) : undefined,
+        sizeInBytes: sizeMB
+          ? Math.round(parseFloat(sizeMB) * 1_048_576)
+          : undefined,
         releaseDescription: releaseDescription || undefined
       }).unwrap();
       dispatch(addAlert('Contribution added.', 'success'));
@@ -84,105 +90,128 @@ const AddContributionForm = () => {
   };
 
   if (releaseLoading) return <Spinner />;
-  if (!release) return <div className="error">Release not found.</div>;
+  if (!release)
+    return <div className="p-4 text-red-400">Release not found.</div>;
 
   return (
-    <div className="thin">
-      <div className="linkbox">
-        <Link to="/private/communities">Communities</Link>
+    <div className="max-w-2xl mx-auto px-4 py-6">
+      <nav className="text-sm text-gray-500 mb-4">
+        <Link to="/private/communities" className="hover:text-gray-300">
+          Communities
+        </Link>
         {' › '}
-        <Link to={`/private/communities/${communityId}`}>Community</Link>
+        <Link
+          to={`/private/communities/${communityId}`}
+          className="hover:text-gray-300"
+        >
+          Community
+        </Link>
         {' › '}
-        <Link to={`/private/communities/${communityId}/releases/${releaseId}`}>
+        <Link
+          to={`/private/communities/${communityId}/releases/${releaseId}`}
+          className="hover:text-gray-300"
+        >
           {release.title}
         </Link>
         {' › '}
-        <strong>Add your version</strong>
-      </div>
+        <strong className="text-gray-200">Add your version</strong>
+      </nav>
 
-      <div className="box">
-        <div className="head colhead_dark">
+      <div className="rounded border border-gray-700 bg-gray-900 mb-6">
+        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t text-sm font-semibold text-gray-200">
           Add your version —{' '}
           {release.artist?.name && `${release.artist.name} — `}
           {release.title}
         </div>
-        <div className="pad">
-          <p className="small">
-            Contribute a different file format or edition of this release. The
-            release metadata already exists — just provide your download link.
-          </p>
-        </div>
+        <p className="px-4 py-3 text-sm text-gray-400">
+          Contribute a different file format or edition of this release. The
+          release metadata already exists — just provide your download link.
+        </p>
       </div>
 
-      <form className="create_form" onSubmit={handleSubmit}>
-        <table className="layout border" width="100%">
-          <tbody>
-            <tr>
-              <td className="label">File type</td>
-              <td>
-                <select
-                  value={fileType}
-                  onChange={(e) => setFileType(e.target.value as FileType)}
-                >
-                  {FILE_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Download URL</td>
-              <td>
-                <input
-                  type="url"
-                  size={60}
-                  value={downloadUrl}
-                  onChange={(e) => setDownloadUrl(e.target.value)}
-                  placeholder="https://example.com/files/my-version.flac"
-                  required
-                />
-                <div className="small">
-                  Link to where your file is hosted (e.g. GitHub, Google Drive,
-                  your own server)
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="label">File size (bytes, optional)</td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  value={sizeInBytes}
-                  onChange={(e) => setSizeInBytes(e.target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Notes (optional)</td>
-              <td>
-                <textarea
-                  cols={60}
-                  rows={4}
-                  value={releaseDescription}
-                  onChange={(e) => setReleaseDescription(e.target.value)}
-                  placeholder="e.g. 24-bit remaster, includes bonus tracks, EU edition..."
-                />
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={2} className="center">
-                <input
-                  type="submit"
-                  value="Add contribution"
-                  disabled={isLoading}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="add-file-type" className={labelClass}>
+            File type
+          </label>
+          <select
+            id="add-file-type"
+            value={fileType}
+            onChange={(e) => setFileType(e.target.value as FileType)}
+            className={inputClass}
+          >
+            {FILE_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="add-download-url" className={labelClass}>
+            Download URL <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="add-download-url"
+            type="url"
+            value={downloadUrl}
+            onChange={(e) => setDownloadUrl(e.target.value)}
+            placeholder="https://example.com/files/my-version.flac"
+            required
+            className={inputClass}
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Link to where your file is hosted (e.g. GitHub, Google Drive, your
+            own server)
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="add-size-mb" className={labelClass}>
+            File size (MB, optional)
+          </label>
+          <input
+            id="add-size-mb"
+            type="number"
+            min="0"
+            step="0.01"
+            value={sizeMB}
+            onChange={(e) => setSizeMB(e.target.value)}
+            placeholder="e.g. 85.4"
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="add-notes" className={labelClass}>
+            Notes (optional)
+          </label>
+          <textarea
+            id="add-notes"
+            rows={4}
+            value={releaseDescription}
+            onChange={(e) => setReleaseDescription(e.target.value)}
+            placeholder="e.g. 24-bit remaster, includes bonus tracks, EU edition…"
+            className={inputClass + ' resize-y'}
+          />
+        </div>
+
+        <div className="flex gap-3 pt-2">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded disabled:opacity-50"
+          >
+            {isLoading ? 'Adding…' : 'Add contribution'}
+          </button>
+          <Link
+            to={`/private/communities/${communityId}/releases/${releaseId}`}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded"
+          >
+            Cancel
+          </Link>
+        </div>
       </form>
     </div>
   );

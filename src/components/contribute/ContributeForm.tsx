@@ -58,6 +58,11 @@ const FILE_TYPES = [
 ] as const;
 type FileType = (typeof FILE_TYPES)[number];
 
+const inputClass =
+  'w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-indigo-500';
+const labelClass = 'block text-sm font-medium text-gray-300 mb-1';
+const fieldWrap = 'space-y-1';
+
 const ContributeForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -71,7 +76,7 @@ const ContributeForm = () => {
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [fileType, setFileType] = useState<FileType>('mp3');
   const [downloadUrl, setDownloadUrl] = useState('');
-  const [sizeInBytes, setSizeInBytes] = useState('');
+  const [sizeMB, setSizeMB] = useState('');
   const [title, setTitle] = useState('');
   const [album, setAlbum] = useState('');
   const [tags, setTags] = useState('');
@@ -124,7 +129,9 @@ const ContributeForm = () => {
         year: parseInt(year, 10),
         fileType,
         downloadUrl,
-        sizeInBytes: sizeInBytes ? parseInt(sizeInBytes, 10) : undefined,
+        sizeInBytes: sizeMB
+          ? Math.round(parseFloat(sizeMB) * 1_048_576)
+          : undefined,
         tags,
         image,
         description,
@@ -146,248 +153,281 @@ const ContributeForm = () => {
   if (loadingCommunities) return <Spinner />;
 
   return (
-    <div className="thin">
-      <h2>Upload</h2>
-      <form className="create_form" onSubmit={handleSubmit}>
-        <table className="layout border" width="100%">
-          <tbody>
-            <tr>
-              <td className="label">Community</td>
-              <td>
-                <select
-                  id="contribute-community"
-                  value={community}
-                  onChange={(e) => setCommunity(e.target.value)}
+    <div className="max-w-2xl mx-auto px-4 py-6">
+      <h2 className="text-xl font-semibold text-gray-100 mb-6">
+        Upload a release
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className={fieldWrap}>
+          <label htmlFor="contribute-community" className={labelClass}>
+            Community <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="contribute-community"
+            value={community}
+            onChange={(e) => setCommunity(e.target.value)}
+            required
+            className={inputClass}
+          >
+            <option value="">Select a community</option>
+            {communities?.data?.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500">
+            Can&apos;t find your community?{' '}
+            <Link
+              to="/private/requests"
+              className="text-indigo-400 hover:text-indigo-300"
+            >
+              Submit a request.
+            </Link>
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className={fieldWrap}>
+            <label htmlFor="contribute-type" className={labelClass}>
+              Content type <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="contribute-type"
+              value={type}
+              onChange={(e) => setType(e.target.value as ContentType)}
+              className={inputClass}
+            >
+              {CONTENT_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={fieldWrap}>
+            <label htmlFor="contribute-year" className={labelClass}>
+              Year <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="contribute-year"
+              type="number"
+              min="1900"
+              max="2100"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              required
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className={fieldWrap}>
+          <label className={labelClass}>
+            {type === 'Music' ? 'Artist(s)' : 'Creator(s)'}{' '}
+            <span className="text-red-500">*</span>
+          </label>
+          <div className="space-y-2">
+            {collaborators.map((c, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={c.artist}
+                  onChange={(e) =>
+                    updateCollaborator(i, 'artist', e.target.value)
+                  }
+                  placeholder={
+                    type === 'Music' ? 'Artist name' : 'Creator name'
+                  }
                   required
-                >
-                  <option value="">Select a community</option>
-                  {communities?.data?.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="small" style={{ float: 'right' }}>
-                  Can&apos;t find your community?{' '}
-                  <Link to="/private/requests">Submit a request!</Link>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Type</td>
-              <td>
+                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-indigo-500"
+                />
                 <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value as ContentType)}
+                  value={c.importance}
+                  onChange={(e) =>
+                    updateCollaborator(i, 'importance', e.target.value)
+                  }
+                  className="px-2 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-indigo-500"
                 >
-                  {CONTENT_TYPES.map((t) => (
+                  {(type === 'Music'
+                    ? ARTIST_TYPES
+                    : ['Creator', 'Contributor', 'Editor']
+                  ).map((t) => (
                     <option key={t} value={t}>
                       {t}
                     </option>
                   ))}
                 </select>
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Year</td>
-              <td>
-                <input
-                  type="number"
-                  min="1900"
-                  max="2100"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                  required
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="label">File type</td>
-              <td>
-                <select
-                  id="contribute-filetype"
-                  value={fileType}
-                  onChange={(e) => setFileType(e.target.value as FileType)}
-                >
-                  {FILE_TYPES.map((value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Download URL</td>
-              <td>
-                <input
-                  type="url"
-                  size={60}
-                  value={downloadUrl}
-                  onChange={(e) => setDownloadUrl(e.target.value)}
-                  placeholder="https://example.com/files/my-release.zip"
-                  required
-                />
-                <div className="small">
-                  Link to where the file is hosted (e.g. GitHub, Google Drive,
-                  your own server)
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="label">File size (bytes, optional)</td>
-              <td>
-                <input
-                  type="number"
-                  min="1"
-                  value={sizeInBytes}
-                  onChange={(e) => setSizeInBytes(e.target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="label">
-                {type === 'Music' ? 'Artist(s)' : 'Creator(s)'}
-              </td>
-              <td>
-                {collaborators.map((c, i) => (
-                  <div key={i}>
-                    <input
-                      type="text"
-                      value={c.artist}
-                      size={40}
-                      onChange={(e) =>
-                        updateCollaborator(i, 'artist', e.target.value)
-                      }
-                      placeholder={
-                        type === 'Music' ? 'Artist name' : 'Creator name'
-                      }
-                      required
-                    />
-                    <select
-                      value={c.importance}
-                      onChange={(e) =>
-                        updateCollaborator(i, 'importance', e.target.value)
-                      }
-                    >
-                      {(type === 'Music'
-                        ? ARTIST_TYPES
-                        : ['Creator', 'Contributor', 'Editor']
-                      ).map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
-                    {i > 0 && (
-                      <button
-                        type="button"
-                        onClick={(e) => removeCollaborator(e, i)}
-                        className="brackets btn-link"
-                      >
-                        −
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addCollaborator}
-                  className="brackets btn-link"
-                >
-                  +
-                </button>
-              </td>
-            </tr>
-            {type === 'Music' ? (
-              <>
-                <tr>
-                  <td className="label">Album title</td>
-                  <td>
-                    <input
-                      id="contribute-album"
-                      type="text"
-                      size={60}
-                      value={album}
-                      onChange={(e) => setAlbum(e.target.value)}
-                      required
-                    />
-                  </td>
-                </tr>
-              </>
-            ) : (
-              <tr>
-                <td className="label">Title</td>
-                <td>
-                  <input
-                    type="text"
-                    size={60}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </td>
-              </tr>
-            )}
-            <tr>
-              <td className="label">Tags</td>
-              <td>
-                <input
-                  type="text"
-                  size={60}
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Image (optional)</td>
-              <td>
-                <input
-                  type="text"
-                  size={60}
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                />
-              </td>
-            </tr>
-            {type === 'Music' ? (
-              <tr>
-                <td className="label">Release description (optional)</td>
-                <td>
-                  <input
-                    type="text"
-                    size={60}
-                    value={releaseDescription}
-                    onChange={(e) => setReleaseDescription(e.target.value)}
-                  />
-                </td>
-              </tr>
-            ) : (
-              <tr>
-                <td className="label">Description</td>
-                <td>
-                  <textarea
-                    cols={60}
-                    rows={8}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                  />
-                </td>
-              </tr>
-            )}
-            <tr>
-              <td colSpan={2} className="center">
-                <input
-                  type="submit"
-                  value="Contribute release"
-                  disabled={isLoading}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                {i > 0 && (
+                  <button
+                    type="button"
+                    onClick={(e) => removeCollaborator(e, i)}
+                    className="text-gray-500 hover:text-red-400 text-sm px-1"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addCollaborator}
+              className="text-indigo-400 hover:text-indigo-300 text-sm"
+            >
+              + Add {type === 'Music' ? 'artist' : 'creator'}
+            </button>
+          </div>
+        </div>
+
+        <div className={fieldWrap}>
+          <label htmlFor="contribute-album" className={labelClass}>
+            {type === 'Music' ? 'Album title' : 'Title'}{' '}
+            <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="contribute-album"
+            type="text"
+            value={type === 'Music' ? album : title}
+            onChange={(e) =>
+              type === 'Music'
+                ? setAlbum(e.target.value)
+                : setTitle(e.target.value)
+            }
+            required
+            className={inputClass}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className={fieldWrap}>
+            <label htmlFor="contribute-filetype" className={labelClass}>
+              File type <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="contribute-filetype"
+              value={fileType}
+              onChange={(e) => setFileType(e.target.value as FileType)}
+              className={inputClass}
+            >
+              {FILE_TYPES.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={fieldWrap}>
+            <label htmlFor="contribute-size" className={labelClass}>
+              File size (MB, optional)
+            </label>
+            <input
+              id="contribute-size"
+              type="number"
+              min="0"
+              step="0.01"
+              value={sizeMB}
+              onChange={(e) => setSizeMB(e.target.value)}
+              placeholder="e.g. 85.4"
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className={fieldWrap}>
+          <label htmlFor="contribute-url" className={labelClass}>
+            Download URL <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="contribute-url"
+            type="url"
+            value={downloadUrl}
+            onChange={(e) => setDownloadUrl(e.target.value)}
+            placeholder="https://example.com/files/my-release.zip"
+            required
+            className={inputClass}
+          />
+          <p className="text-xs text-gray-500">
+            Link to where the file is hosted (e.g. GitHub, Google Drive, your
+            own server)
+          </p>
+        </div>
+
+        <div className={fieldWrap}>
+          <label htmlFor="contribute-tags" className={labelClass}>
+            Tags
+          </label>
+          <input
+            id="contribute-tags"
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            placeholder="rock, jazz, ambient (comma-separated)"
+            className={inputClass}
+          />
+        </div>
+
+        <div className={fieldWrap}>
+          <label htmlFor="contribute-image" className={labelClass}>
+            Cover image URL (optional)
+          </label>
+          <input
+            id="contribute-image"
+            type="text"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            className={inputClass}
+          />
+        </div>
+
+        {type === 'Music' ? (
+          <div className={fieldWrap}>
+            <label htmlFor="contribute-reldesc" className={labelClass}>
+              Release description (optional)
+            </label>
+            <input
+              id="contribute-reldesc"
+              type="text"
+              value={releaseDescription}
+              onChange={(e) => setReleaseDescription(e.target.value)}
+              placeholder="e.g. 24-bit remaster, limited edition…"
+              className={inputClass}
+            />
+          </div>
+        ) : (
+          <div className={fieldWrap}>
+            <label htmlFor="contribute-desc" className={labelClass}>
+              Description <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="contribute-desc"
+              rows={5}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              className={inputClass + ' resize-y'}
+            />
+          </div>
+        )}
+
+        <div className="flex gap-3 pt-2">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded disabled:opacity-50"
+          >
+            {isLoading ? 'Submitting…' : 'Contribute release'}
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

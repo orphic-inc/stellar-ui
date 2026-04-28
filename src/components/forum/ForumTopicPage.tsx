@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import {
   useGetTopicByIdQuery,
   useGetPostsByTopicQuery,
+  useGetForumByIdQuery,
   useMarkTopicReadMutation,
   useGetPollByTopicQuery,
   useVotePollMutation
@@ -28,6 +29,7 @@ const ForumTopicPage = () => {
   const tId = parseInt(forumTopicId ?? '0');
   const currentUser = useSelector(selectCurrentUser);
 
+  const { data: forum } = useGetForumByIdQuery(fId);
   const { data: topic, isLoading: topicLoading } = useGetTopicByIdQuery({
     forumId: fId,
     topicId: tId
@@ -93,7 +95,7 @@ const ForumTopicPage = () => {
         </Link>
         {' › '}
         <Link to={`/private/forums/${forumId}`} className="hover:text-gray-300">
-          Forum
+          {forum?.name ?? 'Forum'}
         </Link>
         {' › '}
         <strong className="text-gray-200">{topic.title}</strong>

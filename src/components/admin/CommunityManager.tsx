@@ -24,6 +24,16 @@ const REGISTRATION_STATUSES: { value: RegistrationStatus; label: string }[] = [
   { value: 'closed', label: 'Closed' }
 ];
 
+const VALID_REGISTRATION_STATUSES = ['open', 'invite', 'closed'] as const;
+
+const isRegistrationStatus = (v: unknown): v is RegistrationStatus =>
+  typeof v === 'string' &&
+  (VALID_REGISTRATION_STATUSES as readonly string[]).includes(v);
+
+const toRegistrationStatus = (
+  v: string | null | undefined
+): RegistrationStatus => (isRegistrationStatus(v) ? v : 'open');
+
 const selectClass =
   'rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
 
@@ -37,6 +47,10 @@ const EditRow = ({
   const [updateCommunity] = useUpdateCommunityMutation();
   const [name, setName] = useState(community.name);
   const [description, setDescription] = useState(community.description ?? '');
+  const [registrationStatus, setRegistrationStatus] =
+    useState<RegistrationStatus>(
+      toRegistrationStatus(community.registrationStatus)
+    );
   const [allowDuplicateFormats, setAllowDuplicateFormats] = useState(
     community.allowDuplicateFormats
   );
@@ -47,6 +61,7 @@ const EditRow = ({
       id: community.id,
       name,
       description,
+      registrationStatus,
       allowDuplicateFormats
     });
     onDone();
@@ -86,6 +101,28 @@ const EditRow = ({
               onChange={(e) => setDescription(e.target.value)}
               className="w-full rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
             />
+          </div>
+          <div>
+            <label
+              htmlFor={`edit-cm-status-${community.id}`}
+              className="block text-xs text-gray-400 mb-1"
+            >
+              Registration
+            </label>
+            <select
+              id={`edit-cm-status-${community.id}`}
+              value={registrationStatus}
+              onChange={(e) =>
+                setRegistrationStatus(e.target.value as RegistrationStatus)
+              }
+              className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              {REGISTRATION_STATUSES.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex items-center gap-2 self-end pb-1">
             <input

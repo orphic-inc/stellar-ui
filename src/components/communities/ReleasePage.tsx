@@ -13,6 +13,7 @@ import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
+import { formatBytes } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
 
 interface ReportModalProps {
@@ -180,6 +181,7 @@ const ReleasePage = () => {
               <tr className="border-b border-gray-700 text-left text-gray-400">
                 <th className="px-4 py-2 font-medium">Contributor</th>
                 <th className="px-4 py-2 font-medium">Format</th>
+                <th className="px-4 py-2 font-medium">Size</th>
                 <th className="px-4 py-2 font-medium">Collaborators</th>
                 <th className="px-4 py-2 font-medium">Notes</th>
                 <th className="px-4 py-2 font-medium">Status</th>
@@ -205,6 +207,9 @@ const ReleasePage = () => {
                     </td>
                     <td className="px-4 py-2 text-gray-400 text-xs">
                       {c.type}
+                    </td>
+                    <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
+                      {c.sizeInBytes ? formatBytes(Number(c.sizeInBytes)) : '—'}
                     </td>
                     <td className="px-4 py-2 text-gray-400">
                       {c.collaborators.map((a) => a.name).join(', ') || '—'}

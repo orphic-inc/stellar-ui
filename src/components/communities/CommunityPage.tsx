@@ -55,6 +55,7 @@ const CommunityPage = () => {
             <thead>
               <tr className="border-b border-gray-700 text-left text-gray-400">
                 <th className="px-4 py-2 font-medium">Title</th>
+                <th className="px-4 py-2 font-medium">Artist</th>
                 <th className="px-4 py-2 font-medium">Year</th>
                 <th className="px-4 py-2 font-medium">Type</th>
               </tr>
@@ -75,6 +76,9 @@ const CommunityPage = () => {
                       </Link>
                     </td>
                     <td className="px-4 py-2 text-gray-400">
+                      {release.artist?.name ?? '—'}
+                    </td>
+                    <td className="px-4 py-2 text-gray-400">
                       {release.year ?? '—'}
                     </td>
                     <td className="px-4 py-2 text-gray-400">
@@ -85,7 +89,7 @@ const CommunityPage = () => {
               ) : (
                 <tr>
                   <td
-                    colSpan={3}
+                    colSpan={4}
                     className="px-4 py-4 text-gray-500 text-center"
                   >
                     No releases yet.
