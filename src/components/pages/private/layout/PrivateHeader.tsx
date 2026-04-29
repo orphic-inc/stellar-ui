@@ -63,9 +63,12 @@ const PrivateHeader = ({ user }: Props) => {
               Consumed:{' '}
               <span className="text-gray-300 font-medium">{downloaded}</span>
             </span>
-            <span>
+            <Link
+              to="/private/ratio"
+              className="hover:text-gray-300 transition-colors"
+            >
               Ratio: <span className="text-gray-300 font-medium">{ratio}</span>
-            </span>
+            </Link>
           </div>
           {/* Quicklinks */}
           <div className="flex items-center gap-3">

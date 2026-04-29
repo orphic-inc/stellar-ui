@@ -97,18 +97,18 @@ const ReleasePage = () => {
     data: release,
     isLoading,
     error
-  } = useGetReleaseByIdQuery({
-    communityId: cId,
-    releaseId: rId
-  });
+  } = useGetReleaseByIdQuery({ communityId: cId, releaseId: rId });
   const { data: community } = useGetCommunityByIdQuery(cId);
 
   if (isLoading) return <Spinner />;
   if (error || !release)
     return <div className="p-4 text-red-400">Release not found.</div>;
 
+  const tags = release.tags ?? [];
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div className="max-w-6xl mx-auto px-4 py-6">
+      {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/private/communities" className="hover:text-gray-300">
           Communities
@@ -124,140 +124,214 @@ const ReleasePage = () => {
         <strong className="text-gray-200">{release.title}</strong>
       </nav>
 
-      <div className="rounded border border-gray-700 bg-gray-900 mb-4">
-        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t text-sm font-semibold text-gray-200">
-          {release.artist && <span>{release.artist.name} — </span>}
-          {release.title}
-          {release.year && <span> ({release.year})</span>}
+      {/* Page title */}
+      <h1 className="text-xl font-bold text-white mb-1">
+        {release.artist && (
+          <span className="text-gray-300">{release.artist.name} — </span>
+        )}
+        {release.title}
+        {release.year && (
+          <span className="text-gray-400 font-normal text-base ml-2">
+            [{release.year}]
+          </span>
+        )}
+      </h1>
+
+      {/* Action links */}
+      <div className="flex gap-3 text-xs text-indigo-400 mb-6">
+        <button
+          type="button"
+          onClick={() =>
+            navigate(
+              `/private/communities/${communityId}/releases/${releaseId}/contribute`
+            )
+          }
+          className="hover:text-indigo-300 transition-colors"
+        >
+          [Add format]
+        </button>
+      </div>
+
+      {/* Two-column layout */}
+      <div className="flex gap-6 items-start">
+        {/* Main content */}
+        <div className="flex-1 min-w-0 space-y-4">
+          {/* Contributions table */}
+          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200">
+              Contributions
+            </div>
+            {release.contributions && release.contributions.length > 0 ? (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-700 text-left text-gray-400 text-xs">
+                    <th className="px-4 py-2 font-medium">Format</th>
+                    <th className="px-4 py-2 font-medium">Size</th>
+                    <th className="px-4 py-2 font-medium">Contributor</th>
+                    <th className="px-4 py-2 font-medium">Notes</th>
+                    <th className="px-4 py-2 font-medium">Status</th>
+                    <th className="px-4 py-2 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {release.contributions.map((c) => {
+                    const linkStatus = ((c as { linkStatus?: string })
+                      .linkStatus ?? 'UNKNOWN') as LinkHealthStatus;
+                    return (
+                      <tr
+                        key={c.id}
+                        className="border-b border-gray-800 hover:bg-gray-800/30"
+                      >
+                        <td className="px-4 py-2 text-gray-300 text-xs font-medium">
+                          » {c.type}
+                        </td>
+                        <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
+                          {c.sizeInBytes
+                            ? formatBytes(Number(c.sizeInBytes))
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-2">
+                          <Link
+                            to={`/private/user/${c.user.username}`}
+                            className="text-indigo-400 hover:text-indigo-300 text-xs"
+                          >
+                            {c.user.username}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-2 text-gray-500 text-xs">
+                          {c.releaseDescription ?? '—'}
+                        </td>
+                        <td className="px-4 py-2">
+                          <LinkStatusBadge status={linkStatus} />
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex gap-2 items-center text-xs">
+                            <DownloadButton
+                              contributionId={c.id}
+                              canDownload={user?.canDownload ?? false}
+                            />
+                            <button
+                              type="button"
+                              className="text-gray-600 hover:text-gray-400 transition-colors"
+                              title="Report dead or misleading link"
+                              onClick={() => setReportingId(c.id)}
+                            >
+                              [RP]
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <div className="px-4 py-4 text-sm text-gray-500">
+                No contributions yet.{' '}
+                <button
+                  type="button"
+                  className="text-indigo-400 hover:text-indigo-300"
+                  onClick={() =>
+                    navigate(
+                      `/private/communities/${communityId}/releases/${releaseId}/contribute`
+                    )
+                  }
+                >
+                  Be the first to contribute a file.
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Description */}
+          {release.description && (
+            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Album Info
+              </div>
+              <div className="px-4 py-3 text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+                {release.description}
+              </div>
+            </div>
+          )}
+
+          <CommentsSection page="release" pageId={rId} />
         </div>
-        <div className="p-4">
+
+        {/* Sidebar */}
+        <div className="w-56 shrink-0 space-y-4">
+          {/* Cover art */}
           {release.image && (
-            <div className="flex justify-center mb-4">
+            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Cover
+              </div>
               <img
                 src={release.image}
                 alt={release.title}
-                className="max-w-[200px] rounded"
+                className="w-full object-cover"
               />
             </div>
           )}
-          {release.type && (
-            <p className="text-sm text-gray-400 mb-1">
-              <span className="text-gray-300 font-medium">Type:</span>{' '}
-              {release.type}
-            </p>
-          )}
-          {release.tags && release.tags.length > 0 && (
-            <p className="text-sm text-gray-400 mb-1">
-              <span className="text-gray-300 font-medium">Tags:</span>{' '}
-              {release.tags.map((t) => t.name).join(', ')}
-            </p>
-          )}
-          {release.description && (
-            <p className="text-sm text-gray-400 mt-2">{release.description}</p>
-          )}
-        </div>
-      </div>
 
-      <div className="rounded border border-gray-700 bg-gray-900 mb-4">
-        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-200">
-            Contributions
-          </span>
-          <button
-            type="button"
-            className="text-xs text-indigo-400 hover:text-indigo-300"
-            onClick={() =>
-              navigate(
-                `/private/communities/${communityId}/releases/${releaseId}/contribute`
-              )
-            }
-          >
-            + Add your version
-          </button>
-        </div>
-        {release.contributions && release.contributions.length > 0 ? (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-700 text-left text-gray-400">
-                <th className="px-4 py-2 font-medium">Contributor</th>
-                <th className="px-4 py-2 font-medium">Format</th>
-                <th className="px-4 py-2 font-medium">Size</th>
-                <th className="px-4 py-2 font-medium">Collaborators</th>
-                <th className="px-4 py-2 font-medium">Notes</th>
-                <th className="px-4 py-2 font-medium">Status</th>
-                <th className="px-4 py-2 font-medium">Download</th>
-              </tr>
-            </thead>
-            <tbody>
-              {release.contributions.map((c) => {
-                const linkStatus = ((c as { linkStatus?: string }).linkStatus ??
-                  'UNKNOWN') as LinkHealthStatus;
-                return (
-                  <tr
-                    key={c.id}
-                    className="border-b border-gray-800 hover:bg-gray-800/30"
+          {/* Artist */}
+          {release.artist && (
+            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Artist
+              </div>
+              <div className="px-3 py-2 text-sm">
+                <Link
+                  to={`/private/artists/${release.artist.id}`}
+                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  {release.artist.name}
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Tags
+              </div>
+              <div className="px-3 py-2 flex flex-wrap gap-1.5">
+                {tags.map((t) => (
+                  <span
+                    key={t.name}
+                    className="text-xs px-2 py-0.5 bg-gray-800 text-indigo-300 rounded border border-gray-700"
                   >
-                    <td className="px-4 py-2">
-                      <Link
-                        to={`/private/user/${c.user.username}`}
-                        className="text-indigo-400 hover:text-indigo-300"
-                      >
-                        {c.user.username}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs">
-                      {c.type}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
-                      {c.sizeInBytes ? formatBytes(Number(c.sizeInBytes)) : '—'}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400">
-                      {c.collaborators.map((a) => a.name).join(', ') || '—'}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400">
-                      {c.releaseDescription ?? '—'}
-                    </td>
-                    <td className="px-4 py-2">
-                      <LinkStatusBadge status={linkStatus} />
-                    </td>
-                    <td className="px-4 py-2 flex gap-2 items-center">
-                      <DownloadButton
-                        contributionId={c.id}
-                        canDownload={user?.canDownload ?? false}
-                      />
-                      <button
-                        type="button"
-                        className="text-xs text-gray-500 hover:text-gray-300"
-                        title="Report dead or misleading link"
-                        onClick={() => setReportingId(c.id)}
-                      >
-                        Report
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        ) : (
-          <div className="px-4 py-4 text-sm text-gray-500">
-            No contributions yet.{' '}
-            <button
-              type="button"
-              className="text-indigo-400 hover:text-indigo-300"
-              onClick={() =>
-                navigate(
-                  `/private/communities/${communityId}/releases/${releaseId}/contribute`
-                )
-              }
-            >
-              Be the first to contribute a file.
-            </button>
-          </div>
-        )}
-      </div>
+                    {t.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
-      <CommentsSection page="release" pageId={rId} />
+          {/* Metadata */}
+          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Info
+            </div>
+            <ul className="divide-y divide-gray-800 text-xs">
+              {release.type && (
+                <li className="flex justify-between px-3 py-1.5">
+                  <span className="text-gray-500">Type</span>
+                  <span className="text-gray-300">{release.type}</span>
+                </li>
+              )}
+              {release.year && (
+                <li className="flex justify-between px-3 py-1.5">
+                  <span className="text-gray-500">Year</span>
+                  <span className="text-gray-300">{release.year}</span>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
 
       {reportingId !== null && (
         <ReportModal

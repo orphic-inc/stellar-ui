@@ -1,20 +1,7 @@
+import { Link } from 'react-router-dom';
 import { useGetMyRatioStatsQuery } from '../../store/services/profileApi';
+import { formatBytes } from '../../utils';
 import Spinner from '../layout/Spinner';
-
-const formatBytes = (bytesStr: string): string => {
-  const bytes = Number(bytesStr);
-  if (bytes >= 1073741824) return `${(bytes / 1073741824).toFixed(2)} GiB`;
-  if (bytes >= 1048576) return `${(bytes / 1048576).toFixed(2)} MiB`;
-  if (bytes >= 1024) return `${(bytes / 1024).toFixed(2)} KiB`;
-  return `${bytes} B`;
-};
-
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
 
 const RatioStats = () => {
   const { data: stats, isLoading } = useGetMyRatioStatsQuery();
@@ -23,60 +10,58 @@ const RatioStats = () => {
   if (!stats) return null;
 
   const ratioColor = stats.meetsRequirement ? 'text-green-400' : 'text-red-400';
-  const { policy } = stats;
 
   return (
-    <div className="box box_info mt-4">
-      <div className="head colhead_dark">Upload / Download</div>
+    <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden mt-4">
+      <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700 text-xs font-semibold uppercase tracking-wider text-gray-300">
+        Upload / Download
+      </div>
 
-      {policy.status === 'LEECH_DISABLED' && (
-        <div className="box_warning p-3 text-sm">
+      {stats.policy?.status === 'LEECH_DISABLED' && (
+        <div className="bg-red-950/40 border-b border-red-900/40 px-4 py-3 text-sm text-red-300">
           <strong>Downloads disabled.</strong> Your ratio fell below the
           required threshold and your download access has been suspended.
           Contact staff to appeal.
-          {policy.leechDisabledAt && (
-            <span className="text-gray-400 ml-1">
-              (since {formatDate(policy.leechDisabledAt)})
-            </span>
-          )}
         </div>
       )}
 
-      {policy.status === 'WATCH' && (
-        <div className="box_warning p-3 text-sm">
+      {stats.policy?.status === 'WATCH' && (
+        <div className="bg-yellow-950/40 border-b border-yellow-900/40 px-4 py-3 text-sm text-yellow-300">
           <strong>Ratio watch active.</strong> Your ratio is below the required
-          minimum. Improve your ratio before{' '}
-          {policy.watchExpiresAt
-            ? formatDate(policy.watchExpiresAt)
-            : 'the deadline'}{' '}
-          to avoid download suspension.
+          minimum. Improve your ratio to avoid download suspension.
         </div>
       )}
 
-      <ul className="stats nobullet">
-        <li>
-          Uploaded:{' '}
-          <span className="text-green-400">
-            {formatBytes(stats.totalEarned)}
+      <ul className="divide-y divide-gray-700/50 text-sm">
+        <li className="flex justify-between px-4 py-2 text-gray-400">
+          <span>Uploaded</span>
+          <span className="text-green-400 font-medium">
+            {formatBytes(Number(stats.totalEarned))}
           </span>
         </li>
-        <li>
-          Downloaded: <span>{formatBytes(stats.downloaded)}</span>
+        <li className="flex justify-between px-4 py-2 text-gray-400">
+          <span>Downloaded</span>
+          <span className="text-gray-200">
+            {formatBytes(Number(stats.downloaded))}
+          </span>
         </li>
-        <li>
-          Ratio: <span className={ratioColor}>{stats.ratio.toFixed(3)}</span>
-          {stats.requiredRatio > 0 && (
-            <span className="text-gray-500 text-xs ml-1">
-              (req. {stats.requiredRatio.toFixed(3)})
-            </span>
-          )}
+        <li className="flex justify-between px-4 py-2 text-gray-400">
+          <span>Ratio</span>
+          <span className={ratioColor + ' font-medium'}>
+            {stats.ratio.toFixed(3)}
+            {stats.requiredRatio > 0 && (
+              <span className="text-gray-500 text-xs ml-1">
+                (req. {stats.requiredRatio.toFixed(3)})
+              </span>
+            )}
+          </span>
         </li>
-        <li>
-          Bracket:{' '}
-          <span className="text-gray-400 text-xs">{stats.bracket.label}</span>
+        <li className="flex justify-between px-4 py-2 text-gray-400">
+          <span>Bracket</span>
+          <span className="text-gray-200 text-xs">{stats.bracket.label}</span>
         </li>
-        <li>
-          Contribution coverage:{' '}
+        <li className="flex justify-between px-4 py-2 text-gray-400">
+          <span>Contribution coverage</span>
           <span
             className={
               stats.contributionCoverage >= 1
@@ -87,11 +72,22 @@ const RatioStats = () => {
             {(stats.contributionCoverage * 100).toFixed(0)}%
           </span>
         </li>
-        <li>
-          Eligible contributions:{' '}
-          <span>{formatBytes(stats.eligibleContributionBytes)}</span>
+        <li className="flex justify-between px-4 py-2 text-gray-400">
+          <span>Eligible contributions</span>
+          <span className="text-gray-200">
+            {formatBytes(Number(stats.eligibleContributionBytes))}
+          </span>
         </li>
       </ul>
+
+      <div className="px-4 py-2 border-t border-gray-700 text-xs">
+        <Link
+          to="/private/ratio"
+          className="text-indigo-400 hover:text-indigo-300 transition-colors"
+        >
+          Ratio rules →
+        </Link>
+      </div>
     </div>
   );
 };

@@ -8,6 +8,7 @@ import NotFound from '../../../layout/NotFound';
 import PrivateHomepage from '../PrivateHomepage';
 import UserProfile from '../../../profile/UserProfile';
 import Settings from '../../../profile/settings/Settings';
+import RatioRulesPage from '../../../profile/RatioRulesPage';
 import InviteForm from '../../../profile/invite/InviteForm';
 import InviteTree from '../../../profile/invite/InviteTree';
 
@@ -86,6 +87,7 @@ const PrivateContent = () => (
     <Route path="user/:id" element={wrap(UserProfile)} />
     <Route path="user/invite-tree" element={<InviteTree />} />
     <Route path="invite" element={<InviteForm />} />
+    <Route path="ratio" element={wrap(RatioRulesPage)} />
 
     <Route
       path="staff/tools/user/new"
