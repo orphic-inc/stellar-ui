@@ -28,6 +28,8 @@ const NotificationCorner = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  if (totalCount === 0) return null;
+
   return (
     <div
       ref={panelRef}

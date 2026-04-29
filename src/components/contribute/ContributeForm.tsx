@@ -321,16 +321,17 @@ const ContributeForm = () => {
 
           <div className={fieldWrap}>
             <label htmlFor="contribute-size" className={labelClass}>
-              File size (MB, optional)
+              File size (MB) <span className="text-red-500">*</span>
             </label>
             <input
               id="contribute-size"
               type="number"
-              min="0"
+              min="0.01"
               step="0.01"
               value={sizeMB}
               onChange={(e) => setSizeMB(e.target.value)}
               placeholder="e.g. 85.4"
+              required
               className={inputClass}
             />
           </div>
