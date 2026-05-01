@@ -38,6 +38,7 @@ import ConversationView from '../../../messages/ConversationView';
 import MyTicketsPage from '../../../staffInbox/MyTicketsPage';
 import NewTicketForm from '../../../staffInbox/NewTicketForm';
 import CannedResponsesPage from '../../../staffInbox/CannedResponsesPage';
+import TicketView from '../../../staffInbox/TicketView';
 import ReportsQueuePage from '../../../reports/ReportsQueuePage';
 import ReportDetailPage from '../../../reports/ReportDetailPage';
 import MyReportsPage from '../../../reports/MyReportsPage';
@@ -219,12 +220,21 @@ const PrivateContent = () => (
     <Route path="collages" element={wrap(CollageBrowse)} />
 
     <Route path="messages/tickets/new" element={wrap(NewTicketForm)} />
+    <Route path="messages/tickets/:id" element={wrap(TicketView)} />
     <Route path="messages/tickets" element={wrap(MyTicketsPage)} />
     <Route path="messages/new" element={wrap(ComposeForm)} />
     <Route path="messages/sent" element={wrap(SentboxPage)} />
     <Route path="messages/:id" element={wrap(ConversationView)} />
     <Route path="messages" element={wrap(InboxPage)} />
 
+    <Route
+      path="staff/tickets/:id"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <TicketView />
+        </StaffGate>
+      }
+    />
     <Route
       path="staff/tickets"
       element={

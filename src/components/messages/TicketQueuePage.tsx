@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   useGetTicketQueueQuery,
   useBulkResolveTicketsMutation
-} from '../../store/services/messagesApi';
+} from '../../store/services/staffInboxApi';
 import Spinner from '../layout/Spinner';
 
 const STATUS_OPTIONS = [
@@ -158,7 +158,6 @@ const TicketQueuePage = () => {
           </thead>
           <tbody>
             {tickets.map((ticket) => {
-              const owner = ticket.participants?.[0]?.user;
               return (
                 <tr key={ticket.id} className="border-b border-gray-800">
                   <td className="py-2 pr-3">
@@ -171,32 +170,30 @@ const TicketQueuePage = () => {
                   </td>
                   <td className="py-2 pr-3">
                     <Link
-                      to={`/private/messages/${ticket.id}`}
+                      to={`/private/staff/tickets/${ticket.id}`}
                       className="hover:underline text-blue-400"
                     >
-                      {ticket.ticketStatus === 'Unanswered' && (
+                      {ticket.status === 'Unanswered' && (
                         <span className="mr-1 text-yellow-400">●</span>
                       )}
                       {ticket.subject}
                     </Link>
                   </td>
                   <td className="py-2 pr-3 text-gray-300">
-                    {owner?.username ?? '—'}
+                    {ticket.user?.username ?? '—'}
                   </td>
                   <td className="py-2 pr-3">
-                    {ticket.ticketStatus && (
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded ${
-                          STATUS_BADGE[ticket.ticketStatus] ??
-                          'bg-gray-700 text-gray-400'
-                        }`}
-                      >
-                        {ticket.ticketStatus}
-                      </span>
-                    )}
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded ${
+                        STATUS_BADGE[ticket.status] ??
+                        'bg-gray-700 text-gray-400'
+                      }`}
+                    >
+                      {ticket.status}
+                    </span>
                   </td>
                   <td className="py-2 pr-3 text-gray-400">
-                    {ticket.assignedStaff?.username ?? '—'}
+                    {ticket.assignedUser?.username ?? '—'}
                   </td>
                   <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
                     {new Date(ticket.updatedAt).toLocaleDateString()}

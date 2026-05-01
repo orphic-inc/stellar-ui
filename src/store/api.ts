@@ -44,6 +44,7 @@ export const api = createApi({
     'PrivateMessage',
     'StaffInbox',
     'StaffInboxResponse',
+    'StaffInboxTicket',
     'Report',
     'SiteSettings',
     'RatioPolicy'

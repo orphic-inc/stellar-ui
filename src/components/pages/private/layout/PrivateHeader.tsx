@@ -5,10 +5,8 @@ import ModBar from '../../../admin/ModBar';
 import type { AuthUser } from '../../../../types';
 import { isStaffUser } from '../../../../utils/permissions';
 import { formatBytes } from '../../../../utils';
-import {
-  useGetUnreadCountQuery,
-  useGetTicketUnreadCountQuery
-} from '../../../../store/services/messagesApi';
+import { useGetUnreadCountQuery } from '../../../../store/services/messagesApi';
+import { useGetQueueCountQuery } from '../../../../store/services/staffInboxApi';
 
 interface Props {
   user: AuthUser;
@@ -25,9 +23,7 @@ const navLinks = [
 const PrivateHeader = ({ user }: Props) => {
   const isStaff = isStaffUser(user);
   const { data: inboxData } = useGetUnreadCountQuery();
-  const { data: ticketData } = useGetTicketUnreadCountQuery(undefined, {
-    skip: !isStaff
-  });
+  const { data: ticketData } = useGetQueueCountQuery();
   const inboxUnread = inboxData?.count ?? 0;
   const ticketUnread = ticketData?.count ?? 0;
 

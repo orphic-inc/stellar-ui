@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useGetMyTicketsQuery } from '../../store/services/messagesApi';
+import { useGetMyTicketsQuery } from '../../store/services/staffInboxApi';
 import Spinner from '../layout/Spinner';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -48,35 +48,34 @@ const MyTicketsPage = () => {
           </thead>
           <tbody>
             {tickets.map((ticket) => {
-              const myPart = ticket.participants?.[0];
-              const isUnread = myPart && !myPart.isRead;
               return (
                 <tr key={ticket.id} className="border-b border-gray-800">
                   <td className="py-2 pr-3">
                     <Link
-                      to={`/private/messages/${ticket.id}`}
+                      to={`/private/messages/tickets/${ticket.id}`}
                       className="hover:underline text-blue-400"
                     >
-                      {isUnread && ticket.ticketStatus !== 'Unanswered' && (
-                        <span className="mr-1 font-bold text-blue-300">●</span>
-                      )}
+                      {!ticket.isReadByUser &&
+                        ticket.status !== 'Unanswered' && (
+                          <span className="mr-1 font-bold text-blue-300">
+                            ●
+                          </span>
+                        )}
                       {ticket.subject}
                     </Link>
                   </td>
                   <td className="py-2 pr-3">
-                    {ticket.ticketStatus && (
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded ${
-                          STATUS_BADGE[ticket.ticketStatus] ??
-                          'bg-gray-700 text-gray-400'
-                        }`}
-                      >
-                        {ticket.ticketStatus}
-                      </span>
-                    )}
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded ${
+                        STATUS_BADGE[ticket.status] ??
+                        'bg-gray-700 text-gray-400'
+                      }`}
+                    >
+                      {ticket.status}
+                    </span>
                   </td>
                   <td className="py-2 pr-3 text-gray-400">
-                    {ticket.assignedStaff?.username ?? '—'}
+                    {ticket.assignedUser?.username ?? '—'}
                   </td>
                   <td className="py-2 text-gray-500 text-xs">
                     {new Date(ticket.updatedAt).toLocaleDateString()}
