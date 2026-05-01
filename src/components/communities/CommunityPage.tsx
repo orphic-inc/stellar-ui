@@ -1,9 +1,26 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import {
   useGetCommunityByIdQuery,
   useGetReleasesByCommunityQuery
 } from '../../store/services/communityApi';
 import Spinner from '../layout/Spinner';
+import DownloadButton from './DownloadButton';
+import LinkStatusBadge from './LinkStatusBadge';
+import ReportContributionModal from './ReportContributionModal';
+import { formatBytes } from '../../utils';
+import type { LinkHealthStatus } from '../../types';
+
+interface ContributionRow {
+  id: number;
+  type: string;
+  sizeInBytes?: number | null;
+  linkStatus?: string | null;
+  user: { id: number; username: string };
+  _count?: { consumers: number };
+}
 
 const MusicNote = () => (
   <svg
@@ -18,6 +35,9 @@ const MusicNote = () => (
 const CommunityPage = () => {
   const { communityId } = useParams<{ communityId: string }>();
   const id = parseInt(communityId ?? '0');
+  const user = useSelector(selectCurrentUser);
+  const [reportingId, setReportingId] = useState<number | null>(null);
+  const [releasePage, setReleasePage] = useState(1);
 
   const {
     data: community,
@@ -25,13 +45,16 @@ const CommunityPage = () => {
     error
   } = useGetCommunityByIdQuery(id);
   const { data: releases, isLoading: loadingReleases } =
-    useGetReleasesByCommunityQuery(id);
+    useGetReleasesByCommunityQuery({ communityId: id, page: releasePage });
 
   if (loadingCommunity) return <Spinner />;
   if (error || !community)
     return <div className="p-4 text-red-400">Community not found.</div>;
 
   const releaseList = releases?.data ?? [];
+  const total = releases?.meta?.total ?? 0;
+  const pageSize = releases?.meta?.limit ?? 25;
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
@@ -50,9 +73,7 @@ const CommunityPage = () => {
       <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
         <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
           <span className="text-sm font-semibold text-gray-200">Releases</span>
-          <span className="text-xs text-gray-500">
-            {releaseList.length} total
-          </span>
+          <span className="text-xs text-gray-500">{total} total</span>
         </div>
 
         {loadingReleases ? (
@@ -68,76 +89,150 @@ const CommunityPage = () => {
             {releaseList.map((release) => {
               const tags =
                 (release as { tags?: { name: string }[] }).tags ?? [];
-              const count = (release as { _count?: { contributions?: number } })
-                ._count?.contributions;
-              return (
-                <div
-                  key={release.id}
-                  className="flex gap-3 px-4 py-3 hover:bg-gray-800/30 transition-colors"
-                >
-                  <Link
-                    to={`/private/communities/${communityId}/releases/${release.id}`}
-                    className="shrink-0"
-                    tabIndex={-1}
-                  >
-                    {release.image ? (
-                      <img
-                        src={release.image}
-                        alt=""
-                        className="w-14 h-14 object-cover rounded border border-gray-700"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 bg-gray-800 border border-gray-700 rounded flex items-center justify-center">
-                        <MusicNote />
-                      </div>
-                    )}
-                  </Link>
+              const contributions =
+                (release as { contributions?: ContributionRow[] })
+                  .contributions ?? [];
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-1.5 flex-wrap">
-                      {release.artist && (
-                        <span className="text-sm font-medium text-gray-200">
-                          {release.artist.name}
-                        </span>
+              const contributorCount = new Set(
+                contributions.map((c) => c.user.id)
+              ).size;
+              const consumerCount = contributions.reduce(
+                (sum, c) => sum + (c._count?.consumers ?? 0),
+                0
+              );
+
+              return (
+                <div key={release.id}>
+                  {/* Release header row */}
+                  <div className="flex gap-3 px-4 py-3 hover:bg-gray-800/20 transition-colors">
+                    <Link
+                      to={`/private/communities/${communityId}/releases/${release.id}`}
+                      className="shrink-0"
+                      tabIndex={-1}
+                    >
+                      {release.image ? (
+                        <img
+                          src={release.image}
+                          alt=""
+                          className="w-14 h-14 object-cover rounded border border-gray-700"
+                        />
+                      ) : (
+                        <div className="w-14 h-14 bg-gray-800 border border-gray-700 rounded flex items-center justify-center">
+                          <MusicNote />
+                        </div>
                       )}
-                      {release.artist && (
-                        <span className="text-gray-600 text-sm">—</span>
-                      )}
-                      <Link
-                        to={`/private/communities/${communityId}/releases/${release.id}`}
-                        className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
-                      >
-                        {release.title}
-                      </Link>
-                      {release.year && (
-                        <span className="text-gray-500 text-xs">
-                          [{release.year}]
-                        </span>
-                      )}
-                      {release.type && (
-                        <span className="text-gray-600 text-xs">
-                          [{release.type}]
-                        </span>
+                    </Link>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-1.5 flex-wrap">
+                        {release.artist && (
+                          <span className="text-sm font-medium text-gray-200">
+                            {release.artist.name}
+                          </span>
+                        )}
+                        {release.artist && (
+                          <span className="text-gray-600 text-sm">—</span>
+                        )}
+                        <Link
+                          to={`/private/communities/${communityId}/releases/${release.id}`}
+                          className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+                        >
+                          {release.title}
+                        </Link>
+                        {release.year && (
+                          <span className="text-gray-500 text-xs">
+                            [{release.year}]
+                          </span>
+                        )}
+                        {release.type && (
+                          <span className="text-gray-600 text-xs">
+                            [{release.type}]
+                          </span>
+                        )}
+                      </div>
+
+                      {tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-1">
+                          {tags.map((t) => (
+                            <span
+                              key={t.name}
+                              className="text-[10px] text-gray-500 italic"
+                            >
+                              {t.name}
+                            </span>
+                          ))}
+                        </div>
                       )}
                     </div>
 
-                    {tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-1">
-                        {tags.map((t) => (
-                          <span
-                            key={t.name}
-                            className="text-[10px] text-gray-500 italic"
-                          >
-                            {t.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {/* Release-level stats */}
+                    <div className="shrink-0 self-center text-right text-xs text-gray-600 space-y-0.5 whitespace-nowrap">
+                      {contributorCount > 0 && (
+                        <div>
+                          {contributorCount}{' '}
+                          {contributorCount === 1
+                            ? 'contributor'
+                            : 'contributors'}
+                        </div>
+                      )}
+                      {consumerCount > 0 && (
+                        <div>
+                          {consumerCount}{' '}
+                          {consumerCount === 1 ? 'snatch' : 'snatches'}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  {count != null && (
-                    <div className="shrink-0 self-center text-xs text-gray-600 whitespace-nowrap">
-                      {count} {count === 1 ? 'format' : 'formats'}
+                  {/* Format rows */}
+                  {contributions.length > 0 && (
+                    <div className="border-t border-gray-800/60">
+                      {contributions.map((c) => {
+                        const linkStatus = (c.linkStatus ??
+                          'UNKNOWN') as LinkHealthStatus;
+                        return (
+                          <div
+                            key={c.id}
+                            className="flex items-center gap-3 px-4 py-1.5 pl-[4.25rem] bg-gray-900/60 hover:bg-gray-800/30 transition-colors"
+                          >
+                            <span className="text-xs text-gray-500 font-medium w-24 shrink-0">
+                              {c.type}
+                            </span>
+                            <span className="text-xs text-gray-500 w-20 shrink-0">
+                              {c.sizeInBytes
+                                ? formatBytes(Number(c.sizeInBytes))
+                                : '—'}
+                            </span>
+                            <Link
+                              to={`/private/user/${c.user.username}`}
+                              className="text-xs text-indigo-400 hover:text-indigo-300 shrink-0"
+                            >
+                              {c.user.username}
+                            </Link>
+                            <span className="text-xs text-gray-600 shrink-0">
+                              {c._count?.consumers ?? 0}{' '}
+                              {(c._count?.consumers ?? 0) === 1
+                                ? 'snatch'
+                                : 'snatches'}
+                            </span>
+                            <LinkStatusBadge status={linkStatus} />
+                            <div className="flex gap-2 items-center ml-auto">
+                              <DownloadButton
+                                contributionId={c.id}
+                                canDownload={user?.canDownload ?? false}
+                              />
+                              <button
+                                type="button"
+                                className="text-xs text-gray-600 hover:text-gray-400 transition-colors"
+                                title="Report dead or misleading link"
+                                onClick={() => setReportingId(c.id)}
+                              >
+                                [Report]
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -146,6 +241,35 @@ const CommunityPage = () => {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2 mt-4 text-sm">
+          <button
+            disabled={releasePage === 1}
+            onClick={() => setReleasePage((p) => p - 1)}
+            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <span className="px-3 py-1 text-gray-400">
+            {releasePage} / {totalPages}
+          </span>
+          <button
+            disabled={releasePage === totalPages}
+            onClick={() => setReleasePage((p) => p + 1)}
+            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {reportingId !== null && (
+        <ReportContributionModal
+          contributionId={reportingId}
+          onClose={() => setReportingId(null)}
+        />
+      )}
     </div>
   );
 };

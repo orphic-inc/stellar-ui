@@ -12,6 +12,7 @@ const CommunitiesTable = ({ communities }: Props) => (
         <th className="pb-2 pr-3 font-medium" style={{ width: '100%' }}>
           Name
         </th>
+        <th className="pb-2 pr-3 font-medium whitespace-nowrap">Type</th>
         <th className="pb-2 pr-3 font-medium whitespace-nowrap">Releases</th>
         <th className="pb-2 pr-3 font-medium whitespace-nowrap">
           Contributors
@@ -26,7 +27,7 @@ const CommunitiesTable = ({ communities }: Props) => (
         ))
       ) : (
         <tr>
-          <td colSpan={4} className="py-4 text-gray-500 text-center">
+          <td colSpan={5} className="py-4 text-gray-500 text-center">
             No communities to display.
           </td>
         </tr>

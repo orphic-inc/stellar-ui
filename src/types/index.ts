@@ -179,6 +179,7 @@ export interface CollageEntryRelease {
   title: string;
   image: string | null;
   year: number;
+  communityId: number | null;
   releaseType: string;
   artist: { id: number; name: string };
 }

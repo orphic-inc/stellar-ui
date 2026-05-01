@@ -7,80 +7,12 @@ import {
   useGetReleaseByIdQuery,
   useGetCommunityByIdQuery
 } from '../../store/services/communityApi';
-import { useReportContributionMutation } from '../../store/services/downloadApi';
-import { useAppDispatch } from '../../store/hooks';
-import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
+import ReportContributionModal from './ReportContributionModal';
 import { formatBytes } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
-
-interface ReportModalProps {
-  contributionId: number;
-  onClose: () => void;
-}
-
-const ReportModal = ({ contributionId, onClose }: ReportModalProps) => {
-  const [reason, setReason] = useState('');
-  const dispatch = useAppDispatch();
-  const [reportContribution, { isLoading }] = useReportContributionMutation();
-
-  const handleSubmit = async () => {
-    if (!reason.trim()) return;
-    try {
-      await reportContribution({ contributionId, reason }).unwrap();
-      dispatch(addAlert('Report submitted. Thank you.', 'success'));
-      onClose();
-    } catch {
-      dispatch(addAlert('Failed to submit report.', 'danger'));
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-gray-900 border border-gray-700 rounded w-full max-w-md mx-4">
-        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t text-sm font-semibold text-gray-200">
-          Report Dead / Misleading Link
-        </div>
-        <div className="p-4">
-          <label
-            className="block text-sm text-gray-400 mb-1"
-            htmlFor="report-reason"
-          >
-            Reason
-          </label>
-          <textarea
-            id="report-reason"
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-indigo-500"
-            rows={4}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="Describe the problem (dead link, misleading content, etc.)"
-          />
-          <div className="mt-3 flex gap-2 justify-end">
-            <button
-              type="button"
-              className="px-3 py-1.5 text-sm rounded bg-gray-700 hover:bg-gray-600 text-gray-300"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="px-3 py-1.5 text-sm rounded bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50"
-              onClick={handleSubmit}
-              disabled={isLoading || !reason.trim()}
-            >
-              {isLoading ? 'Submitting…' : 'Submit Report'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const ReleasePage = () => {
   const { communityId, releaseId } = useParams<{
@@ -183,7 +115,7 @@ const ReleasePage = () => {
                         className="border-b border-gray-800 hover:bg-gray-800/30"
                       >
                         <td className="px-4 py-2 text-gray-300 text-xs font-medium">
-                          » {c.type}
+                          {c.type}
                         </td>
                         <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
                           {c.sizeInBytes
@@ -216,7 +148,7 @@ const ReleasePage = () => {
                               title="Report dead or misleading link"
                               onClick={() => setReportingId(c.id)}
                             >
-                              [RP]
+                              [Report]
                             </button>
                           </div>
                         </td>
@@ -328,13 +260,21 @@ const ReleasePage = () => {
                   <span className="text-gray-300">{release.year}</span>
                 </li>
               )}
+              {(release as { isEdition?: boolean }).isEdition && (
+                <li className="flex justify-between px-3 py-1.5">
+                  <span className="text-gray-500">Edition</span>
+                  <span className="text-gray-300">
+                    {(release as { edition?: string }).edition ?? 'Yes'}
+                  </span>
+                </li>
+              )}
             </ul>
           </div>
         </div>
       </div>
 
       {reportingId !== null && (
-        <ReportModal
+        <ReportContributionModal
           contributionId={reportingId}
           onClose={() => setReportingId(null)}
         />

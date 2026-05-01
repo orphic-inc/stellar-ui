@@ -235,7 +235,7 @@ const CollageDetail = () => {
           <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-200">
-                Torrents
+                Entries
               </span>
               <span className="text-xs text-gray-500">
                 {collage.numEntries} entries
@@ -265,7 +265,7 @@ const CollageDetail = () => {
                     <div className="flex-1 min-w-0">
                       <Link
                         to={`/private/communities/${
-                          entry.release?.artist?.id ?? 0
+                          entry.release?.communityId ?? 0
                         }/releases/${entry.releaseId}`}
                         className="text-sm text-blue-400 hover:underline truncate block"
                       >

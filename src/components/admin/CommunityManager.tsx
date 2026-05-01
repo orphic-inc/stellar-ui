@@ -159,7 +159,7 @@ const EditRow = ({
 };
 
 const CommunityManager = () => {
-  const { data: communities, isLoading, error } = useGetCommunitiesQuery();
+  const { data: communities, isLoading, error } = useGetCommunitiesQuery(1);
   const [createCommunity, { isLoading: isCreating }] =
     useCreateCommunityMutation();
 

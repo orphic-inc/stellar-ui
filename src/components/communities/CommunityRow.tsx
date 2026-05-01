@@ -20,6 +20,9 @@ const CommunityRow = ({ community }: Props) => (
         </div>
       )}
     </td>
+    <td className="py-3 pr-3 text-gray-500 text-xs whitespace-nowrap">
+      {community.type ?? '—'}
+    </td>
     <td className="py-3 pr-3 text-gray-400 text-right">
       {community._count?.releases ?? 0}
     </td>

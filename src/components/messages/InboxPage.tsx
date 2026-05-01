@@ -110,7 +110,7 @@ const InboxPage = () => {
                 />
               </th>
               <th className="pb-2 pr-3">Subject</th>
-              <th className="pb-2 pr-3">From</th>
+              <th className="pb-2 pr-3">Last reply by</th>
               <th className="pb-2">Received</th>
               <th className="pb-2 w-8"></th>
             </tr>

@@ -21,7 +21,7 @@ const MIN_BOUNTY_BYTES = 104857600; // 100 MiB
 const CreateRequestForm = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { data: communitiesData } = useGetCommunitiesQuery();
+  const { data: communitiesData } = useGetCommunitiesQuery(1);
   const [createRequest, { isLoading }] = useCreateRequestMutation();
 
   const [form, setForm] = useState({

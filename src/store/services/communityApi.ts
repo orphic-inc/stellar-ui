@@ -30,8 +30,8 @@ type AddContributionToReleaseResponse =
 
 export const communityApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getCommunities: build.query<CommunitiesResponse, void>({
-      query: () => '/communities',
+    getCommunities: build.query<CommunitiesResponse, number>({
+      query: (page = 1) => `/communities?page=${page}`,
       providesTags: ['Community']
     }),
     getCommunityById: build.query<CommunityResponse, number>({
@@ -58,8 +58,12 @@ export const communityApi = api.injectEndpoints({
     }),
 
     // Releases
-    getReleasesByCommunity: build.query<CommunityReleasesResponse, number>({
-      query: (communityId) => `/communities/${communityId}/releases`,
+    getReleasesByCommunity: build.query<
+      CommunityReleasesResponse,
+      { communityId: number; page?: number }
+    >({
+      query: ({ communityId, page = 1 }) =>
+        `/communities/${communityId}/releases?page=${page}`,
       providesTags: [{ type: 'Release', id: 'LIST' }]
     }),
     getReleaseById: build.query<ReleaseResponse, ReleaseArgs>({

@@ -68,7 +68,7 @@ const ContributeForm = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
   const { data: communities, isLoading: loadingCommunities } =
-    useGetCommunitiesQuery();
+    useGetCommunitiesQuery(1);
   const [createContribution, { isLoading }] = useCreateContributionMutation();
 
   const [community, setCommunity] = useState('');

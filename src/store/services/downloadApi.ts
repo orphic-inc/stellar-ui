@@ -12,7 +12,7 @@ export const downloadApi = api.injectEndpoints({
         method: 'POST',
         body: idempotencyKey ? { idempotencyKey } : {}
       }),
-      invalidatesTags: ['Request']
+      invalidatesTags: ['Contribution']
     }),
 
     reverseGrant: builder.mutation<

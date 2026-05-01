@@ -14,6 +14,7 @@ import {
   useSubscribeMutation
 } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
+import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import PostBox from '../layout/PostBox';
 import ForumTopicPost from './ForumTopicPost';
@@ -47,6 +48,12 @@ const ForumTopicPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   const isSubscribed = subscriptions?.some((s) => s.topicId === tId) ?? false;
+  const canModerate = hasAnyPermission(currentUser, [
+    'forums_moderate',
+    'forums_manage',
+    'staff',
+    'admin'
+  ]);
 
   useEffect(() => {
     if (posts?.data?.length) {
@@ -207,7 +214,13 @@ const ForumTopicPage = () => {
 
       {posts?.data?.map((post) => (
         <ErrorBoundary key={post.id} FallbackComponent={FallbackComponent}>
-          <ForumTopicPost post={post} />
+          <ForumTopicPost
+            post={post}
+            forumId={fId}
+            topicId={tId}
+            currentUserId={currentUser?.id}
+            canModerate={canModerate}
+          />
         </ErrorBoundary>
       ))}
 
