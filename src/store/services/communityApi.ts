@@ -47,7 +47,15 @@ export const communityApi = api.injectEndpoints({
     }),
     updateCommunity: build.mutation<
       CommunityResponse,
-      { id: number } & Partial<CommunityResponse>
+      {
+        id: number;
+        name?: string;
+        description?: string;
+        image?: string;
+        registrationStatus?: string;
+        allowDuplicateFormats?: boolean;
+        staffIds?: number[];
+      }
     >({
       query: ({ id, ...data }) => ({
         url: `/communities/${id}`,
@@ -105,6 +113,60 @@ export const communityApi = api.injectEndpoints({
       invalidatesTags: ['Release']
     }),
 
+    // Members
+    addCommunityMember: build.mutation<
+      void,
+      { communityId: number; userId: number }
+    >({
+      query: ({ communityId, userId }) => ({
+        url: `/communities/${communityId}/members`,
+        method: 'POST',
+        body: { userId }
+      }),
+      invalidatesTags: (_, __, { communityId }) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+    removeCommunityMember: build.mutation<
+      void,
+      { communityId: number; userId: number }
+    >({
+      query: ({ communityId, userId }) => ({
+        url: `/communities/${communityId}/members/${userId}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_, __, { communityId }) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+
+    // Staff
+    addCommunityStaff: build.mutation<
+      void,
+      { communityId: number; userId: number }
+    >({
+      query: ({ communityId, userId }) => ({
+        url: `/communities/${communityId}/staff`,
+        method: 'POST',
+        body: { userId }
+      }),
+      invalidatesTags: (_, __, { communityId }) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+    removeCommunityStaff: build.mutation<
+      void,
+      { communityId: number; userId: number }
+    >({
+      query: ({ communityId, userId }) => ({
+        url: `/communities/${communityId}/staff/${userId}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_, __, { communityId }) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+
     // Contributions
     getContributions: build.query<ContributionsResponse, void>({
       query: () => '/contributions',
@@ -143,6 +205,10 @@ export const {
   useGetCommunityByIdQuery,
   useCreateCommunityMutation,
   useUpdateCommunityMutation,
+  useAddCommunityMemberMutation,
+  useRemoveCommunityMemberMutation,
+  useAddCommunityStaffMutation,
+  useRemoveCommunityStaffMutation,
   useGetReleasesByCommunityQuery,
   useGetReleaseByIdQuery,
   useCreateReleaseMutation,

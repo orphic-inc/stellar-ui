@@ -6202,6 +6202,12 @@ export interface components {
       image?: string | null;
       allowDuplicateFormats: boolean;
       staff?: components['schemas']['CommunityStaffMember'][];
+      consumers?: {
+        user: {
+          id: number;
+          username: string;
+        };
+      }[];
       _count?: {
         releases: number;
         contributors: number;

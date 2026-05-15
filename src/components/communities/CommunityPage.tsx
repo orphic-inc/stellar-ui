@@ -4,8 +4,13 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import {
   useGetCommunityByIdQuery,
-  useGetReleasesByCommunityQuery
+  useGetReleasesByCommunityQuery,
+  useAddCommunityMemberMutation,
+  useRemoveCommunityMemberMutation,
+  useAddCommunityStaffMutation,
+  useRemoveCommunityStaffMutation
 } from '../../store/services/communityApi';
+import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
@@ -38,6 +43,12 @@ const CommunityPage = () => {
   const user = useSelector(selectCurrentUser);
   const [reportingId, setReportingId] = useState<number | null>(null);
   const [releasePage, setReleasePage] = useState(1);
+  const [newMemberUserId, setNewMemberUserId] = useState('');
+  const [addCommunityMember, { isLoading: isAdding }] =
+    useAddCommunityMemberMutation();
+  const [removeCommunityMember] = useRemoveCommunityMemberMutation();
+  const [addCommunityStaff] = useAddCommunityStaffMutation();
+  const [removeCommunityStaff] = useRemoveCommunityStaffMutation();
 
   const {
     data: community,
@@ -48,8 +59,28 @@ const CommunityPage = () => {
     useGetReleasesByCommunityQuery({ communityId: id, page: releasePage });
 
   if (loadingCommunity) return <Spinner />;
-  if (error || !community)
+  if (!community) {
+    const status = (error as { status?: number } | undefined)?.status;
+    if (status === 403)
+      return (
+        <div className="p-4 text-yellow-400">
+          You are not a member of this community.
+        </div>
+      );
     return <div className="p-4 text-red-400">Community not found.</div>;
+  }
+
+  const isStaff = community.staff?.some((s) => s.id === user?.id) ?? false;
+  const canManageMembers =
+    isStaff || hasAnyPermission(user, ['communities_manage', 'admin']);
+
+  const handleAddMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const uid = parseInt(newMemberUserId, 10);
+    if (!uid) return;
+    await addCommunityMember({ communityId: id, userId: uid });
+    setNewMemberUserId('');
+  };
 
   const releaseList = releases?.data ?? [];
   const total = releases?.meta?.total ?? 0;
@@ -68,6 +99,94 @@ const CommunityPage = () => {
 
       {community.description && (
         <p className="text-sm text-gray-400 mb-4">{community.description}</p>
+      )}
+
+      {canManageMembers && (
+        <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
+          <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
+            <span className="text-sm font-semibold text-gray-200">Members</span>
+            <span className="text-xs text-gray-500">
+              {community._count?.consumers ?? 0} total
+            </span>
+          </div>
+          <div className="px-4 py-3 border-b border-gray-800">
+            <form onSubmit={handleAddMember} className="flex gap-2">
+              <input
+                type="number"
+                min={1}
+                value={newMemberUserId}
+                onChange={(e) => setNewMemberUserId(e.target.value)}
+                placeholder="User ID"
+                className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-28"
+              />
+              <button
+                type="submit"
+                disabled={isAdding || !newMemberUserId}
+                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-3 py-1.5 rounded text-sm"
+              >
+                Add Member
+              </button>
+            </form>
+          </div>
+          {community.consumers && community.consumers.length > 0 ? (
+            <div className="divide-y divide-gray-800">
+              {community.consumers.map((c) => {
+                const memberIsStaff =
+                  community.staff?.some((s) => s.id === c.user.id) ?? false;
+                return (
+                  <div
+                    key={c.user.id}
+                    className="flex items-center justify-between px-4 py-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-300">
+                        {c.user.username}
+                      </span>
+                      {memberIsStaff && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900 text-indigo-300 border border-indigo-700 font-medium">
+                          Staff
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          memberIsStaff
+                            ? removeCommunityStaff({
+                                communityId: id,
+                                userId: c.user.id
+                              })
+                            : addCommunityStaff({
+                                communityId: id,
+                                userId: c.user.id
+                              })
+                        }
+                        className="text-xs text-gray-500 hover:text-indigo-400 transition-colors"
+                      >
+                        {memberIsStaff ? 'Demote' : 'Make Staff'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeCommunityMember({
+                            communityId: id,
+                            userId: c.user.id
+                          })
+                        }
+                        className="text-xs text-red-500 hover:text-red-400 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="px-4 py-3 text-sm text-gray-600">No members yet.</p>
+          )}
+        </div>
       )}
 
       <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">

@@ -7,7 +7,8 @@ import {
   useGetForumByIdQuery,
   useMarkTopicReadMutation,
   useGetPollByTopicQuery,
-  useVotePollMutation
+  useVotePollMutation,
+  useUpdateTopicMutation
 } from '../../store/services/forumApi';
 import {
   useGetSubscriptionsQuery,
@@ -44,6 +45,7 @@ const ForumTopicPage = () => {
   const [markRead] = useMarkTopicReadMutation();
   const [votePoll, { isLoading: voting }] = useVotePollMutation();
   const [subscribe, { isLoading: subscribing }] = useSubscribeMutation();
+  const [updateTopic, { isLoading: updatingTopic }] = useUpdateTopicMutation();
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
@@ -123,19 +125,53 @@ const ForumTopicPage = () => {
               </span>
             )}
           </span>
-          <button
-            type="button"
-            onClick={() =>
-              subscribe({
-                topicId: tId,
-                action: isSubscribed ? 'unsubscribe' : 'subscribe'
-              })
-            }
-            disabled={subscribing}
-            className="text-xs text-gray-400 hover:text-gray-200"
-          >
-            {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
-          </button>
+          <div className="flex items-center gap-3">
+            {canModerate && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateTopic({
+                      forumId: fId,
+                      topicId: tId,
+                      isLocked: !topic.isLocked
+                    })
+                  }
+                  disabled={updatingTopic}
+                  className="text-xs text-gray-400 hover:text-yellow-400 disabled:opacity-50"
+                >
+                  {topic.isLocked ? 'Unlock' : 'Lock'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateTopic({
+                      forumId: fId,
+                      topicId: tId,
+                      isSticky: !topic.isSticky
+                    })
+                  }
+                  disabled={updatingTopic}
+                  className="text-xs text-gray-400 hover:text-blue-400 disabled:opacity-50"
+                >
+                  {topic.isSticky ? 'Unsticky' : 'Sticky'}
+                </button>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() =>
+                subscribe({
+                  topicId: tId,
+                  action: isSubscribed ? 'unsubscribe' : 'subscribe'
+                })
+              }
+              disabled={subscribing}
+              className="text-xs text-gray-400 hover:text-gray-200"
+            >
+              {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+            </button>
+          </div>
         </div>
       </div>
 

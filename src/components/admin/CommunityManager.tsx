@@ -54,6 +54,19 @@ const EditRow = ({
   const [allowDuplicateFormats, setAllowDuplicateFormats] = useState(
     community.allowDuplicateFormats
   );
+  const [staffMembers, setStaffMembers] = useState(community.staff ?? []);
+  const [newStaffUserId, setNewStaffUserId] = useState('');
+
+  const handleAddStaff = () => {
+    const uid = parseInt(newStaffUserId, 10);
+    if (!uid || staffMembers.some((s) => s.id === uid)) return;
+    setStaffMembers((prev) => [...prev, { id: uid, username: `#${uid}` }]);
+    setNewStaffUserId('');
+  };
+
+  const handleRemoveStaff = (uid: number) => {
+    setStaffMembers((prev) => prev.filter((s) => s.id !== uid));
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +75,8 @@ const EditRow = ({
       name,
       description,
       registrationStatus,
-      allowDuplicateFormats
+      allowDuplicateFormats,
+      staffIds: staffMembers.map((s) => s.id)
     });
     onDone();
   };
@@ -70,88 +84,140 @@ const EditRow = ({
   return (
     <tr className="bg-indigo-950/30">
       <td className="px-4 py-2" colSpan={5}>
-        <form onSubmit={handleSave} className="flex flex-wrap gap-2 items-end">
-          <div>
-            <label
-              htmlFor={`edit-cm-name-${community.id}`}
-              className="block text-xs text-gray-400 mb-1"
-            >
-              Name
-            </label>
-            <input
-              id={`edit-cm-name-${community.id}`}
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
+        <form onSubmit={handleSave} className="space-y-3">
+          <div className="flex flex-wrap gap-2 items-end">
+            <div>
+              <label
+                htmlFor={`edit-cm-name-${community.id}`}
+                className="block text-xs text-gray-400 mb-1"
+              >
+                Name
+              </label>
+              <input
+                id={`edit-cm-name-${community.id}`}
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+            <div className="flex-1 min-w-40">
+              <label
+                htmlFor={`edit-cm-desc-${community.id}`}
+                className="block text-xs text-gray-400 mb-1"
+              >
+                Description
+              </label>
+              <input
+                id={`edit-cm-desc-${community.id}`}
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor={`edit-cm-status-${community.id}`}
+                className="block text-xs text-gray-400 mb-1"
+              >
+                Registration
+              </label>
+              <select
+                id={`edit-cm-status-${community.id}`}
+                value={registrationStatus}
+                onChange={(e) =>
+                  setRegistrationStatus(e.target.value as RegistrationStatus)
+                }
+                className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              >
+                {REGISTRATION_STATUSES.map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2 self-end pb-1">
+              <input
+                id={`edit-cm-dupeformats-${community.id}`}
+                type="checkbox"
+                checked={allowDuplicateFormats}
+                onChange={(e) => setAllowDuplicateFormats(e.target.checked)}
+                className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+              />
+              <label
+                htmlFor={`edit-cm-dupeformats-${community.id}`}
+                className="text-xs text-gray-400 whitespace-nowrap"
+              >
+                Allow duplicate formats
+              </label>
+            </div>
           </div>
-          <div className="flex-1 min-w-40">
-            <label
-              htmlFor={`edit-cm-desc-${community.id}`}
-              className="block text-xs text-gray-400 mb-1"
-            >
-              Description
-            </label>
-            <input
-              id={`edit-cm-desc-${community.id}`}
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor={`edit-cm-status-${community.id}`}
-              className="block text-xs text-gray-400 mb-1"
-            >
-              Registration
-            </label>
-            <select
-              id={`edit-cm-status-${community.id}`}
-              value={registrationStatus}
-              onChange={(e) =>
-                setRegistrationStatus(e.target.value as RegistrationStatus)
-              }
-              className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            >
-              {REGISTRATION_STATUSES.map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
+
+          {/* Staff management */}
+          <div className="border border-gray-700 rounded p-3 space-y-2">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Community Staff
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {staffMembers.length === 0 && (
+                <span className="text-xs text-gray-600">
+                  No staff assigned.
+                </span>
+              )}
+              {staffMembers.map((s) => (
+                <span
+                  key={s.id}
+                  className="inline-flex items-center gap-1 text-xs bg-gray-700 text-gray-200 rounded px-2 py-0.5"
+                >
+                  {s.username}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveStaff(s.id)}
+                    className="text-gray-500 hover:text-red-400 ml-0.5"
+                  >
+                    ×
+                  </button>
+                </span>
               ))}
-            </select>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min={1}
+                value={newStaffUserId}
+                onChange={(e) => setNewStaffUserId(e.target.value)}
+                placeholder="User ID"
+                className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 w-24"
+              />
+              <button
+                type="button"
+                onClick={handleAddStaff}
+                disabled={!newStaffUserId}
+                className="text-xs bg-gray-600 hover:bg-gray-500 disabled:opacity-40 text-white px-2 py-1 rounded"
+              >
+                Add Staff
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2 self-end pb-1">
-            <input
-              id={`edit-cm-dupeformats-${community.id}`}
-              type="checkbox"
-              checked={allowDuplicateFormats}
-              onChange={(e) => setAllowDuplicateFormats(e.target.checked)}
-              className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
-            />
-            <label
-              htmlFor={`edit-cm-dupeformats-${community.id}`}
-              className="text-xs text-gray-400 whitespace-nowrap"
+
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm"
             >
-              Allow duplicate formats
-            </label>
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={onDone}
+              className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-sm"
+            >
+              Cancel
+            </button>
           </div>
-          <button
-            type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm"
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            onClick={onDone}
-            className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-sm"
-          >
-            Cancel
-          </button>
         </form>
       </td>
     </tr>
@@ -170,6 +236,7 @@ const CommunityManager = () => {
   const [newStatus, setNewStatus] = useState<RegistrationStatus>('open');
   const [newAllowDuplicateFormats, setNewAllowDuplicateFormats] =
     useState(true);
+  const [newOwnerId, setNewOwnerId] = useState('');
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -178,13 +245,15 @@ const CommunityManager = () => {
       description: newDescription,
       type: newType,
       registrationStatus: newStatus,
-      allowDuplicateFormats: newAllowDuplicateFormats
+      allowDuplicateFormats: newAllowDuplicateFormats,
+      ...(newOwnerId !== '' && { ownerId: parseInt(newOwnerId, 10) })
     });
     setNewName('');
     setNewDescription('');
     setNewType('Music');
     setNewStatus('open');
     setNewAllowDuplicateFormats(true);
+    setNewOwnerId('');
   };
 
   return (
@@ -373,6 +442,26 @@ const CommunityManager = () => {
               className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
+          {newStatus !== 'open' && (
+            <div>
+              <label
+                htmlFor="cm-owner-id"
+                className="block text-sm font-medium text-gray-300 mb-1"
+              >
+                Owner User ID <span className="text-red-400">*</span>
+              </label>
+              <input
+                id="cm-owner-id"
+                type="number"
+                min={1}
+                value={newOwnerId}
+                onChange={(e) => setNewOwnerId(e.target.value)}
+                required
+                placeholder="User ID"
+                className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-28"
+              />
+            </div>
+          )}
           <div className="flex items-center gap-2 self-end pb-2.5">
             <input
               id="cm-allow-duplicate-formats"

@@ -51,30 +51,32 @@ const ArtistPage = () => {
       </div>
 
       {/* Tags */}
-      {tags.length > 0 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
-          <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            Tags
-          </div>
-          <div className="px-4 py-2 text-sm text-gray-300">
-            {tags.map((t, i) => (
+      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
+        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Tags
+        </div>
+        <div className="px-4 py-2 text-sm text-gray-300">
+          {tags.length > 0 ? (
+            tags.map((t, i) => (
               <span key={t.tag.id}>
                 {i > 0 && <span className="text-gray-600">{', '}</span>}
                 <span className="text-indigo-400">{t.tag.name}</span>
               </span>
-            ))}
-          </div>
+            ))
+          ) : (
+            <span className="text-gray-600">No tags.</span>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Similar artists */}
-      {similar.length > 0 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
-          <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            Similar Artists
-          </div>
-          <div className="px-4 py-2 text-sm text-gray-300">
-            {similar.map((s, i) => (
+      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
+        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Similar Artists
+        </div>
+        <div className="px-4 py-2 text-sm text-gray-300">
+          {similar.length > 0 ? (
+            similar.map((s, i) => (
               <span key={s.similarArtist.id}>
                 {i > 0 && <span className="text-gray-600">{', '}</span>}
                 <Link
@@ -84,10 +86,12 @@ const ArtistPage = () => {
                   {s.similarArtist.name}
                 </Link>
               </span>
-            ))}
-          </div>
+            ))
+          ) : (
+            <span className="text-gray-600">No similar artists.</span>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Aliases */}
       {aliases.length > 0 && (
