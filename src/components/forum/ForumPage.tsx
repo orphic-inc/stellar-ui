@@ -74,14 +74,10 @@ const ForumPage = () => {
                 >
                   <td className="px-4 py-3 text-center">
                     {topic.isLocked && (
-                      <span title="Locked" className="text-xs">
-                        🔒
-                      </span>
+                      <span className="text-xs text-gray-400">[Locked]</span>
                     )}
                     {topic.isSticky && (
-                      <span title="Sticky" className="text-xs">
-                        📌
-                      </span>
+                      <span className="text-xs text-yellow-600">[Sticky]</span>
                     )}
                   </td>
                   <td className="px-4 py-3">

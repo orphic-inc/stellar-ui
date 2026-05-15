@@ -21,6 +21,7 @@ import CommunitiesPage from '../../../communities/CommunitiesPage';
 import CommunityPage from '../../../communities/CommunityPage';
 import ReleasePage from '../../../communities/ReleasePage';
 import AddContributionForm from '../../../communities/AddContributionForm';
+import ArtistPage from '../../../communities/ArtistPage';
 import ContributeForm from '../../../contribute/ContributeForm';
 import ContributionsPage from '../../../contribute/ContributionsPage';
 
@@ -53,7 +54,7 @@ import CommunityManager from '../../../admin/CommunityManager';
 import NewsManager from '../../../admin/NewsManager';
 import SiteSettingsPage from '../../../admin/SiteSettingsPage';
 import RatioPolicyPanel from '../../../admin/RatioPolicyPanel';
-import TicketQueuePage from '../../../messages/TicketQueuePage';
+import TicketQueuePage from '../../../staffInbox/TicketQueuePage';
 import { selectCurrentUser } from '../../../../store/slices/authSlice';
 import {
   hasAnyPermission,
@@ -207,6 +208,7 @@ const PrivateContent = () => (
     />
     <Route path="communities/:communityId" element={wrap(CommunityPage)} />
     <Route path="communities" element={wrap(CommunitiesPage)} />
+    <Route path="artists/:id" element={wrap(ArtistPage)} />
     <Route path="contribute/list" element={wrap(ContributionsPage)} />
     <Route path="contribute" element={wrap(ContributeForm)} />
 

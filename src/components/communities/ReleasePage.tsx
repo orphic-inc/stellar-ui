@@ -82,6 +82,12 @@ const ReleasePage = () => {
         >
           [Add format]
         </button>
+        <Link
+          to={`/private/reports/new?targetType=Release&targetId=${rId}`}
+          className="hover:text-indigo-300 transition-colors"
+        >
+          [Report release]
+        </Link>
       </div>
 
       {/* Two-column layout */}

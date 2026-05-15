@@ -176,6 +176,14 @@ const CollageDetail = () => {
           >
             {collage.isBookmarked ? 'Bookmarked' : 'Bookmark'}
           </button>
+          {user && (
+            <Link
+              to={`/private/reports/new?targetType=Collage&targetId=${collageId}`}
+              className="px-3 py-1 rounded border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-300"
+            >
+              Report
+            </Link>
+          )}
           {canEdit && (
             <button
               onClick={handleDelete}

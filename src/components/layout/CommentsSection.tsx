@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { useSelector } from 'react-redux';
 import {
@@ -74,6 +75,16 @@ const CommentsSection = ({ page, pageId }: Props) => {
                     verticalAlign: 'top'
                   }}
                 >
+                  {currentUser && currentUser.id !== c.authorId && (
+                    <Link
+                      to={`/private/reports/new?targetType=Comment&targetId=${c.id}`}
+                      className="brackets btn-link text-gray-600 hover:text-gray-400"
+                      aria-label="Report comment"
+                      title="Report this comment"
+                    >
+                      !
+                    </Link>
+                  )}
                   {currentUser?.id === c.authorId && (
                     <button
                       type="button"

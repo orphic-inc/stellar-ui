@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   useGetReportQuery,
@@ -31,39 +31,18 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 function buildSourceLink(
+  sourceUrl: string | null,
   targetType: string,
   targetId: number
 ): { href: string; label: string } | { label: string } {
-  switch (targetType) {
-    case 'Collage':
-      return {
-        href: `/private/collages/${targetId}`,
-        label: `Collage #${targetId}`
-      };
-    case 'ForumTopic':
-      return { label: `Forum Topic #${targetId}` };
-    case 'ForumPost':
-      return { label: `Forum Post #${targetId}` };
-    case 'Release':
-      return { label: `Release #${targetId}` };
-    case 'Contribution':
-      return { label: `Contribution #${targetId}` };
-    case 'Artist':
-      return { label: `Artist #${targetId}` };
-    case 'User':
-      return { label: `User #${targetId}` };
-    case 'Comment':
-      return { label: `Comment #${targetId}` };
-    case 'Post':
-      return { label: `Post #${targetId}` };
-    default:
-      return { label: `${targetType} #${targetId}` };
-  }
+  const label = `${targetType} #${targetId}`;
+  return sourceUrl ? { href: sourceUrl, label } : { label };
 }
 
 const ReportDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const reportId = Number(id);
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const currentUser = useSelector(selectCurrentUser);
   const isStaff = hasAnyPermission(currentUser, ['staff', 'admin']);
@@ -121,6 +100,12 @@ const ReportDetailPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (error && 'status' in error && error.status === 403 && !isStaff) {
+      navigate('/private/reports/mine', { replace: true });
+    }
+  }, [error, isStaff, navigate]);
+
   if (isLoading) return <Spinner />;
   if (error || !report)
     return (
@@ -161,7 +146,11 @@ const ReportDetailPage = () => {
               <span className="text-gray-200">{report.reporter.username}</span>
             </span>
             {(() => {
-              const src = buildSourceLink(report.targetType, report.targetId);
+              const src = buildSourceLink(
+                report.sourceUrl,
+                report.targetType,
+                report.targetId
+              );
               return 'href' in src ? (
                 <Link to={src.href} className="text-blue-400 hover:underline">
                   {src.label} →

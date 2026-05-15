@@ -20,6 +20,8 @@ type AddNoteResponse =
   paths['/reports/{id}/notes']['post']['responses'][201]['content']['application/json'];
 type CountsResponse =
   paths['/reports/counts']['get']['responses'][200]['content']['application/json'];
+type StatsResponse =
+  paths['/reports/stats']['get']['responses'][200]['content']['application/json'];
 type MyReportsResponse =
   paths['/reports/mine']['get']['responses'][200]['content']['application/json'];
 
@@ -32,16 +34,24 @@ export const reportsApi = api.injectEndpoints({
         status?: string;
         targetType?: string;
         claimedByMe?: boolean;
+        reporterUsername?: string;
       }
     >({
       query: ({
         page = 1,
         status = 'Open',
         targetType = 'all',
-        claimedByMe = false
+        claimedByMe = false,
+        reporterUsername
       } = {}) => ({
         url: '/reports',
-        params: { page, status, targetType, claimedByMe }
+        params: {
+          page,
+          status,
+          targetType,
+          claimedByMe,
+          ...(reporterUsername ? { reporterUsername } : {})
+        }
       }),
       providesTags: ['Report']
     }),
@@ -56,6 +66,11 @@ export const reportsApi = api.injectEndpoints({
 
     getReportCounts: build.query<CountsResponse, void>({
       query: () => '/reports/counts',
+      providesTags: ['Report']
+    }),
+
+    getReportStats: build.query<StatsResponse, void>({
+      query: () => '/reports/stats',
       providesTags: ['Report']
     }),
 
@@ -109,6 +124,7 @@ export const {
   useGetReportsQuery,
   useGetMyReportsQuery,
   useGetReportCountsQuery,
+  useGetReportStatsQuery,
   useGetReportQuery,
   useFileReportMutation,
   useClaimReportMutation,
