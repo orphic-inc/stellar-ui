@@ -138,6 +138,7 @@ const ArtistPage = () => {
               {releases.map((release) => {
                 const isFirstInYear = !seenYears.has(release.year);
                 if (isFirstInYear) seenYears.add(release.year);
+                const yearLabel = release.year ?? '—';
 
                 return (
                   <tr
@@ -146,7 +147,7 @@ const ArtistPage = () => {
                   >
                     <td className="px-4 py-2 text-gray-400 text-xs font-medium whitespace-nowrap">
                       {isFirstInYear ? (
-                        release.year ?? '—'
+                        yearLabel
                       ) : (
                         <span className="text-gray-700">—</span>
                       )}

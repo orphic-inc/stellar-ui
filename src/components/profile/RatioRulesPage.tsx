@@ -22,12 +22,10 @@ const td = 'px-4 py-2 text-sm text-gray-300';
 const RatioRulesPage = () => {
   const { data: stats } = useGetMyRatioStatsQuery();
 
-  const ratioColor =
-    stats == null
-      ? 'text-gray-300'
-      : stats.meetsRequirement
-      ? 'text-green-400'
-      : 'text-red-400';
+  let ratioColor = 'text-gray-300';
+  if (stats != null) {
+    ratioColor = stats.meetsRequirement ? 'text-green-400' : 'text-red-400';
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-8 text-gray-300 text-sm leading-relaxed">
