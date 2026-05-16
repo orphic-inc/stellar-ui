@@ -23,7 +23,8 @@ export const downloadApi = api.injectEndpoints({
         url: `/downloads/${grantId}/reverse`,
         method: 'POST',
         body: reason ? { reason } : {}
-      })
+      }),
+      invalidatesTags: ['Download', 'Contribution']
     }),
 
     reportContribution: builder.mutation<
@@ -34,7 +35,8 @@ export const downloadApi = api.injectEndpoints({
         url: `/contributions/${contributionId}/report`,
         method: 'POST',
         body: { reason }
-      })
+      }),
+      invalidatesTags: ['Contribution']
     })
   })
 });

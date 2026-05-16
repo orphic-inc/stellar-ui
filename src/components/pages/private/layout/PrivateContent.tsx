@@ -1,6 +1,5 @@
 import type { ReactElement } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import ErrorBoundary from '../../../layout/ErrorBoundary';
 import FallbackComponent from '../../../layout/FallbackComponent';
 import NotFound from '../../../layout/NotFound';
@@ -55,7 +54,7 @@ import NewsManager from '../../../admin/NewsManager';
 import SiteSettingsPage from '../../../admin/SiteSettingsPage';
 import RatioPolicyPanel from '../../../admin/RatioPolicyPanel';
 import TicketQueuePage from '../../../staffInbox/TicketQueuePage';
-import { selectCurrentUser } from '../../../../store/slices/authSlice';
+import { useGetMeQuery } from '../../../../store/services/authApi';
 import {
   hasAnyPermission,
   type Permission
@@ -74,9 +73,9 @@ const StaffGate = ({
   permissions: Permission[];
   children: ReactElement;
 }) => {
-  const user = useSelector(selectCurrentUser);
+  const { data: user } = useGetMeQuery();
 
-  if (!hasAnyPermission(user, permissions)) {
+  if (!user || !hasAnyPermission(user, permissions)) {
     return <Navigate to="/private" replace />;
   }
 

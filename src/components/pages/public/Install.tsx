@@ -40,7 +40,8 @@ const Install = () => {
       dispatch(setCredentials(user));
       dispatch(
         installApi.util.updateQueryData('getInstallStatus', undefined, () => ({
-          installed: true
+          installed: true,
+          registrationStatus: 'open' as const
         }))
       );
       dispatch(addAlert('Installation complete. Welcome, SysOp.', 'success'));

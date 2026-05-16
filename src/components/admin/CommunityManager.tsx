@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetCommunitiesQuery,
   useCreateCommunityMutation,
   useUpdateCommunityMutation
 } from '../../store/services/communityApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import type { Community, CommunityType, RegistrationStatus } from '../../types';
 
@@ -225,6 +228,7 @@ const EditRow = ({
 };
 
 const CommunityManager = () => {
+  const dispatch = useDispatch();
   const { data: communities, isLoading, error } = useGetCommunitiesQuery(1);
   const [createCommunity, { isLoading: isCreating }] =
     useCreateCommunityMutation();
@@ -240,20 +244,30 @@ const CommunityManager = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createCommunity({
-      name: newName,
-      description: newDescription,
-      type: newType,
-      registrationStatus: newStatus,
-      allowDuplicateFormats: newAllowDuplicateFormats,
-      ...(newOwnerId !== '' && { ownerId: parseInt(newOwnerId, 10) })
-    });
-    setNewName('');
-    setNewDescription('');
-    setNewType('Music');
-    setNewStatus('open');
-    setNewAllowDuplicateFormats(true);
-    setNewOwnerId('');
+    try {
+      await createCommunity({
+        name: newName,
+        description: newDescription,
+        type: newType,
+        registrationStatus: newStatus,
+        allowDuplicateFormats: newAllowDuplicateFormats,
+        ...(newOwnerId !== '' && { ownerId: parseInt(newOwnerId, 10) })
+      }).unwrap();
+      dispatch(addAlert('Community created successfully.', 'success'));
+      setNewName('');
+      setNewDescription('');
+      setNewType('Music');
+      setNewStatus('open');
+      setNewAllowDuplicateFormats(true);
+      setNewOwnerId('');
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to create community.',
+          'danger'
+        )
+      );
+    }
   };
 
   return (

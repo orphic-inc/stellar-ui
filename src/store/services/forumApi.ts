@@ -248,7 +248,10 @@ export const forumApi = api.injectEndpoints({
         url: '/forums/last-read',
         method: 'POST',
         body: data
-      })
+      }),
+      invalidatesTags: (_, __, { forumTopicId }) => [
+        { type: 'ForumTopic', id: forumTopicId }
+      ]
     })
   })
 });

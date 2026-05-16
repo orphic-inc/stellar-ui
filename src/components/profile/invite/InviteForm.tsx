@@ -16,8 +16,20 @@ const InviteForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createInvite({ email, reason: reason || undefined }).unwrap();
-      dispatch(addAlert('Invitation sent successfully.', 'success'));
+      const result = await createInvite({
+        email,
+        reason: reason || undefined
+      }).unwrap();
+      if (result.emailSent) {
+        dispatch(addAlert('Invitation sent successfully.', 'success'));
+      } else {
+        dispatch(
+          addAlert(
+            'Invite created, but email delivery is not configured on this server.',
+            'warning'
+          )
+        );
+      }
       setEmail('');
       setReason('');
     } catch (err) {

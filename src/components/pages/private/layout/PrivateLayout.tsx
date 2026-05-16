@@ -1,8 +1,6 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { useGetMeQuery } from '../../../../store/services/authApi';
-import { selectCurrentUser } from '../../../../store/slices/authSlice';
 import PrivateHeader from './PrivateHeader';
 import PrivateFooter from './PrivateFooter';
 import NotificationCorner from '../../../layout/NotificationCorner';
@@ -13,11 +11,10 @@ interface Props {
 }
 
 const PrivateLayout = ({ children }: Props) => {
-  const { isLoading } = useGetMeQuery();
-  const user = useSelector(selectCurrentUser);
+  const { isLoading, isError, isUninitialized, data: user } = useGetMeQuery();
 
-  if (isLoading) return <Spinner />;
-  if (!user) return <Navigate to="/login" replace />;
+  if (isUninitialized || isLoading) return <Spinner />;
+  if (isError || !user) return <Navigate to="/login" replace />;
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">

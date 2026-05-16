@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useRegisterMutation } from '../../store/services/authApi';
+import { useGetInstallStatusQuery } from '../../store/services/installApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 
@@ -10,21 +11,26 @@ interface FormState {
   email: string;
   password: string;
   password2: string;
+  inviteKey: string;
 }
 
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [register, { isLoading }] = useRegisterMutation();
+  const { data: installStatus } = useGetInstallStatusQuery();
 
   const [form, setForm] = useState<FormState>({
     username: '',
     email: '',
     password: '',
-    password2: ''
+    password2: '',
+    inviteKey: ''
   });
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
+
+  const isInviteMode = installStatus?.registrationStatus === 'invite';
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +42,8 @@ const Register = () => {
       await register({
         username: form.username,
         email: form.email,
-        password: form.password
+        password: form.password,
+        ...(isInviteMode && { inviteKey: form.inviteKey })
       }).unwrap();
       dispatch(addAlert('Account created.', 'success'));
       navigate('/private');
@@ -47,13 +54,34 @@ const Register = () => {
     }
   };
 
+  if (installStatus?.registrationStatus === 'closed') {
+    return (
+      <div className="w-full max-w-sm text-center">
+        <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-6">
+          Stellar
+        </h1>
+        <p className="text-gray-400 mb-4">Registration is currently closed.</p>
+        <Link
+          to="/login"
+          className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm"
+        >
+          Sign in
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-2">
           Stellar
         </h1>
-        <p className="text-gray-400 text-sm">Create your account</p>
+        <p className="text-gray-400 text-sm">
+          {installStatus?.registrationStatus === 'invite'
+            ? 'Enter your invite key to register'
+            : 'Create your account'}
+        </p>
       </div>
 
       <form
@@ -139,6 +167,27 @@ const Register = () => {
             className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
           />
         </div>
+
+        {isInviteMode && (
+          <div>
+            <label
+              htmlFor="reg-invite-key"
+              className="block text-sm font-medium text-gray-300 mb-1"
+            >
+              Invite Key <span className="text-red-400">*</span>
+            </label>
+            <input
+              id="reg-invite-key"
+              type="text"
+              name="inviteKey"
+              value={form.inviteKey}
+              onChange={onChange}
+              required
+              placeholder="Paste your invite key"
+              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
+            />
+          </div>
+        )}
 
         <button
           type="submit"

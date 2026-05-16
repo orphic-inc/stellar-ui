@@ -93,6 +93,7 @@ export default {
   },
   output: {
     path: resolve(__dirname, 'dist'),
+    publicPath: '/',
     filename: '[name]-[chunkhash].js',
     chunkFilename: '[name]-[chunkhash].js'
   },

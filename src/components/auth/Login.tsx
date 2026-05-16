@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLoginMutation } from '../../store/services/authApi';
+import { useGetInstallStatusQuery } from '../../store/services/installApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
@@ -21,6 +22,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [login, { isLoading }] = useLoginMutation();
   const user = useSelector(selectCurrentUser);
+  const { data: installStatus } = useGetInstallStatusQuery();
 
   const notice = (location.state as LocationState)?.notice;
   const [form, setForm] = useState<FormState>({ email: '', password: '' });
@@ -123,12 +125,14 @@ const Login = () => {
             Forgot password?
           </Link>
           <span>·</span>
-          <Link
-            to="/register"
-            className="hover:text-gray-300 transition-colors"
-          >
-            Register
-          </Link>
+          {installStatus?.registrationStatus === 'open' && (
+            <Link
+              to="/register"
+              className="hover:text-gray-300 transition-colors"
+            >
+              Register
+            </Link>
+          )}
         </div>
       </form>
     </div>
