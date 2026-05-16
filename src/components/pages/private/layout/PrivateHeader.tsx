@@ -17,7 +17,8 @@ const navLinks = [
   { label: 'Communities', to: '/private/communities' },
   { label: 'Collages', to: '/private/collages' },
   { label: 'Requests', to: '/private/requests' },
-  { label: 'Forums', to: '/private/forums' }
+  { label: 'Forums', to: '/private/forums' },
+  { label: 'Wiki', to: '/private/wiki' }
 ];
 
 const PrivateHeader = ({ user }: Props) => {

@@ -50,7 +50,8 @@ export const api = createApi({
     'RatioPolicy',
     'Bookmark',
     'SiteHistory',
-    'Draft'
+    'Draft',
+    'WikiPage'
   ] as const,
   endpoints: () => ({})
 });
