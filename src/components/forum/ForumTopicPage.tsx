@@ -8,7 +8,8 @@ import {
   useMarkTopicReadMutation,
   useGetPollByTopicQuery,
   useVotePollMutation,
-  useUpdateTopicMutation
+  useUpdateTopicMutation,
+  useCatchupForumMutation
 } from '../../store/services/forumApi';
 import {
   useGetSubscriptionsQuery,
@@ -48,6 +49,9 @@ const ForumTopicPage = () => {
   const [updateTopic, { isLoading: updatingTopic }] = useUpdateTopicMutation();
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [quoteText, setQuoteText] = useState('');
+
+  const [catchupForum] = useCatchupForumMutation();
 
   const isSubscribed = subscriptions?.some((s) => s.topicId === tId) ?? false;
   const canModerate = hasAnyPermission(currentUser, [
@@ -171,6 +175,13 @@ const ForumTopicPage = () => {
             >
               {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
             </button>
+            <button
+              type="button"
+              onClick={() => catchupForum(fId)}
+              className="text-xs text-gray-400 hover:text-gray-200"
+            >
+              Catch Up
+            </button>
           </div>
         </div>
       </div>
@@ -256,12 +267,18 @@ const ForumTopicPage = () => {
             topicId={tId}
             currentUserId={currentUser?.id}
             canModerate={canModerate}
+            onQuote={(text) => setQuoteText((prev) => prev + text)}
           />
         </ErrorBoundary>
       ))}
 
-      {!topic.isLocked && (
-        <PostBox forumId={forumId!} topicId={forumTopicId!} />
+      {(!topic.isLocked || canModerate) && (
+        <PostBox
+          forumId={forumId!}
+          topicId={forumTopicId!}
+          quoteText={quoteText}
+          onQuoteConsumed={() => setQuoteText('')}
+        />
       )}
     </div>
   );

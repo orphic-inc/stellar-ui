@@ -119,6 +119,31 @@ const sections: SectionProps[] = [
         permissions: ['staff', 'admin']
       }
     ]
+  },
+  {
+    title: 'Communications',
+    links: [
+      {
+        label: 'Mass PM',
+        to: '/private/staff/mass-pm',
+        permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Site History',
+        to: '/private/staff/site-history',
+        permissions: ['staff', 'admin']
+      }
+    ]
+  },
+  {
+    title: 'Donor System',
+    links: [
+      {
+        label: 'Donor ranks',
+        to: '/private/staff/donor-ranks',
+        permissions: ['admin']
+      }
+    ]
   }
 ];
 

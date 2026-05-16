@@ -54,6 +54,12 @@ import NewsManager from '../../../admin/NewsManager';
 import SiteSettingsPage from '../../../admin/SiteSettingsPage';
 import RatioPolicyPanel from '../../../admin/RatioPolicyPanel';
 import TicketQueuePage from '../../../staffInbox/TicketQueuePage';
+import SiteHistoryPage from '../../../staff/SiteHistoryPage';
+import MassPmPage from '../../../staff/MassPmPage';
+import DonorRanksPage from '../../../staff/DonorRanksPage';
+import SnatchList from '../snatch/SnatchList';
+import BookmarksPage from '../bookmarks/BookmarksPage';
+import DraftsPage from '../../../messages/DraftsPage';
 import { useGetMeQuery } from '../../../../store/services/authApi';
 import {
   hasAnyPermission,
@@ -85,10 +91,12 @@ const StaffGate = ({
 const PrivateContent = () => (
   <Routes>
     <Route path="user/edit/:id" element={wrap(Settings)} />
-    <Route path="user/:id" element={wrap(UserProfile)} />
+    <Route path="user/snatch-list" element={wrap(SnatchList)} />
     <Route path="user/invite-tree" element={<InviteTree />} />
+    <Route path="user/:id" element={wrap(UserProfile)} />
     <Route path="invite" element={<InviteForm />} />
     <Route path="ratio" element={wrap(RatioRulesPage)} />
+    <Route path="bookmarks" element={wrap(BookmarksPage)} />
 
     <Route
       path="staff/tools/user/new"
@@ -188,6 +196,30 @@ const PrivateContent = () => (
         </StaffGate>
       }
     />
+    <Route
+      path="staff/site-history"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <SiteHistoryPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/mass-pm"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <MassPmPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/donor-ranks"
+      element={
+        <StaffGate permissions={['admin']}>
+          <DonorRanksPage />
+        </StaffGate>
+      }
+    />
 
     <Route
       path="forums/:forumId/topics/:forumTopicId"
@@ -223,6 +255,7 @@ const PrivateContent = () => (
     <Route path="messages/tickets/new" element={wrap(NewTicketForm)} />
     <Route path="messages/tickets/:id" element={wrap(TicketView)} />
     <Route path="messages/tickets" element={wrap(MyTicketsPage)} />
+    <Route path="messages/drafts" element={wrap(DraftsPage)} />
     <Route path="messages/new" element={wrap(ComposeForm)} />
     <Route path="messages/sent" element={wrap(SentboxPage)} />
     <Route path="messages/:id" element={wrap(ConversationView)} />

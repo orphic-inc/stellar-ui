@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import {
   useGetCommunityByIdQuery,
@@ -10,6 +10,8 @@ import {
   useAddCommunityStaffMutation,
   useRemoveCommunityStaffMutation
 } from '../../store/services/communityApi';
+import { useToggleCommunityBookmarkMutation } from '../../store/services/bookmarkApi';
+import { addAlert } from '../../store/slices/alertSlice';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
@@ -40,6 +42,7 @@ const MusicNote = () => (
 const CommunityPage = () => {
   const { communityId } = useParams<{ communityId: string }>();
   const id = parseInt(communityId ?? '0');
+  const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
   const [reportingId, setReportingId] = useState<number | null>(null);
   const [releasePage, setReleasePage] = useState(1);
@@ -48,6 +51,22 @@ const CommunityPage = () => {
     useAddCommunityMemberMutation();
   const [removeCommunityMember] = useRemoveCommunityMemberMutation();
   const [addCommunityStaff] = useAddCommunityStaffMutation();
+  const [toggleBookmark, { isLoading: bookmarking }] =
+    useToggleCommunityBookmarkMutation();
+
+  const handleBookmark = async () => {
+    try {
+      const result = await toggleBookmark(id).unwrap();
+      dispatch(
+        addAlert(
+          result.bookmarked ? 'Community bookmarked.' : 'Bookmark removed.',
+          'success'
+        )
+      );
+    } catch {
+      dispatch(addAlert('Failed to update bookmark.', 'danger'));
+    }
+  };
   const [removeCommunityStaff] = useRemoveCommunityStaffMutation();
 
   const {
@@ -95,6 +114,16 @@ const CommunityPage = () => {
         </Link>
         {' › '}
         <strong className="text-gray-200">{community.name}</strong>
+        {user && (
+          <button
+            onClick={handleBookmark}
+            disabled={bookmarking}
+            title="Bookmark community"
+            className="ml-3 text-gray-500 hover:text-yellow-300 transition-colors text-sm disabled:opacity-50"
+          >
+            🔖
+          </button>
+        )}
       </nav>
 
       {community.description && (

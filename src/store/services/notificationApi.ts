@@ -1,8 +1,10 @@
 import { api } from '../api';
-import type { paths } from '../../types/api';
+import type { paths, components } from '../../types/api';
 
 type NotificationsResponse =
   paths['/notifications']['get']['responses'][200]['content']['application/json'];
+
+export type Notification = components['schemas']['Notification'];
 
 export const notificationApi = api.injectEndpoints({
   endpoints: (build) => ({

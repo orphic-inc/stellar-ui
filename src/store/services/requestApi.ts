@@ -121,6 +121,24 @@ export const requestApi = api.injectEndpoints({
         { type: 'Request', id },
         { type: 'Request', id: 'LIST' }
       ]
+    }),
+
+    toggleRequestVote: builder.mutation<{ voted: boolean }, number>({
+      query: (id) => ({ url: `/requests/${id}/vote`, method: 'POST' }),
+      invalidatesTags: (_result, _error, id) => [{ type: 'Request', id }]
+    }),
+
+    getRequestBountyHistory: builder.query<
+      Array<{
+        id: number;
+        amount: string;
+        createdAt: string;
+        user: { id: number; username: string } | null;
+      }>,
+      number
+    >({
+      query: (id) => `/requests/${id}/bounty-history`,
+      providesTags: (_result, _error, id) => [{ type: 'Request', id }]
     })
   })
 });
@@ -132,5 +150,7 @@ export const {
   useAddBountyMutation,
   useFillRequestMutation,
   useUnfillRequestMutation,
-  useDeleteRequestMutation
+  useDeleteRequestMutation,
+  useToggleRequestVoteMutation,
+  useGetRequestBountyHistoryQuery
 } = requestApi;

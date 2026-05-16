@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import CommentsSection from '../layout/CommentsSection';
 import {
   useGetReleaseByIdQuery,
   useGetCommunityByIdQuery
 } from '../../store/services/communityApi';
+import { useToggleReleaseBookmarkMutation } from '../../store/services/bookmarkApi';
+import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
@@ -22,6 +24,7 @@ const ReleasePage = () => {
   const cId = parseInt(communityId ?? '0');
   const rId = parseInt(releaseId ?? '0');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
   const [reportingId, setReportingId] = useState<number | null>(null);
 
@@ -31,6 +34,22 @@ const ReleasePage = () => {
     error
   } = useGetReleaseByIdQuery({ communityId: cId, releaseId: rId });
   const { data: community } = useGetCommunityByIdQuery(cId);
+  const [toggleBookmark, { isLoading: bookmarking }] =
+    useToggleReleaseBookmarkMutation();
+
+  const handleBookmark = async () => {
+    try {
+      const result = await toggleBookmark(rId).unwrap();
+      dispatch(
+        addAlert(
+          result.bookmarked ? 'Release bookmarked.' : 'Bookmark removed.',
+          'success'
+        )
+      );
+    } catch {
+      dispatch(addAlert('Failed to update bookmark.', 'danger'));
+    }
+  };
 
   if (isLoading) return <Spinner />;
   if (error || !release)
@@ -82,6 +101,16 @@ const ReleasePage = () => {
         >
           [Add format]
         </button>
+        {user && (
+          <button
+            type="button"
+            onClick={handleBookmark}
+            disabled={bookmarking}
+            className="hover:text-yellow-300 transition-colors disabled:opacity-50"
+          >
+            [🔖 Bookmark]
+          </button>
+        )}
         <Link
           to={`/private/reports/new?targetType=Release&targetId=${rId}`}
           className="hover:text-indigo-300 transition-colors"

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  useGetForumCategoriesQuery,
+  useGetForumCategoriesAdminQuery,
   useCreateForumCategoryMutation,
   useUpdateForumCategoryMutation,
   useDeleteForumCategoryMutation
@@ -110,7 +110,11 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
 };
 
 const ForumCategoryControlPanel = () => {
-  const { data: categories, isLoading, error } = useGetForumCategoriesQuery();
+  const {
+    data: categories,
+    isLoading,
+    error
+  } = useGetForumCategoriesAdminQuery();
   const [createCategory, { isLoading: isCreating }] =
     useCreateForumCategoryMutation();
   const [name, setName] = useState('');

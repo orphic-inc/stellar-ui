@@ -47,7 +47,10 @@ export const api = createApi({
     'StaffInboxTicket',
     'Report',
     'SiteSettings',
-    'RatioPolicy'
+    'RatioPolicy',
+    'Bookmark',
+    'SiteHistory',
+    'Draft'
   ] as const,
   endpoints: () => ({})
 });

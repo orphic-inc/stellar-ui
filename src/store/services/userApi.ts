@@ -81,6 +81,167 @@ export const userApi = api.injectEndpoints({
     deleteUserRank: build.mutation<void, number>({
       query: (id) => ({ url: `/tools/user-ranks/${id}`, method: 'DELETE' }),
       invalidatesTags: ['UserRank']
+    }),
+
+    // Staff user actions
+    warnUser: build.mutation<
+      { msg: string },
+      { id: number; reason: string; expiresAt?: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/users/${id}/warn`,
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+    }),
+    getUserWarnings: build.query<
+      Array<{
+        id: number;
+        reason: string;
+        expiresAt: string | null;
+        createdAt: string;
+        warnedBy: { id: number; username: string } | null;
+      }>,
+      number
+    >({
+      query: (id) => `/users/${id}/warnings`,
+      providesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+    getUserNotes: build.query<
+      Array<{
+        id: number;
+        body: string;
+        createdAt: string;
+        author: { id: number; username: string } | null;
+      }>,
+      number
+    >({
+      query: (id) => `/users/${id}/notes`,
+      providesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+    addUserNote: build.mutation<{ msg: string }, { id: number; body: string }>({
+      query: ({ id, body }) => ({
+        url: `/users/${id}/notes`,
+        method: 'POST',
+        body: { body }
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+    }),
+    deleteUserNote: build.mutation<void, { id: number; noteId: number }>({
+      query: ({ id, noteId }) => ({
+        url: `/users/${id}/notes/${noteId}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+    }),
+    disableUser: build.mutation<{ msg: string }, number>({
+      query: (id) => ({ url: `/users/${id}/disable`, method: 'POST' }),
+      invalidatesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+    enableUser: build.mutation<{ msg: string }, number>({
+      query: (id) => ({ url: `/users/${id}/enable`, method: 'POST' }),
+      invalidatesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+    setUserRank: build.mutation<
+      { msg: string },
+      { id: number; userRankId: number }
+    >({
+      query: ({ id, userRankId }) => ({
+        url: `/users/${id}/rank`,
+        method: 'PUT',
+        body: { userRankId }
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+    }),
+    getUserIpHistory: build.query<
+      Array<{ ip: string; seenAt: string }>,
+      number
+    >({
+      query: (id) => `/users/${id}/ip-history`,
+      providesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+    getUserEmailHistory: build.query<
+      Array<{ email: string; changedAt: string }>,
+      number
+    >({
+      query: (id) => `/users/${id}/email-history`,
+      providesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+
+    // Snatch list
+    getSnatchList: build.query<
+      Array<{
+        id: number;
+        release: { id: number; title: string; communityId: number | null };
+        artist: { name: string } | null;
+        downloadedAt: string;
+      }>,
+      void
+    >({
+      query: () => '/users/me/snatch-list',
+      providesTags: ['User']
+    }),
+
+    // Donor ranks
+    getDonorRanks: build.query<
+      Array<{
+        id: number;
+        name: string;
+        minDonation: number;
+        badge: string | null;
+        expiresAfterDays: number | null;
+      }>,
+      void
+    >({
+      query: () => '/users/donor-ranks',
+      providesTags: ['User']
+    }),
+    createDonorRank: build.mutation<
+      { id: number; name: string },
+      {
+        name: string;
+        minDonation: number;
+        badge?: string;
+        expiresAfterDays?: number;
+      }
+    >({
+      query: (body) => ({ url: '/users/donor-ranks', method: 'POST', body }),
+      invalidatesTags: ['User']
+    }),
+    grantDonor: build.mutation<
+      { msg: string },
+      { id: number; donorRankId: number; expiresAt?: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/users/${id}/donor`,
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+    }),
+    revokeDonor: build.mutation<{ msg: string }, number>({
+      query: (id) => ({ url: `/users/${id}/donor`, method: 'DELETE' }),
+      invalidatesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+    removeUserWarning: build.mutation<void, { id: number; warnId: number }>({
+      query: ({ id, warnId }) => ({
+        url: `/users/${id}/warnings/${warnId}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+    }),
+    getSnatchListByUserId: build.query<
+      Array<{
+        id: number;
+        release: { id: number; title: string; communityId: number | null };
+        artist: { name: string } | null;
+        downloadedAt: string;
+      }>,
+      number
+    >({
+      query: (id) => `/users/${id}/snatch-list`,
+      providesTags: (_, __, id) => [{ type: 'User', id }]
     })
   })
 });
@@ -94,5 +255,22 @@ export const {
   useGetUserRankByIdQuery,
   useCreateUserRankMutation,
   useUpdateUserRankMutation,
-  useDeleteUserRankMutation
+  useDeleteUserRankMutation,
+  useWarnUserMutation,
+  useGetUserWarningsQuery,
+  useGetUserNotesQuery,
+  useAddUserNoteMutation,
+  useDeleteUserNoteMutation,
+  useDisableUserMutation,
+  useEnableUserMutation,
+  useSetUserRankMutation,
+  useGetUserIpHistoryQuery,
+  useGetUserEmailHistoryQuery,
+  useGetSnatchListQuery,
+  useGetDonorRanksQuery,
+  useCreateDonorRankMutation,
+  useGrantDonorMutation,
+  useRevokeDonorMutation,
+  useRemoveUserWarningMutation,
+  useGetSnatchListByUserIdQuery
 } = userApi;

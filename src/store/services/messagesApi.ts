@@ -95,6 +95,52 @@ export const messagesApi = api.injectEndpoints({
     bulkUpdateConversations: build.mutation<void, BulkBody>({
       query: (body) => ({ url: '/messages/bulk', method: 'POST', body }),
       invalidatesTags: ['PrivateMessage']
+    }),
+
+    // Drafts
+    getDrafts: build.query<
+      Array<{
+        id: number;
+        toUserId: number | null;
+        subject: string;
+        body: string;
+        updatedAt: string;
+        toUser: { id: number; username: string } | null;
+      }>,
+      void
+    >({
+      query: () => '/messages/drafts',
+      providesTags: ['Draft']
+    }),
+    createDraft: build.mutation<
+      { id: number },
+      { toUserId?: number; subject: string; body: string }
+    >({
+      query: (body) => ({ url: '/messages/drafts', method: 'POST', body }),
+      invalidatesTags: ['Draft']
+    }),
+    updateDraft: build.mutation<
+      void,
+      { id: number; toUserId?: number; subject?: string; body?: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/messages/drafts/${id}`,
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: ['Draft']
+    }),
+    deleteDraft: build.mutation<void, number>({
+      query: (id) => ({ url: `/messages/drafts/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Draft']
+    }),
+
+    // Mass PM (staff only)
+    sendMassPm: build.mutation<
+      { sentCount: number },
+      { subject: string; body: string; targetRankId?: number }
+    >({
+      query: (body) => ({ url: '/messages/mass', method: 'POST', body })
     })
   })
 });
@@ -108,5 +154,10 @@ export const {
   useReplyToConversationMutation,
   useUpdateConversationFlagsMutation,
   useDeleteConversationMutation,
-  useBulkUpdateConversationsMutation
+  useBulkUpdateConversationsMutation,
+  useGetDraftsQuery,
+  useCreateDraftMutation,
+  useUpdateDraftMutation,
+  useDeleteDraftMutation,
+  useSendMassPmMutation
 } = messagesApi;

@@ -2,9 +2,28 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   useGetNotificationsQuery,
-  useDeleteNotificationMutation
+  useDeleteNotificationMutation,
+  type Notification
 } from '../../store/services/notificationApi';
 import { useGetUnreadCountQuery } from '../../store/services/messagesApi';
+
+function sourcePath(n: Notification): string | null {
+  if (!n.source) return null;
+  switch (n.page) {
+    case 'forums':
+      return `/private/forums/${n.source.forumId}/topics/${n.pageId}#post${n.postId}`;
+    case 'artist':
+      return `/private/artists/${n.pageId}`;
+    case 'collages':
+      return `/private/collages/${n.pageId}`;
+    case 'requests':
+      return `/private/requests/${n.pageId}`;
+    case 'communities':
+      return `/private/communities/${n.pageId}`;
+    default:
+      return null;
+  }
+}
 
 const NotificationCorner = () => {
   const [open, setOpen] = useState(false);
@@ -76,7 +95,18 @@ const NotificationCorner = () => {
                   className="flex items-start gap-2 px-3 py-2 hover:bg-gray-700/40 transition-colors"
                 >
                   <span className="flex-1 text-sm text-gray-200 leading-snug">
-                    {n.quoter.username} quoted you on {n.page} #{n.pageId}
+                    {n.quoter.username} quoted you in{' '}
+                    {n.source && sourcePath(n) ? (
+                      <Link
+                        to={sourcePath(n)!}
+                        onClick={() => setOpen(false)}
+                        className="text-indigo-400 hover:text-indigo-300 underline"
+                      >
+                        {n.source.title}
+                      </Link>
+                    ) : (
+                      `${n.page} #${n.pageId}`
+                    )}
                   </span>
                   <button
                     onClick={() => deleteNotification(n.id)}

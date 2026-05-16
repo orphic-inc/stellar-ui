@@ -252,6 +252,19 @@ export const forumApi = api.injectEndpoints({
       invalidatesTags: (_, __, { forumTopicId }) => [
         { type: 'ForumTopic', id: forumTopicId }
       ]
+    }),
+
+    catchupForum: build.mutation<{ markedRead: number }, number>({
+      query: (forumId) => ({
+        url: `/forums/${forumId}/catchup`,
+        method: 'POST'
+      }),
+      invalidatesTags: (_, __, forumId) => [{ type: 'ForumTopic', id: forumId }]
+    }),
+
+    getForumCategoriesAdmin: build.query<ForumCategoriesResponse, void>({
+      query: () => '/forums/categories?all=true',
+      providesTags: ['ForumCategory']
     })
   })
 });
@@ -277,5 +290,7 @@ export const {
   useDeletePostMutation,
   useGetPollByTopicQuery,
   useVotePollMutation,
-  useMarkTopicReadMutation
+  useMarkTopicReadMutation,
+  useCatchupForumMutation,
+  useGetForumCategoriesAdminQuery
 } = forumApi;

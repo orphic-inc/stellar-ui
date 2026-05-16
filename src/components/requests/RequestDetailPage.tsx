@@ -7,8 +7,11 @@ import {
   useAddBountyMutation,
   useFillRequestMutation,
   useUnfillRequestMutation,
-  useDeleteRequestMutation
+  useDeleteRequestMutation,
+  useToggleRequestVoteMutation,
+  useGetRequestBountyHistoryQuery
 } from '../../store/services/requestApi';
+import { useToggleRequestBookmarkMutation } from '../../store/services/bookmarkApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import { addAlert } from '../../store/slices/alertSlice';
@@ -33,6 +36,13 @@ const RequestDetailPage = () => {
   const [fillRequest, { isLoading: filling }] = useFillRequestMutation();
   const [unfillRequest, { isLoading: unfilling }] = useUnfillRequestMutation();
   const [deleteRequest, { isLoading: deleting }] = useDeleteRequestMutation();
+  const [toggleVote, { isLoading: voting }] = useToggleRequestVoteMutation();
+  const [toggleBookmark, { isLoading: bookmarking }] =
+    useToggleRequestBookmarkMutation();
+  const [showBountyHistory, setShowBountyHistory] = useState(false);
+  const { data: bountyHistory } = useGetRequestBountyHistoryQuery(requestId, {
+    skip: !showBountyHistory
+  });
 
   const [bountyInput, setBountyInput] = useState('');
   const [fillContribId, setFillContribId] = useState('');
@@ -40,6 +50,28 @@ const RequestDetailPage = () => {
 
   const isStaff = hasAnyPermission(user, ['staff', 'admin']);
   const isOwner = user?.id === req?.userId;
+
+  const handleVote = async () => {
+    try {
+      await toggleVote(requestId).unwrap();
+    } catch {
+      dispatch(addAlert('Failed to vote.', 'danger'));
+    }
+  };
+
+  const handleBookmark = async () => {
+    try {
+      const result = await toggleBookmark(requestId).unwrap();
+      dispatch(
+        addAlert(
+          result.bookmarked ? 'Request bookmarked.' : 'Bookmark removed.',
+          'success'
+        )
+      );
+    } catch {
+      dispatch(addAlert('Failed to update bookmark.', 'danger'));
+    }
+  };
 
   const handleAddBounty = async () => {
     if (!bountyInput) return;
@@ -112,15 +144,40 @@ const RequestDetailPage = () => {
       <div>
         <div className="flex items-start justify-between gap-4">
           <h2 className="text-xl font-semibold">{req.title}</h2>
-          <span
-            className={`text-xs px-2 py-1 rounded-full shrink-0 ${
-              req.status === 'filled'
-                ? 'bg-green-900/40 text-green-400'
-                : 'bg-gray-800 text-gray-300'
-            }`}
-          >
-            {req.status}
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            {user && (
+              <>
+                <button
+                  onClick={handleVote}
+                  disabled={voting}
+                  title="Vote"
+                  className="flex items-center gap-1 px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-sm text-gray-300 transition-colors disabled:opacity-50"
+                >
+                  ▲{' '}
+                  <span className="text-xs">
+                    {(req as { voteCount?: number }).voteCount ?? 0}
+                  </span>
+                </button>
+                <button
+                  onClick={handleBookmark}
+                  disabled={bookmarking}
+                  title="Bookmark"
+                  className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-sm text-gray-400 hover:text-yellow-300 transition-colors disabled:opacity-50"
+                >
+                  🔖
+                </button>
+              </>
+            )}
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${
+                req.status === 'filled'
+                  ? 'bg-green-900/40 text-green-400'
+                  : 'bg-gray-800 text-gray-300'
+              }`}
+            >
+              {req.status}
+            </span>
+          </div>
         </div>
         <div className="text-sm text-gray-400 mt-1 space-x-4">
           <span>Type: {req.type}</span>
@@ -285,6 +342,58 @@ const RequestDetailPage = () => {
           </button>
         </div>
       )}
+
+      {/* Bounty History */}
+      <div className="border border-gray-800 rounded overflow-hidden">
+        <button
+          onClick={() => setShowBountyHistory((v) => !v)}
+          className="w-full px-4 py-2 bg-gray-900 text-left text-sm text-gray-400 flex items-center justify-between hover:bg-gray-800 transition-colors"
+        >
+          <span>Bounty History</span>
+          <span>{showBountyHistory ? '▲' : '▼'}</span>
+        </button>
+        {showBountyHistory && (
+          <div className="px-4 py-3">
+            {bountyHistory && bountyHistory.length > 0 ? (
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-gray-500">
+                    <th className="pb-1">Contributor</th>
+                    <th className="pb-1 text-right">Amount</th>
+                    <th className="pb-1 text-right">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bountyHistory.map((entry) => (
+                    <tr key={entry.id} className="border-t border-gray-800/50">
+                      <td className="py-1">
+                        {entry.user ? (
+                          <Link
+                            to={`/private/user/${entry.user.id}`}
+                            className="text-blue-400 hover:underline"
+                          >
+                            {entry.user.username}
+                          </Link>
+                        ) : (
+                          'Anonymous'
+                        )}
+                      </td>
+                      <td className="py-1 text-right font-mono text-yellow-300">
+                        {formatBytes(entry.amount)}
+                      </td>
+                      <td className="py-1 text-right text-gray-500">
+                        {new Date(entry.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-sm text-gray-500">No bounty history.</p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useComposeMessageMutation } from '../../store/services/messagesApi';
+import {
+  useComposeMessageMutation,
+  useCreateDraftMutation
+} from '../../store/services/messagesApi';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 
@@ -15,6 +18,7 @@ const ComposeForm = () => {
   const [body, setBody] = useState('');
 
   const [compose, { isLoading }] = useComposeMessageMutation();
+  const [createDraft, { isLoading: isSavingDraft }] = useCreateDraftMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,9 +41,30 @@ const ComposeForm = () => {
     }
   };
 
+  const handleSaveDraft = async () => {
+    if (!subject && !body) {
+      dispatch(addAlert('Nothing to save.', 'danger'));
+      return;
+    }
+    try {
+      await createDraft({ subject: subject || '(no subject)', body }).unwrap();
+      dispatch(addAlert('Draft saved.', 'success'));
+    } catch {
+      dispatch(addAlert('Failed to save draft.', 'danger'));
+    }
+  };
+
   return (
     <div className="thin">
-      <h2 className="text-xl font-semibold mb-4">New Message</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">New Message</h2>
+        <a
+          href="/private/messages/drafts"
+          className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+        >
+          View drafts
+        </a>
+      </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label
@@ -100,6 +125,14 @@ const ComposeForm = () => {
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
           >
             {isLoading ? 'Sending…' : 'Send'}
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveDraft}
+            disabled={isSavingDraft}
+            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded disabled:opacity-50"
+          >
+            {isSavingDraft ? 'Saving…' : 'Save Draft'}
           </button>
           <button
             type="button"

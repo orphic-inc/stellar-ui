@@ -6,6 +6,7 @@ import {
   useUpdatePostMutation,
   useDeletePostMutation
 } from '../../store/services/forumApi';
+import { parseBBCode, quotePost } from '../../utils/bbcode';
 import type { ForumPost } from '../../types';
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
   topicId: number;
   currentUserId?: number;
   canModerate?: boolean;
+  onQuote?: (text: string) => void;
 }
 
 const ForumTopicPost = ({
@@ -21,7 +23,8 @@ const ForumTopicPost = ({
   forumId,
   topicId,
   currentUserId,
-  canModerate = false
+  canModerate = false,
+  onQuote
 }: Props) => {
   const { id, author, body, createdAt } = post;
   const [editing, setEditing] = useState(false);
@@ -46,6 +49,15 @@ const ForumTopicPost = ({
     await deletePost({ forumId, topicId, postId: id });
   };
 
+  const handleQuote = () => {
+    onQuote?.(quotePost(author?.username ?? 'unknown', body));
+  };
+
+  const renderedBody = DOMPurify.sanitize(parseBBCode(body), {
+    ADD_TAGS: ['blockquote', 'cite', 'u', 's', 'pre', 'code', 'ul', 'li'],
+    ADD_ATTR: ['style', 'class', 'rel', 'target']
+  });
+
   return (
     <div
       id={`post${id}`}
@@ -63,9 +75,13 @@ const ForumTopicPost = ({
             {author?.username}
           </Link>
           <Time date={createdAt} />
-          <Link to="#quickpost" className="text-gray-500 hover:text-gray-300">
+          <button
+            type="button"
+            onClick={handleQuote}
+            className="text-gray-500 hover:text-gray-300"
+          >
             Quote
-          </Link>
+          </button>
           {canEdit && !editing && (
             <button
               type="button"
@@ -136,8 +152,8 @@ const ForumTopicPost = ({
             />
           </div>
           <div
-            className="flex-1 text-sm text-gray-300 prose prose-invert prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(body) }}
+            className="flex-1 text-sm text-gray-300 bbcode-content"
+            dangerouslySetInnerHTML={{ __html: renderedBody }}
           />
         </div>
       )}

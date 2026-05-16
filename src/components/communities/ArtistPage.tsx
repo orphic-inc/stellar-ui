@@ -1,12 +1,35 @@
 import { Link, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { useGetArtistByIdQuery } from '../../store/services/artistApi';
+import { useToggleArtistBookmarkMutation } from '../../store/services/bookmarkApi';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import { addAlert } from '../../store/slices/alertSlice';
+import { useAppDispatch } from '../../store/hooks';
 import Spinner from '../layout/Spinner';
 
 const ArtistPage = () => {
   const { id } = useParams<{ id: string }>();
   const artistId = parseInt(id ?? '0');
+  const dispatch = useAppDispatch();
+  const user = useSelector(selectCurrentUser);
 
   const { data: artist, isLoading, error } = useGetArtistByIdQuery(artistId);
+  const [toggleBookmark, { isLoading: bookmarking }] =
+    useToggleArtistBookmarkMutation();
+
+  const handleBookmark = async () => {
+    try {
+      const result = await toggleBookmark(artistId).unwrap();
+      dispatch(
+        addAlert(
+          result.bookmarked ? 'Artist bookmarked.' : 'Bookmark removed.',
+          'success'
+        )
+      );
+    } catch {
+      dispatch(addAlert('Failed to update bookmark.', 'danger'));
+    }
+  };
 
   if (isLoading) return <Spinner />;
   if (error || !artist)
@@ -41,6 +64,16 @@ const ArtistPage = () => {
             <span className="text-xs px-1.5 py-0.5 bg-indigo-900 text-indigo-300 rounded border border-indigo-700 font-medium">
               Vanity House
             </span>
+          )}
+          {user && (
+            <button
+              onClick={handleBookmark}
+              disabled={bookmarking}
+              title="Bookmark artist"
+              className="ml-auto text-gray-500 hover:text-yellow-300 text-sm transition-colors disabled:opacity-50"
+            >
+              🔖
+            </button>
           )}
         </div>
         {artist.description && (
