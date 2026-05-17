@@ -22,12 +22,9 @@ const UserBrowsePage = () => {
     | 'createdAt'
     | 'lastLogin';
   const order = (searchParams.get('order') ?? 'asc') as 'asc' | 'desc';
+  const rawDisabled = searchParams.get('disabled');
   const disabled =
-    searchParams.get('disabled') === 'true'
-      ? true
-      : searchParams.get('disabled') === 'false'
-      ? false
-      : undefined;
+    rawDisabled === 'true' ? true : rawDisabled === 'false' ? false : undefined;
   const page = Number(searchParams.get('page') ?? 1);
 
   const { data, isLoading, error } = useSearchUsersQuery({
@@ -121,13 +118,7 @@ const UserBrowsePage = () => {
                 <select
                   id="user-disabled"
                   name="disabled"
-                  defaultValue={
-                    disabled === true
-                      ? 'true'
-                      : disabled === false
-                      ? 'false'
-                      : ''
-                  }
+                  defaultValue={disabled != null ? String(disabled) : ''}
                   className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">All</option>
