@@ -5,8 +5,13 @@ import { selectCurrentUser } from '../../store/slices/authSlice';
 import CommentsSection from '../layout/CommentsSection';
 import {
   useGetReleaseByIdQuery,
-  useGetCommunityByIdQuery
+  useGetCommunityByIdQuery,
+  useVoteOnReleaseMutation,
+  useRemoveVoteOnReleaseMutation,
+  useAddTagToReleaseMutation,
+  useRemoveTagFromReleaseMutation
 } from '../../store/services/communityApi';
+import type { MyVote, VoteAggregate } from '../../store/services/communityApi';
 import { useToggleReleaseBookmarkMutation } from '../../store/services/bookmarkApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
@@ -15,6 +20,12 @@ import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
 import { formatBytes } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
+
+type ReleaseWithVote = {
+  myVote?: MyVote;
+  voteAggregate?: VoteAggregate | null;
+  tags?: Array<{ id: number; name: string }>;
+};
 
 const ReleasePage = () => {
   const { communityId, releaseId } = useParams<{
@@ -27,6 +38,7 @@ const ReleasePage = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
   const [reportingId, setReportingId] = useState<number | null>(null);
+  const [pendingTag, setPendingTag] = useState('');
 
   const {
     data: release,
@@ -36,6 +48,11 @@ const ReleasePage = () => {
   const { data: community } = useGetCommunityByIdQuery(cId);
   const [toggleBookmark, { isLoading: bookmarking }] =
     useToggleReleaseBookmarkMutation();
+  const [voteOn, { isLoading: voting }] = useVoteOnReleaseMutation();
+  const [removeVote, { isLoading: unvoting }] =
+    useRemoveVoteOnReleaseMutation();
+  const [addTag, { isLoading: addingTag }] = useAddTagToReleaseMutation();
+  const [removeTag] = useRemoveTagFromReleaseMutation();
 
   const handleBookmark = async () => {
     try {
@@ -51,11 +68,54 @@ const ReleasePage = () => {
     }
   };
 
+  const handleVote = async (positive: boolean) => {
+    const r = release as ReleaseWithVote | undefined;
+    const alreadyThis =
+      (positive && r?.myVote === 'up') || (!positive && r?.myVote === 'down');
+    try {
+      if (alreadyThis) {
+        await removeVote({ communityId: cId, releaseId: rId }).unwrap();
+      } else {
+        await voteOn({
+          communityId: cId,
+          releaseId: rId,
+          positive
+        }).unwrap();
+      }
+    } catch {
+      dispatch(addAlert('Failed to record vote.', 'danger'));
+    }
+  };
+
+  const handleAddTag = async () => {
+    const name = pendingTag.trim().toLowerCase();
+    if (!name) return;
+    try {
+      await addTag({ communityId: cId, releaseId: rId, name }).unwrap();
+      setPendingTag('');
+    } catch (e: unknown) {
+      const msg =
+        (e as { data?: { msg?: string } })?.data?.msg ?? 'Failed to add tag.';
+      dispatch(addAlert(msg, 'danger'));
+    }
+  };
+
+  const handleRemoveTag = async (tagId: number) => {
+    try {
+      await removeTag({ communityId: cId, releaseId: rId, tagId }).unwrap();
+    } catch {
+      dispatch(addAlert('Failed to remove tag.', 'danger'));
+    }
+  };
+
   if (isLoading) return <Spinner />;
   if (error || !release)
     return <div className="p-4 text-red-400">Release not found.</div>;
 
-  const tags = release.tags ?? [];
+  const r = release as typeof release & ReleaseWithVote;
+  const tags = r.tags ?? [];
+  const myVote = r.myVote ?? null;
+  const agg = r.voteAggregate ?? null;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -241,6 +301,47 @@ const ReleasePage = () => {
             </div>
           )}
 
+          {/* Votes */}
+          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Rating
+            </div>
+            <div className="px-3 py-3 flex flex-col gap-2">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={voting || unvoting}
+                  onClick={() => handleVote(true)}
+                  className={`flex-1 py-1.5 text-sm rounded border transition-colors disabled:opacity-50 ${
+                    myVote === 'up'
+                      ? 'bg-green-700 border-green-600 text-white'
+                      : 'bg-gray-800 border-gray-700 text-green-400 hover:bg-green-900/40'
+                  }`}
+                >
+                  ▲{agg ? ` ${agg.ups}` : ''}
+                </button>
+                <button
+                  type="button"
+                  disabled={voting || unvoting}
+                  onClick={() => handleVote(false)}
+                  className={`flex-1 py-1.5 text-sm rounded border transition-colors disabled:opacity-50 ${
+                    myVote === 'down'
+                      ? 'bg-red-800 border-red-700 text-white'
+                      : 'bg-gray-800 border-gray-700 text-red-400 hover:bg-red-900/40'
+                  }`}
+                >
+                  ▼{agg ? ` ${agg.total - agg.ups}` : ''}
+                </button>
+              </div>
+              {agg && agg.total > 0 && (
+                <p className="text-xs text-gray-500 text-center">
+                  {Math.round((agg.ups / agg.total) * 100)}% positive ·{' '}
+                  {agg.total} vote{agg.total !== 1 ? 's' : ''}
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Artist */}
           {release.artist && (
             <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
@@ -259,23 +360,55 @@ const ReleasePage = () => {
           )}
 
           {/* Tags */}
-          {tags.length > 0 && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Tags
-              </div>
-              <div className="px-3 py-2 flex flex-wrap gap-1.5">
-                {tags.map((t) => (
-                  <span
-                    key={t.name}
-                    className="text-xs px-2 py-0.5 bg-gray-800 text-indigo-300 rounded border border-gray-700"
-                  >
-                    {t.name}
-                  </span>
-                ))}
+          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              Tags
+            </div>
+            <div className="px-3 py-2 space-y-2">
+              {tags.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map((t) => (
+                    <span
+                      key={t.id}
+                      className="group flex items-center gap-1 text-xs px-2 py-0.5 bg-gray-800 text-indigo-300 rounded border border-gray-700"
+                    >
+                      {t.name}
+                      <button
+                        type="button"
+                        title="Remove tag"
+                        onClick={() => handleRemoveTag(t.id)}
+                        className="text-gray-600 hover:text-red-400 transition-colors leading-none"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-gray-600">No tags yet.</p>
+              )}
+              <div className="flex gap-1">
+                <input
+                  type="text"
+                  value={pendingTag}
+                  onChange={(e) => setPendingTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddTag();
+                  }}
+                  placeholder="Add tag…"
+                  className="flex-1 min-w-0 bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+                <button
+                  type="button"
+                  disabled={addingTag || !pendingTag.trim()}
+                  onClick={handleAddTag}
+                  className="px-2 py-1 bg-indigo-700 hover:bg-indigo-600 text-white text-xs rounded disabled:opacity-50 transition-colors"
+                >
+                  +
+                </button>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Metadata */}
           <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">

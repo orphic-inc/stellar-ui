@@ -1,6 +1,26 @@
 import { api } from '../api';
 import type { paths } from '../../types/api';
 
+export interface VoteAggregate {
+  releaseId: number;
+  ups: number;
+  total: number;
+  score: number;
+}
+
+export type MyVote = 'up' | 'down' | null;
+
+export interface VoteResponse {
+  myVote: MyVote;
+  voteAggregate: VoteAggregate | null;
+}
+
+export interface ReleaseTag {
+  id: number;
+  name: string;
+  occurrences: number;
+}
+
 interface ReleaseArgs {
   communityId: number;
   releaseId: number;
@@ -196,7 +216,60 @@ export const communityApi = api.injectEndpoints({
         { type: 'Release', id: releaseId },
         'Contribution'
       ]
-    })
+    }),
+
+    // Votes
+    voteOnRelease: build.mutation<
+      VoteResponse,
+      ReleaseArgs & { positive: boolean }
+    >({
+      query: ({ communityId, releaseId, positive }) => ({
+        url: `/communities/${communityId}/releases/${releaseId}/vote`,
+        method: 'POST',
+        body: { positive }
+      }),
+      invalidatesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId },
+        'Top10'
+      ]
+    }),
+    removeVoteOnRelease: build.mutation<VoteResponse, ReleaseArgs>({
+      query: ({ communityId, releaseId }) => ({
+        url: `/communities/${communityId}/releases/${releaseId}/vote`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId },
+        'Top10'
+      ]
+    }),
+
+    // Tags
+    addTagToRelease: build.mutation<ReleaseTag, ReleaseArgs & { name: string }>(
+      {
+        query: ({ communityId, releaseId, name }) => ({
+          url: `/communities/${communityId}/releases/${releaseId}/tags`,
+          method: 'POST',
+          body: { name }
+        }),
+        invalidatesTags: (_, __, { releaseId }) => [
+          { type: 'Release', id: releaseId },
+          'Top10'
+        ]
+      }
+    ),
+    removeTagFromRelease: build.mutation<void, ReleaseArgs & { tagId: number }>(
+      {
+        query: ({ communityId, releaseId, tagId }) => ({
+          url: `/communities/${communityId}/releases/${releaseId}/tags/${tagId}`,
+          method: 'DELETE'
+        }),
+        invalidatesTags: (_, __, { releaseId }) => [
+          { type: 'Release', id: releaseId },
+          'Top10'
+        ]
+      }
+    )
   })
 });
 
@@ -216,5 +289,9 @@ export const {
   useDeleteReleaseMutation,
   useGetContributionsQuery,
   useCreateContributionMutation,
-  useAddContributionToReleaseMutation
+  useAddContributionToReleaseMutation,
+  useVoteOnReleaseMutation,
+  useRemoveVoteOnReleaseMutation,
+  useAddTagToReleaseMutation,
+  useRemoveTagFromReleaseMutation
 } = communityApi;
