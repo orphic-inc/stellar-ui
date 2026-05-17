@@ -67,6 +67,12 @@ import ReleaseBrowsePage from '../../../releases/ReleaseBrowsePage';
 import ArtistBrowsePage from '../../../artists/ArtistBrowsePage';
 import LogBrowsePage from '../../../log/LogBrowsePage';
 import UserBrowsePage from '../../../users/UserBrowsePage';
+import Top10Layout from '../../../top10/Top10Layout';
+import TopReleasesPage from '../../../top10/TopReleasesPage';
+import TopUsersPage from '../../../top10/TopUsersPage';
+import TopTagsPage from '../../../top10/TopTagsPage';
+import TopVotesPage from '../../../top10/TopVotesPage';
+import TopHistoryPage from '../../../top10/TopHistoryPage';
 import DraftsPage from '../../../messages/DraftsPage';
 import { useGetMeQuery } from '../../../../store/services/authApi';
 import {
@@ -325,6 +331,21 @@ const PrivateContent = () => (
     <Route path="artists" element={wrap(ArtistBrowsePage)} />
     <Route path="log" element={wrap(LogBrowsePage)} />
     <Route path="users" element={wrap(UserBrowsePage)} />
+
+    <Route path="top10" element={wrap(Top10Layout)}>
+      <Route path="releases" element={<TopReleasesPage />} />
+      <Route path="users" element={<TopUsersPage />} />
+      <Route path="tags" element={<TopTagsPage />} />
+      <Route path="votes" element={<TopVotesPage />} />
+      <Route
+        path="history"
+        element={
+          <StaffGate permissions={['staff', 'admin']}>
+            <TopHistoryPage />
+          </StaffGate>
+        }
+      />
+    </Route>
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />

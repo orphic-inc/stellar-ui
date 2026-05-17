@@ -70,7 +70,7 @@ const RatioRulesPage = () => {
               Downloaded
             </span>
             <p className="text-base font-medium mt-0.5 text-gray-200">
-              {formatBytes(Number(stats.downloaded))}
+              {formatBytes(Number(stats.consumed))}
             </p>
           </div>
           <div>

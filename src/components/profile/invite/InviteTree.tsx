@@ -13,8 +13,8 @@ const renderNode = (node: InviteNode): React.ReactNode => (
       <td>{node.email}</td>
       <td>{node.joinedAt ? <Time date={node.joinedAt} /> : '—'}</td>
       <td>{node.lastSeen ? <Time date={node.lastSeen} /> : '—'}</td>
-      <td>{node.uploaded}</td>
-      <td>{node.downloaded}</td>
+      <td>{node.contributed}</td>
+      <td>{node.consumed}</td>
       <td>{node.ratio}</td>
     </tr>
     {node.children?.map(renderNode)}

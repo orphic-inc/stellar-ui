@@ -126,7 +126,7 @@ export interface RatioBracket {
 export interface RatioStats {
   ratio: number;
   totalEarned: string;
-  downloaded: string;
+  consumed: string;
   bracket: RatioBracket;
   eligibleContributionBytes: string;
   contributionCoverage: number;

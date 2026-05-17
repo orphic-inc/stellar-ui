@@ -367,8 +367,8 @@ export interface paths {
               | 'Combined';
             showEmail?: boolean;
             showLastSeen?: boolean;
-            showUploadedStats?: boolean;
-            showDownloadedStats?: boolean;
+            showContributedStats?: boolean;
+            showConsumedStats?: boolean;
             showRatioStats?: boolean;
           };
         };
@@ -538,8 +538,8 @@ export interface paths {
               | 'Combined';
             showEmail?: boolean;
             showLastSeen?: boolean;
-            showUploadedStats?: boolean;
-            showDownloadedStats?: boolean;
+            showContributedStats?: boolean;
+            showConsumedStats?: boolean;
             showRatioStats?: boolean;
           };
         };
@@ -5910,8 +5910,8 @@ export interface components {
       isArtist?: boolean;
       isDonor?: boolean;
       canDownload?: boolean;
-      uploaded?: string;
-      downloaded?: string;
+      contributed?: string;
+      consumed?: string;
       ratio?: number;
       userRank: {
         level: number;
@@ -5969,13 +5969,13 @@ export interface components {
         | 'Combined';
       showEmail: boolean;
       showLastSeen: boolean;
-      showUploadedStats: boolean;
-      showDownloadedStats: boolean;
+      showContributedStats: boolean;
+      showConsumedStats: boolean;
       showRatioStats: boolean;
     };
     ProfileStats: {
-      uploaded: string | null;
-      downloaded: string | null;
+      contributed: string | null;
+      consumed: string | null;
       totalEarned: string | null;
       ratio: string | null;
       buffer: string | null;
@@ -6010,8 +6010,8 @@ export interface components {
       total: number;
     };
     ProfilePercentiles: {
-      uploaded: components['schemas']['ProfilePercentile'];
-      downloaded: components['schemas']['ProfilePercentile'];
+      contributed: components['schemas']['ProfilePercentile'];
+      consumed: components['schemas']['ProfilePercentile'];
       contributions: components['schemas']['ProfilePercentile'];
       forumPosts: components['schemas']['ProfilePercentile'];
       requestsFilled: components['schemas']['ProfilePercentile'];
@@ -6084,8 +6084,8 @@ export interface components {
       email?: string;
       joinedAt: string;
       lastSeen?: string | null;
-      uploaded?: string;
-      downloaded?: string;
+      contributed?: string;
+      consumed?: string;
       ratio?: string;
       children?: components['schemas']['InviteNode'][];
     };

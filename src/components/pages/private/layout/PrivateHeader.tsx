@@ -19,6 +19,7 @@ const navLinks = [
   { label: 'Collages', to: '/private/collages' },
   { label: 'Requests', to: '/private/requests' },
   { label: 'Forums', to: '/private/forums' },
+  { label: 'Top 10', to: '/private/top10' },
   { label: 'Wiki', to: '/private/wiki' }
 ];
 
@@ -29,10 +30,10 @@ const PrivateHeader = ({ user }: Props) => {
   const inboxUnread = inboxData?.count ?? 0;
   const ticketUnread = ticketData?.count ?? 0;
 
-  const uploaded = user.uploaded ? formatBytes(Number(user.uploaded)) : '0 B';
-  const downloaded = user.downloaded
-    ? formatBytes(Number(user.downloaded))
+  const uploaded = user.contributed
+    ? formatBytes(Number(user.contributed))
     : '0 B';
+  const downloaded = user.consumed ? formatBytes(Number(user.consumed)) : '0 B';
   const ratio = user.ratio != null ? user.ratio.toFixed(2) : '∞';
 
   return (

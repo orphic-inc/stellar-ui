@@ -42,7 +42,7 @@ const RatioStats = () => {
         <li className="flex justify-between px-4 py-2 text-gray-400">
           <span>Downloaded</span>
           <span className="text-gray-200">
-            {formatBytes(Number(stats.downloaded))}
+            {formatBytes(Number(stats.consumed))}
           </span>
         </li>
         <li className="flex justify-between px-4 py-2 text-gray-400">

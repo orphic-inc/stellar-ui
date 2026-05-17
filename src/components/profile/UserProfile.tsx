@@ -798,8 +798,8 @@ const UserProfile = () => {
   const featuredShelves = profile.collageShelves.featuredPersonalCollages;
   const publicShelves = profile.collageShelves.publicCollages;
   const percentileItems = [
-    { label: 'Uploaded', value: profile.percentiles.uploaded },
-    { label: 'Downloaded', value: profile.percentiles.downloaded },
+    { label: 'Contributed', value: profile.percentiles.contributed },
+    { label: 'Consumed', value: profile.percentiles.consumed },
     { label: 'Contributions', value: profile.percentiles.contributions },
     { label: 'Forum Posts', value: profile.percentiles.forumPosts },
     { label: 'Requests Filled', value: profile.percentiles.requestsFilled }
@@ -922,12 +922,12 @@ const UserProfile = () => {
             </div>
             <ul className="px-3 py-2 space-y-1 text-xs text-gray-300">
               <li>
-                <span className="text-gray-500">Uploaded:</span>{' '}
-                {formatCount(profileStats.uploaded)}
+                <span className="text-gray-500">Contributed:</span>{' '}
+                {formatCount(profileStats.contributed)}
               </li>
               <li>
-                <span className="text-gray-500">Downloaded:</span>{' '}
-                {formatCount(profileStats.downloaded)}
+                <span className="text-gray-500">Consumed:</span>{' '}
+                {formatCount(profileStats.consumed)}
               </li>
               <li>
                 <span className="text-gray-500">Ratio:</span>{' '}

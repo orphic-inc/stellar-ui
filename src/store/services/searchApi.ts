@@ -178,8 +178,8 @@ export interface UserSearchResult {
   lastLogin?: string | null;
   disabled?: boolean;
   ratio?: number | null;
-  uploaded?: string;
-  downloaded?: string;
+  contributed?: string;
+  consumed?: string;
 }
 
 // ── Random ────────────────────────────────────────────────────────────────────

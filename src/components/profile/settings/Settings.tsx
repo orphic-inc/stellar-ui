@@ -53,8 +53,8 @@ const toProfileForm = (profile: MyProfileResponse): ProfileForm => ({
   notificationMethod: profile.userSettings.notificationMethod,
   showEmail: profile.userSettings.showEmail,
   showLastSeen: profile.userSettings.showLastSeen,
-  showUploadedStats: profile.userSettings.showUploadedStats,
-  showDownloadedStats: profile.userSettings.showDownloadedStats,
+  showContributedStats: profile.userSettings.showContributedStats,
+  showConsumedStats: profile.userSettings.showConsumedStats,
   showRatioStats: profile.userSettings.showRatioStats
 });
 
@@ -406,19 +406,19 @@ const Settings = () => {
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
-                  {...register('showUploadedStats')}
+                  {...register('showContributedStats')}
                   className="accent-indigo-500"
                 />
-                <span className="text-sm text-gray-300">Uploaded stats</span>
+                <span className="text-sm text-gray-300">Contributed stats</span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
-                  {...register('showDownloadedStats')}
+                  {...register('showConsumedStats')}
                   className="accent-indigo-500"
                 />
-                <span className="text-sm text-gray-300">Downloaded stats</span>
+                <span className="text-sm text-gray-300">Consumed stats</span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
