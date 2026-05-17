@@ -368,7 +368,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                             <td className="py-1 pr-3">
                               {conversation.viewerCanOpen ? (
                                 <Link
-                                  to={`/private/messages/${conversation.id}`}
+                                  to={`/private/messages/tickets/${conversation.id}`}
                                   className="text-indigo-400 hover:text-indigo-300"
                                 >
                                   {conversation.subject}
