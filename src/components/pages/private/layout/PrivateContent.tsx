@@ -63,6 +63,10 @@ import WikiListPage from '../../../wiki/WikiListPage';
 import WikiViewPage from '../../../wiki/WikiViewPage';
 import WikiEditPage from '../../../wiki/WikiEditPage';
 import WikiHistoryPage from '../../../wiki/WikiHistoryPage';
+import ReleaseBrowsePage from '../../../releases/ReleaseBrowsePage';
+import ArtistBrowsePage from '../../../artists/ArtistBrowsePage';
+import LogBrowsePage from '../../../log/LogBrowsePage';
+import UserBrowsePage from '../../../users/UserBrowsePage';
 import DraftsPage from '../../../messages/DraftsPage';
 import { useGetMeQuery } from '../../../../store/services/authApi';
 import {
@@ -316,6 +320,11 @@ const PrivateContent = () => (
     <Route path="wiki/:id/history" element={wrap(WikiHistoryPage)} />
     <Route path="wiki/:id" element={wrap(WikiViewPage)} />
     <Route path="wiki" element={wrap(WikiListPage)} />
+
+    <Route path="releases" element={wrap(ReleaseBrowsePage)} />
+    <Route path="artists" element={wrap(ArtistBrowsePage)} />
+    <Route path="log" element={wrap(LogBrowsePage)} />
+    <Route path="users" element={wrap(UserBrowsePage)} />
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />

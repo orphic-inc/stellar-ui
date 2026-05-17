@@ -28,6 +28,10 @@ const PERM_GROUPS: { title: string; perms: string[] }[] = [
     perms: ['users_edit', 'users_warn', 'users_disable', 'invites_manage']
   },
   {
+    title: 'Search',
+    perms: ['advanced_search', 'users_search']
+  },
+  {
     title: 'System',
     perms: ['news_manage', 'staff', 'admin']
   }

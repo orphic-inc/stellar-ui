@@ -2,6 +2,7 @@ import { Link, NavLink } from 'react-router-dom';
 import UserMenu from '../../../layout/UserMenu';
 import Alert from '../../../layout/Alert';
 import ModBar from '../../../admin/ModBar';
+import QuickSearch from '../../../layout/QuickSearch';
 import type { AuthUser } from '../../../../types';
 import { isStaffUser } from '../../../../utils/permissions';
 import { formatBytes } from '../../../../utils';
@@ -131,6 +132,7 @@ const PrivateHeader = ({ user }: Props) => {
         </div>
       </nav>
 
+      <QuickSearch />
       {isStaff && <ModBar />}
       <Alert />
     </header>
