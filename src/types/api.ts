@@ -5997,6 +5997,7 @@ export interface components {
         id: number;
         title: string;
         communityId: number | null;
+        image: string | null;
         artist: {
           id: number;
           name: string;
@@ -6045,6 +6046,25 @@ export interface components {
         body: string;
       }[];
     };
+    ProfileStaffPmSummary: {
+      id: number;
+      subject: string;
+      /** @enum {string} */
+      status: 'Unanswered' | 'Open' | 'Resolved';
+      createdAt: string;
+      updatedAt: string;
+      assignedStaff: {
+        id: number;
+        username: string;
+      } | null;
+      replyCount: number;
+      viewerCanOpen: boolean;
+    };
+    ProfileStaffPmOverview: {
+      total: number;
+      unresolved: number;
+      recentConversations: components['schemas']['ProfileStaffPmSummary'][];
+    };
     ProfileSnatch: {
       id: number;
       downloadedAt: string;
@@ -6091,6 +6111,8 @@ export interface components {
       percentiles: components['schemas']['ProfilePercentiles'];
       donorPresentation: components['schemas']['DonorPresentation'] & unknown;
       collageShelves: components['schemas']['ProfileCollageShelves'];
+      staffPmOverview: components['schemas']['ProfileStaffPmOverview'] &
+        unknown;
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
@@ -6117,6 +6139,8 @@ export interface components {
       percentiles: components['schemas']['ProfilePercentiles'];
       donorPresentation: components['schemas']['DonorPresentation'] & unknown;
       collageShelves: components['schemas']['ProfileCollageShelves'];
+      staffPmOverview: components['schemas']['ProfileStaffPmOverview'] &
+        unknown;
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];

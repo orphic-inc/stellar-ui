@@ -53,6 +53,12 @@ const formatCount = (value: number | string | null | undefined) => {
 
 const formatPercentile = (percentile: number) => `${percentile}th percentile`;
 
+const STAFF_PM_STATUS_CLASS: Record<string, string> = {
+  Unanswered: 'bg-yellow-900/40 text-yellow-300 border border-yellow-800/50',
+  Open: 'bg-blue-900/40 text-blue-300 border border-blue-800/50',
+  Resolved: 'bg-gray-800 text-gray-300 border border-gray-700'
+};
+
 const WarnModal = ({
   userId,
   onClose
@@ -171,6 +177,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
 
   const { data: profile } = useGetProfileByUserIdQuery(String(profileId));
   const isDisabled = (profile as { disabled?: boolean } | undefined)?.disabled;
+  const staffPmOverview = profile?.staffPmOverview;
 
   const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
   const [enableUser, { isLoading: isEnabling }] = useEnableUserMutation();
@@ -196,6 +203,20 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     }
   };
 
+  const handleAddNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNote.trim()) return;
+    try {
+      await addUserNote({ id: profileId, body: newNote }).unwrap();
+      setNewNote('');
+      dispatch(addAlert('Note added.', 'success'));
+    } catch (err) {
+      dispatch(
+        addAlert(getApiErrorMessage(err) ?? 'Failed to add note.', 'danger')
+      );
+    }
+  };
+
   const handleSetRank = async () => {
     if (!selectedRankId) return;
     try {
@@ -207,20 +228,6 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     } catch (err) {
       dispatch(
         addAlert(getApiErrorMessage(err) ?? 'Failed to set rank.', 'danger')
-      );
-    }
-  };
-
-  const handleAddNote = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newNote.trim()) return;
-    try {
-      await addUserNote({ id: profileId, body: newNote }).unwrap();
-      setNewNote('');
-      dispatch(addAlert('Note added.', 'success'));
-    } catch (err) {
-      dispatch(
-        addAlert(getApiErrorMessage(err) ?? 'Failed to add note.', 'danger')
       );
     }
   };
@@ -317,30 +324,95 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             </button>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-xs">
-            {profile?.userRank?.id && (
-              <Link
-                to={`/private/staff/tools/user-ranks/${profile.userRank.id}`}
-                className="px-3 py-1.5 rounded border border-indigo-800 text-indigo-300 hover:border-indigo-600 hover:text-indigo-200 transition-colors"
-              >
-                Edit Rank Permissions
-              </Link>
-            )}
-            <Link
-              to="/private/staff/tickets"
-              className="px-3 py-1.5 rounded border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white transition-colors"
-            >
-              Staff Ticket Queue
-            </Link>
-            <Link
-              to="/private/staff/inbox/responses"
-              className="px-3 py-1.5 rounded border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white transition-colors"
-            >
-              Canned Responses
-            </Link>
-          </div>
+          {staffPmOverview && (
+            <div className={sectionClass}>
+              <div className={headClass}>Staff PMs</div>
+              <div className={`${bodyClass} space-y-3`}>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="rounded border border-gray-800 bg-gray-950 px-3 py-2 text-xs">
+                    <div className="text-gray-500 uppercase tracking-wide">
+                      Total
+                    </div>
+                    <div className="mt-1 text-base text-white">
+                      {staffPmOverview.total}
+                    </div>
+                  </div>
+                  <div className="rounded border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 text-xs">
+                    <div className="text-yellow-300 uppercase tracking-wide">
+                      Unresolved
+                    </div>
+                    <div className="mt-1 text-base text-white">
+                      {staffPmOverview.unresolved}
+                    </div>
+                  </div>
+                </div>
 
-          {/* Change rank */}
+                {staffPmOverview.recentConversations.length > 0 ? (
+                  <table className="w-full text-xs text-gray-300">
+                    <thead>
+                      <tr className="text-gray-500">
+                        <th className="pb-1 text-left">Subject</th>
+                        <th className="pb-1 text-left">Date</th>
+                        <th className="pb-1 text-left">Assigned</th>
+                        <th className="pb-1 text-left">Replies</th>
+                        <th className="pb-1 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {staffPmOverview.recentConversations.map(
+                        (conversation) => (
+                          <tr
+                            key={conversation.id}
+                            className="border-t border-gray-800"
+                          >
+                            <td className="py-1 pr-3">
+                              {conversation.viewerCanOpen ? (
+                                <Link
+                                  to={`/private/messages/${conversation.id}`}
+                                  className="text-indigo-400 hover:text-indigo-300"
+                                >
+                                  {conversation.subject}
+                                </Link>
+                              ) : (
+                                <span className="text-gray-200">
+                                  {conversation.subject}
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-1 pr-3 text-gray-500">
+                              <Time date={conversation.createdAt} />
+                            </td>
+                            <td className="py-1 pr-3 text-gray-400">
+                              {conversation.assignedStaff?.username ??
+                                'Class / unassigned'}
+                            </td>
+                            <td className="py-1 pr-3 text-gray-400">
+                              {conversation.replyCount}
+                            </td>
+                            <td className="py-1">
+                              <span
+                                className={`rounded px-2 py-0.5 text-[11px] ${
+                                  STAFF_PM_STATUS_CLASS[conversation.status] ??
+                                  STAFF_PM_STATUS_CLASS.Resolved
+                                }`}
+                              >
+                                {conversation.status}
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p className="text-xs text-gray-500">
+                    No staff PMs for this user.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className={sectionClass}>
             <div className={headClass}>Change Rank</div>
             <div className={`${bodyClass} flex gap-2`}>
@@ -998,10 +1070,10 @@ const UserProfile = () => {
           <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
               <span className="text-sm font-semibold text-gray-200">
-                Activity Summary
+                Community Stats
               </span>
             </div>
-            <div className="grid gap-px bg-gray-800 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-px bg-gray-800 sm:grid-cols-2 lg:grid-cols-5">
               <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
                 <div className="text-gray-500 text-xs uppercase tracking-wide">
                   Contributions
@@ -1035,6 +1107,14 @@ const UserProfile = () => {
                 <div className="mt-1 text-lg text-white">
                   {activitySummary.collagesStarted} collages /{' '}
                   {activitySummary.collageEntries} entries
+                </div>
+              </div>
+              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
+                <div className="text-gray-500 text-xs uppercase tracking-wide">
+                  Comments
+                </div>
+                <div className="mt-1 text-lg text-white">
+                  {activitySummary.comments}
                 </div>
               </div>
             </div>
@@ -1163,33 +1243,40 @@ const UserProfile = () => {
           <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
               <span className="text-sm font-semibold text-gray-200">
-                Recent Contributions
+                Recent Uploads
               </span>
             </div>
             {profile.recentContributions.length ? (
-              <div className="divide-y divide-gray-800">
+              <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-5">
                 {profile.recentContributions.map((item) => (
-                  <div
+                  <Link
                     key={item.id}
-                    className="px-4 py-3 flex items-center justify-between gap-4 text-sm"
+                    to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                    className="overflow-hidden rounded border border-gray-800 bg-gray-950 hover:border-indigo-500 transition-colors"
                   >
-                    <div className="min-w-0">
-                      <Link
-                        to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
-                        className="text-indigo-400 hover:text-indigo-300"
-                      >
+                    <div className="aspect-square bg-gray-900">
+                      {item.release.image ? (
+                        <img
+                          src={item.release.image}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="p-3">
+                      <div className="truncate text-sm font-medium text-white">
                         {item.release.title}
-                      </Link>
+                      </div>
                       {item.release.artist && (
-                        <div className="text-xs text-gray-500">
+                        <div className="mt-1 truncate text-xs text-gray-500">
                           {item.release.artist.name}
                         </div>
                       )}
+                      <div className="mt-2 text-xs text-gray-500">
+                        <Time date={item.createdAt} />
+                      </div>
                     </div>
-                    <span className="shrink-0 text-xs text-gray-500">
-                      <Time date={item.createdAt} />
-                    </span>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (

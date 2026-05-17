@@ -93,7 +93,7 @@ export const userApi = api.injectEndpoints({
         method: 'POST',
         body
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
     getUserWarnings: build.query<
       Array<{
@@ -126,22 +126,22 @@ export const userApi = api.injectEndpoints({
         method: 'POST',
         body: { body }
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
     deleteUserNote: build.mutation<void, { id: number; noteId: number }>({
       query: ({ id, noteId }) => ({
         url: `/users/${id}/notes/${noteId}`,
         method: 'DELETE'
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
     disableUser: build.mutation<{ msg: string }, number>({
       query: (id) => ({ url: `/users/${id}/disable`, method: 'POST' }),
-      invalidatesTags: (_, __, id) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, id) => [{ type: 'User', id }, 'Profile']
     }),
     enableUser: build.mutation<{ msg: string }, number>({
       query: (id) => ({ url: `/users/${id}/enable`, method: 'POST' }),
-      invalidatesTags: (_, __, id) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, id) => [{ type: 'User', id }, 'Profile']
     }),
     setUserRank: build.mutation<
       { msg: string },
@@ -152,7 +152,7 @@ export const userApi = api.injectEndpoints({
         method: 'PUT',
         body: { userRankId }
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
     getUserIpHistory: build.query<
       Array<{ ip: string; seenAt: string }>,
@@ -218,18 +218,18 @@ export const userApi = api.injectEndpoints({
         method: 'POST',
         body
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
     revokeDonor: build.mutation<{ msg: string }, number>({
       query: (id) => ({ url: `/users/${id}/donor`, method: 'DELETE' }),
-      invalidatesTags: (_, __, id) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, id) => [{ type: 'User', id }, 'Profile']
     }),
     removeUserWarning: build.mutation<void, { id: number; warnId: number }>({
       query: ({ id, warnId }) => ({
         url: `/users/${id}/warnings/${warnId}`,
         method: 'DELETE'
       }),
-      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }]
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
     getSnatchListByUserId: build.query<
       Array<{
