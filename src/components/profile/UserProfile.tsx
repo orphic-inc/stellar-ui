@@ -31,6 +31,16 @@ import Time from '../layout/Time';
 import RatioStats from './RatioStats';
 import UserBadges from '../layout/UserBadges';
 
+const COLLAGE_CATEGORY_LABELS: Record<number, string> = {
+  0: 'Personal',
+  1: 'Theme / Genre',
+  2: 'Discography',
+  3: 'Label',
+  4: 'Charts',
+  5: 'Staff Picks',
+  6: 'Other'
+};
+
 const formatCount = (value: number | string | null | undefined) => {
   if (value === null || value === undefined) return 'Hidden';
   if (typeof value === 'number') return value.toLocaleString();
@@ -40,6 +50,8 @@ const formatCount = (value: number | string | null | undefined) => {
     return value;
   }
 };
+
+const formatPercentile = (percentile: number) => `${percentile}th percentile`;
 
 const WarnModal = ({
   userId,
@@ -303,6 +315,29 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             >
               {isDisabled ? 'Enable Account' : 'Disable Account'}
             </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-xs">
+            {profile?.userRank?.id && (
+              <Link
+                to={`/private/staff/tools/user-ranks/${profile.userRank.id}`}
+                className="px-3 py-1.5 rounded border border-indigo-800 text-indigo-300 hover:border-indigo-600 hover:text-indigo-200 transition-colors"
+              >
+                Edit Rank Permissions
+              </Link>
+            )}
+            <Link
+              to="/private/staff/tickets"
+              className="px-3 py-1.5 rounded border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white transition-colors"
+            >
+              Staff Ticket Queue
+            </Link>
+            <Link
+              to="/private/staff/inbox/responses"
+              className="px-3 py-1.5 rounded border border-gray-700 text-gray-300 hover:border-gray-500 hover:text-white transition-colors"
+            >
+              Canned Responses
+            </Link>
           </div>
 
           {/* Change rank */}
@@ -687,6 +722,16 @@ const UserProfile = () => {
   const profileIsDonor = profileAny.isDonor as boolean | undefined;
   const profileStats = profile.stats;
   const activitySummary = profile.activitySummary;
+  const donorPresentation = profile.donorPresentation;
+  const featuredShelves = profile.collageShelves.featuredPersonalCollages;
+  const publicShelves = profile.collageShelves.publicCollages;
+  const percentileItems = [
+    { label: 'Uploaded', value: profile.percentiles.uploaded },
+    { label: 'Downloaded', value: profile.percentiles.downloaded },
+    { label: 'Contributions', value: profile.percentiles.contributions },
+    { label: 'Forum Posts', value: profile.percentiles.forumPosts },
+    { label: 'Requests Filled', value: profile.percentiles.requestsFilled }
+  ];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
@@ -844,6 +889,112 @@ const UserProfile = () => {
             </div>
           )}
 
+          {donorPresentation && (
+            <div className="rounded border border-pink-900/50 bg-gradient-to-br from-pink-950/40 via-gray-900 to-gray-900 overflow-hidden">
+              <div className="bg-pink-900/20 border-b border-pink-900/40 px-4 py-2 flex items-center justify-between">
+                <span className="text-sm font-semibold text-pink-200">
+                  Donor Presentation
+                </span>
+                {donorPresentation.rank && (
+                  <span
+                    className="text-xs font-semibold"
+                    style={{ color: donorPresentation.rank.color || undefined }}
+                  >
+                    {donorPresentation.rank.badge} {donorPresentation.rank.name}
+                  </span>
+                )}
+              </div>
+              <div className="p-4 space-y-4">
+                {(donorPresentation.customIcon ||
+                  donorPresentation.secondAvatar) && (
+                  <div className="flex flex-wrap gap-4 items-start">
+                    {donorPresentation.customIcon && (
+                      <div className="space-y-2">
+                        <div className="text-xs uppercase tracking-wide text-pink-200/80">
+                          Custom Icon
+                        </div>
+                        {donorPresentation.customIconLink ? (
+                          <a
+                            href={donorPresentation.customIconLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-block"
+                          >
+                            <img
+                              src={donorPresentation.customIcon}
+                              alt=""
+                              className="h-12 w-12 object-contain rounded border border-pink-900/40 bg-black/20"
+                            />
+                          </a>
+                        ) : (
+                          <img
+                            src={donorPresentation.customIcon}
+                            alt=""
+                            className="h-12 w-12 object-contain rounded border border-pink-900/40 bg-black/20"
+                          />
+                        )}
+                      </div>
+                    )}
+                    {donorPresentation.secondAvatar && (
+                      <div className="space-y-2">
+                        <div className="text-xs uppercase tracking-wide text-pink-200/80">
+                          Donor Avatar
+                        </div>
+                        <img
+                          src={donorPresentation.secondAvatar}
+                          alt=""
+                          className="h-20 w-20 object-cover rounded border border-pink-900/40"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {donorPresentation.rank && (
+                  <div className="text-sm text-gray-300">
+                    Granted{' '}
+                    <span className="text-white">
+                      {new Date(
+                        donorPresentation.rank.grantedAt
+                      ).toLocaleDateString()}
+                    </span>
+                    {donorPresentation.rank.expiresAt && (
+                      <>
+                        {' '}
+                        · Expires{' '}
+                        <span className="text-white">
+                          {new Date(
+                            donorPresentation.rank.expiresAt
+                          ).toLocaleDateString()}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {donorPresentation.profileBlocks.length > 0 && (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {donorPresentation.profileBlocks.map((block, index) => (
+                      <div
+                        key={`${block.title}-${index}`}
+                        className="rounded border border-pink-900/30 bg-black/10 p-3"
+                      >
+                        {block.title && (
+                          <div className="mb-2 text-xs uppercase tracking-wide text-pink-200/80">
+                            {block.title}
+                          </div>
+                        )}
+                        <div className="text-sm text-gray-300 whitespace-pre-wrap">
+                          {block.body}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
               <span className="text-sm font-semibold text-gray-200">
@@ -888,6 +1039,126 @@ const UserProfile = () => {
               </div>
             </div>
           </div>
+
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+              <span className="text-sm font-semibold text-gray-200">
+                Percentile Rankings
+              </span>
+            </div>
+            <div className="grid gap-px bg-gray-800 sm:grid-cols-2 lg:grid-cols-5">
+              {percentileItems.map(({ label, value }) => (
+                <div key={label} className="bg-gray-900 px-4 py-3">
+                  <div className="text-xs uppercase tracking-wide text-gray-500">
+                    {label}
+                  </div>
+                  <div className="mt-1 text-base font-semibold text-white">
+                    {formatPercentile(value.percentile)}
+                  </div>
+                  <div className="mt-1 text-xs text-gray-500">
+                    Rank {value.rank} of {value.total}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {(featuredShelves.length > 0 || publicShelves.length > 0) && (
+            <div className="space-y-4">
+              {featuredShelves.length > 0 && (
+                <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+                  <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+                    <span className="text-sm font-semibold text-gray-200">
+                      Featured Shelves
+                    </span>
+                  </div>
+                  <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
+                    {featuredShelves.map((collage) => (
+                      <Link
+                        key={collage.id}
+                        to={`/private/collages/${collage.id}`}
+                        className="rounded border border-gray-700 bg-gray-950 hover:border-indigo-500 transition-colors overflow-hidden"
+                      >
+                        <div className="grid grid-cols-2 gap-px bg-gray-800">
+                          {collage.coverImages.length > 0 ? (
+                            collage.coverImages
+                              .slice(0, 4)
+                              .map((image, index) => (
+                                <img
+                                  key={`${collage.id}-${index}`}
+                                  src={image}
+                                  alt=""
+                                  className="aspect-square w-full object-cover"
+                                />
+                              ))
+                          ) : (
+                            <div className="col-span-2 aspect-[2/1] bg-gray-900" />
+                          )}
+                        </div>
+                        <div className="p-3">
+                          <div className="text-sm font-medium text-white">
+                            {collage.name}
+                          </div>
+                          <div className="mt-1 text-xs text-gray-500">
+                            {collage.numEntries} entries
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {publicShelves.length > 0 && (
+                <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+                  <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+                    <span className="text-sm font-semibold text-gray-200">
+                      Public Collages
+                    </span>
+                  </div>
+                  <div className="divide-y divide-gray-800">
+                    {publicShelves.map((collage) => (
+                      <Link
+                        key={collage.id}
+                        to={`/private/collages/${collage.id}`}
+                        className="flex items-center gap-4 px-4 py-3 hover:bg-gray-800/30 transition-colors"
+                      >
+                        <div className="grid h-16 w-20 shrink-0 grid-cols-2 gap-px overflow-hidden rounded bg-gray-800">
+                          {collage.coverImages.length > 0 ? (
+                            collage.coverImages
+                              .slice(0, 4)
+                              .map((image, index) => (
+                                <img
+                                  key={`${collage.id}-public-${index}`}
+                                  src={image}
+                                  alt=""
+                                  className="h-full w-full object-cover"
+                                />
+                              ))
+                          ) : (
+                            <div className="col-span-2 h-full w-full bg-gray-900" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-medium text-white">
+                            {collage.name}
+                          </div>
+                          <div className="mt-1 text-xs text-gray-500">
+                            {COLLAGE_CATEGORY_LABELS[collage.categoryId] ??
+                              'Collage'}{' '}
+                            · {collage.numEntries} entries
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-xs text-gray-500">
+                          {new Date(collage.updatedAt).toLocaleDateString()}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">

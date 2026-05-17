@@ -608,15 +608,6 @@ export interface paths {
             'application/json': components['schemas']['PublicProfile'];
           };
         };
-        /** @description Not authenticated */
-        401: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
         /** @description Profile not found */
         404: {
           headers: {
@@ -6005,12 +5996,54 @@ export interface components {
       release: {
         id: number;
         title: string;
-        communityId: number;
+        communityId: number | null;
         artist: {
           id: number;
           name: string;
         } | null;
       };
+    };
+    ProfilePercentile: {
+      percentile: number;
+      rank: number;
+      total: number;
+    };
+    ProfilePercentiles: {
+      uploaded: components['schemas']['ProfilePercentile'];
+      downloaded: components['schemas']['ProfilePercentile'];
+      contributions: components['schemas']['ProfilePercentile'];
+      forumPosts: components['schemas']['ProfilePercentile'];
+      requestsFilled: components['schemas']['ProfilePercentile'];
+    };
+    ProfileCollageShelf: {
+      id: number;
+      name: string;
+      categoryId: number;
+      isFeatured: boolean;
+      numEntries: number;
+      createdAt: string;
+      updatedAt: string;
+      coverImages: string[];
+    };
+    ProfileCollageShelves: {
+      featuredPersonalCollages: components['schemas']['ProfileCollageShelf'][];
+      publicCollages: components['schemas']['ProfileCollageShelf'][];
+    };
+    DonorPresentation: {
+      rank: {
+        name: string;
+        badge: string;
+        color: string;
+        grantedAt: string;
+        expiresAt: string | null;
+      } | null;
+      customIcon: string | null;
+      customIconLink: string | null;
+      secondAvatar: string | null;
+      profileBlocks: {
+        title: string;
+        body: string;
+      }[];
     };
     ProfileSnatch: {
       id: number;
@@ -6050,9 +6083,14 @@ export interface components {
       warned: string | null;
       inviteCount: number | null;
       stats: components['schemas']['ProfileStats'];
-      userRank: components['schemas']['UserRankSummary'];
+      userRank: components['schemas']['UserRankSummary'] & {
+        id: number;
+      };
       profile: components['schemas']['ProfileDetails'];
       activitySummary: components['schemas']['ProfileActivitySummary'];
+      percentiles: components['schemas']['ProfilePercentiles'];
+      donorPresentation: components['schemas']['DonorPresentation'] & unknown;
+      collageShelves: components['schemas']['ProfileCollageShelves'];
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
@@ -6071,9 +6109,14 @@ export interface components {
       warned: string | null;
       inviteCount: number | null;
       stats: components['schemas']['ProfileStats'];
-      userRank: components['schemas']['UserRankSummary'];
+      userRank: components['schemas']['UserRankSummary'] & {
+        id: number;
+      };
       profile: components['schemas']['ProfileDetails'];
       activitySummary: components['schemas']['ProfileActivitySummary'];
+      percentiles: components['schemas']['ProfilePercentiles'];
+      donorPresentation: components['schemas']['DonorPresentation'] & unknown;
+      collageShelves: components['schemas']['ProfileCollageShelves'];
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
