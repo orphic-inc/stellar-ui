@@ -356,8 +356,20 @@ export interface paths {
             siteAppearance?: string;
             externalStylesheet?: string | '';
             styledTooltips?: boolean;
-            paranoia?: number;
+            paranoia?: number | null;
             avatar?: string;
+            /** @enum {string} */
+            notificationMethod?:
+              | 'Disabled'
+              | 'Popup'
+              | 'Traditional'
+              | 'Push'
+              | 'Combined';
+            showEmail?: boolean;
+            showLastSeen?: boolean;
+            showUploadedStats?: boolean;
+            showDownloadedStats?: boolean;
+            showRatioStats?: boolean;
           };
         };
       };
@@ -516,6 +528,19 @@ export interface paths {
             siteAppearance?: string;
             externalStylesheet?: string | '';
             styledTooltips?: boolean;
+            paranoia?: number | null;
+            /** @enum {string} */
+            notificationMethod?:
+              | 'Disabled'
+              | 'Popup'
+              | 'Traditional'
+              | 'Push'
+              | 'Combined';
+            showEmail?: boolean;
+            showLastSeen?: boolean;
+            showUploadedStats?: boolean;
+            showDownloadedStats?: boolean;
+            showRatioStats?: boolean;
           };
         };
       };
@@ -581,6 +606,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['PublicProfile'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Profile not found */
@@ -2590,6 +2624,14 @@ export interface paths {
             downloadUrl: string;
             sizeInBytes?: number;
             releaseDescription?: string;
+            bitrate?: string;
+            media?: string;
+            /** @default false */
+            hasLog?: boolean;
+            /** @default false */
+            hasCue?: boolean;
+            /** @default false */
+            isScene?: boolean;
           };
         };
       };
@@ -2715,6 +2757,14 @@ export interface paths {
             image?: string | '';
             description?: string;
             releaseDescription?: string;
+            bitrate?: string;
+            media?: string;
+            /** @default false */
+            hasLog?: boolean;
+            /** @default false */
+            hasCue?: boolean;
+            /** @default false */
+            isScene?: boolean;
             collaborators: {
               artist: string;
               importance: string;
@@ -5919,12 +5969,66 @@ export interface components {
       externalStylesheet?: string | null;
       styledTooltips: boolean;
       paranoia: number;
+      /** @enum {string} */
+      notificationMethod:
+        | 'Disabled'
+        | 'Popup'
+        | 'Traditional'
+        | 'Push'
+        | 'Combined';
+      showEmail: boolean;
+      showLastSeen: boolean;
+      showUploadedStats: boolean;
+      showDownloadedStats: boolean;
+      showRatioStats: boolean;
+    };
+    ProfileStats: {
+      uploaded: string | null;
+      downloaded: string | null;
+      totalEarned: string | null;
+      ratio: string | null;
+      buffer: string | null;
+    };
+    ProfileActivitySummary: {
+      contributions: number;
+      requestsCreated: number;
+      requestsFilled: number;
+      forumTopics: number;
+      forumPosts: number;
+      comments: number;
+      collagesStarted: number;
+      collageEntries: number;
+    };
+    ProfileContribution: {
+      id: number;
+      createdAt: string;
+      release: {
+        id: number;
+        title: string;
+        communityId: number;
+        artist: {
+          id: number;
+          name: string;
+        } | null;
+      };
+    };
+    ProfileSnatch: {
+      id: number;
+      downloadedAt: string;
+      release: {
+        id: number;
+        title: string;
+        communityId: number | null;
+      };
+      artist: {
+        name: string;
+      } | null;
     };
     InviteNode: {
       id: number;
       username: string;
       /** Format: email */
-      email: string;
+      email?: string;
       joinedAt: string;
       lastSeen?: string | null;
       uploaded?: string;
@@ -5936,27 +6040,44 @@ export interface components {
       id: number;
       username: string;
       avatar: string | null;
+      /** Format: email */
+      email: string | null;
       dateRegistered: string;
+      lastSeen: string | null;
       isArtist: boolean;
       isDonor: boolean;
+      disabled: boolean;
+      warned: string | null;
+      inviteCount: number | null;
+      stats: components['schemas']['ProfileStats'];
       userRank: components['schemas']['UserRankSummary'];
       profile: components['schemas']['ProfileDetails'];
-      userSettings: {
-        siteAppearance?: string;
-        styledTooltips?: boolean;
-      };
+      activitySummary: components['schemas']['ProfileActivitySummary'];
+      recentContributions: components['schemas']['ProfileContribution'][];
+      recentSnatches: components['schemas']['ProfileSnatch'][];
+      inviteTree: components['schemas']['InviteNode'][];
     };
     MyProfile: {
       id: number;
       username: string;
       avatar: string | null;
+      /** Format: email */
+      email: string | null;
+      dateRegistered: string;
+      lastSeen: string | null;
+      isArtist: boolean;
+      isDonor: boolean;
+      disabled: boolean;
+      warned: string | null;
+      inviteCount: number | null;
+      stats: components['schemas']['ProfileStats'];
+      userRank: components['schemas']['UserRankSummary'];
       profile: components['schemas']['ProfileDetails'];
-      userSettings: components['schemas']['UserSettings'];
-      userRank: {
-        name: string;
-        color: string;
-      };
+      activitySummary: components['schemas']['ProfileActivitySummary'];
+      recentContributions: components['schemas']['ProfileContribution'][];
+      recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
+      userSettings: components['schemas']['UserSettings'];
     };
     AdminCreatedUser: {
       id: number;

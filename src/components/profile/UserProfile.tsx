@@ -31,6 +31,16 @@ import Time from '../layout/Time';
 import RatioStats from './RatioStats';
 import UserBadges from '../layout/UserBadges';
 
+const formatCount = (value: number | string | null | undefined) => {
+  if (value === null || value === undefined) return 'Hidden';
+  if (typeof value === 'number') return value.toLocaleString();
+  try {
+    return BigInt(value).toLocaleString();
+  } catch {
+    return value;
+  }
+};
+
 const WarnModal = ({
   userId,
   onClose
@@ -644,13 +654,23 @@ const UserProfile = () => {
   const { data: profile, isLoading, error } = useGetProfileByUserIdQuery(id!);
 
   if (isLoading) return <Spinner />;
-  if (error || !profile) {
+  if (error) {
+    const status =
+      'status' in error && typeof error.status === 'number' ? error.status : 0;
+    let message = 'Unable to load profile.';
+    if (status === 401) {
+      message = 'You must be signed in to view this profile.';
+    } else if (status === 403) {
+      message = 'You do not have permission to view this profile.';
+    } else if (status === 404) {
+      message = 'User not found.';
+    }
+
     return (
-      <div className="max-w-5xl mx-auto px-4 py-6 text-red-400">
-        User not found.
-      </div>
+      <div className="max-w-5xl mx-auto px-4 py-6 text-red-400">{message}</div>
     );
   }
+  if (!profile) return <Spinner />;
 
   const isOwnProfile = currentUser?.id === profile.id;
   const isStaff = hasAnyPermission(currentUser, [
@@ -665,12 +685,19 @@ const UserProfile = () => {
   const profileDisabled = profileAny.disabled as boolean | undefined;
   const profileWarned = profileAny.warned as string | null | undefined;
   const profileIsDonor = profileAny.isDonor as boolean | undefined;
+  const profileStats = profile.stats;
+  const activitySummary = profile.activitySummary;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
       {/* Page header */}
       <div className="mb-6 flex items-center gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-white">{profile.username}</h1>
+        {profile.profile?.profileTitle && (
+          <span className="text-sm text-gray-400">
+            {profile.profile.profileTitle}
+          </span>
+        )}
         <UserBadges
           disabled={profileDisabled}
           warned={profileWarned}
@@ -740,6 +767,17 @@ const UserProfile = () => {
                   <Time date={profile.dateRegistered} />
                 </li>
               )}
+              {profile.lastSeen && (
+                <li>
+                  <span className="text-gray-500">Last seen:</span>{' '}
+                  <Time date={profile.lastSeen} />
+                </li>
+              )}
+              {profile.email && (
+                <li className="break-all">
+                  <span className="text-gray-500">Email:</span> {profile.email}
+                </li>
+              )}
               {profile.userRank && (
                 <li>
                   <span className="text-gray-500">Class:</span>{' '}
@@ -748,7 +786,40 @@ const UserProfile = () => {
                   </span>
                 </li>
               )}
+              {profile.inviteCount !== null &&
+                profile.inviteCount !== undefined && (
+                  <li>
+                    <span className="text-gray-500">Invites:</span>{' '}
+                    {profile.inviteCount}
+                  </li>
+                )}
               {profileIsDonor && <li className="text-pink-400">Donor ♥</li>}
+            </ul>
+          </div>
+
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Transfer Stats
+              </span>
+            </div>
+            <ul className="px-3 py-2 space-y-1 text-xs text-gray-300">
+              <li>
+                <span className="text-gray-500">Uploaded:</span>{' '}
+                {formatCount(profileStats.uploaded)}
+              </li>
+              <li>
+                <span className="text-gray-500">Downloaded:</span>{' '}
+                {formatCount(profileStats.downloaded)}
+              </li>
+              <li>
+                <span className="text-gray-500">Ratio:</span>{' '}
+                {profileStats.ratio ?? 'Hidden'}
+              </li>
+              <li>
+                <span className="text-gray-500">Buffer:</span>{' '}
+                {formatCount(profileStats.buffer)}
+              </li>
             </ul>
           </div>
 
@@ -770,6 +841,125 @@ const UserProfile = () => {
                   __html: DOMPurify.sanitize(profile.profile.profileInfo)
                 }}
               />
+            </div>
+          )}
+
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+              <span className="text-sm font-semibold text-gray-200">
+                Activity Summary
+              </span>
+            </div>
+            <div className="grid gap-px bg-gray-800 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
+                <div className="text-gray-500 text-xs uppercase tracking-wide">
+                  Contributions
+                </div>
+                <div className="mt-1 text-lg text-white">
+                  {activitySummary.contributions}
+                </div>
+              </div>
+              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
+                <div className="text-gray-500 text-xs uppercase tracking-wide">
+                  Requests
+                </div>
+                <div className="mt-1 text-lg text-white">
+                  {activitySummary.requestsCreated} created /{' '}
+                  {activitySummary.requestsFilled} filled
+                </div>
+              </div>
+              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
+                <div className="text-gray-500 text-xs uppercase tracking-wide">
+                  Forums
+                </div>
+                <div className="mt-1 text-lg text-white">
+                  {activitySummary.forumTopics} topics /{' '}
+                  {activitySummary.forumPosts} posts
+                </div>
+              </div>
+              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
+                <div className="text-gray-500 text-xs uppercase tracking-wide">
+                  Collections
+                </div>
+                <div className="mt-1 text-lg text-white">
+                  {activitySummary.collagesStarted} collages /{' '}
+                  {activitySummary.collageEntries} entries
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+              <span className="text-sm font-semibold text-gray-200">
+                Recent Contributions
+              </span>
+            </div>
+            {profile.recentContributions.length ? (
+              <div className="divide-y divide-gray-800">
+                {profile.recentContributions.map((item) => (
+                  <div
+                    key={item.id}
+                    className="px-4 py-3 flex items-center justify-between gap-4 text-sm"
+                  >
+                    <div className="min-w-0">
+                      <Link
+                        to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                        className="text-indigo-400 hover:text-indigo-300"
+                      >
+                        {item.release.title}
+                      </Link>
+                      {item.release.artist && (
+                        <div className="text-xs text-gray-500">
+                          {item.release.artist.name}
+                        </div>
+                      )}
+                    </div>
+                    <span className="shrink-0 text-xs text-gray-500">
+                      <Time date={item.createdAt} />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="px-4 py-3 text-sm text-gray-500">
+                No recent contributions.
+              </div>
+            )}
+          </div>
+
+          {profile.recentSnatches.length > 0 && (
+            <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+                <span className="text-sm font-semibold text-gray-200">
+                  Recent Snatches
+                </span>
+              </div>
+              <div className="divide-y divide-gray-800">
+                {profile.recentSnatches.map((item) => (
+                  <div
+                    key={item.id}
+                    className="px-4 py-3 flex items-center justify-between gap-4 text-sm"
+                  >
+                    <div className="min-w-0">
+                      <Link
+                        to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                        className="text-indigo-400 hover:text-indigo-300"
+                      >
+                        {item.release.title}
+                      </Link>
+                      {item.artist && (
+                        <div className="text-xs text-gray-500">
+                          {item.artist.name}
+                        </div>
+                      )}
+                    </div>
+                    <span className="shrink-0 text-xs text-gray-500">
+                      <Time date={item.downloadedAt} />
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

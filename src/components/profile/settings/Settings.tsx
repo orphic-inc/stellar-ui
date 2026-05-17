@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import {
-  useGetUserSettingsQuery,
-  useUpdateUserSettingsMutation
-} from '../../../store/services/userApi';
+  useGetMyProfileQuery,
+  useUpdateMyProfileMutation
+} from '../../../store/services/profileApi';
 import {
   useChangePasswordMutation,
   useChangeEmailMutation,
@@ -18,11 +18,11 @@ import { getApiErrorMessage } from '../../../utils/apiError';
 import Spinner from '../../layout/Spinner';
 import type { paths } from '../../../types/api';
 
-type UserSettingsForm = NonNullable<
-  paths['/users/settings']['put']['requestBody']
+type ProfileForm = NonNullable<
+  paths['/profile/me']['put']['requestBody']
 >['content']['application/json'];
-type UserSettingsResponse =
-  paths['/users/settings']['get']['responses'][200]['content']['application/json'];
+type MyProfileResponse =
+  paths['/profile/me']['get']['responses'][200]['content']['application/json'];
 
 type Tab = 'appearance' | 'privacy' | 'security';
 
@@ -41,11 +41,21 @@ const NOTIFICATION_OPTIONS = [
   { value: 'combined', label: 'Combined' }
 ];
 
-const toSettingsForm = (settings: UserSettingsResponse): UserSettingsForm => ({
-  siteAppearance: settings.siteAppearance,
-  externalStylesheet: settings.externalStylesheet ?? '',
-  styledTooltips: settings.styledTooltips,
-  paranoia: settings.paranoia
+const toProfileForm = (profile: MyProfileResponse): ProfileForm => ({
+  avatar: profile.profile.avatar ?? profile.avatar ?? '',
+  avatarMouseoverText: profile.profile.avatarMouseoverText ?? '',
+  profileTitle: profile.profile.profileTitle ?? '',
+  profileInfo: profile.profile.profileInfo ?? '',
+  siteAppearance: profile.userSettings.siteAppearance,
+  externalStylesheet: profile.userSettings.externalStylesheet ?? '',
+  styledTooltips: profile.userSettings.styledTooltips,
+  paranoia: profile.userSettings.paranoia,
+  notificationMethod: profile.userSettings.notificationMethod,
+  showEmail: profile.userSettings.showEmail,
+  showLastSeen: profile.userSettings.showLastSeen,
+  showUploadedStats: profile.userSettings.showUploadedStats,
+  showDownloadedStats: profile.userSettings.showDownloadedStats,
+  showRatioStats: profile.userSettings.showRatioStats
 });
 
 const Settings = () => {
@@ -53,26 +63,24 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState<Tab>('appearance');
   const dispatch = useDispatch();
 
-  // Appearance/privacy settings
-  const { data: settings, isLoading } = useGetUserSettingsQuery();
-  const [updateSettings, { isLoading: isSaving }] =
-    useUpdateUserSettingsMutation();
-  const { register, handleSubmit, reset, watch } = useForm<UserSettingsForm>();
+  const { data: profile, isLoading } = useGetMyProfileQuery();
+  const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
+  const { register, handleSubmit, reset, watch } = useForm<ProfileForm>();
 
   useEffect(() => {
-    if (settings) reset(toSettingsForm(settings));
-  }, [settings, reset]);
+    if (profile) reset(toProfileForm(profile));
+  }, [profile, reset]);
 
   const paranoiaValue = watch('paranoia') ?? 0;
 
-  const onSubmit = async (data: UserSettingsForm) => {
+  const onSubmit = async (data: ProfileForm) => {
     try {
-      await updateSettings(data).unwrap();
-      dispatch(addAlert('Settings saved.', 'success'));
+      await updateProfile(data).unwrap();
+      dispatch(addAlert('Profile settings saved.', 'success'));
     } catch (err) {
       dispatch(
         addAlert(
-          getApiErrorMessage(err) ?? 'Failed to save settings.',
+          getApiErrorMessage(err) ?? 'Failed to save profile settings.',
           'danger'
         )
       );
@@ -218,6 +226,66 @@ const Settings = () => {
 
             <div>
               <label
+                htmlFor="settings-avatar-mouseover"
+                className="block text-sm text-gray-300 mb-1"
+              >
+                Avatar mouseover text
+              </label>
+              <input
+                id="settings-avatar-mouseover"
+                type="text"
+                {...register('avatarMouseoverText')}
+                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="settings-profile-title"
+                className="block text-sm text-gray-300 mb-1"
+              >
+                Profile title
+              </label>
+              <input
+                id="settings-profile-title"
+                type="text"
+                {...register('profileTitle')}
+                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="settings-profile-info"
+                className="block text-sm text-gray-300 mb-1"
+              >
+                Profile bio
+              </label>
+              <textarea
+                id="settings-profile-info"
+                rows={8}
+                {...register('profileInfo')}
+                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="settings-site-appearance"
+                className="block text-sm text-gray-300 mb-1"
+              >
+                Site appearance
+              </label>
+              <input
+                id="settings-site-appearance"
+                type="text"
+                {...register('siteAppearance')}
+                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label
                 htmlFor="settings-stylesheet"
                 className="block text-sm text-gray-300 mb-1"
               >
@@ -300,6 +368,7 @@ const Settings = () => {
               </label>
               <select
                 id="notificationMethod"
+                {...register('notificationMethod')}
                 className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 {NOTIFICATION_OPTIONS.map((opt) => (
@@ -309,8 +378,57 @@ const Settings = () => {
                 ))}
               </select>
               <p className="text-xs text-gray-600 mt-1">
-                Note: notification preferences are managed server-side.
+                Controls how account notifications are delivered.
               </p>
+            </div>
+
+            <div className="space-y-3">
+              <p className="block text-sm text-gray-300">Visible to others</p>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register('showEmail')}
+                  className="accent-indigo-500"
+                />
+                <span className="text-sm text-gray-300">Email address</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register('showLastSeen')}
+                  className="accent-indigo-500"
+                />
+                <span className="text-sm text-gray-300">Last seen time</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register('showUploadedStats')}
+                  className="accent-indigo-500"
+                />
+                <span className="text-sm text-gray-300">Uploaded stats</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register('showDownloadedStats')}
+                  className="accent-indigo-500"
+                />
+                <span className="text-sm text-gray-300">Downloaded stats</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...register('showRatioStats')}
+                  className="accent-indigo-500"
+                />
+                <span className="text-sm text-gray-300">Ratio and buffer</span>
+              </label>
             </div>
           </div>
 

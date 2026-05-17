@@ -26,8 +26,8 @@ const UserBrowsePage = () => {
     searchParams.get('disabled') === 'true'
       ? true
       : searchParams.get('disabled') === 'false'
-        ? false
-        : undefined;
+      ? false
+      : undefined;
   const page = Number(searchParams.get('page') ?? 1);
 
   const { data, isLoading, error } = useSearchUsersQuery({
@@ -125,8 +125,8 @@ const UserBrowsePage = () => {
                     disabled === true
                       ? 'true'
                       : disabled === false
-                        ? 'false'
-                        : ''
+                      ? 'false'
+                      : ''
                   }
                   className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
