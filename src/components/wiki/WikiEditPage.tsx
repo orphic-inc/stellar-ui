@@ -79,6 +79,9 @@ const WikiEditPage = () => {
     }
   };
 
+  // prettier-ignore
+  const backLabel = isNew ? 'Wiki' : (existing?.title ?? 'Back');
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="mb-4">
@@ -86,7 +89,7 @@ const WikiEditPage = () => {
           to={isNew ? '/private/wiki' : `/private/wiki/${pageId}`}
           className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
         >
-          ← {isNew ? 'Wiki' : existing?.title ?? 'Back'}
+          ← {backLabel}
         </Link>
         <h1 className="text-xl font-bold text-white mt-1">
           {isNew ? 'New Wiki Page' : `Edit: ${existing?.title}`}

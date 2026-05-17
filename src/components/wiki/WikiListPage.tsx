@@ -147,7 +147,8 @@ const WikiListPage = () => {
       {/* Active filter indicator */}
       {q && (
         <p className="text-sm text-gray-400">
-          Showing results for <span className="text-white">&ldquo;{q}&rdquo;</span>
+          Showing results for{' '}
+          <span className="text-white">&ldquo;{q}&rdquo;</span>{' '}
           {type !== 'all' && (
             <span className="ml-1 text-gray-500">
               in {type === 'title' ? 'titles' : 'body text'}

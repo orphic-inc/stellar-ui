@@ -35,6 +35,17 @@ const ALLOWED_WIKI_TAGS = [
   'h3'
 ];
 
+const DIFF_CLASS: Record<string, string> = {
+  deleted: 'bg-red-900/40 text-red-300',
+  added: 'bg-green-900/40 text-green-300',
+  unchanged: 'text-gray-400'
+};
+const DIFF_PREFIX: Record<string, string> = {
+  deleted: '−',
+  added: '+',
+  unchanged: ' '
+};
+
 // Compute a simple line-level diff to mirror Gazelle's compare.php output.
 function diffLines(
   oldText: string,
@@ -114,22 +125,9 @@ const CompareModal = ({
         {data && (
           <div className="p-5 font-mono text-xs overflow-x-auto">
             {lines.map((line, i) => (
-              <div
-                key={i}
-                className={
-                  line.type === 'deleted'
-                    ? 'bg-red-900/40 text-red-300'
-                    : line.type === 'added'
-                    ? 'bg-green-900/40 text-green-300'
-                    : 'text-gray-400'
-                }
-              >
+              <div key={i} className={DIFF_CLASS[line.type]}>
                 <span className="select-none mr-2">
-                  {line.type === 'deleted'
-                    ? '−'
-                    : line.type === 'added'
-                    ? '+'
-                    : ' '}
+                  {DIFF_PREFIX[line.type]}
                 </span>
                 {line.text || ' '}
               </div>
