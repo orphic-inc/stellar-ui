@@ -1,4 +1,4 @@
-import { useSearchParams, Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useSearchLogQuery } from '../../store/services/searchApi';
 import type {
   LogSearchResponse,
@@ -14,11 +14,11 @@ const labelCls = 'block text-xs font-medium text-gray-400 mb-1';
 const checkboxCls =
   'rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800';
 
-function isSingleList(d: LogSearchResponse): d is {
-  data: (TopicSearchResult | PostSearchResult)[];
-  meta: PaginatedMeta;
+function hasSplitLists(d: LogSearchResponse): d is {
+  topics: { data: TopicSearchResult[]; meta: PaginatedMeta };
+  posts: { data: PostSearchResult[]; meta: PaginatedMeta };
 } {
-  return 'data' in d;
+  return 'topics' in d;
 }
 
 const LogBrowsePage = () => {
@@ -134,6 +134,29 @@ const LogBrowsePage = () => {
     </div>
   );
 
+  const renderResults = (results: LogSearchResponse) => {
+    if (hasSplitLists(results)) {
+      return (
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-300 mb-3">Topics</h2>
+            {renderTopics(results.topics.data, results.topics.meta)}
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-gray-300 mb-3">Posts</h2>
+            {renderPosts(results.posts.data, results.posts.meta)}
+          </div>
+        </div>
+      );
+    }
+
+    if (type === 'topic') {
+      return renderTopics(results.data as TopicSearchResult[], results.meta);
+    }
+
+    return renderPosts(results.data as PostSearchResult[], results.meta);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
       <h1 className="text-2xl font-bold text-white">Forum Log</h1>
@@ -207,29 +230,7 @@ const LogBrowsePage = () => {
 
       {isLoading && <Spinner />}
       {error && <p className="text-red-400 text-sm">Failed to load results.</p>}
-      {data &&
-        (isSingleList(data) ? (
-          type === 'topic' ? (
-            renderTopics(data.data as TopicSearchResult[], data.meta)
-          ) : (
-            renderPosts(data.data as PostSearchResult[], data.meta)
-          )
-        ) : (
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-sm font-semibold text-gray-300 mb-3">
-                Topics
-              </h2>
-              {renderTopics(data.topics.data, data.topics.meta)}
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-gray-300 mb-3">
-                Posts
-              </h2>
-              {renderPosts(data.posts.data, data.posts.meta)}
-            </div>
-          </div>
-        ))}
+      {data && renderResults(data)}
     </div>
   );
 };
