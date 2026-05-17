@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   useGetNotificationsQuery,
+  useGetUnreadNotificationCountQuery,
+  useMarkNotificationReadMutation,
+  useMarkAllNotificationsReadMutation,
   useDeleteNotificationMutation,
   type Notification
 } from '../../store/services/notificationApi';
@@ -30,12 +33,15 @@ const NotificationCorner = () => {
   const panelRef = useRef<HTMLDivElement>(null);
 
   const { data: notifications } = useGetNotificationsQuery();
+  const { data: unreadNotifData } = useGetUnreadNotificationCountQuery();
+  const [markRead] = useMarkNotificationReadMutation();
+  const [markAllRead] = useMarkAllNotificationsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
   const { data: pmData } = useGetUnreadCountQuery();
 
   const pmCount = pmData?.count ?? 0;
-  const notifCount = notifications?.length ?? 0;
-  const totalCount = pmCount + notifCount;
+  const unreadNotifCount = unreadNotifData?.count ?? 0;
+  const totalCount = pmCount + unreadNotifCount;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -49,6 +55,8 @@ const NotificationCorner = () => {
 
   if (totalCount === 0) return null;
 
+  const notifCount = notifications?.length ?? 0;
+
   return (
     <div
       ref={panelRef}
@@ -60,12 +68,22 @@ const NotificationCorner = () => {
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-300">
               Notifications
             </span>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-gray-500 hover:text-gray-300 transition-colors text-xs"
-            >
-              ✕
-            </button>
+            <div className="flex items-center gap-2">
+              {unreadNotifCount > 0 && (
+                <button
+                  onClick={() => markAllRead()}
+                  className="text-xs text-gray-400 hover:text-indigo-300 transition-colors"
+                >
+                  Mark all read
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-500 hover:text-gray-300 transition-colors text-xs"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {pmCount > 0 && (
@@ -89,34 +107,51 @@ const NotificationCorner = () => {
             </p>
           ) : notifCount > 0 ? (
             <ul className="max-h-64 overflow-y-auto divide-y divide-gray-700/50">
-              {notifications!.map((n) => (
-                <li
-                  key={n.id}
-                  className="flex items-start gap-2 px-3 py-2 hover:bg-gray-700/40 transition-colors"
-                >
-                  <span className="flex-1 text-sm text-gray-200 leading-snug">
-                    {n.quoter.username} quoted you in{' '}
-                    {n.source && sourcePath(n) ? (
-                      <Link
-                        to={sourcePath(n)!}
-                        onClick={() => setOpen(false)}
-                        className="text-indigo-400 hover:text-indigo-300 underline"
-                      >
-                        {n.source.title}
-                      </Link>
-                    ) : (
-                      `${n.page} #${n.pageId}`
-                    )}
-                  </span>
-                  <button
-                    onClick={() => deleteNotification(n.id)}
-                    className="text-gray-500 hover:text-red-400 transition-colors text-xs shrink-0 mt-0.5"
-                    aria-label="Dismiss"
+              {notifications!.map((n) => {
+                const isUnread = !n.readAt;
+                return (
+                  <li
+                    key={n.id}
+                    className={`flex items-start gap-2 px-3 py-2 transition-colors ${
+                      isUnread
+                        ? 'bg-indigo-950/30 hover:bg-indigo-950/50'
+                        : 'hover:bg-gray-700/40'
+                    }`}
                   >
-                    ✕
-                  </button>
-                </li>
-              ))}
+                    {isUnread && (
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                    )}
+                    <span
+                      className={`flex-1 text-sm leading-snug ${
+                        isUnread ? 'text-white' : 'text-gray-400'
+                      }`}
+                    >
+                      {n.quoter.username} quoted you in{' '}
+                      {n.source && sourcePath(n) ? (
+                        <Link
+                          to={sourcePath(n)!}
+                          onClick={() => {
+                            if (isUnread) markRead(n.id);
+                            setOpen(false);
+                          }}
+                          className="text-indigo-400 hover:text-indigo-300 underline"
+                        >
+                          {n.source.title}
+                        </Link>
+                      ) : (
+                        `${n.page} #${n.pageId}`
+                      )}
+                    </span>
+                    <button
+                      onClick={() => deleteNotification(n.id)}
+                      className="text-gray-500 hover:text-red-400 transition-colors text-xs shrink-0 mt-0.5"
+                      aria-label="Dismiss"
+                    >
+                      ✕
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           ) : null}
         </div>

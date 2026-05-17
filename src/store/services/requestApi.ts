@@ -25,6 +25,15 @@ export interface CreateRequestPayload {
   artists?: number[];
 }
 
+export interface UpdateRequestPayload {
+  id: number;
+  title?: string;
+  description?: string;
+  type?: ReleaseType;
+  year?: number | null;
+  image?: string;
+}
+
 export interface ListRequestsQuery {
   page?: number;
   communityId?: number;
@@ -65,6 +74,18 @@ export const requestApi = api.injectEndpoints({
         body
       }),
       invalidatesTags: [{ type: 'Request', id: 'LIST' }]
+    }),
+
+    updateRequest: builder.mutation<RequestItem, UpdateRequestPayload>({
+      query: ({ id, ...body }) => ({
+        url: `/requests/${id}`,
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'Request', id },
+        { type: 'Request', id: 'LIST' }
+      ]
     }),
 
     addBounty: builder.mutation<
@@ -147,6 +168,7 @@ export const {
   useListRequestsQuery,
   useGetRequestQuery,
   useCreateRequestMutation,
+  useUpdateRequestMutation,
   useAddBountyMutation,
   useFillRequestMutation,
   useUnfillRequestMutation,
