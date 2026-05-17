@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   useGetReportsQuery,
@@ -297,8 +297,8 @@ const ReportsQueuePage = () => {
               </thead>
               <tbody>
                 {reports.map((report) => (
-                  <>
-                    <tr key={report.id} className="border-b border-gray-800">
+                  <Fragment key={report.id}>
+                    <tr className="border-b border-gray-800">
                       <td className="py-2 pr-3 text-gray-400">
                         {report.targetType}
                       </td>
@@ -360,10 +360,7 @@ const ReportsQueuePage = () => {
                       </td>
                     </tr>
                     {expandedNotes.has(report.id) && (
-                      <tr
-                        key={`${report.id}-notes`}
-                        className="border-b border-gray-800 bg-gray-900/50"
-                      >
+                      <tr className="border-b border-gray-800 bg-gray-900/50">
                         <td colSpan={8} className="px-4 py-3">
                           <div className="space-y-2">
                             {report.notes.map((note) => (
@@ -382,7 +379,7 @@ const ReportsQueuePage = () => {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
