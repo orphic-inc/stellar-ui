@@ -1,0 +1,116 @@
+import React from 'react';
+import { screen } from '@testing-library/react';
+import { renderWithProviders } from '../testUtils';
+import Toolbox from '../../components/admin/Toolbox';
+
+const mockUseAppSelector = jest.fn();
+
+jest.mock('../../store/hooks', () => ({
+  useAppSelector: (...args: unknown[]) => mockUseAppSelector(...args)
+}));
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  Link: ({
+    to,
+    children
+  }: {
+    to: string;
+    children: React.ReactNode;
+  }) => <a href={to}>{children}</a>
+}));
+
+const adminUser = {
+  id: 1,
+  username: 'admin',
+  avatar: null,
+  userRank: {
+    level: 1000,
+    name: 'SysOp',
+    color: '#fff',
+    permissions: {
+      admin: true,
+      staff: true,
+      news_manage: true,
+      communities_manage: true,
+      forums_manage: true,
+      users_edit: true
+    }
+  }
+};
+
+const staffUser = {
+  id: 2,
+  username: 'staffmember',
+  avatar: null,
+  userRank: {
+    level: 500,
+    name: 'Staff',
+    color: '#fff',
+    permissions: { staff: true }
+  }
+};
+
+const unprivilegedUser = {
+  id: 3,
+  username: 'nobody',
+  avatar: null,
+  userRank: { level: 100, name: 'User', color: '#fff', permissions: {} }
+};
+
+describe('Toolbox', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('shows admin-only links for admin user', () => {
+    mockUseAppSelector.mockReturnValue(adminUser);
+    renderWithProviders(<Toolbox />);
+    expect(screen.getByRole('link', { name: /user ranks/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /site settings/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /donor ranks/i })).toBeInTheDocument();
+  });
+
+  it('shows staff-accessible links for staff user', () => {
+    mockUseAppSelector.mockReturnValue(staffUser);
+    renderWithProviders(<Toolbox />);
+    expect(screen.getByRole('link', { name: /ticket queue/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /reports queue/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /mass pm/i })).toBeInTheDocument();
+  });
+
+  it('shows only news link for user with news_manage permission only', () => {
+    mockUseAppSelector.mockReturnValue({
+      id: 4,
+      username: 'newseditor',
+      avatar: null,
+      userRank: {
+        level: 200,
+        name: 'Power User',
+        color: '#fff',
+        permissions: { news_manage: true }
+      }
+    });
+    renderWithProviders(<Toolbox />);
+    expect(screen.getByRole('link', { name: /news post/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /user ranks/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /ticket queue/i })).not.toBeInTheDocument();
+  });
+
+  it('shows no-tools message for user without any staff permissions', () => {
+    mockUseAppSelector.mockReturnValue(unprivilegedUser);
+    renderWithProviders(<Toolbox />);
+    expect(
+      screen.getByText(/does not currently have any staff tools/i)
+    ).toBeInTheDocument();
+  });
+
+  it('links to correct URLs', () => {
+    mockUseAppSelector.mockReturnValue(adminUser);
+    renderWithProviders(<Toolbox />);
+    expect(screen.getByRole('link', { name: /user ranks/i })).toHaveAttribute(
+      'href',
+      '/private/staff/tools/user-ranks'
+    );
+  });
+});
