@@ -230,8 +230,10 @@ const PrivateHomepage = () => {
                       {vanityHouse.artist?.name ?? 'Unknown artist'}
                     </div>
                     <div className="text-xs text-gray-500 truncate">
-                      {vanityHouse.title}
-                      {vanityHouse.year ? ` • ${vanityHouse.year}` : ''}
+                      <span>{vanityHouse.title}</span>
+                      {vanityHouse.year ? (
+                        <span> • {vanityHouse.year}</span>
+                      ) : null}
                     </div>
                   </div>
                 </div>
