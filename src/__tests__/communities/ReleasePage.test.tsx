@@ -53,17 +53,29 @@ jest.mock('react-router-dom', () => ({
   )
 }));
 
-jest.mock('../../components/layout/CommentsSection', () => () => (
-  <div data-testid="comments-section" />
-));
+jest.mock(
+  '../../components/layout/CommentsSection',
+  () =>
+    function CommentsSection() {
+      return <div data-testid="comments-section" />;
+    }
+);
 
-jest.mock('../../components/communities/DownloadButton', () => () => (
-  <button>Download</button>
-));
+jest.mock(
+  '../../components/communities/DownloadButton',
+  () =>
+    function DownloadButton() {
+      return <button>Download</button>;
+    }
+);
 
-jest.mock('../../components/communities/LinkStatusBadge', () => () => (
-  <span>OK</span>
-));
+jest.mock(
+  '../../components/communities/LinkStatusBadge',
+  () =>
+    function LinkStatusBadge() {
+      return <span>OK</span>;
+    }
+);
 
 jest.mock('../../components/communities/ReportContributionModal', () => ({
   __esModule: true,

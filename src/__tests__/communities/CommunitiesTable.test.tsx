@@ -16,6 +16,7 @@ const mockCommunities = [
     name: 'Jazz Archive',
     description: 'A collection of jazz recordings',
     type: 'Music',
+    allowDuplicateFormats: false,
     _count: { releases: 120, contributors: 15, consumers: 80 }
   },
   {
@@ -23,6 +24,7 @@ const mockCommunities = [
     name: 'Film Noir',
     description: null,
     type: null,
+    allowDuplicateFormats: false,
     _count: { releases: 45, contributors: 8, consumers: 30 }
   }
 ];

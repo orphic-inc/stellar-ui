@@ -1,10 +1,9 @@
 import React from 'react';
 import { screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../testUtils';
+import { renderWithProviders, createTestStore } from '../testUtils';
 import Alert from '../../components/layout/Alert';
 import { addAlert } from '../../store/slices/alertSlice';
-import { createTestStore } from '../testUtils';
 
 describe('Alert', () => {
   it('renders nothing when there are no alerts', () => {

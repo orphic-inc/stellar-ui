@@ -36,9 +36,13 @@ jest.mock('../../store/services/forumApi', () => ({
 
 const mockPost = {
   id: 7,
+  forumTopicId: 5,
+  authorId: 10,
   author: { id: 10, username: 'alice', avatar: null },
   body: 'Hello forum world',
-  createdAt: '2024-03-01T00:00:00Z'
+  edits: [],
+  createdAt: '2024-03-01T00:00:00Z',
+  updatedAt: '2024-03-01T00:00:00Z'
 };
 
 describe('ForumTopicPost', () => {
