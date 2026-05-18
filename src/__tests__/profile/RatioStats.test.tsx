@@ -31,7 +31,10 @@ let mockStatsData: typeof baseStats | null = baseStats;
 let mockIsLoading = false;
 
 jest.mock('../../store/services/profileApi', () => ({
-  useGetMyRatioStatsQuery: () => ({ data: mockStatsData, isLoading: mockIsLoading })
+  useGetMyRatioStatsQuery: () => ({
+    data: mockStatsData,
+    isLoading: mockIsLoading
+  })
 }));
 
 describe('RatioStats', () => {
@@ -91,6 +94,8 @@ describe('RatioStats', () => {
 
   it('shows ratio rules link', () => {
     renderWithProviders(<RatioStats />);
-    expect(screen.getByRole('link', { name: /ratio rules/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /ratio rules/i })
+    ).toBeInTheDocument();
   });
 });

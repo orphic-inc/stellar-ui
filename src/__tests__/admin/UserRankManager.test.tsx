@@ -42,9 +42,7 @@ describe('UserRankManager', () => {
       error: { status: 500 }
     });
     renderWithProviders(<UserRankManager />);
-    expect(
-      screen.getByText(/failed to load user ranks/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/failed to load user ranks/i)).toBeInTheDocument();
   });
 
   it('shows empty state when no ranks defined', () => {
@@ -54,9 +52,7 @@ describe('UserRankManager', () => {
       error: undefined
     });
     renderWithProviders(<UserRankManager />);
-    expect(
-      screen.getByText(/no user ranks defined yet/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no user ranks defined yet/i)).toBeInTheDocument();
   });
 
   it('renders rank list with name, level, user count, and actions', () => {

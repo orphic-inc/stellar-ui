@@ -10,8 +10,7 @@ const mockSetSearchParams = jest.fn();
 const mockUseSearchParams = jest.fn();
 
 jest.mock('../../store/services/searchApi', () => ({
-  useSearchUsersQuery: (...args: unknown[]) =>
-    mockUseSearchUsersQuery(...args)
+  useSearchUsersQuery: (...args: unknown[]) => mockUseSearchUsersQuery(...args)
 }));
 
 jest.mock('../../store/services/authApi', () => ({
@@ -161,7 +160,9 @@ describe('UserBrowsePage', () => {
     renderWithProviders(<UserBrowsePage />);
     await user.type(screen.getByPlaceholderText(/search users/i), 'alice');
     await user.click(screen.getByRole('button', { name: /^search$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('q')).toBe('alice');
   });
 });

@@ -55,12 +55,10 @@ describe('SiteSettingsPage', () => {
       name: /registration/i
     }) as HTMLSelectElement;
     expect(select.value).toBe('open');
-    expect(
-      (screen.getByRole('spinbutton') as HTMLInputElement).value
-    ).toBe('7000');
-    expect(screen.getByRole('textbox')).toHaveValue(
-      'gmail.com\nproton.me'
+    expect((screen.getByRole('spinbutton') as HTMLInputElement).value).toBe(
+      '7000'
     );
+    expect(screen.getByRole('textbox')).toHaveValue('gmail.com\nproton.me');
   });
 
   it('calls updateSettings on submit', async () => {

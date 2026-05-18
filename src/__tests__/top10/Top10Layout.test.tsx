@@ -53,9 +53,7 @@ describe('Top10Layout', () => {
       data: { id: 2, userRank: { permissions: { staff: true } } }
     });
     renderWithProviders(<Top10Layout />);
-    expect(
-      screen.getByRole('link', { name: 'History' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'History' })).toBeInTheDocument();
   });
 
   it('shows History tab for admin users', () => {
@@ -63,9 +61,7 @@ describe('Top10Layout', () => {
       data: { id: 3, userRank: { permissions: { admin: true } } }
     });
     renderWithProviders(<Top10Layout />);
-    expect(
-      screen.getByRole('link', { name: 'History' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'History' })).toBeInTheDocument();
   });
 
   it('renders the outlet for child routes', () => {

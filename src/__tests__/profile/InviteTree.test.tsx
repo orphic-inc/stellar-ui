@@ -28,7 +28,9 @@ const mockInviteTree = [
 ];
 
 let mockUser: { id: number } | null = { id: 42 };
-let mockProfile: { inviteTree: typeof mockInviteTree } | undefined = { inviteTree: mockInviteTree };
+let mockProfile: { inviteTree: typeof mockInviteTree } | undefined = {
+  inviteTree: mockInviteTree
+};
 let mockIsLoading = false;
 
 jest.mock('react-redux', () => ({

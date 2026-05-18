@@ -139,7 +139,9 @@ describe('ReleaseBrowsePage', () => {
     const searchInput = screen.getByRole('textbox', { name: /search/i });
     await user.type(searchInput, 'Kind of Blue');
     await user.click(screen.getByRole('button', { name: /^search$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('q')).toBe('Kind of Blue');
   });
 

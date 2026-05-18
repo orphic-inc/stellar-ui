@@ -22,7 +22,9 @@ const mockNavigate = jest.fn();
 const mockAddContribution = jest.fn();
 const mockDispatch = jest.fn();
 
-let mockRelease: { id: number; title: string; artist?: { name: string } } | undefined = {
+let mockRelease:
+  | { id: number; title: string; artist?: { name: string } }
+  | undefined = {
   id: 7,
   title: 'Kind of Blue',
   artist: { name: 'Miles Davis' }
@@ -30,8 +32,14 @@ let mockRelease: { id: number; title: string; artist?: { name: string } } | unde
 let mockReleaseLoading = false;
 
 jest.mock('../../store/services/communityApi', () => ({
-  useGetReleaseByIdQuery: () => ({ data: mockRelease, isLoading: mockReleaseLoading }),
-  useAddContributionToReleaseMutation: () => [mockAddContribution, { isLoading: false }]
+  useGetReleaseByIdQuery: () => ({
+    data: mockRelease,
+    isLoading: mockReleaseLoading
+  }),
+  useAddContributionToReleaseMutation: () => [
+    mockAddContribution,
+    { isLoading: false }
+  ]
 }));
 
 jest.mock('react-redux', () => ({
@@ -42,7 +50,11 @@ jest.mock('react-redux', () => ({
 describe('AddContributionForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRelease = { id: 7, title: 'Kind of Blue', artist: { name: 'Miles Davis' } };
+    mockRelease = {
+      id: 7,
+      title: 'Kind of Blue',
+      artist: { name: 'Miles Davis' }
+    };
     mockReleaseLoading = false;
     mockAddContribution.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
@@ -62,7 +74,9 @@ describe('AddContributionForm', () => {
 
   it('renders release title in breadcrumb link', () => {
     renderWithProviders(<AddContributionForm />);
-    expect(screen.getByRole('link', { name: 'Kind of Blue' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Kind of Blue' })
+    ).toBeInTheDocument();
   });
 
   it('renders file type select, download URL, file size, and notes fields', () => {

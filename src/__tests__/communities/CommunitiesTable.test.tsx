@@ -44,7 +44,9 @@ describe('CommunitiesTable', () => {
 
   it('shows description when present', () => {
     renderWithProviders(<CommunitiesTable communities={mockCommunities} />);
-    expect(screen.getByText('A collection of jazz recordings')).toBeInTheDocument();
+    expect(
+      screen.getByText('A collection of jazz recordings')
+    ).toBeInTheDocument();
   });
 
   it('shows type or dash when null', () => {

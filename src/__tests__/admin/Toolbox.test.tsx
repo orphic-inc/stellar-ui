@@ -11,13 +11,9 @@ jest.mock('../../store/hooks', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const adminUser = {
@@ -66,16 +62,26 @@ describe('Toolbox', () => {
   it('shows admin-only links for admin user', () => {
     mockUseAppSelector.mockReturnValue(adminUser);
     renderWithProviders(<Toolbox />);
-    expect(screen.getByRole('link', { name: /user ranks/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /site settings/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /donor ranks/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /user ranks/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /site settings/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /donor ranks/i })
+    ).toBeInTheDocument();
   });
 
   it('shows staff-accessible links for staff user', () => {
     mockUseAppSelector.mockReturnValue(staffUser);
     renderWithProviders(<Toolbox />);
-    expect(screen.getByRole('link', { name: /ticket queue/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /reports queue/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /ticket queue/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /reports queue/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /mass pm/i })).toBeInTheDocument();
   });
 
@@ -92,9 +98,15 @@ describe('Toolbox', () => {
       }
     });
     renderWithProviders(<Toolbox />);
-    expect(screen.getByRole('link', { name: /news post/i })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /user ranks/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /ticket queue/i })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /news post/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /user ranks/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /ticket queue/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows no-tools message for user without any staff permissions', () => {

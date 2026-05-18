@@ -89,18 +89,19 @@ describe('ArtistBrowsePage', () => {
   it('renders artist list with name, tags, and release count', () => {
     mockUseSearchArtistsQuery.mockReturnValue({
       data: {
-        data: [
-          makeArtist(1, 'Miles Davis'),
-          makeArtist(2, 'John Coltrane')
-        ],
+        data: [makeArtist(1, 'Miles Davis'), makeArtist(2, 'John Coltrane')],
         meta: { total: 2, totalPages: 1 }
       },
       isLoading: false,
       error: undefined
     });
     renderWithProviders(<ArtistBrowsePage />);
-    expect(screen.getByRole('link', { name: 'Miles Davis' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'John Coltrane' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Miles Davis' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'John Coltrane' })
+    ).toBeInTheDocument();
     expect(screen.getAllByText('jazz').length).toBeGreaterThan(0);
   });
 
@@ -127,7 +128,9 @@ describe('ArtistBrowsePage', () => {
     renderWithProviders(<ArtistBrowsePage />);
     await user.type(screen.getByPlaceholderText(/search artists/i), 'Coltrane');
     await user.click(screen.getByRole('button', { name: /^search$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('q')).toBe('Coltrane');
   });
 
@@ -140,7 +143,9 @@ describe('ArtistBrowsePage', () => {
     });
     renderWithProviders(<ArtistBrowsePage />);
     await user.click(screen.getByRole('button', { name: /reset/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.toString()).toBe('');
   });
 
@@ -151,9 +156,7 @@ describe('ArtistBrowsePage', () => {
       error: undefined
     });
     renderWithProviders(<ArtistBrowsePage />);
-    expect(
-      screen.queryByText(/advanced options/i)
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/advanced options/i)).not.toBeInTheDocument();
   });
 
   it('shows advanced options toggle for users with advanced_search permission', async () => {

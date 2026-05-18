@@ -19,7 +19,9 @@ jest.mock('react-redux', () => ({
 describe('PostBox', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreatePost.mockReturnValue({ unwrap: () => Promise.resolve({ id: 1 }) });
+    mockCreatePost.mockReturnValue({
+      unwrap: () => Promise.resolve({ id: 1 })
+    });
   });
 
   it('renders Post Reply button and body textarea', () => {

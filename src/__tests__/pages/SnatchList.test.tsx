@@ -35,7 +35,11 @@ let mockIsLoading = false;
 let mockError: unknown = undefined;
 
 jest.mock('../../store/services/userApi', () => ({
-  useGetSnatchListQuery: () => ({ data: mockData, isLoading: mockIsLoading, error: mockError })
+  useGetSnatchListQuery: () => ({
+    data: mockData,
+    isLoading: mockIsLoading,
+    error: mockError
+  })
 }));
 
 describe('SnatchList', () => {
@@ -62,7 +66,9 @@ describe('SnatchList', () => {
   it('shows empty state when no items', () => {
     mockData = [];
     renderWithProviders(<SnatchList />);
-    expect(screen.getByText(/have not downloaded any releases yet/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/have not downloaded any releases yet/i)
+    ).toBeInTheDocument();
   });
 
   it('renders release titles in list', () => {
@@ -79,7 +85,9 @@ describe('SnatchList', () => {
 
   it('renders release without community as plain text (no link)', () => {
     renderWithProviders(<SnatchList />);
-    expect(screen.queryByRole('link', { name: 'Orphan Release' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Orphan Release' })
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Orphan Release')).toBeInTheDocument();
   });
 

@@ -65,7 +65,9 @@ describe('BookmarksPage', () => {
   it('shows all four tabs', () => {
     renderWithProviders(<BookmarksPage />);
     expect(screen.getByRole('button', { name: 'Artists' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Releases' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Releases' })
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Communities' })
     ).toBeInTheDocument();

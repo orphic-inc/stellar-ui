@@ -7,8 +7,7 @@ import TopVotesPage from '../../components/top10/TopVotesPage';
 const mockUseGetTopVotesQuery = jest.fn();
 
 jest.mock('../../store/services/top10Api', () => ({
-  useGetTopVotesQuery: (...args: unknown[]) =>
-    mockUseGetTopVotesQuery(...args)
+  useGetTopVotesQuery: (...args: unknown[]) => mockUseGetTopVotesQuery(...args)
 }));
 
 const makeVoteItem = (id: number) => ({
@@ -44,9 +43,7 @@ describe('TopVotesPage', () => {
       error: { status: 500 }
     });
     renderWithProviders(<TopVotesPage />);
-    expect(
-      screen.getByText(/failed to load top votes/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/failed to load top votes/i)).toBeInTheDocument();
   });
 
   it('shows empty state when no voted releases', () => {
@@ -56,9 +53,7 @@ describe('TopVotesPage', () => {
       error: undefined
     });
     renderWithProviders(<TopVotesPage />);
-    expect(
-      screen.getByText(/no voted releases found/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no voted releases found/i)).toBeInTheDocument();
   });
 
   it('renders release rows with up/down/total/score', () => {

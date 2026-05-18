@@ -20,8 +20,7 @@ jest.mock('../../store/services/profileApi', () => ({
 jest.mock('../../store/services/authApi', () => ({
   useChangePasswordMutation: () => mockUseChangePasswordMutation(),
   useChangeEmailMutation: () => mockUseChangeEmailMutation(),
-  useGetSessionsQuery: (...args: unknown[]) =>
-    mockUseGetSessionsQuery(...args),
+  useGetSessionsQuery: (...args: unknown[]) => mockUseGetSessionsQuery(...args),
   useRevokeSessionMutation: () => mockUseRevokeSessionMutation()
 }));
 
@@ -123,7 +122,9 @@ describe('Settings', () => {
   });
 
   it('dispatches success on profile save', async () => {
-    const updateFn = jest.fn().mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    const updateFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockUseUpdateMyProfileMutation.mockReturnValue([
       updateFn,
       { isLoading: false }
@@ -167,7 +168,10 @@ describe('Settings', () => {
     await user.click(screen.getByRole('button', { name: /security/i }));
     await user.type(screen.getByLabelText('Current password'), 'oldpass');
     await user.type(screen.getByLabelText('New password'), 'samepass1');
-    await user.type(screen.getByLabelText(/confirm new password/i), 'samepass1');
+    await user.type(
+      screen.getByLabelText(/confirm new password/i),
+      'samepass1'
+    );
     await user.click(screen.getByRole('button', { name: /change password/i }));
     expect(changePwFn).toHaveBeenCalledWith({
       currentPassword: 'oldpass',
@@ -208,8 +212,6 @@ describe('Settings', () => {
     const user = userEvent.setup();
     renderWithProviders(<Settings />);
     await user.click(screen.getByRole('button', { name: /security/i }));
-    expect(
-      screen.getByText(/no active sessions found/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no active sessions found/i)).toBeInTheDocument();
   });
 });

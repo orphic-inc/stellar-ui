@@ -48,13 +48,9 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ communityId: '1', releaseId: '5' }),
   useNavigate: () => mockNavigate,
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 jest.mock('../../components/layout/CommentsSection', () => () => (
@@ -105,7 +101,9 @@ const makeRelease = (overrides: Record<string, unknown> = {}) => ({
 describe('ReleasePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetCommunityByIdQuery.mockReturnValue({ data: { id: 1, name: 'Jazz Community' } });
+    mockGetCommunityByIdQuery.mockReturnValue({
+      data: { id: 1, name: 'Jazz Community' }
+    });
     mockVoteOn.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveVote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockToggleBookmark.mockReturnValue({
@@ -155,7 +153,9 @@ describe('ReleasePage', () => {
     });
     renderWithProviders(<ReleasePage />);
     expect(screen.getByText('FLAC')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'contributor1' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'contributor1' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Lossless rip')).toBeInTheDocument();
   });
 
@@ -223,7 +223,10 @@ describe('ReleasePage', () => {
     });
     renderWithProviders(<ReleasePage />);
     await user.click(screen.getByRole('button', { name: /▲/ }));
-    expect(mockRemoveVote).toHaveBeenCalledWith({ communityId: 1, releaseId: 5 });
+    expect(mockRemoveVote).toHaveBeenCalledWith({
+      communityId: 1,
+      releaseId: 5
+    });
     expect(mockVoteOn).not.toHaveBeenCalled();
   });
 
@@ -242,7 +245,12 @@ describe('ReleasePage', () => {
 
   it('shows existing tags', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ tags: [{ id: 1, name: 'jazz' }, { id: 2, name: 'modal' }] }),
+      data: makeRelease({
+        tags: [
+          { id: 1, name: 'jazz' },
+          { id: 2, name: 'modal' }
+        ]
+      }),
       isLoading: false,
       error: undefined
     });

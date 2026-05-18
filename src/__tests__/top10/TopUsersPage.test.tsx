@@ -7,8 +7,7 @@ import TopUsersPage from '../../components/top10/TopUsersPage';
 const mockUseGetTopUsersQuery = jest.fn();
 
 jest.mock('../../store/services/top10Api', () => ({
-  useGetTopUsersQuery: (...args: unknown[]) =>
-    mockUseGetTopUsersQuery(...args)
+  useGetTopUsersQuery: (...args: unknown[]) => mockUseGetTopUsersQuery(...args)
 }));
 
 const makeItem = (id: number) => ({
@@ -45,9 +44,7 @@ describe('TopUsersPage', () => {
       error: { status: 500 }
     });
     renderWithProviders(<TopUsersPage />);
-    expect(
-      screen.getByText(/failed to load top users/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/failed to load top users/i)).toBeInTheDocument();
   });
 
   it('shows empty state when no items', () => {
@@ -67,12 +64,8 @@ describe('TopUsersPage', () => {
       error: undefined
     });
     renderWithProviders(<TopUsersPage />);
-    expect(
-      screen.getByRole('link', { name: 'user1' })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'user2' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'user1' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'user2' })).toBeInTheDocument();
     expect(screen.getAllByText('2.00').length).toBeGreaterThan(0);
   });
 

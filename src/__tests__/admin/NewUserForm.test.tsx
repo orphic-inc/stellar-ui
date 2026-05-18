@@ -14,13 +14,9 @@ jest.mock('../../store/services/userApi', () => ({
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 describe('NewUserForm', () => {
@@ -46,7 +42,9 @@ describe('NewUserForm', () => {
   });
 
   it('submits form data and navigates on success', async () => {
-    mockCreateUser.mockReturnValue({ unwrap: () => Promise.resolve({ id: 5 }) });
+    mockCreateUser.mockReturnValue({
+      unwrap: () => Promise.resolve({ id: 5 })
+    });
     const user = userEvent.setup();
     renderWithProviders(<NewUserForm />);
     await user.type(screen.getByLabelText(/username/i), 'newuser');
@@ -65,8 +63,7 @@ describe('NewUserForm', () => {
 
   it('shows inline error message on failure', async () => {
     mockCreateUser.mockReturnValue({
-      unwrap: () =>
-        Promise.reject({ data: { msg: 'Username already taken.' } })
+      unwrap: () => Promise.reject({ data: { msg: 'Username already taken.' } })
     });
     const user = userEvent.setup();
     renderWithProviders(<NewUserForm />);

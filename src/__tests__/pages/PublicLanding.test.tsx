@@ -33,20 +33,26 @@ describe('PublicLanding', () => {
 
   it('renders Stellar heading and Sign In link', () => {
     renderWithProviders(<PublicLanding />);
-    expect(screen.getByRole('heading', { name: /stellar/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /stellar/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
   });
 
   it('shows Request Access link when registration is open', () => {
     mockInstallStatus = { registrationStatus: 'open' };
     renderWithProviders(<PublicLanding />);
-    expect(screen.getByRole('link', { name: /request access/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /request access/i })
+    ).toBeInTheDocument();
   });
 
   it('hides Request Access when registration is not open', () => {
     mockInstallStatus = { registrationStatus: 'invite' };
     renderWithProviders(<PublicLanding />);
-    expect(screen.queryByRole('link', { name: /request access/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /request access/i })
+    ).not.toBeInTheDocument();
   });
 
   it('navigates to /private when user is logged in', () => {

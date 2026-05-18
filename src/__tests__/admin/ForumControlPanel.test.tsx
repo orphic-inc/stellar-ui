@@ -16,13 +16,9 @@ jest.mock('../../store/services/forumApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const categories = [
@@ -104,14 +100,9 @@ describe('ForumControlPanel', () => {
   it('calls createForum with correct payload on submit', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ForumControlPanel />);
-    await user.selectOptions(
-      screen.getByLabelText(/^category/i),
-      'General'
-    );
+    await user.selectOptions(screen.getByLabelText(/^category/i), 'General');
     await user.type(screen.getByLabelText(/^name/i), 'Intro Forum');
-    await user.click(
-      screen.getByRole('button', { name: /create forum/i })
-    );
+    await user.click(screen.getByRole('button', { name: /create forum/i }));
     await waitFor(() => {
       expect(mockCreateForum).toHaveBeenCalledWith(
         expect.objectContaining({

@@ -76,7 +76,9 @@ describe('CannedResponsesPage', () => {
     });
     renderWithProviders(<CannedResponsesPage />);
     await user.click(screen.getByRole('button', { name: /new response/i }));
-    expect(screen.getByRole('button', { name: /^create$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^create$/i })
+    ).toBeInTheDocument();
   });
 
   it('creates a new canned response on submit', async () => {
@@ -107,9 +109,9 @@ describe('CannedResponsesPage', () => {
     });
     renderWithProviders(<CannedResponsesPage />);
     await user.click(screen.getByRole('button', { name: /edit/i }));
-    expect(
-      (screen.getByLabelText(/^name$/i) as HTMLInputElement).value
-    ).toBe('Response 5');
+    expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe(
+      'Response 5'
+    );
   });
 
   it('calls deleteResponse after confirm', async () => {

@@ -71,9 +71,9 @@ describe('ContributionsPage', () => {
     expect(screen.getAllByText('Kind of Blue').length).toBeGreaterThan(0);
     expect(screen.getAllByText('FLAC').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Miles Davis').length).toBeGreaterThan(0);
-    expect(
-      screen.getAllByText('High quality lossless').length
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText('High quality lossless').length).toBeGreaterThan(
+      0
+    );
     expect(screen.getByRole('link', { name: '+ Upload' })).toBeInTheDocument();
   });
 
@@ -84,9 +84,7 @@ describe('ContributionsPage', () => {
       error: undefined
     });
     renderWithProviders(<ContributionsPage />);
-    expect(
-      screen.getByRole('link', { name: /download/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /download/i })).toBeInTheDocument();
   });
 
   it('shows dash when no collaborators', () => {

@@ -10,7 +10,8 @@ jest.mock('dompurify', () => ({
 
 jest.mock('../../utils/bbcode', () => ({
   parseBBCode: (s: string) => s,
-  quotePost: (username: string, body: string) => `[quote=${username}]${body}[/quote]`
+  quotePost: (username: string, body: string) =>
+    `[quote=${username}]${body}[/quote]`
 }));
 
 jest.mock('../../components/layout/Time', () => ({
@@ -65,28 +66,51 @@ describe('ForumTopicPost', () => {
 
   it('shows Edit button when currentUserId matches author', () => {
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={10} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
     );
     expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
   it('hides Edit button when currentUserId does not match author', () => {
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={99} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={99}
+      />
     );
-    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /edit/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows Delete button for post owner', () => {
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={10} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
     );
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
 
   it('shows Delete button for moderator even without ownership', () => {
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={99} canModerate={true} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={99}
+        canModerate={true}
+      />
     );
     expect(screen.getByRole('button', { name: /delete/i })).toBeInTheDocument();
   });
@@ -95,16 +119,28 @@ describe('ForumTopicPost', () => {
     const user = userEvent.setup();
     const mockOnQuote = jest.fn();
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} onQuote={mockOnQuote} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        onQuote={mockOnQuote}
+      />
     );
     await user.click(screen.getByRole('button', { name: /quote/i }));
-    expect(mockOnQuote).toHaveBeenCalledWith('[quote=alice]Hello forum world[/quote]');
+    expect(mockOnQuote).toHaveBeenCalledWith(
+      '[quote=alice]Hello forum world[/quote]'
+    );
   });
 
   it('shows edit form when Edit is clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={10} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
     );
     await user.click(screen.getByRole('button', { name: /edit/i }));
     expect(screen.getByRole('textbox')).toBeInTheDocument();
@@ -114,7 +150,12 @@ describe('ForumTopicPost', () => {
   it('calls updatePost on save with edited body', async () => {
     const user = userEvent.setup();
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={10} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
     );
     await user.click(screen.getByRole('button', { name: /edit/i }));
     const textarea = screen.getByRole('textbox');
@@ -134,7 +175,12 @@ describe('ForumTopicPost', () => {
   it('restores body and hides form on Cancel', async () => {
     const user = userEvent.setup();
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={10} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
     );
     await user.click(screen.getByRole('button', { name: /edit/i }));
     await user.click(screen.getByRole('button', { name: /cancel/i }));
@@ -145,11 +191,20 @@ describe('ForumTopicPost', () => {
   it('calls deletePost after confirm on Delete click', async () => {
     const user = userEvent.setup();
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={10} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
     );
     await user.click(screen.getByRole('button', { name: /delete/i }));
     await waitFor(() => {
-      expect(mockDeletePost).toHaveBeenCalledWith({ forumId: 1, topicId: 5, postId: 7 });
+      expect(mockDeletePost).toHaveBeenCalledWith({
+        forumId: 1,
+        topicId: 5,
+        postId: 7
+      });
     });
   });
 
@@ -157,7 +212,12 @@ describe('ForumTopicPost', () => {
     window.confirm = jest.fn(() => false);
     const user = userEvent.setup();
     renderWithProviders(
-      <ForumTopicPost post={mockPost} forumId={1} topicId={5} currentUserId={10} />
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
     );
     await user.click(screen.getByRole('button', { name: /delete/i }));
     expect(mockDeletePost).not.toHaveBeenCalled();

@@ -11,10 +11,7 @@ const mockDispatch = jest.fn();
 const mockUseSearchParams = jest.fn();
 
 jest.mock('../../store/services/authApi', () => ({
-  useRequestRecoveryMutation: () => [
-    mockRequestRecovery,
-    { isLoading: false }
-  ],
+  useRequestRecoveryMutation: () => [mockRequestRecovery, { isLoading: false }],
   useResetPasswordMutation: () => [mockResetPassword, { isLoading: false }]
 }));
 
@@ -27,13 +24,9 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
   useSearchParams: () => mockUseSearchParams(),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 describe('Recovery — request form (no token)', () => {
@@ -81,9 +74,7 @@ describe('Recovery — request form (no token)', () => {
     await user.click(
       screen.getByRole('button', { name: /send recovery email/i })
     );
-    expect(
-      screen.getByText(/if an account exists/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/if an account exists/i)).toBeInTheDocument();
   });
 
   it('dispatches danger alert on request failure', async () => {
@@ -107,9 +98,7 @@ describe('Recovery — request form (no token)', () => {
 describe('Recovery — reset form (with token)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseSearchParams.mockReturnValue([
-      new URLSearchParams('token=abc123')
-    ]);
+    mockUseSearchParams.mockReturnValue([new URLSearchParams('token=abc123')]);
   });
 
   it('renders new password and confirm password fields', () => {
@@ -144,10 +133,7 @@ describe('Recovery — reset form (with token)', () => {
     const user = userEvent.setup();
     renderWithProviders(<Recovery />);
     await user.type(screen.getByLabelText(/^new password/i), 'pass1234');
-    await user.type(
-      screen.getByLabelText(/confirm new password/i),
-      'pass5678'
-    );
+    await user.type(screen.getByLabelText(/confirm new password/i), 'pass5678');
     await user.click(screen.getByRole('button', { name: /reset password/i }));
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({

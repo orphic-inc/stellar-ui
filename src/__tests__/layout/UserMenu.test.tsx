@@ -28,13 +28,9 @@ jest.mock('react-redux', () => ({
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const mockUser = {
@@ -55,7 +51,9 @@ describe('UserMenu', () => {
     renderWithProviders(<UserMenu user={mockUser} />);
     expect(screen.getByRole('link', { name: 'jazzfan' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Edit' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /contribute/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /contribute/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });
 
@@ -65,7 +63,9 @@ describe('UserMenu', () => {
   });
 
   it('shows ∞ when invite count is null', () => {
-    renderWithProviders(<UserMenu user={{ ...mockUser, inviteCount: undefined }} />);
+    renderWithProviders(
+      <UserMenu user={{ ...mockUser, inviteCount: undefined }} />
+    );
     expect(screen.getByText(/invite \(∞\)/i)).toBeInTheDocument();
   });
 

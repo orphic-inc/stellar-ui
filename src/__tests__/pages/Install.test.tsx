@@ -63,7 +63,9 @@ describe('Install', () => {
       'input[autocomplete="new-password"]'
     );
     expect(passwordInputs.length).toBe(2);
-    expect(screen.getByRole('button', { name: /^install$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^install$/i })
+    ).toBeInTheDocument();
   });
 
   it('shows explanatory text about what will be created', () => {
@@ -100,14 +102,15 @@ describe('Install', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/private');
     });
     expect(mockDispatch).toHaveBeenCalledWith(
-      expect.objectContaining({ payload: expect.objectContaining({ alertType: 'success' }) })
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'success' })
+      })
     );
   });
 
   it('dispatches danger alert on install failure', async () => {
     mockInstall.mockReturnValue({
-      unwrap: () =>
-        Promise.reject({ data: { msg: 'Already installed.' } })
+      unwrap: () => Promise.reject({ data: { msg: 'Already installed.' } })
     });
     const user = userEvent.setup();
     renderWithProviders(<Install />);

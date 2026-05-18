@@ -17,17 +17,35 @@ let mockCommentsData: unknown[] | undefined = [];
 let mockIsLoading = false;
 
 const mockComments = [
-  { id: 1, authorId: 10, author: { username: 'alice' }, body: '<b>Hello</b>', createdAt: '2024-01-01' },
-  { id: 2, authorId: 99, author: { username: 'bob' }, body: 'World', createdAt: '2024-01-02' }
+  {
+    id: 1,
+    authorId: 10,
+    author: { username: 'alice' },
+    body: '<b>Hello</b>',
+    createdAt: '2024-01-01'
+  },
+  {
+    id: 2,
+    authorId: 99,
+    author: { username: 'bob' },
+    body: 'World',
+    createdAt: '2024-01-02'
+  }
 ];
 
 jest.mock('../../store/services/commentApi', () => ({
-  useGetCommentsQuery: () => ({ data: mockCommentsData, isLoading: mockIsLoading }),
+  useGetCommentsQuery: () => ({
+    data: mockCommentsData,
+    isLoading: mockIsLoading
+  }),
   useCreateCommentMutation: () => [mockCreateComment, { isLoading: false }],
   useDeleteCommentMutation: () => [mockDeleteComment]
 }));
 
-let mockCurrentUser: { id: number; username: string } | null = { id: 99, username: 'bob' };
+let mockCurrentUser: { id: number; username: string } | null = {
+  id: 99,
+  username: 'bob'
+};
 
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
@@ -36,8 +54,18 @@ jest.mock('react-redux', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({ to, children, ...props }: { to: string; children: React.ReactNode; [key: string]: unknown }) => (
-    <a href={to} {...props}>{children}</a>
+  Link: ({
+    to,
+    children,
+    ...props
+  }: {
+    to: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => (
+    <a href={to} {...props}>
+      {children}
+    </a>
   )
 }));
 
@@ -71,12 +99,16 @@ describe('CommentsSection', () => {
 
   it('shows delete button for own comment (bob)', () => {
     renderWithProviders(<CommentsSection page="release" pageId={1} />);
-    expect(screen.getByRole('button', { name: /delete comment/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /delete comment/i })
+    ).toBeInTheDocument();
   });
 
-  it('shows report link for other users\' comments (alice)', () => {
+  it("shows report link for other users' comments (alice)", () => {
     renderWithProviders(<CommentsSection page="release" pageId={1} />);
-    expect(screen.getByRole('link', { name: /report comment/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /report comment/i })
+    ).toBeInTheDocument();
   });
 
   it('calls deleteComment when delete button is clicked', async () => {
@@ -89,7 +121,10 @@ describe('CommentsSection', () => {
   it('calls createComment with releaseId on submit', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CommentsSection page="release" pageId={5} />);
-    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Nice release');
+    await user.type(
+      screen.getByPlaceholderText(/add a comment/i),
+      'Nice release'
+    );
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
       expect(mockCreateComment).toHaveBeenCalledWith({
@@ -114,6 +149,8 @@ describe('CommentsSection', () => {
   it('hides form when user is not logged in', () => {
     mockCurrentUser = null;
     renderWithProviders(<CommentsSection page="release" pageId={1} />);
-    expect(screen.queryByPlaceholderText(/add a comment/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/add a comment/i)
+    ).not.toBeInTheDocument();
   });
 });

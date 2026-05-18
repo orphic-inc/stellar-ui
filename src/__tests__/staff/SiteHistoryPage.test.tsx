@@ -70,9 +70,7 @@ describe('SiteHistoryPage', () => {
       error: undefined
     });
     renderWithProviders(<SiteHistoryPage />);
-    expect(
-      screen.getByText(/no site history entries/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no site history entries/i)).toBeInTheDocument();
   });
 
   it('renders entries with title, body, and action buttons', () => {
@@ -111,9 +109,9 @@ describe('SiteHistoryPage', () => {
     renderWithProviders(<SiteHistoryPage />);
     await user.click(screen.getByRole('button', { name: /edit/i }));
     expect(screen.getByText('Edit Entry')).toBeInTheDocument();
-    expect(
-      (screen.getByLabelText(/title/i) as HTMLInputElement).value
-    ).toBe('Entry 5');
+    expect((screen.getByLabelText(/title/i) as HTMLInputElement).value).toBe(
+      'Entry 5'
+    );
   });
 
   it('calls create when new entry is submitted', async () => {

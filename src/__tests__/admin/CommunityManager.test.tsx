@@ -23,13 +23,9 @@ jest.mock('react-redux', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const makeCommunity = (id: number) => ({
@@ -108,9 +104,7 @@ describe('CommunityManager', () => {
     });
     renderWithProviders(<CommunityManager />);
     await user.type(screen.getByLabelText(/^name/i), 'Jazz Hub');
-    await user.click(
-      screen.getByRole('button', { name: /create community/i })
-    );
+    await user.click(screen.getByRole('button', { name: /create community/i }));
     await waitFor(() => {
       expect(mockCreateCommunity).toHaveBeenCalledWith(
         expect.objectContaining({ name: 'Jazz Hub' })
@@ -135,9 +129,7 @@ describe('CommunityManager', () => {
     });
     renderWithProviders(<CommunityManager />);
     await user.type(screen.getByLabelText(/^name/i), 'Dupe');
-    await user.click(
-      screen.getByRole('button', { name: /create community/i })
-    );
+    await user.click(screen.getByRole('button', { name: /create community/i }));
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -156,9 +148,7 @@ describe('CommunityManager', () => {
     });
     renderWithProviders(<CommunityManager />);
     await user.click(screen.getByRole('button', { name: /edit/i }));
-    expect(
-      screen.getByDisplayValue('Community 3')
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Community 3')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /^save$/i }));
     await waitFor(() => {
       expect(mockUpdateCommunity).toHaveBeenCalled();
@@ -174,7 +164,10 @@ describe('CommunityManager', () => {
     });
     renderWithProviders(<CommunityManager />);
     expect(screen.queryByLabelText(/owner user id/i)).not.toBeInTheDocument();
-    await user.selectOptions(screen.getByLabelText(/registration/i), 'Invite only');
+    await user.selectOptions(
+      screen.getByLabelText(/registration/i),
+      'Invite only'
+    );
     expect(screen.getByLabelText(/owner user id/i)).toBeInTheDocument();
   });
 });

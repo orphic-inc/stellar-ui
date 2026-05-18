@@ -55,9 +55,7 @@ describe('TopReleasesPage', () => {
       error: undefined
     });
     renderWithProviders(<TopReleasesPage />);
-    expect(
-      screen.getByText(/no data for this period/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no data for this period/i)).toBeInTheDocument();
   });
 
   it('renders release rows with rank, title, and stats', () => {

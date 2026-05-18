@@ -23,13 +23,9 @@ jest.mock('../../store/services/announcementApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 jest.mock('../../components/layout/Time', () => ({
@@ -66,9 +62,7 @@ describe('NewsManager', () => {
     expect(
       screen.getByText(/failed to load announcements/i)
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/failed to load blog posts/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/failed to load blog posts/i)).toBeInTheDocument();
   });
 
   it('shows empty state rows when no data', () => {

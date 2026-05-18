@@ -42,9 +42,7 @@ describe('CommunitiesPage', () => {
       error: { status: 500 }
     });
     renderWithProviders(<CommunitiesPage />);
-    expect(
-      screen.getByText(/failed to load communities/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/failed to load communities/i)).toBeInTheDocument();
   });
 
   it('renders community list from response', () => {

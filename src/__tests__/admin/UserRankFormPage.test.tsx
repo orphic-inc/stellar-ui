@@ -27,20 +27,19 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => mockUseParams(),
   useNavigate: () => mockNavigate,
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 describe('UserRankFormPage — create mode', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseParams.mockReturnValue({ id: undefined });
-    mockGetUserRankByIdQuery.mockReturnValue({ data: undefined, isLoading: false });
+    mockGetUserRankByIdQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false
+    });
     mockCreateUserRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
@@ -126,9 +125,9 @@ describe('UserRankFormPage — edit mode', () => {
   it('prefills name and level from existing rank', async () => {
     renderWithProviders(<UserRankFormPage />);
     await waitFor(() => {
-      expect(
-        (screen.getByLabelText(/^name$/i) as HTMLInputElement).value
-      ).toBe('Staff');
+      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe(
+        'Staff'
+      );
     });
   });
 
@@ -136,9 +135,9 @@ describe('UserRankFormPage — edit mode', () => {
     const user = userEvent.setup();
     renderWithProviders(<UserRankFormPage />);
     await waitFor(() =>
-      expect(
-        (screen.getByLabelText(/^name$/i) as HTMLInputElement).value
-      ).toBe('Staff')
+      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe(
+        'Staff'
+      )
     );
     await user.click(screen.getByRole('button', { name: /save changes/i }));
     await waitFor(() => {

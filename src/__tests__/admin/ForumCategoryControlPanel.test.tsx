@@ -21,13 +21,9 @@ jest.mock('../../store/services/forumApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const makeCategory = (id: number) => ({
@@ -40,9 +36,15 @@ describe('ForumCategoryControlPanel', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.confirm = jest.fn().mockReturnValue(true);
-    mockCreateForumCategory.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    mockUpdateForumCategory.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    mockDeleteForumCategory.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockCreateForumCategory.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+    mockUpdateForumCategory.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+    mockDeleteForumCategory.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
   });
 
   it('shows spinner while loading', () => {

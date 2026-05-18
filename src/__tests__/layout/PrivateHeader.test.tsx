@@ -30,14 +30,26 @@ jest.mock('react-router-dom', () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
     <a href={to}>{children}</a>
   ),
-  NavLink: ({ to, children }: { to: string; children: ((arg: { isActive: boolean }) => React.ReactNode) | React.ReactNode }) => (
-    <a href={to}>{typeof children === 'function' ? children({ isActive: false }) : children}</a>
+  NavLink: ({
+    to,
+    children
+  }: {
+    to: string;
+    children:
+      | ((arg: { isActive: boolean }) => React.ReactNode)
+      | React.ReactNode;
+  }) => (
+    <a href={to}>
+      {typeof children === 'function'
+        ? children({ isActive: false })
+        : children}
+    </a>
   )
 }));
 
 jest.mock('../../utils/permissions', () => ({
   isStaffUser: (user: { permissions?: { staff?: boolean } }) =>
-    !!(user.permissions?.staff)
+    !!user.permissions?.staff
 }));
 
 jest.mock('../../store/services/messagesApi', () => ({
@@ -71,7 +83,9 @@ describe('PrivateHeader', () => {
 
   it('renders primary nav links', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
-    expect(screen.getByRole('link', { name: 'Communities' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Communities' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Forums' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Wiki' })).toBeInTheDocument();
   });
@@ -101,13 +115,17 @@ describe('PrivateHeader', () => {
 
   it('hides Staff Inbox link for non-staff users', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
-    expect(screen.queryByRole('link', { name: /staff inbox/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /staff inbox/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows Staff Inbox link for staff users', () => {
     const staffUser = { ...mockUser, permissions: { staff: true } };
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
-    expect(screen.getByRole('link', { name: /staff inbox/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /staff inbox/i })
+    ).toBeInTheDocument();
   });
 
   it('shows ModBar for staff users', () => {

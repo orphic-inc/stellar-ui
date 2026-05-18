@@ -19,25 +19,34 @@ describe('DownloadButton', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGrantAccess.mockReturnValue({
-      unwrap: () => Promise.resolve({ downloadUrl: 'https://example.com/file.zip' })
+      unwrap: () =>
+        Promise.resolve({ downloadUrl: 'https://example.com/file.zip' })
     });
     window.open = jest.fn();
   });
 
   it('shows disabled text when canDownload is false', () => {
-    renderWithProviders(<DownloadButton contributionId={1} canDownload={false} />);
+    renderWithProviders(
+      <DownloadButton contributionId={1} canDownload={false} />
+    );
     expect(screen.getByText('[disabled]')).toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('shows Download button when canDownload is true', () => {
-    renderWithProviders(<DownloadButton contributionId={1} canDownload={true} />);
-    expect(screen.getByRole('button', { name: /download/i })).toBeInTheDocument();
+    renderWithProviders(
+      <DownloadButton contributionId={1} canDownload={true} />
+    );
+    expect(
+      screen.getByRole('button', { name: /download/i })
+    ).toBeInTheDocument();
   });
 
   it('calls grantAccess and opens download URL on click', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<DownloadButton contributionId={42} canDownload={true} />);
+    renderWithProviders(
+      <DownloadButton contributionId={42} canDownload={true} />
+    );
     await user.click(screen.getByRole('button', { name: /download/i }));
     expect(mockGrantAccess).toHaveBeenCalledWith({ contributionId: 42 });
     await waitFor(() => {
@@ -54,7 +63,9 @@ describe('DownloadButton', () => {
       unwrap: () => Promise.reject({ data: { msg: 'Ratio too low.' } })
     });
     const user = userEvent.setup();
-    renderWithProviders(<DownloadButton contributionId={1} canDownload={true} />);
+    renderWithProviders(
+      <DownloadButton contributionId={1} canDownload={true} />
+    );
     await user.click(screen.getByRole('button', { name: /download/i }));
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(

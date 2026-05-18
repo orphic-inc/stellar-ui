@@ -22,13 +22,9 @@ jest.mock('../../store/services/siteApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const mockUser = {
@@ -152,7 +148,9 @@ describe('PrivateHomepage', () => {
     renderWithUser();
     expect(screen.getByText('Kind of Blue')).toBeInTheDocument();
     expect(screen.getByText(/miles davis/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /view release/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /view release/i })
+    ).toBeInTheDocument();
   });
 
   it('renders vanity house release', () => {

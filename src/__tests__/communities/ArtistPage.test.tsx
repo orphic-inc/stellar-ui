@@ -95,7 +95,9 @@ describe('ArtistPage', () => {
     expect(
       screen.getByRole('link', { name: 'John Coltrane' })
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Kind of Blue' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Kind of Blue' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Jazz Vault')).toBeInTheDocument();
     expect(screen.getByText('1959')).toBeInTheDocument();
   });

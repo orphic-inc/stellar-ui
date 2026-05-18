@@ -33,9 +33,7 @@ describe('NewTicketForm', () => {
     expect(
       screen.getByRole('button', { name: /submit ticket/i })
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /cancel/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
   it('submits ticket and navigates on success', async () => {
@@ -56,8 +54,7 @@ describe('NewTicketForm', () => {
 
   it('dispatches danger alert on submission failure', async () => {
     mockCreateTicket.mockReturnValue({
-      unwrap: () =>
-        Promise.reject({ data: { msg: 'Server unavailable.' } })
+      unwrap: () => Promise.reject({ data: { msg: 'Server unavailable.' } })
     });
     const user = userEvent.setup();
     renderWithProviders(<NewTicketForm />);

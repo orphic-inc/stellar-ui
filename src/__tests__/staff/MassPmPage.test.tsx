@@ -41,7 +41,9 @@ describe('MassPmPage', () => {
     renderWithProviders(<MassPmPage />);
     expect(screen.getByLabelText(/subject/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'All users' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('option', { name: 'All users' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'Member' })).toBeInTheDocument();
   });
 
@@ -79,10 +81,7 @@ describe('MassPmPage', () => {
     renderWithProviders(<MassPmPage />);
     await user.type(screen.getByLabelText(/subject/i), 'Staff meeting');
     await user.type(screen.getByLabelText(/message/i), 'Join us tonight.');
-    await user.selectOptions(
-      screen.getByRole('combobox'),
-      '2'
-    );
+    await user.selectOptions(screen.getByRole('combobox'), '2');
     await user.click(screen.getByRole('button', { name: /send mass pm/i }));
     expect(mockSendMassPm).toHaveBeenCalledWith(
       expect.objectContaining({ targetRankId: 2 })
@@ -110,8 +109,7 @@ describe('MassPmPage', () => {
 
   it('dispatches danger alert on API failure', async () => {
     mockSendMassPm.mockReturnValue({
-      unwrap: () =>
-        Promise.reject({ data: { msg: 'Permission denied.' } })
+      unwrap: () => Promise.reject({ data: { msg: 'Permission denied.' } })
     });
     const user = userEvent.setup();
     renderWithProviders(<MassPmPage />);

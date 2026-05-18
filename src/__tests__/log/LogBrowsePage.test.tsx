@@ -124,9 +124,14 @@ describe('LogBrowsePage', () => {
       error: undefined
     });
     renderWithProviders(<LogBrowsePage />);
-    await user.type(screen.getByPlaceholderText(/search topics and posts/i), 'modal jazz');
+    await user.type(
+      screen.getByPlaceholderText(/search topics and posts/i),
+      'modal jazz'
+    );
     await user.click(screen.getByRole('button', { name: /^search$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('q')).toBe('modal jazz');
     expect(params.get('page')).toBe('1');
   });
@@ -140,7 +145,9 @@ describe('LogBrowsePage', () => {
     });
     renderWithProviders(<LogBrowsePage />);
     await user.click(screen.getByRole('button', { name: /reset/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.toString()).toBe('');
   });
 
@@ -156,7 +163,12 @@ describe('LogBrowsePage', () => {
     ]);
     renderWithProviders(<LogBrowsePage />);
     expect(mockUseSearchLogQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ q: 'jazz', type: 'topic', order: 'asc', page: 2 })
+      expect.objectContaining({
+        q: 'jazz',
+        type: 'topic',
+        order: 'asc',
+        page: 2
+      })
     );
   });
 });

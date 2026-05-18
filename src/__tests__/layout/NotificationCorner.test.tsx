@@ -28,13 +28,16 @@ const mockNotifications = [
   }
 ];
 
-let mockNotificationsData: typeof mockNotifications | undefined = mockNotifications;
+let mockNotificationsData: typeof mockNotifications | undefined =
+  mockNotifications;
 let mockUnreadCount = 2;
 let mockPmCount = 0;
 
 jest.mock('../../store/services/notificationApi', () => ({
   useGetNotificationsQuery: () => ({ data: mockNotificationsData }),
-  useGetUnreadNotificationCountQuery: () => ({ data: { count: mockUnreadCount } }),
+  useGetUnreadNotificationCountQuery: () => ({
+    data: { count: mockUnreadCount }
+  }),
   useMarkNotificationReadMutation: () => [mockMarkRead],
   useMarkAllNotificationsReadMutation: () => [mockMarkAllRead],
   useDeleteNotificationMutation: () => [mockDeleteNotification]
@@ -46,8 +49,18 @@ jest.mock('../../store/services/messagesApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({ to, children, onClick }: { to: string; children: React.ReactNode; onClick?: () => void }) => (
-    <a href={to} onClick={onClick}>{children}</a>
+  Link: ({
+    to,
+    children,
+    onClick
+  }: {
+    to: string;
+    children: React.ReactNode;
+    onClick?: () => void;
+  }) => (
+    <a href={to} onClick={onClick}>
+      {children}
+    </a>
   )
 }));
 
@@ -98,7 +111,9 @@ describe('NotificationCorner', () => {
     const user = userEvent.setup();
     renderWithProviders(<NotificationCorner />);
     await user.click(screen.getByRole('button', { name: /notifications/i }));
-    expect(screen.getByRole('button', { name: /mark all read/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /mark all read/i })
+    ).toBeInTheDocument();
   });
 
   it('calls markAllRead when button is clicked', async () => {
@@ -141,9 +156,9 @@ describe('NotificationCorner', () => {
     renderWithProviders(<NotificationCorner />);
     await user.click(screen.getByRole('button', { name: /notifications/i }));
     expect(screen.getByText('Notifications')).toBeInTheDocument();
-    const closeBtn = screen.getAllByRole('button').find(
-      (b) => b.textContent === '✕' && !b.getAttribute('aria-label')
-    );
+    const closeBtn = screen
+      .getAllByRole('button')
+      .find((b) => b.textContent === '✕' && !b.getAttribute('aria-label'));
     await user.click(closeBtn!);
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument();
   });

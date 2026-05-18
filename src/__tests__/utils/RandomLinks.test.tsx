@@ -17,7 +17,10 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('../../store/services/searchApi', () => ({
-  useLazyGetRandomReleaseQuery: () => [mockTriggerRelease, { isFetching: false }],
+  useLazyGetRandomReleaseQuery: () => [
+    mockTriggerRelease,
+    { isFetching: false }
+  ],
   useLazyGetRandomArtistQuery: () => [mockTriggerArtist, { isFetching: false }]
 }));
 
@@ -32,7 +35,9 @@ describe('RandomReleaseLink', () => {
 
   it('renders the button', () => {
     renderWithProviders(<RandomReleaseLink />);
-    expect(screen.getByRole('button', { name: /random release/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /random release/i })
+    ).toBeInTheDocument();
   });
 
   it('navigates to release on click', async () => {
@@ -57,7 +62,9 @@ describe('RandomArtistLink', () => {
 
   it('renders the button', () => {
     renderWithProviders(<RandomArtistLink />);
-    expect(screen.getByRole('button', { name: /random artist/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /random artist/i })
+    ).toBeInTheDocument();
   });
 
   it('navigates to artist on click', async () => {

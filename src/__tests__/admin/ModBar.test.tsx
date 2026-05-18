@@ -16,20 +16,21 @@ jest.mock('../../store/services/reportsApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const staffUser = {
   id: 1,
   username: 'moduser',
   avatar: null,
-  userRank: { level: 500, name: 'Staff', color: '#fff', permissions: { staff: true } }
+  userRank: {
+    level: 500,
+    name: 'Staff',
+    color: '#fff',
+    permissions: { staff: true }
+  }
 };
 
 const regularUser = {

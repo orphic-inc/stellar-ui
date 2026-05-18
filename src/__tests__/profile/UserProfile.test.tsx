@@ -33,7 +33,11 @@ jest.mock('react-router-dom', () => ({
   )
 }));
 
-let mockCurrentUser: { id: number; username: string; permissions?: Record<string, boolean> } | null = {
+let mockCurrentUser: {
+  id: number;
+  username: string;
+  permissions?: Record<string, boolean>;
+} | null = {
   id: 99,
   username: 'bob'
 };
@@ -160,9 +164,7 @@ describe('UserProfile', () => {
     mockError = { status: 403 };
     mockProfileData = undefined;
     renderWithProviders(<UserProfile />);
-    expect(
-      screen.getByText(/do not have permission/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/do not have permission/i)).toBeInTheDocument();
   });
 
   it('shows must be signed in message for 401 error', () => {
@@ -174,9 +176,7 @@ describe('UserProfile', () => {
 
   it('renders username in page header', () => {
     renderWithProviders(<UserProfile />);
-    expect(
-      screen.getByRole('heading', { name: 'alice' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'alice' })).toBeInTheDocument();
   });
 
   it('shows Settings link for own profile', () => {
@@ -185,16 +185,20 @@ describe('UserProfile', () => {
     expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument();
   });
 
-  it('shows Send Message and Report links for other users\' profile', () => {
+  it("shows Send Message and Report links for other users' profile", () => {
     renderWithProviders(<UserProfile />);
-    expect(screen.getByRole('link', { name: /send message/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /send message/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /report/i })).toBeInTheDocument();
   });
 
   it('hides Send Message link on own profile', () => {
     mockCurrentUser = { id: 42, username: 'alice' };
     renderWithProviders(<UserProfile />);
-    expect(screen.queryByRole('link', { name: /send message/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /send message/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows Staff Actions panel for staff user', () => {

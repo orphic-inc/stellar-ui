@@ -32,13 +32,9 @@ jest.mock('react-redux', () => ({
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  Link: ({
-    to,
-    children
-  }: {
-    to: string;
-    children: React.ReactNode;
-  }) => <a href={to}>{children}</a>
+  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
+    <a href={to}>{children}</a>
+  )
 }));
 
 const communities = [
@@ -72,8 +68,12 @@ describe('ContributeForm', () => {
     expect(
       screen.getByRole('combobox', { name: /community/i })
     ).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Jazz Community' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Rock Community' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('option', { name: 'Jazz Community' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('option', { name: 'Rock Community' })
+    ).toBeInTheDocument();
   });
 
   it('renders all key fields by default (Music type)', () => {
@@ -95,13 +95,12 @@ describe('ContributeForm', () => {
   it('switches to Creator label and Description textarea on non-Music type', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
-    await user.selectOptions(
-      screen.getByLabelText(/content type/i),
-      'EBooks'
-    );
+    await user.selectOptions(screen.getByLabelText(/content type/i), 'EBooks');
     expect(screen.getByPlaceholderText(/creator name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^description/i)).toBeInTheDocument();
-    expect(screen.queryByLabelText(/release description/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/release description/i)
+    ).not.toBeInTheDocument();
   });
 
   it('can add a second collaborator row', async () => {
@@ -162,12 +161,20 @@ describe('ContributeForm', () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
 
-    await user.selectOptions(screen.getByLabelText(/community/i), 'Jazz Community');
+    await user.selectOptions(
+      screen.getByLabelText(/community/i),
+      'Jazz Community'
+    );
     await user.type(screen.getByPlaceholderText(/artist name/i), 'Artist');
     await user.type(screen.getByLabelText(/album title/i), 'Album');
     await user.type(screen.getByLabelText(/file size/i), '100');
-    await user.type(screen.getByLabelText(/download url/i), 'https://example.com/a.flac');
-    await user.click(screen.getByRole('button', { name: /contribute release/i }));
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/a.flac'
+    );
+    await user.click(
+      screen.getByRole('button', { name: /contribute release/i })
+    );
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/private/contribute/list');
@@ -181,12 +188,20 @@ describe('ContributeForm', () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
 
-    await user.selectOptions(screen.getByLabelText(/community/i), 'Jazz Community');
+    await user.selectOptions(
+      screen.getByLabelText(/community/i),
+      'Jazz Community'
+    );
     await user.type(screen.getByPlaceholderText(/artist name/i), 'Artist');
     await user.type(screen.getByLabelText(/album title/i), 'Album');
     await user.type(screen.getByLabelText(/file size/i), '100');
-    await user.type(screen.getByLabelText(/download url/i), 'https://example.com/a.flac');
-    await user.click(screen.getByRole('button', { name: /contribute release/i }));
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/a.flac'
+    );
+    await user.click(
+      screen.getByRole('button', { name: /contribute release/i })
+    );
 
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(

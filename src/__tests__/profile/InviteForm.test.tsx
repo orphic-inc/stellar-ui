@@ -8,10 +8,7 @@ const mockCreateInvite = jest.fn();
 const mockDispatch = jest.fn();
 
 jest.mock('../../store/services/profileApi', () => ({
-  useCreateInviteMutation: () => [
-    mockCreateInvite,
-    { isLoading: false }
-  ]
+  useCreateInviteMutation: () => [mockCreateInvite, { isLoading: false }]
 }));
 
 jest.mock('../../store/slices/authSlice', () => ({
@@ -33,7 +30,9 @@ describe('InviteForm', () => {
     renderWithProviders(<InviteForm />);
     expect(document.querySelector('input[type="email"]')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /invite/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /invite tree/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /invite tree/i })
+    ).toBeInTheDocument();
   });
 
   it('shows warning text about invite responsibility', () => {
@@ -77,7 +76,9 @@ describe('InviteForm', () => {
     await user.click(screen.getByRole('button', { name: /invite/i }));
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        payload: expect.objectContaining({ msg: 'Invitation sent successfully.' })
+        payload: expect.objectContaining({
+          msg: 'Invitation sent successfully.'
+        })
       })
     );
   });
