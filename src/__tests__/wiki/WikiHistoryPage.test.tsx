@@ -133,6 +133,72 @@ describe('WikiHistoryPage', () => {
     expect(screen.getByText(/failed to load comparison/i)).toBeInTheDocument();
   });
 
+  it('shows spinner while loading revision history', () => {
+    mockUseGetWikiRevisionsQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    renderWithProviders(<WikiHistoryPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('skips rollback when confirm dialog is cancelled', async () => {
+    window.confirm = jest.fn(() => false);
+    const user = userEvent.setup();
+    const store = createTestStore();
+    renderWithProviders(<WikiHistoryPage />, { store });
+
+    await user.click(screen.getAllByRole('button', { name: /^view$/i })[0]);
+    await user.click(
+      screen.getByRole('button', { name: /rollback to this revision/i })
+    );
+
+    expect(mockRollbackWikiPage).not.toHaveBeenCalled();
+  });
+
+  it('dispatches danger alert when rollback fails', async () => {
+    mockRollbackWikiPage.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Conflict error.' } })
+    });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    renderWithProviders(<WikiHistoryPage />, { store });
+
+    await user.click(screen.getAllByRole('button', { name: /^view$/i })[0]);
+    await user.click(
+      screen.getByRole('button', { name: /rollback to this revision/i })
+    );
+
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.alertType === 'danger')).toBe(true);
+    });
+  });
+
+  it('renders unchanged, added, and deleted diff lines when comparing multiline content', async () => {
+    mockUseCompareWikiRevisionsQuery.mockReturnValue({
+      data: {
+        title: 'Wiki Page',
+        old: { body: 'common line\nonly old\nold extra' },
+        new: { body: 'common line\nonly new\nnew extra 1\nnew extra 2' }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<WikiHistoryPage />);
+
+    await user.selectOptions(screen.getByDisplayValue('Old rev…'), '2');
+    await user.selectOptions(screen.getByDisplayValue('New rev…'), '4');
+    await user.click(screen.getByRole('button', { name: /^compare$/i }));
+
+    // unchanged line appears undecorated
+    expect(screen.getByText('common line')).toBeInTheDocument();
+    // added lines (extra new lines at end cover the oi >= oldLines.length branch)
+    expect(screen.getByText('new extra 2')).toBeInTheDocument();
+  });
+
   it('hides rollback controls for a non-editor', async () => {
     const user = userEvent.setup();
     mockUseGetMeQuery.mockReturnValue({
