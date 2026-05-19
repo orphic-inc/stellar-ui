@@ -131,6 +131,49 @@ describe('WikiViewPage', () => {
     expect(screen.queryByTitle('Remove alias')).not.toBeInTheDocument();
   });
 
+  it('dispatches danger alert when page delete fails', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    mockDeleteWikiPage.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Cannot delete.' } })
+    });
+    renderWithProviders(<WikiViewPage />, { store });
+
+    await user.click(screen.getByRole('button', { name: /^delete$/i }));
+
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.alertType === 'danger')).toBe(true);
+    });
+  });
+
+  it('dispatches danger alert when alias removal fails', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    mockDeleteWikiAlias.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Cannot remove alias.' } })
+    });
+    renderWithProviders(<WikiViewPage />, { store });
+
+    await user.click(screen.getByTitle('Remove alias'));
+
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.alertType === 'danger')).toBe(true);
+    });
+  });
+
+  it('hides alias form when Cancel is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<WikiViewPage />);
+
+    await user.click(screen.getByRole('button', { name: /\+ add alias/i }));
+    expect(screen.getByPlaceholderText('new-alias')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+    expect(screen.queryByPlaceholderText('new-alias')).toBeNull();
+  });
+
   it('surfaces an alias add failure alert', async () => {
     const user = userEvent.setup();
     const store = createTestStore();
