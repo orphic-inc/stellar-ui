@@ -165,4 +165,80 @@ describe('UserBrowsePage', () => {
     )?.[0] as URLSearchParams;
     expect(params.get('q')).toBe('alice');
   });
+
+  it('shows ∞ when ratio is null (privileged view)', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { staff: true } } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: {
+        data: [{ ...makeUser(9), ratio: null }],
+        meta: { total: 1, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    expect(screen.getByText('∞')).toBeInTheDocument();
+  });
+
+  it('renders pagination buttons when totalPages > 1', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 1, userRank: { permissions: {} } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: {
+        data: [makeUser(1)],
+        meta: { total: 50, totalPages: 2 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    expect(screen.getByRole('button', { name: '1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
+  });
+
+  it('calls setSearchParams with new page when pagination button is clicked', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 1, userRank: { permissions: {} } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: {
+        data: [makeUser(1)],
+        meta: { total: 50, totalPages: 2 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    await user.click(screen.getByRole('button', { name: '2' }));
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
+    expect(params.get('page')).toBe('2');
+  });
+
+  it('includes disabled filter in search params when privileged user submits', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { staff: true } } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /status/i }),
+      'true'
+    );
+    await user.click(screen.getByRole('button', { name: /^search$/i }));
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
+    expect(params.get('disabled')).toBe('true');
+  });
 });
