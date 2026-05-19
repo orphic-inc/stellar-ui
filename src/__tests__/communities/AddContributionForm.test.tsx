@@ -177,6 +177,36 @@ describe('AddContributionForm', () => {
     });
   });
 
+  it('omits audio rip fields from payload when file type is switched to non-audio before submit', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AddContributionForm />);
+
+    // Fill in audio fields while type is mp3 (default)
+    await user.type(screen.getByLabelText(/bitrate/i), '320');
+    await user.type(screen.getByLabelText(/media/i), 'CD');
+    await user.click(screen.getByLabelText(/has log/i));
+
+    // Switch to non-audio type — audio fields disappear
+    await user.selectOptions(screen.getByLabelText(/file type/i), 'pdf');
+    expect(screen.queryByLabelText(/bitrate/i)).not.toBeInTheDocument();
+
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/file.pdf'
+    );
+    await user.click(screen.getByRole('button', { name: /add contribution/i }));
+
+    await waitFor(() => {
+      const payload = mockAddContribution.mock.calls[0][0];
+      expect(payload).toMatchObject({ fileType: 'pdf' });
+      expect(payload).not.toHaveProperty('bitrate');
+      expect(payload).not.toHaveProperty('media');
+      expect(payload).not.toHaveProperty('hasLog');
+      expect(payload).not.toHaveProperty('hasCue');
+      expect(payload).not.toHaveProperty('isScene');
+    });
+  });
+
   it('dispatches danger alert with API message on failure', async () => {
     mockAddContribution.mockReturnValue({
       unwrap: () => Promise.reject({ data: { msg: 'Duplicate format.' } })
