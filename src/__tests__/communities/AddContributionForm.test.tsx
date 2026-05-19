@@ -30,6 +30,7 @@ let mockRelease:
   artist: { name: 'Miles Davis' }
 };
 let mockReleaseLoading = false;
+let mockMutationIsLoading = false;
 
 jest.mock('../../store/services/communityApi', () => ({
   useGetReleaseByIdQuery: () => ({
@@ -38,7 +39,7 @@ jest.mock('../../store/services/communityApi', () => ({
   }),
   useAddContributionToReleaseMutation: () => [
     mockAddContribution,
-    { isLoading: false }
+    { isLoading: mockMutationIsLoading }
   ]
 }));
 
@@ -56,6 +57,7 @@ describe('AddContributionForm', () => {
       artist: { name: 'Miles Davis' }
     };
     mockReleaseLoading = false;
+    mockMutationIsLoading = false;
     mockAddContribution.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
@@ -140,7 +142,39 @@ describe('AddContributionForm', () => {
     });
   });
 
-  it('dispatches danger alert on failure', async () => {
+  it('submits with all audio rip fields filled in', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AddContributionForm />);
+
+    await user.type(screen.getByLabelText(/download url/i), 'https://example.com/file.flac');
+    await user.clear(screen.getByLabelText(/file size/i));
+    await user.type(screen.getByLabelText(/file size/i), '500');
+    await user.type(screen.getByLabelText(/bitrate/i), '320');
+    await user.type(screen.getByLabelText(/media/i), 'CD');
+    await user.click(screen.getByLabelText(/has log/i));
+    await user.click(screen.getByLabelText(/has cue/i));
+    await user.click(screen.getByLabelText(/scene release/i));
+    await user.type(screen.getByLabelText(/notes/i), 'Perfect rip');
+
+    await user.click(screen.getByRole('button', { name: /add contribution/i }));
+
+    await waitFor(() => {
+      expect(mockAddContribution).toHaveBeenCalledWith(
+        expect.objectContaining({
+          communityId: 3,
+          releaseId: 7,
+          bitrate: '320',
+          media: 'CD',
+          hasLog: true,
+          hasCue: true,
+          isScene: true,
+          releaseDescription: 'Perfect rip'
+        })
+      );
+    });
+  });
+
+  it('dispatches danger alert with API message on failure', async () => {
     mockAddContribution.mockReturnValue({
       unwrap: () => Promise.reject({ data: { msg: 'Duplicate format.' } })
     });
@@ -154,7 +188,39 @@ describe('AddContributionForm', () => {
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
-          payload: expect.objectContaining({ alertType: 'danger' })
+          payload: expect.objectContaining({
+            msg: 'Duplicate format.',
+            alertType: 'danger'
+          })
+        })
+      );
+    });
+  });
+
+  it('shows "Adding…" label when mutation is loading', () => {
+    mockMutationIsLoading = true;
+    renderWithProviders(<AddContributionForm />);
+    expect(screen.getByRole('button', { name: /adding…/i })).toBeInTheDocument();
+  });
+
+  it('dispatches fallback error message when rejection has no API message', async () => {
+    mockAddContribution.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<AddContributionForm />);
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/file.flac'
+    );
+    await user.click(screen.getByRole('button', { name: /add contribution/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: 'Failed to add contribution.',
+            alertType: 'danger'
+          })
         })
       );
     });

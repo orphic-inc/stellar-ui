@@ -93,7 +93,14 @@ const AddContributionForm = () => {
         sizeInBytes: sizeMB
           ? Math.round(parseFloat(sizeMB) * 1_048_576)
           : undefined,
-        releaseDescription: releaseDescription || undefined
+        releaseDescription: releaseDescription || undefined,
+        ...(isAudio && {
+          bitrate: bitrate || undefined,
+          media: media || undefined,
+          hasLog,
+          hasCue,
+          isScene
+        })
       }).unwrap();
       dispatch(addAlert('Contribution added.', 'success'));
       navigate(`/private/communities/${communityId}/releases/${releaseId}`);
