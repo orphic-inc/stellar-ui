@@ -41,10 +41,14 @@ const Install = () => {
 
       dispatch(setCredentials(user));
       dispatch(
-        installApi.util.updateQueryData('getInstallStatus', undefined, (draft) => {
-          draft.installed = true;
-          draft.registrationStatus = 'open';
-        })
+        installApi.util.updateQueryData(
+          'getInstallStatus',
+          undefined,
+          (draft) => {
+            draft.installed = true;
+            draft.registrationStatus = 'open';
+          }
+        )
       );
       dispatch(addAlert('Installation complete. Welcome, SysOp.', 'success'));
       navigate('/private');
@@ -101,7 +105,9 @@ const Install = () => {
             className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
           />
           {errors.username && (
-            <p className="mt-1 text-xs text-red-400">{errors.username.message}</p>
+            <p className="mt-1 text-xs text-red-400">
+              {errors.username.message}
+            </p>
           )}
         </div>
 
@@ -153,7 +159,9 @@ const Install = () => {
             className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
           />
           {errors.password && (
-            <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>
+            <p className="mt-1 text-xs text-red-400">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
@@ -193,11 +201,19 @@ const Install = () => {
 
       <div className="mt-6 bg-gray-800/50 border border-gray-700 rounded-lg p-4 text-xs text-gray-400 space-y-1">
         <p className="font-medium text-gray-300 mb-2">What this creates</p>
-        <p>User ranks: User (100) · Power User (200) · Staff (500) · SysOp (1000)</p>
-        <p>Default forum structure (Site, Community, Music, Help, Staff, Trash)</p>
-        <p>Your account will be assigned the SysOp rank with a 5 GiB startup buffer.</p>
+        <p>
+          User ranks: User (100) · Power User (200) · Staff (500) · SysOp (1000)
+        </p>
+        <p>
+          Default forum structure (Site, Community, Music, Help, Staff, Trash)
+        </p>
+        <p>
+          Your account will be assigned the SysOp rank with a 5 GiB startup
+          buffer.
+        </p>
         <p className="pt-1 text-gray-500">
-          A pre-launch configuration checklist will be waiting in your staff inbox.
+          A pre-launch configuration checklist will be waiting in your staff
+          inbox.
         </p>
       </div>
     </div>
