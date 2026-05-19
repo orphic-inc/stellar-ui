@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import SiteSettingsPage from '../../components/admin/SiteSettingsPage';
@@ -82,5 +82,52 @@ describe('SiteSettingsPage', () => {
     await user.type(maxField, '0');
     await user.click(screen.getByRole('button', { name: /save/i }));
     expect(mockUpdateSettings).not.toHaveBeenCalled();
+  });
+
+  it('dispatches danger alert for empty maxUsers (bypassing HTML5 validation)', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<SiteSettingsPage />);
+    await user.clear(screen.getByRole('spinbutton'));
+    fireEvent.submit(document.querySelector('form')!);
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+    expect(mockUpdateSettings).not.toHaveBeenCalled();
+  });
+
+  it('dispatches danger alert when save fails', async () => {
+    mockUpdateSettings.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('fail'))
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<SiteSettingsPage />);
+    await user.click(screen.getByRole('button', { name: /save/i }));
+    await waitFor(() =>
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ alertType: 'danger' })
+        })
+      )
+    );
+  });
+
+  it('allows changing registration status and approved domains', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<SiteSettingsPage />);
+
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /registration/i }),
+      'closed'
+    );
+    expect((screen.getByRole('combobox') as HTMLSelectElement).value).toBe(
+      'closed'
+    );
+
+    const domainsTextarea = screen.getByRole('textbox');
+    await user.clear(domainsTextarea);
+    await user.type(domainsTextarea, 'example.com');
+    expect((domainsTextarea as HTMLTextAreaElement).value).toBe('example.com');
   });
 });
