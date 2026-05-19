@@ -114,6 +114,81 @@ describe('CannedResponsesPage', () => {
     );
   });
 
+  it('dispatches danger alert when create fails', async () => {
+    mockCreate.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Server error.' } })
+    });
+    const user = userEvent.setup();
+    mockUseGetCannedResponsesQuery.mockReturnValue({
+      data: [],
+      isLoading: false
+    });
+    renderWithProviders(<CannedResponsesPage />);
+    await user.click(screen.getByRole('button', { name: /new response/i }));
+    await user.type(screen.getByLabelText(/^name$/i), 'Fail');
+    await user.type(screen.getByLabelText(/^body$/i), 'Fail body');
+    await user.click(screen.getByRole('button', { name: /^create$/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('dispatches danger alert when update fails', async () => {
+    mockUpdate.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Update failed.' } })
+    });
+    const user = userEvent.setup();
+    mockUseGetCannedResponsesQuery.mockReturnValue({
+      data: [makeResponse(5)],
+      isLoading: false
+    });
+    renderWithProviders(<CannedResponsesPage />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('dispatches danger alert when delete fails', async () => {
+    mockDelete.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Delete failed.' } })
+    });
+    const user = userEvent.setup();
+    mockUseGetCannedResponsesQuery.mockReturnValue({
+      data: [makeResponse(8)],
+      isLoading: false
+    });
+    renderWithProviders(<CannedResponsesPage />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('edits the body in the edit form and updates editing state', async () => {
+    const user = userEvent.setup();
+    mockUseGetCannedResponsesQuery.mockReturnValue({
+      data: [makeResponse(5)],
+      isLoading: false
+    });
+    renderWithProviders(<CannedResponsesPage />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+
+    const bodyTextarea = screen.getByDisplayValue(
+      'Body of response 5'
+    ) as HTMLTextAreaElement;
+    await user.clear(bodyTextarea);
+    await user.type(bodyTextarea, 'Updated body text');
+    expect(bodyTextarea.value).toBe('Updated body text');
+  });
+
   it('calls deleteResponse after confirm', async () => {
     const user = userEvent.setup();
     mockUseGetCannedResponsesQuery.mockReturnValue({
