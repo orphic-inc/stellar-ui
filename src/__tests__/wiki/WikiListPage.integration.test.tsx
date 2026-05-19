@@ -293,6 +293,24 @@ describe('WikiListPage RTK Query integration', () => {
     });
   });
 
+  it('clicking a type radio button updates the type search param', async () => {
+    const user = userEvent.setup();
+    setupFetch({ pages: [] });
+    renderWithProviders(<WikiListPage />);
+
+    await screen.findByText(/no pages found/i);
+
+    await user.click(screen.getByRole('radio', { name: /title/i }));
+
+    await waitFor(() => {
+      const hit = getWikiRequests().find((req) => {
+        const url = new URL(req.url, 'http://localhost');
+        return url.searchParams.get('type') === 'title';
+      });
+      expect(hit).toBeDefined();
+    });
+  });
+
   it('sends page=2 after clicking pagination button', async () => {
     const user = userEvent.setup();
     setupFetch({
