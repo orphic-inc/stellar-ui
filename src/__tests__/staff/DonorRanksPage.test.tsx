@@ -121,6 +121,27 @@ describe('DonorRanksPage', () => {
     });
   });
 
+  it('fills badge and expiresAfterDays fields in create form', async () => {
+    const user = userEvent.setup();
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    await user.click(screen.getByRole('button', { name: /\+ create rank/i }));
+
+    const badgeInput = screen.getByLabelText(/badge/i) as HTMLInputElement;
+    await user.type(badgeInput, 'G');
+    expect(badgeInput.value).toBe('G');
+
+    const expiresInput = screen.getByLabelText(
+      /expires after/i
+    ) as HTMLInputElement;
+    await user.type(expiresInput, '180');
+    expect(expiresInput.value).toBe('180');
+  });
+
   it('dispatches danger alert on create failure', async () => {
     mockCreateDonorRank.mockReturnValue({
       unwrap: () => Promise.reject({ data: { msg: 'Duplicate rank name.' } })
