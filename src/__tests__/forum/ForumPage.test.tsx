@@ -74,6 +74,13 @@ describe('ForumPage', () => {
       forumId: 9,
       page: 2
     });
+
+    await user.click(screen.getByRole('button', { name: /prev/i }));
+
+    expect(mockUseGetTopicsByForumQuery).toHaveBeenLastCalledWith({
+      forumId: 9,
+      page: 1
+    });
   });
 
   it('shows empty and missing-forum states', () => {

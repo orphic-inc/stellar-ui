@@ -47,6 +47,17 @@ describe('SentboxPage', () => {
     expect(mockUseGetSentboxQuery).toHaveBeenLastCalledWith({ page: 2 });
   });
 
+  it('navigates back to page 1 when Previous is clicked from page 2', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<SentboxPage />);
+
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    expect(mockUseGetSentboxQuery).toHaveBeenLastCalledWith({ page: 2 });
+
+    await user.click(screen.getByRole('button', { name: /previous/i }));
+    expect(mockUseGetSentboxQuery).toHaveBeenLastCalledWith({ page: 1 });
+  });
+
   it('shows empty and error states', () => {
     mockUseGetSentboxQuery.mockReturnValue({
       data: { total: 0, page: 1, pageSize: 25, conversations: [] },

@@ -93,5 +93,8 @@ describe('CommunitiesPage', () => {
 
     await user.click(nextBtn);
     expect(mockUseGetCommunitiesQuery).toHaveBeenLastCalledWith(2);
+
+    await user.click(screen.getByRole('button', { name: /previous/i }));
+    expect(mockUseGetCommunitiesQuery).toHaveBeenLastCalledWith(1);
   });
 });

@@ -59,6 +59,16 @@ describe('ForumCategoryPage', () => {
     expect(screen.getByText('Ambient')).toBeInTheDocument();
   });
 
+  it('shows spinner while loading', () => {
+    mockUseGetForumCategoriesQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    renderWithProviders(<ForumCategoryPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
   it('shows the load failure state', () => {
     mockUseGetForumCategoriesQuery.mockReturnValue({
       data: undefined,
