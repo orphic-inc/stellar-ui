@@ -96,6 +96,7 @@ type FetchOpts = {
   profile?: ReturnType<typeof makeProfile>;
   profileStatus?: number;
   ipHistory?: Array<{ ip: string; seenAt: string }>;
+  emailHistory?: Array<{ email: string; changedAt: string }>;
   notes?: Array<{
     id: number;
     body: string;
@@ -116,6 +117,7 @@ const setupFetch = (opts: FetchOpts = {}) => {
     profile = makeProfile(),
     profileStatus = 200,
     ipHistory = [],
+    emailHistory = [],
     notes = [],
     warnings = []
   } = opts;
@@ -151,10 +153,19 @@ const setupFetch = (opts: FetchOpts = {}) => {
       );
     if (pathname === `/api/users/42/ip-history`)
       return Promise.resolve(makeResponse({ body: ipHistory }));
-    if (pathname === `/api/users/42/notes`)
+    if (pathname === `/api/users/42/email-history`)
+      return Promise.resolve(makeResponse({ body: emailHistory }));
+    if (pathname === `/api/users/42/notes` && method === 'GET')
       return Promise.resolve(makeResponse({ body: notes }));
-    if (pathname === `/api/users/42/warnings`)
+    if (pathname.match(/^\/api\/users\/42\/notes\/\d+$/) && method === 'DELETE')
+      return Promise.resolve(makeResponse({ status: 204, body: undefined }));
+    if (pathname === `/api/users/42/warnings` && method === 'GET')
       return Promise.resolve(makeResponse({ body: warnings }));
+    if (
+      pathname.match(/^\/api\/users\/42\/warnings\/\d+$/) &&
+      method === 'DELETE'
+    )
+      return Promise.resolve(makeResponse({ status: 204, body: undefined }));
     if (pathname === `/api/users/42/warn` && method === 'POST')
       return Promise.resolve(
         makeResponse({ body: { msg: 'Warning issued.' } })
@@ -470,6 +481,115 @@ describe('UserProfile RTK Query integration', () => {
     await user.click(screen.getByRole('button', { name: /ip history/i }));
 
     expect(await screen.findByText('192.168.1.1')).toBeInTheDocument();
+  });
+
+  it('clicks Disable Account and sends the disable request', async () => {
+    const user = userEvent.setup();
+    setupFetch({ profile: makeProfile({ disabled: false }) });
+    renderAs(STAFF_USER);
+
+    await screen.findByText('Staff Actions');
+    await user.click(screen.getByRole('button', { name: /disable account/i }));
+
+    await waitFor(() => {
+      const disableReqs = (global.fetch as jest.Mock).mock.calls
+        .map((call) => call[0] as Request)
+        .filter(
+          (req) =>
+            new URL(req.url, 'http://localhost').pathname ===
+            '/api/users/42/disable'
+        );
+      expect(disableReqs.length).toBe(1);
+    });
+  });
+
+  it('clicks Enable Account and sends the enable request', async () => {
+    const user = userEvent.setup();
+    setupFetch({ profile: makeProfile({ disabled: true }) });
+    renderAs(STAFF_USER);
+
+    await screen.findByText('Staff Actions');
+    await user.click(screen.getByRole('button', { name: /enable account/i }));
+
+    await waitFor(() => {
+      const enableReqs = (global.fetch as jest.Mock).mock.calls
+        .map((call) => call[0] as Request)
+        .filter(
+          (req) =>
+            new URL(req.url, 'http://localhost').pathname ===
+            '/api/users/42/enable'
+        );
+      expect(enableReqs.length).toBe(1);
+    });
+  });
+
+  it('expands Email History and shows email rows', async () => {
+    const user = userEvent.setup();
+    setupFetch({
+      emailHistory: [
+        { email: 'old@example.com', changedAt: '2024-01-01T00:00:00Z' }
+      ]
+    });
+    renderAs(STAFF_USER);
+
+    await screen.findByText('Staff Actions');
+    await user.click(screen.getByRole('button', { name: /email history/i }));
+
+    expect(await screen.findByText('old@example.com')).toBeInTheDocument();
+  });
+
+  it('expands Warnings section and shows existing warnings', async () => {
+    const user = userEvent.setup();
+    setupFetch({
+      warnings: [
+        {
+          id: 10,
+          reason: 'Spamming',
+          expiresAt: null,
+          createdAt: '2024-02-01T00:00:00Z',
+          warnedBy: { username: 'mod-alice' }
+        }
+      ]
+    });
+    renderAs(STAFF_USER);
+
+    await screen.findByText('Staff Actions');
+    await user.click(screen.getByRole('button', { name: /warnings/i }));
+
+    expect(await screen.findByText('Spamming')).toBeInTheDocument();
+    expect(screen.getByText(/mod-alice/)).toBeInTheDocument();
+  });
+
+  it('deletes a moderation note when × is clicked', async () => {
+    const user = userEvent.setup();
+    setupFetch({
+      notes: [
+        {
+          id: 5,
+          body: 'Watch this user',
+          createdAt: '2024-03-01T00:00:00Z',
+          author: { id: 99, username: 'staffmod' }
+        }
+      ]
+    });
+    renderAs(STAFF_USER);
+
+    await screen.findByText('Staff Actions');
+    await user.click(screen.getByRole('button', { name: /moderation notes/i }));
+    await screen.findByText('Watch this user');
+
+    await user.click(screen.getByRole('button', { name: '✕' }));
+
+    await waitFor(() => {
+      const deleteReqs = (global.fetch as jest.Mock).mock.calls
+        .map((call) => call[0] as Request)
+        .filter(
+          (req) =>
+            new URL(req.url, 'http://localhost').pathname ===
+              '/api/users/42/notes/5' && req.method === 'DELETE'
+        );
+      expect(deleteReqs.length).toBe(1);
+    });
   });
 
   it('expands Moderation Notes and adds a note via the form', async () => {
