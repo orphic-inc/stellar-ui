@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import CommunityPage from '../../components/communities/CommunityPage';
@@ -43,6 +43,15 @@ jest.mock('../../store/services/bookmarkApi', () => ({
     mockToggleBookmark,
     { isLoading: false }
   ]
+}));
+
+jest.mock('../../components/communities/ReportContributionModal', () => ({
+  __esModule: true,
+  default: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="report-modal">
+      <button onClick={onClose}>Close Report</button>
+    </div>
+  )
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -305,6 +314,166 @@ describe('CommunityPage', () => {
     expect(screen.getByText('[Report]')).toBeInTheDocument();
   });
 
+  it('dispatches success alert on bookmark with proper unwrap mock', async () => {
+    const user = userEvent.setup();
+    mockToggleBookmark.mockReturnValue({
+      unwrap: () => Promise.resolve({ bookmarked: true })
+    });
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    await user.click(screen.getByTitle(/bookmark community/i));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'success' })
+      })
+    );
+  });
+
+  it('dispatches "Bookmark removed." when bookmarked result is false', async () => {
+    const user = userEvent.setup();
+    mockToggleBookmark.mockReturnValue({
+      unwrap: () => Promise.resolve({ bookmarked: false })
+    });
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    await user.click(screen.getByTitle(/bookmark community/i));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Bookmark removed.',
+          alertType: 'success'
+        })
+      })
+    );
+  });
+
+  it('demotes staff member and removes a member', async () => {
+    const user = userEvent.setup();
+    mockCurrentUser = {
+      id: 99,
+      username: 'staffmember',
+      canDownload: true,
+      userRank: { permissions: {} }
+    };
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+
+    await user.click(screen.getByRole('button', { name: /demote/i }));
+    expect(mockRemoveCommunityStaff).toHaveBeenCalledWith({
+      communityId: 3,
+      userId: 99
+    });
+
+    await user.click(screen.getAllByRole('button', { name: /remove/i })[0]);
+    expect(mockRemoveCommunityMember).toHaveBeenCalled();
+  });
+
+  it('promotes a non-staff member to staff via Make Staff button', async () => {
+    const user = userEvent.setup();
+    mockCurrentUser = {
+      id: 99,
+      username: 'staffmember',
+      canDownload: true,
+      userRank: { permissions: {} }
+    };
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+
+    // alice (id:10) is a non-staff member — "Make Staff" button shown for her
+    await user.click(screen.getByRole('button', { name: /make staff/i }));
+    expect(mockAddCommunityStaff).toHaveBeenCalledWith({
+      communityId: 3,
+      userId: 10
+    });
+  });
+
+  it('shows loading spinner when releases are loading', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    mockUseGetReleasesByCommunityQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('shows "No members yet." when consumers list is empty', () => {
+    mockCurrentUser = {
+      id: 99,
+      username: 'staffmember',
+      canDownload: true,
+      userRank: { permissions: {} }
+    };
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity({ consumers: [], _count: { consumers: 0 } }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(screen.getByText('No members yet.')).toBeInTheDocument();
+  });
+
+  it('shows plural contributors and singular snatch for matching counts', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    mockUseGetReleasesByCommunityQuery.mockReturnValue({
+      data: makeReleasesResponse([{
+        ...makeRelease(1),
+        contributions: [
+          { id: 101, type: 'FLAC', sizeInBytes: 1073741824, linkStatus: 'ALIVE', user: { id: 10, username: 'alice' }, _count: { consumers: 1 } },
+          { id: 102, type: 'MP3', sizeInBytes: null, linkStatus: null, user: { id: 11, username: 'bob' }, _count: { consumers: 0 } }
+        ]
+      }]),
+      isLoading: false
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(screen.getByText(/2 contributors/)).toBeInTheDocument();
+    // "1 snatch" text is split across nodes — check via combined textContent
+    const statsEl = Array.from(document.querySelectorAll('div')).find(
+      (el) => el.textContent?.includes('1 snatch') && !el.textContent?.includes('snatches') && el.children.length === 0
+    );
+    expect(statsEl).toBeDefined();
+  });
+
+  it('opens and closes report modal via onClose callback', async () => {
+    const user = userEvent.setup();
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+
+    await user.click(screen.getByText('[Report]'));
+    expect(screen.getByTestId('report-modal')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /close report/i }));
+    expect(screen.queryByTestId('report-modal')).not.toBeInTheDocument();
+  });
+
   it('shows pagination controls when multiple release pages exist', async () => {
     const user = userEvent.setup();
     mockUseGetCommunityByIdQuery.mockReturnValue({
@@ -322,6 +491,85 @@ describe('CommunityPage', () => {
     expect(mockUseGetReleasesByCommunityQuery).toHaveBeenLastCalledWith({
       communityId: 3,
       page: 2
+    });
+  });
+
+  it('does not add member when userId input is empty (guard fires)', () => {
+    mockCurrentUser = {
+      id: 99,
+      username: 'staffmember',
+      canDownload: true,
+      userRank: { permissions: {} }
+    };
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    const form = document.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
+    expect(mockAddCommunityMember).not.toHaveBeenCalled();
+  });
+
+  it('handles community without staff array (isStaff defaults to false)', () => {
+    mockCurrentUser = {
+      id: 7,
+      username: 'testuser',
+      canDownload: true,
+      userRank: { permissions: { communities_manage: true } }
+    };
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity({ staff: undefined }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    // Renders OK — staff panel visible via permission
+    expect(screen.getByText('Members')).toBeInTheDocument();
+  });
+
+  it('renders release without tags or contributions gracefully', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    mockUseGetReleasesByCommunityQuery.mockReturnValue({
+      data: makeReleasesResponse([{
+        id: 9,
+        title: 'Sparse Release',
+        artist: null,
+        year: null,
+        type: null,
+        image: null
+        // no tags or contributions properties
+      }]),
+      isLoading: false
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(screen.getByText('Sparse Release')).toBeInTheDocument();
+  });
+
+  it('navigates to previous page on Previous button click', async () => {
+    const user = userEvent.setup();
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    mockUseGetReleasesByCommunityQuery.mockReturnValue({
+      data: { data: [makeRelease(1)], meta: { total: 50, limit: 25 } },
+      isLoading: false
+    });
+    renderWithProviders(<CommunityPage />);
+    // Go to page 2 first
+    await user.click(screen.getByRole('button', { name: /^next$/i }));
+    // Then go back
+    await user.click(screen.getByRole('button', { name: /^previous$/i }));
+    expect(mockUseGetReleasesByCommunityQuery).toHaveBeenLastCalledWith({
+      communityId: 3,
+      page: 1
     });
   });
 });
