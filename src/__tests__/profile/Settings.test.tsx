@@ -214,4 +214,134 @@ describe('Settings', () => {
     await user.click(screen.getByRole('button', { name: /security/i }));
     expect(screen.getByText(/no active sessions found/i)).toBeInTheDocument();
   });
+
+  it('dispatches danger alert when profile save fails', async () => {
+    const updateFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.reject({ status: 500 }) });
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      updateFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /save settings/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('dispatches danger alert when password change fails', async () => {
+    const changePwFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.reject({ status: 500 }) });
+    mockUseChangePasswordMutation.mockReturnValue([
+      changePwFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    await user.type(screen.getByLabelText('Current password'), 'oldpass');
+    await user.type(screen.getByLabelText('New password'), 'match1');
+    await user.type(screen.getByLabelText(/confirm new password/i), 'match1');
+    await user.click(screen.getByRole('button', { name: /change password/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('calls changeEmail and dispatches success alert on email change', async () => {
+    const changeEmailFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUseChangeEmailMutation.mockReturnValue([
+      changeEmailFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    await user.type(
+      screen.getByLabelText(/new email address/i),
+      'new@example.com'
+    );
+    await user.type(
+      screen.getByLabelText(/current password \(to confirm\)/i),
+      'mypassword'
+    );
+    await user.click(screen.getByRole('button', { name: /^change email$/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(changeEmailFn).toHaveBeenCalledWith({
+      newEmail: 'new@example.com',
+      password: 'mypassword'
+    });
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Email changed successfully.',
+          alertType: 'success'
+        })
+      })
+    );
+  });
+
+  it('dispatches danger alert when email change fails', async () => {
+    const changeEmailFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.reject({ status: 400 }) });
+    mockUseChangeEmailMutation.mockReturnValue([
+      changeEmailFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    await user.type(screen.getByLabelText(/new email address/i), 'bad@x.com');
+    await user.type(
+      screen.getByLabelText(/current password \(to confirm\)/i),
+      'wrongpw'
+    );
+    await user.click(screen.getByRole('button', { name: /^change email$/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('calls revokeSession when Revoke button is clicked', async () => {
+    const revokeFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUseRevokeSessionMutation.mockReturnValue([
+      revokeFn,
+      { isLoading: false }
+    ]);
+    mockUseGetSessionsQuery.mockReturnValue({
+      data: [
+        {
+          id: 'ses-abc',
+          userAgent: 'Firefox/120',
+          ipAddress: '1.2.3.4',
+          lastActiveAt: '2026-05-17T12:00:00Z',
+          isCurrent: false
+        }
+      ],
+      isLoading: false
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    await user.click(screen.getByRole('button', { name: /revoke/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(revokeFn).toHaveBeenCalledWith('ses-abc');
+  });
 });
