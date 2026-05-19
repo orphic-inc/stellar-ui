@@ -43,6 +43,24 @@ describe('RatioRulesPage', () => {
     expect(screen.getByText('← your bracket')).toBeInTheDocument();
   });
 
+  it('shows red ratio color and green coverage when meetsRequirement=false and coverage>=1', () => {
+    mockUseGetMyRatioStatsQuery.mockReturnValue({
+      data: {
+        ratio: 0.1,
+        requiredRatio: 0.3,
+        totalEarned: '10737418240',
+        consumed: '26843545600',
+        eligibleContributionBytes: '5368709120',
+        contributionCoverage: 1.5,
+        meetsRequirement: false,
+        bracket: { label: '20–30 GiB', maxRequired: 0.3, minRequired: 0.05 },
+        policy: { status: 'OK', watchStartedAt: null, watchExpiresAt: null, leechDisabledAt: null, lastEvaluatedAt: null }
+      }
+    });
+    renderWithProviders(<RatioRulesPage />);
+    expect(screen.getByText('150%')).toBeInTheDocument();
+  });
+
   it('renders the static guidance even without stats', () => {
     mockUseGetMyRatioStatsQuery.mockReturnValue({ data: undefined });
 

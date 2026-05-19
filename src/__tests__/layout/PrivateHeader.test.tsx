@@ -3,6 +3,9 @@ import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../testUtils';
 import PrivateHeader from '../../components/pages/private/layout/PrivateHeader';
 
+const mockUseGetUnreadCountQuery = jest.fn();
+const mockUseGetQueueCountQuery = jest.fn();
+
 jest.mock('../../components/layout/UserMenu', () => ({
   __esModule: true,
   default: ({ user }: { user: { username: string } }) => (
@@ -32,19 +35,25 @@ jest.mock('react-router-dom', () => ({
   ),
   NavLink: ({
     to,
-    children
+    children,
+    className
   }: {
     to: string;
     children:
       | ((arg: { isActive: boolean }) => React.ReactNode)
       | React.ReactNode;
-  }) => (
-    <a href={to}>
-      {typeof children === 'function'
-        ? children({ isActive: false })
-        : children}
-    </a>
-  )
+    className?: ((arg: { isActive: boolean }) => string) | string;
+  }) => {
+    const inactiveClass =
+      typeof className === 'function' ? className({ isActive: false }) : (className ?? '');
+    const activeClass =
+      typeof className === 'function' ? className({ isActive: true }) : '';
+    return (
+      <a href={to} className={inactiveClass} data-active-class={activeClass}>
+        {typeof children === 'function' ? children({ isActive: false }) : children}
+      </a>
+    );
+  }
 }));
 
 jest.mock('../../utils/permissions', () => ({
@@ -53,11 +62,11 @@ jest.mock('../../utils/permissions', () => ({
 }));
 
 jest.mock('../../store/services/messagesApi', () => ({
-  useGetUnreadCountQuery: () => ({ data: { count: 0 } })
+  useGetUnreadCountQuery: () => mockUseGetUnreadCountQuery()
 }));
 
 jest.mock('../../store/services/staffInboxApi', () => ({
-  useGetQueueCountQuery: () => ({ data: { count: 0 } })
+  useGetQueueCountQuery: () => mockUseGetQueueCountQuery()
 }));
 
 const mockUser = {
@@ -73,6 +82,12 @@ const mockUser = {
 };
 
 describe('PrivateHeader', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseGetUnreadCountQuery.mockReturnValue({ data: { count: 0 } });
+    mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 0 } });
+  });
+
   it('renders Stellar brand link', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
     expect(screen.getByRole('link', { name: /stellar/i })).toHaveAttribute(
@@ -137,5 +152,42 @@ describe('PrivateHeader', () => {
   it('hides ModBar for non-staff users', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
     expect(screen.queryByText('ModBar')).not.toBeInTheDocument();
+  });
+
+  it('NavLink className returns active styles when isActive is true', () => {
+    renderWithProviders(<PrivateHeader user={mockUser as never} />);
+    const communityLink = screen.getByRole('link', { name: 'Communities' });
+    expect(communityLink.getAttribute('data-active-class')).toContain(
+      'border-indigo-500'
+    );
+  });
+
+  it('shows inbox unread badge when there are unread messages', () => {
+    mockUseGetUnreadCountQuery.mockReturnValue({ data: { count: 4 } });
+    renderWithProviders(<PrivateHeader user={mockUser as never} />);
+    expect(screen.getByText('4')).toBeInTheDocument();
+  });
+
+  it('shows staff inbox badge when there are pending tickets', () => {
+    const staffUser = { ...mockUser, permissions: { staff: true } };
+    mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 7 } });
+    renderWithProviders(<PrivateHeader user={staffUser as never} />);
+    expect(screen.getByText('7')).toBeInTheDocument();
+  });
+
+  it('shows 0 B for contributed and consumed when user has no data', () => {
+    renderWithProviders(
+      <PrivateHeader
+        user={{ ...mockUser, contributed: null, consumed: null } as never}
+      />
+    );
+    expect(screen.getAllByText('0 B').length).toBeGreaterThan(0);
+  });
+
+  it('handles undefined inbox and ticket data without crashing', () => {
+    mockUseGetUnreadCountQuery.mockReturnValue({ data: undefined });
+    mockUseGetQueueCountQuery.mockReturnValue({ data: undefined });
+    renderWithProviders(<PrivateHeader user={mockUser as never} />);
+    expect(screen.getByRole('link', { name: 'Inbox' })).toBeInTheDocument();
   });
 });

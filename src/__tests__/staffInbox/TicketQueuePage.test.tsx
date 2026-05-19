@@ -168,6 +168,66 @@ describe('TicketQueuePage', () => {
     );
   });
 
+  it('unchecks assignedToMe without affecting unassigned (false branch of if(e.target.checked))', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TicketQueuePage />);
+    await user.click(screen.getByLabelText('Assigned to me'));
+    await user.click(screen.getByLabelText('Assigned to me'));
+    expect(mockUseGetTicketQueueQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ assignedToMe: false })
+    );
+  });
+
+  it('unchecks Unassigned only without affecting assignedToMe', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TicketQueuePage />);
+    await user.click(screen.getByLabelText('Unassigned only'));
+    await user.click(screen.getByLabelText('Unassigned only'));
+    expect(mockUseGetTicketQueueQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ unassigned: false })
+    );
+  });
+
+  it('renders "—" for null user and fallback badge for unknown status', () => {
+    mockUseGetTicketQueueQuery.mockReturnValue({
+      data: {
+        total: 1,
+        page: 1,
+        pageSize: 25,
+        conversations: [
+          {
+            id: 9,
+            subject: 'Odd ticket',
+            status: 'Unknown',
+            user: null,
+            assignedUser: null,
+            updatedAt: '2026-05-17T12:00:00.000Z'
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<TicketQueuePage />);
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+    expect(screen.getByText('Unknown')).toBeInTheDocument();
+  });
+
+  it('navigates to previous page when Previous button is clicked', async () => {
+    const user = userEvent.setup();
+    mockUseGetTicketQueueQuery.mockReturnValue({
+      data: { total: 50, pageSize: 25, conversations: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<TicketQueuePage />);
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    await user.click(screen.getByRole('button', { name: /previous/i }));
+    expect(mockUseGetTicketQueueQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: 1 })
+    );
+  });
+
   it('toggles Unassigned filter and clears Assigned to me', async () => {
     const user = userEvent.setup();
     renderWithProviders(<TicketQueuePage />);

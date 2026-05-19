@@ -16,10 +16,13 @@ jest.mock('../../store/services/authApi', () => ({
   useGetMeQuery: () => mockUseGetMeQuery()
 }));
 
+let mockIsCreating = false;
+let mockIsUpdating = false;
+
 jest.mock('../../store/services/wikiApi', () => ({
   useGetWikiPageQuery: (...args: unknown[]) => mockUseGetWikiPageQuery(...args),
-  useCreateWikiPageMutation: () => [mockCreateWikiPage, { isLoading: false }],
-  useUpdateWikiPageMutation: () => [mockUpdateWikiPage, { isLoading: false }]
+  useCreateWikiPageMutation: () => [mockCreateWikiPage, { isLoading: mockIsCreating }],
+  useUpdateWikiPageMutation: () => [mockUpdateWikiPage, { isLoading: mockIsUpdating }]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -31,6 +34,8 @@ jest.mock('react-router-dom', () => ({
 describe('WikiEditPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsCreating = false;
+    mockIsUpdating = false;
     mockUseGetMeQuery.mockReturnValue({
       data: {
         id: 9,
@@ -151,6 +156,78 @@ describe('WikiEditPage', () => {
       expect(
         screen.queryByLabelText(/min rank level to edit/i)
       ).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows "Back" as back label when existing page data is unavailable in edit mode', () => {
+    mockUseParams.mockReturnValue({ id: '12' });
+    mockUseGetWikiPageQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 404 }
+    });
+    renderWithProviders(<WikiEditPage />);
+    expect(screen.getByRole('link', { name: /← back/i })).toBeInTheDocument();
+  });
+
+  it('shows spinner when loading existing page (edit mode + isLoading=true)', () => {
+    mockUseParams.mockReturnValue({ id: '12' });
+    mockUseGetWikiPageQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    renderWithProviders(<WikiEditPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('shows "Saving…" when isSaving is true', () => {
+    mockIsCreating = true;
+    mockUseParams.mockReturnValue({});
+    mockUseGetWikiPageQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<WikiEditPage />);
+    expect(screen.getByRole('button', { name: /saving…/i })).toBeInTheDocument();
+  });
+
+  it('dispatches fallback danger alert when save fails with no API message', async () => {
+    mockUseParams.mockReturnValue({ id: '12' });
+    mockUseGetWikiPageQuery.mockReturnValue({
+      data: { id: 12, title: 'Existing', body: '<p>Old</p>', slug: 'existing', minReadLevel: 0, minEditLevel: 0 },
+      isLoading: false,
+      error: undefined
+    });
+    mockUpdateWikiPage.mockReturnValue({ unwrap: () => Promise.reject({}) });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    renderWithProviders(<WikiEditPage />, { store });
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === 'Failed to save.')).toBe(true);
+    });
+  });
+
+  it('omits manager fields in update when user is not a manager', async () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 5, username: 'editor', userRank: { permissions: { wiki_edit: true } } }
+    });
+    mockUseParams.mockReturnValue({ id: '12' });
+    mockUseGetWikiPageQuery.mockReturnValue({
+      data: { id: 12, title: 'Existing', body: '<p>Old</p>', slug: 'existing', minReadLevel: 0, minEditLevel: 0 },
+      isLoading: false,
+      error: undefined
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<WikiEditPage />);
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => {
+      expect(mockUpdateWikiPage).toHaveBeenCalledWith(
+        expect.not.objectContaining({ minReadLevel: expect.anything() })
+      );
     });
   });
 

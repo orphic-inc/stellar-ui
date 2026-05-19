@@ -8,6 +8,7 @@ import NewTopicForm from '../../components/forum/NewTopicForm';
 const mockUseGetForumByIdQuery = jest.fn();
 const mockCreateTopic = jest.fn();
 const mockNavigate = jest.fn();
+let mockForumId: string | undefined = '9';
 
 jest.mock('../../store/services/forumApi', () => ({
   useGetForumByIdQuery: (...args: unknown[]) =>
@@ -17,13 +18,14 @@ jest.mock('../../store/services/forumApi', () => ({
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({ forumId: '9' }),
+  useParams: () => ({ forumId: mockForumId }),
   useNavigate: () => mockNavigate
 }));
 
 describe('NewTopicForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockForumId = '9';
     mockUseGetForumByIdQuery.mockReturnValue({
       data: { id: 9, name: 'Jazz Forum' }
     });
@@ -56,6 +58,52 @@ describe('NewTopicForm', () => {
         answers: JSON.stringify(['CD', 'Vinyl'])
       });
       expect(mockNavigate).toHaveBeenCalledWith('/private/forums/9/topics/77');
+    });
+  });
+
+  it('removes an answer when "−" is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<NewTopicForm />);
+    await user.click(screen.getByRole('button', { name: /^show$/i }));
+    await user.click(screen.getByRole('button', { name: '+' }));
+    expect(screen.getAllByRole('textbox').length).toBe(5);
+    await user.click(screen.getByRole('button', { name: '−' }));
+    expect(screen.getAllByRole('textbox').length).toBe(4);
+  });
+
+  it('uses forumId 0 fallback in query and submit when param is undefined', async () => {
+    mockForumId = undefined;
+    mockUseGetForumByIdQuery.mockReturnValue({ data: undefined });
+    const user = userEvent.setup();
+    renderWithProviders(<NewTopicForm />);
+    expect(screen.getByText('Forum')).toBeInTheDocument();
+    const textboxes = screen.getAllByRole('textbox');
+    await user.type(textboxes[0], 'Title');
+    await user.type(textboxes[1], 'Body');
+    await user.click(screen.getByDisplayValue(/create thread/i));
+    await waitFor(() => {
+      expect(mockCreateTopic).toHaveBeenCalledWith(
+        expect.objectContaining({ forumId: 0 })
+      );
+    });
+  });
+
+  it('dispatches fallback alert when creation fails with no API message', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    mockCreateTopic.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    renderWithProviders(<NewTopicForm />, { store });
+    const textboxes = screen.getAllByRole('textbox');
+    await user.type(textboxes[0], 'Title');
+    await user.type(textboxes[1], 'Body text');
+    await user.click(screen.getByDisplayValue(/create thread/i));
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(
+        alerts.some((a) => a.msg === 'Failed to create topic. Please try again.')
+      ).toBe(true);
     });
   });
 

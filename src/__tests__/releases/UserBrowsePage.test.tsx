@@ -220,6 +220,99 @@ describe('UserBrowsePage', () => {
     expect(params.get('page')).toBe('2');
   });
 
+  it('initializes disabled select from URL params (covers disabled=true/false branches)', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { staff: true } } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: {
+        data: [{ ...makeUser(1), lastLogin: null }],
+        meta: { total: 1, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('disabled=true'),
+      mockSetSearchParams
+    ]);
+    renderWithProviders(<UserBrowsePage />);
+    const select = screen.getByRole('combobox', { name: /status/i }) as HTMLSelectElement;
+    expect(select.value).toBe('true');
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
+  it('submits with non-default orderBy, order=desc, and disabled=false (covers handleSubmit branches)', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { staff: true } } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    await user.selectOptions(screen.getByRole('combobox', { name: /order by/i }), 'createdAt');
+    await user.selectOptions(screen.getByRole('combobox', { name: /direction/i }), 'desc');
+    await user.selectOptions(screen.getByRole('combobox', { name: /status/i }), 'false');
+    await user.click(screen.getByRole('button', { name: /^search$/i }));
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('orderBy')).toBe('createdAt');
+    expect(params.get('order')).toBe('desc');
+    expect(params.get('disabled')).toBe('false');
+  });
+
+  it('initializes disabled select to false when URL param is disabled=false', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { staff: true } } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('disabled=false'),
+      mockSetSearchParams
+    ]);
+    renderWithProviders(<UserBrowsePage />);
+    const select = screen.getByRole('combobox', { name: /status/i }) as HTMLSelectElement;
+    expect(select.value).toBe('false');
+  });
+
+  it('does not set disabled param when privileged user submits with status=All', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { staff: true } } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    await user.click(screen.getByRole('button', { name: /^search$/i }));
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('disabled')).toBeNull();
+  });
+
+  it('resets search params when Reset button is clicked', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 1, userRank: { permissions: {} } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    await user.click(screen.getByRole('button', { name: /reset/i }));
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.toString()).toBe('');
+  });
+
   it('includes disabled filter in search params when privileged user submits', async () => {
     const user = userEvent.setup();
     mockUseGetMeQuery.mockReturnValue({

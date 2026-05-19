@@ -6,9 +6,10 @@ import DownloadButton from '../../components/communities/DownloadButton';
 
 const mockGrantAccess = jest.fn();
 const mockDispatch = jest.fn();
+let mockIsLoading = false;
 
 jest.mock('../../store/services/downloadApi', () => ({
-  useGrantAccessMutation: () => [mockGrantAccess, { isLoading: false }]
+  useGrantAccessMutation: () => [mockGrantAccess, { isLoading: mockIsLoading }]
 }));
 
 jest.mock('../../store/hooks', () => ({
@@ -18,6 +19,7 @@ jest.mock('../../store/hooks', () => ({
 describe('DownloadButton', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsLoading = false;
     mockGrantAccess.mockReturnValue({
       unwrap: () =>
         Promise.resolve({ downloadUrl: 'https://example.com/file.zip' })
@@ -74,5 +76,34 @@ describe('DownloadButton', () => {
         })
       );
     });
+  });
+
+  it('dispatches fallback danger alert when rejection has no API message', async () => {
+    mockGrantAccess.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(
+      <DownloadButton contributionId={1} canDownload={true} />
+    );
+    await user.click(screen.getByRole('button', { name: /download/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: 'Failed to access download.',
+            alertType: 'danger'
+          })
+        })
+      );
+    });
+  });
+
+  it('shows "Loading…" button label when isLoading is true', () => {
+    mockIsLoading = true;
+    renderWithProviders(
+      <DownloadButton contributionId={1} canDownload={true} />
+    );
+    expect(screen.getByRole('button', { name: /loading…/i })).toBeInTheDocument();
   });
 });

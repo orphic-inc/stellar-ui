@@ -131,6 +131,48 @@ describe('UserRankFormPage — edit mode', () => {
     });
   });
 
+  it('shows spinner when isLoading is true in edit mode', () => {
+    mockGetUserRankByIdQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true
+    });
+    renderWithProviders(<UserRankFormPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('prefills empty permissions object when existing.permissions is null', async () => {
+    mockGetUserRankByIdQuery.mockReturnValue({
+      data: { id: 4, level: 100, name: 'Basic', permissions: null },
+      isLoading: false
+    });
+    renderWithProviders(<UserRankFormPage />);
+    await waitFor(() => {
+      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe('Basic');
+    });
+  });
+
+  it('dispatches danger alert on update failure', async () => {
+    mockUpdateUserRank.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<UserRankFormPage />);
+    await waitFor(() =>
+      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe('Staff')
+    );
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: 'Failed to update user rank.',
+            alertType: 'danger'
+          })
+        })
+      );
+    });
+  });
+
   it('calls updateUserRank and navigates on success', async () => {
     const user = userEvent.setup();
     renderWithProviders(<UserRankFormPage />);

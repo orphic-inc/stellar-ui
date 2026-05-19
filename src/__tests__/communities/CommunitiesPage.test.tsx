@@ -74,6 +74,17 @@ describe('CommunitiesPage', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('renders empty list when data has no data or meta fields', () => {
+    mockUseGetCommunitiesQuery.mockReturnValue({
+      data: {},
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunitiesPage />);
+    expect(screen.getByText('Communities')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /previous/i })).not.toBeInTheDocument();
+  });
+
   it('shows pagination and advances pages when total exceeds page size', async () => {
     const user = userEvent.setup();
     mockUseGetCommunitiesQuery.mockReturnValue({

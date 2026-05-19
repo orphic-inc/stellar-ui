@@ -10,14 +10,17 @@ const mockDeleteAnnouncement = jest.fn();
 const mockCreateBlogPost = jest.fn();
 const mockDeleteBlogPost = jest.fn();
 
+let mockCreatingNews = false;
+let mockCreatingBlog = false;
+
 jest.mock('../../store/services/announcementApi', () => ({
   useGetAnnouncementsQuery: () => mockGetAnnouncementsQuery(),
   useCreateAnnouncementMutation: () => [
     mockCreateAnnouncement,
-    { isLoading: false }
+    { isLoading: mockCreatingNews }
   ],
   useDeleteAnnouncementMutation: () => [mockDeleteAnnouncement],
-  useCreateBlogPostMutation: () => [mockCreateBlogPost, { isLoading: false }],
+  useCreateBlogPostMutation: () => [mockCreateBlogPost, { isLoading: mockCreatingBlog }],
   useDeleteBlogPostMutation: () => [mockDeleteBlogPost]
 }));
 
@@ -38,6 +41,8 @@ const emptyData = { announcements: [], blogPosts: [] };
 describe('NewsManager', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCreatingNews = false;
+    mockCreatingBlog = false;
     mockCreateAnnouncement.mockResolvedValue({});
     mockCreateBlogPost.mockResolvedValue({});
   });
@@ -151,6 +156,28 @@ describe('NewsManager', () => {
     expect(screen.getByText('admin')).toBeInTheDocument();
   });
 
+  it('calls deleteBlogPost when Delete button is clicked', async () => {
+    const user = userEvent.setup();
+    mockGetAnnouncementsQuery.mockReturnValue({
+      data: {
+        announcements: [],
+        blogPosts: [
+          {
+            id: 5,
+            title: 'Old Post',
+            createdAt: '2026-03-01T00:00:00Z',
+            user: { username: 'admin' }
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<NewsManager />);
+    await user.click(screen.getByRole('button', { name: /^delete$/i }));
+    expect(mockDeleteBlogPost).toHaveBeenCalledWith(5);
+  });
+
   it('submits blog post form with title and body', async () => {
     const user = userEvent.setup();
     mockGetAnnouncementsQuery.mockReturnValue({
@@ -168,5 +195,51 @@ describe('NewsManager', () => {
       title: 'Monthly Update',
       body: 'Content here.'
     });
+  });
+
+  it('shows "Posting…" when creatingNews is true', () => {
+    mockCreatingNews = true;
+    mockGetAnnouncementsQuery.mockReturnValue({
+      data: emptyData,
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<NewsManager />);
+    expect(
+      screen.getByRole('button', { name: /posting…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('shows "Posting…" for blog when creatingBlog is true', () => {
+    mockCreatingBlog = true;
+    mockGetAnnouncementsQuery.mockReturnValue({
+      data: emptyData,
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<NewsManager />);
+    expect(
+      screen.getAllByRole('button', { name: /posting…/i }).length
+    ).toBeGreaterThan(0);
+  });
+
+  it('shows dash when blog post has no user', () => {
+    mockGetAnnouncementsQuery.mockReturnValue({
+      data: {
+        announcements: [],
+        blogPosts: [
+          {
+            id: 9,
+            title: 'Anonymous',
+            createdAt: '2026-04-01T00:00:00Z',
+            user: null
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<NewsManager />);
+    expect(screen.getByText('—')).toBeInTheDocument();
   });
 });

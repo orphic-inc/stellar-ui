@@ -98,4 +98,44 @@ describe('ContributionsPage', () => {
     renderWithProviders(<ContributionsPage />);
     expect(screen.getAllByText('—').length).toBeGreaterThan(0);
   });
+
+  it('renders release title as plain text when communityId is null', () => {
+    mockUseGetContributionsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            ...makeContribution(1),
+            release: { id: 10, title: 'Orphaned Release', communityId: null }
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ContributionsPage />);
+    expect(screen.getByText('Orphaned Release')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Orphaned Release' })).not.toBeInTheDocument();
+  });
+
+  it('shows dash when releaseDescription or sizeInBytes is null', () => {
+    mockUseGetContributionsQuery.mockReturnValue({
+      data: {
+        data: [{ ...makeContribution(1), releaseDescription: null, sizeInBytes: null }]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ContributionsPage />);
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+  });
+
+  it('renders empty list when data has no data field', () => {
+    mockUseGetContributionsQuery.mockReturnValue({
+      data: {},
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ContributionsPage />);
+    expect(screen.getByText(/no contributions yet/i)).toBeInTheDocument();
+  });
 });

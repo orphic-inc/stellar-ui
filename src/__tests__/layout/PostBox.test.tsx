@@ -6,9 +6,10 @@ import PostBox from '../../components/layout/PostBox';
 
 const mockCreatePost = jest.fn();
 const mockDispatch = jest.fn();
+let mockIsLoading = false;
 
 jest.mock('../../store/services/forumApi', () => ({
-  useCreatePostMutation: () => [mockCreatePost, { isLoading: false }]
+  useCreatePostMutation: () => [mockCreatePost, { isLoading: mockIsLoading }]
 }));
 
 jest.mock('react-redux', () => ({
@@ -19,6 +20,7 @@ jest.mock('react-redux', () => ({
 describe('PostBox', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsLoading = false;
     mockCreatePost.mockReturnValue({
       unwrap: () => Promise.resolve({ id: 1 })
     });
@@ -72,6 +74,34 @@ describe('PostBox', () => {
         })
       );
     });
+  });
+
+  it('dispatches fallback danger alert when rejection has no API message', async () => {
+    mockCreatePost.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<PostBox forumId="1" topicId="5" />);
+    await user.type(screen.getByRole('textbox'), 'Oops');
+    await user.click(screen.getByRole('button', { name: /post reply/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: 'Failed to post reply.',
+            alertType: 'danger'
+          })
+        })
+      );
+    });
+  });
+
+  it('shows "Posting…" button label when isLoading is true', () => {
+    mockIsLoading = true;
+    renderWithProviders(<PostBox forumId="1" topicId="5" />);
+    expect(
+      screen.getByRole('button', { name: /posting…/i })
+    ).toBeInTheDocument();
   });
 
   it('prepopulates body with quoteText when provided', () => {

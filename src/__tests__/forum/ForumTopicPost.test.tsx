@@ -29,8 +29,10 @@ jest.mock('react-router-dom', () => ({
 const mockUpdatePost = jest.fn();
 const mockDeletePost = jest.fn();
 
+let mockIsSaving = false;
+
 jest.mock('../../store/services/forumApi', () => ({
-  useUpdatePostMutation: () => [mockUpdatePost, { isLoading: false }],
+  useUpdatePostMutation: () => [mockUpdatePost, { isLoading: mockIsSaving }],
   useDeletePostMutation: () => [mockDeletePost]
 }));
 
@@ -48,6 +50,7 @@ const mockPost = {
 describe('ForumTopicPost', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsSaving = false;
     mockUpdatePost.mockResolvedValue({});
     mockDeletePost.mockResolvedValue({});
     window.confirm = jest.fn(() => true);
@@ -210,6 +213,41 @@ describe('ForumTopicPost', () => {
         postId: 7
       });
     });
+  });
+
+  it('uses "unknown" fallback for author username when author is null', async () => {
+    const user = userEvent.setup();
+    const mockOnQuote = jest.fn();
+    const postWithNullAuthor = { ...mockPost, author: null };
+    renderWithProviders(
+      <ForumTopicPost
+        post={postWithNullAuthor}
+        forumId={1}
+        topicId={5}
+        onQuote={mockOnQuote}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /quote/i }));
+    expect(mockOnQuote).toHaveBeenCalledWith(
+      '[quote=unknown]Hello forum world[/quote]'
+    );
+  });
+
+  it('shows "Saving…" in save button when saving is true', async () => {
+    mockIsSaving = true;
+    const user = userEvent.setup();
+    renderWithProviders(
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
   });
 
   it('does not call deletePost when confirm is cancelled', async () => {

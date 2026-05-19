@@ -8,9 +8,11 @@ const mockGetDonorRanksQuery = jest.fn();
 const mockCreateDonorRank = jest.fn();
 const mockDispatch = jest.fn();
 
+let mockIsCreating = false;
+
 jest.mock('../../store/services/userApi', () => ({
   useGetDonorRanksQuery: () => mockGetDonorRanksQuery(),
-  useCreateDonorRankMutation: () => [mockCreateDonorRank, { isLoading: false }]
+  useCreateDonorRankMutation: () => [mockCreateDonorRank, { isLoading: mockIsCreating }]
 }));
 
 jest.mock('react-redux', () => ({
@@ -29,6 +31,7 @@ const makeRank = (id: number) => ({
 describe('DonorRanksPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsCreating = false;
     mockCreateDonorRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
@@ -140,6 +143,76 @@ describe('DonorRanksPage', () => {
     ) as HTMLInputElement;
     await user.type(expiresInput, '180');
     expect(expiresInput.value).toBe('180');
+  });
+
+  it('shows "Creating…" button label when isCreating is true', async () => {
+    const user = userEvent.setup();
+    mockIsCreating = true;
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    await user.click(screen.getByRole('button', { name: /\+ create rank/i }));
+    expect(
+      screen.getByRole('button', { name: /creating…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('shows dash when badge is null', () => {
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [{ ...makeRank(1), badge: null }],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
+  it('submits rank with badge and expiresAfterDays when filled', async () => {
+    const user = userEvent.setup();
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    await user.click(screen.getByRole('button', { name: /\+ create rank/i }));
+    await user.type(screen.getByLabelText(/^name$/i), 'Gold');
+    await user.type(screen.getByLabelText(/min donation/i), '100');
+    await user.type(screen.getByLabelText(/badge/i), 'G');
+    await user.type(screen.getByLabelText(/expires after/i), '365');
+    await user.click(screen.getByRole('button', { name: /^create rank$/i }));
+    await waitFor(() => {
+      expect(mockCreateDonorRank).toHaveBeenCalledWith(
+        expect.objectContaining({ badge: 'G', expiresAfterDays: 365 })
+      );
+    });
+  });
+
+  it('dispatches fallback danger alert when create fails with no API message', async () => {
+    mockCreateDonorRank.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    await user.click(screen.getByRole('button', { name: /\+ create rank/i }));
+    await user.type(screen.getByLabelText(/^name$/i), 'Silver');
+    await user.type(screen.getByLabelText(/min donation/i), '25');
+    await user.click(screen.getByRole('button', { name: /^create rank$/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ msg: 'Failed to create donor rank.' })
+        })
+      );
+    });
   });
 
   it('dispatches danger alert on create failure', async () => {

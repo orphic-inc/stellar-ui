@@ -121,6 +121,26 @@ describe('InviteForm', () => {
     );
   });
 
+  it('dispatches fallback danger alert when API error has no message', async () => {
+    mockCreateInvite.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<InviteForm />);
+    await user.type(
+      document.querySelector('input[type="email"]') as HTMLElement,
+      'a@b.com'
+    );
+    await user.click(screen.getByRole('button', { name: /invite/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Failed to send invite. Please try again.'
+        })
+      })
+    );
+  });
+
   it('clears form fields after successful invite', async () => {
     mockCreateInvite.mockReturnValue({
       unwrap: () => Promise.resolve({ emailSent: true })

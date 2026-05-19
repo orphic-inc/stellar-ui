@@ -7,10 +7,19 @@ import Install from '../../components/pages/public/Install';
 const mockInstall = jest.fn();
 const mockNavigate = jest.fn();
 const mockDispatch = jest.fn();
+let mockIsInstalling = false;
 
 jest.mock('../../store/services/installApi', () => ({
-  installApi: { util: { updateQueryData: jest.fn(() => ({ type: 'mock' })) } },
-  useInstallMutation: () => [mockInstall, { isLoading: false }]
+  installApi: {
+    util: {
+      updateQueryData: jest.fn((...args: unknown[]) => {
+        const fn = args[2];
+        if (typeof fn === 'function') fn({});
+        return { type: 'mock' };
+      })
+    }
+  },
+  useInstallMutation: () => [mockInstall, { isLoading: mockIsInstalling }]
 }));
 
 jest.mock('../../store/hooks', () => ({
@@ -49,6 +58,7 @@ const fillForm = async (
 describe('Install', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsInstalling = false;
   });
 
   it('renders username, email, password, confirm fields and Install button', () => {
@@ -135,6 +145,29 @@ describe('Install', () => {
       expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
     });
     expect(mockInstall).not.toHaveBeenCalled();
+  });
+
+  it('shows "Installing…" when isLoading is true', () => {
+    mockIsInstalling = true;
+    renderWithProviders(<Install />);
+    expect(screen.getByDisplayValue(/installing…/i)).toBeInTheDocument();
+  });
+
+  it('dispatches fallback danger alert when install fails with no API message', async () => {
+    mockInstall.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Install />);
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: /^install$/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ msg: 'Installation failed' })
+        })
+      );
+    });
   });
 
   it('shows validation error when username is empty', async () => {

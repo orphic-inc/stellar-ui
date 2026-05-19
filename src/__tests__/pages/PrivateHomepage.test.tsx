@@ -171,4 +171,46 @@ describe('PrivateHomepage', () => {
     expect(screen.getByText('VH Album')).toBeInTheDocument();
     expect(screen.getByText(/vh artist/i)).toBeInTheDocument();
   });
+
+  it('shows aotm image when present, unknown artist and no year fallbacks', () => {
+    mockUseGetHomepageFeaturedQuery.mockReturnValue({
+      data: {
+        albumOfTheMonth: {
+          id: 2,
+          title: 'Rare Album',
+          release: {
+            id: 11,
+            communityId: null,
+            image: 'https://example.com/cover.jpg',
+            artist: null,
+            year: null
+          }
+        },
+        vanityHouse: null
+      }
+    });
+    renderWithUser();
+    expect(screen.getByRole('img', { name: 'Rare Album' })).toBeInTheDocument();
+    expect(screen.getByText('Unknown artist')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /view release/i })).not.toBeInTheDocument();
+  });
+
+  it('shows vanity house image and unknown artist/no year fallbacks', () => {
+    mockUseGetHomepageFeaturedQuery.mockReturnValue({
+      data: {
+        albumOfTheMonth: null,
+        vanityHouse: {
+          id: 21,
+          communityId: null,
+          title: 'Obscure House',
+          image: 'https://example.com/vh.jpg',
+          year: null,
+          artist: null
+        }
+      }
+    });
+    renderWithUser();
+    expect(screen.getByRole('img', { name: 'Obscure House' })).toBeInTheDocument();
+    expect(screen.getByText('Unknown artist')).toBeInTheDocument();
+  });
 });

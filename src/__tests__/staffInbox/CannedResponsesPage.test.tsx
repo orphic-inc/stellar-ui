@@ -189,6 +189,15 @@ describe('CannedResponsesPage', () => {
     expect(bodyTextarea.value).toBe('Updated body text');
   });
 
+  it('shows empty state when data is undefined (not loading)', () => {
+    mockUseGetCannedResponsesQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false
+    });
+    renderWithProviders(<CannedResponsesPage />);
+    expect(screen.getByText(/no canned responses/i)).toBeInTheDocument();
+  });
+
   it('calls deleteResponse after confirm', async () => {
     const user = userEvent.setup();
     mockUseGetCannedResponsesQuery.mockReturnValue({

@@ -74,4 +74,24 @@ describe('InviteTree', () => {
     expect(screen.getByText('Email')).toBeInTheDocument();
     expect(screen.getByText('Ratio')).toBeInTheDocument();
   });
+
+  it('shows dash when joinedAt or lastSeen is null', () => {
+    mockProfile = {
+      inviteTree: [
+        {
+          id: 2,
+          username: 'dave',
+          email: 'dave@example.com',
+          joinedAt: null as unknown as string,
+          lastSeen: null as unknown as string,
+          contributed: '0.00 GB',
+          consumed: '0.00 GB',
+          ratio: '0.00',
+          children: []
+        }
+      ]
+    };
+    renderWithProviders(<InviteTree />);
+    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(2);
+  });
 });

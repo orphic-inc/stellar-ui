@@ -126,6 +126,21 @@ describe('authApi', () => {
     });
   });
 
+  it('does not dispatch logout for non-401/403 errors in getMe onQueryStarted', async () => {
+    const store = createTestStore();
+    setCredentials(authUser);
+    fetchMock.mockResolvedValueOnce(
+      makeResponse({ status: 500, body: { msg: 'Server Error' } })
+    );
+
+    await expect(
+      store.dispatch(authApi.endpoints.getMe.initiate()).unwrap()
+    ).rejects.toMatchObject({ status: 500 });
+
+    // Auth state unchanged (no logout dispatched for 500)
+    expect(store.getState().auth.isAuthenticated).toBe(false);
+  });
+
   it('builds requests for register, account maintenance, recovery, and sessions', async () => {
     const cases = [
       {

@@ -50,6 +50,30 @@ describe('RandomReleaseLink', () => {
       );
     });
   });
+
+  it('does not navigate when release has no communityId', async () => {
+    const user = userEvent.setup();
+    mockTriggerRelease.mockReturnValue({
+      unwrap: () => Promise.resolve({ id: 10, communityId: null })
+    });
+    renderWithProviders(<RandomReleaseLink />);
+    await user.click(screen.getByRole('button', { name: /random release/i }));
+    await waitFor(() => {
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+  });
+
+  it('silently catches trigger errors', async () => {
+    const user = userEvent.setup();
+    mockTriggerRelease.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('network'))
+    });
+    renderWithProviders(<RandomReleaseLink />);
+    await user.click(screen.getByRole('button', { name: /random release/i }));
+    await waitFor(() => {
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe('RandomArtistLink', () => {
@@ -73,6 +97,18 @@ describe('RandomArtistLink', () => {
     await user.click(screen.getByRole('button', { name: /random artist/i }));
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/private/artists/7');
+    });
+  });
+
+  it('silently catches trigger errors', async () => {
+    const user = userEvent.setup();
+    mockTriggerArtist.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('network'))
+    });
+    renderWithProviders(<RandomArtistLink />);
+    await user.click(screen.getByRole('button', { name: /random artist/i }));
+    await waitFor(() => {
+      expect(mockNavigate).not.toHaveBeenCalled();
     });
   });
 });

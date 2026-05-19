@@ -196,6 +196,50 @@ describe('LogBrowsePage', () => {
     expect(params.get('page')).toBe('2');
   });
 
+  it('renders post pagination and setPage updates page param', async () => {
+    const user = userEvent.setup();
+    mockUseSearchLogQuery.mockReturnValue({
+      data: {
+        data: [makePostResult(5)],
+        meta: { total: 50, totalPages: 3 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('type=post&page=1'),
+      mockSetSearchParams
+    ]);
+    renderWithProviders(<LogBrowsePage />);
+
+    expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '3' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('page')).toBe('2');
+  });
+
+  it('submits with non-default type and order, empty q (covers false/true branches)', async () => {
+    const user = userEvent.setup();
+    mockUseSearchLogQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<LogBrowsePage />);
+
+    await user.click(screen.getByRole('radio', { name: /topics/i }));
+    await user.selectOptions(screen.getByRole('combobox', { name: /order/i }), 'asc');
+    await user.click(screen.getByRole('button', { name: /^search$/i }));
+
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('type')).toBe('topic');
+    expect(params.get('order')).toBe('asc');
+    expect(params.get('q')).toBeNull();
+  });
+
   it('queries with parsed params from URL', () => {
     mockUseSearchLogQuery.mockReturnValue({
       data: undefined,

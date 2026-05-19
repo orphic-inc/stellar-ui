@@ -38,8 +38,8 @@ const mockNotifications: Notification[] = [
 
 let mockNotificationsData: typeof mockNotifications | undefined =
   mockNotifications;
-let mockUnreadCount = 2;
-let mockPmCount = 0;
+let mockUnreadCount: number | undefined = 2;
+let mockPmCount: number | undefined = 0;
 
 jest.mock('../../store/services/notificationApi', () => ({
   useGetNotificationsQuery: () => ({ data: mockNotificationsData }),
@@ -261,6 +261,56 @@ describe('NotificationCorner', () => {
     expect(screen.getByText('Notifications')).toBeInTheDocument();
     fireEvent.mouseDown(document.body);
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument();
+  });
+
+  it('shows 99+ when total count exceeds 99', () => {
+    mockPmCount = 60;
+    mockUnreadCount = 60;
+    renderWithProviders(<NotificationCorner />);
+    expect(screen.getByText('99+')).toBeInTheDocument();
+  });
+
+  it('uses 0 fallback when pmData count is undefined', () => {
+    mockPmCount = undefined;
+    mockUnreadCount = 3;
+    renderWithProviders(<NotificationCorner />);
+    expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  it('uses 0 fallback when unreadNotifData count is undefined, renders via pmCount', () => {
+    mockUnreadCount = undefined;
+    mockPmCount = 4;
+    renderWithProviders(<NotificationCorner />);
+    expect(screen.getByText('4')).toBeInTheDocument();
+  });
+
+  it('shows only PM link and no notification list when pmCount > 0 and notifCount = 0', async () => {
+    const user = userEvent.setup();
+    mockNotificationsData = [];
+    mockUnreadCount = 0;
+    mockPmCount = 2;
+    renderWithProviders(<NotificationCorner />);
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
+    expect(screen.getByText(/2 unread messages/i)).toBeInTheDocument();
+    expect(screen.queryByText('No notifications')).not.toBeInTheDocument();
+  });
+
+  it('shows "No notifications" when notifications is undefined but unread count > 0', async () => {
+    const user = userEvent.setup();
+    mockNotificationsData = undefined;
+    mockUnreadCount = 1;
+    mockPmCount = 0;
+    renderWithProviders(<NotificationCorner />);
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
+    expect(screen.getByText('No notifications')).toBeInTheDocument();
+  });
+
+  it('does not call markRead when clicking a read notification link', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<NotificationCorner />);
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
+    await user.click(screen.getByRole('link', { name: 'Miles Davis' }));
+    expect(mockMarkRead).not.toHaveBeenCalled();
   });
 
   it('closes panel when close (✕) button is clicked', async () => {

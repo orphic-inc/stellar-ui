@@ -58,6 +58,38 @@ describe('SentboxPage', () => {
     expect(mockUseGetSentboxQuery).toHaveBeenLastCalledWith({ page: 1 });
   });
 
+  it('renders spinner while loading', () => {
+    mockUseGetSentboxQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    renderWithProviders(<SentboxPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('shows dash when conversation has no messages or sentAt', () => {
+    mockUseGetSentboxQuery.mockReturnValue({
+      data: {
+        total: 1,
+        page: 1,
+        pageSize: 25,
+        conversations: [
+          {
+            id: 9,
+            subject: 'No body',
+            participants: [{ sentAt: null }],
+            messages: []
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SentboxPage />);
+    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(2);
+  });
+
   it('shows empty and error states', () => {
     mockUseGetSentboxQuery.mockReturnValue({
       data: { total: 0, page: 1, pageSize: 25, conversations: [] },

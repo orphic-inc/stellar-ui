@@ -344,4 +344,146 @@ describe('Settings', () => {
     await new Promise((r) => setTimeout(r, 0));
     expect(revokeFn).toHaveBeenCalledWith('ses-abc');
   });
+
+  it('dispatches fallback danger alert when revokeSession fails with no API message', async () => {
+    const revokeFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.reject({}) });
+    mockUseRevokeSessionMutation.mockReturnValue([
+      revokeFn,
+      { isLoading: false }
+    ]);
+    mockUseGetSessionsQuery.mockReturnValue({
+      data: [
+        {
+          id: 'ses-xyz',
+          userAgent: 'Chrome/120',
+          ipAddress: '5.6.7.8',
+          lastActiveAt: '2026-05-17T12:00:00Z',
+          isCurrent: false
+        }
+      ],
+      isLoading: false
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    await user.click(screen.getByRole('button', { name: /revoke/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Failed to revoke session.',
+          alertType: 'danger'
+        })
+      })
+    );
+  });
+
+  it('navigates to Privacy tab and back to Appearance tab', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /^privacy$/i }));
+    expect(screen.getByText(/paranoia level/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /^appearance$/i }));
+    expect(screen.getByLabelText(/site appearance/i)).toBeInTheDocument();
+  });
+
+  it('shows "Saving…" on Appearance tab when isSaving is true', () => {
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      jest.fn(),
+      { isLoading: true }
+    ]);
+    renderWithProviders(<Settings />);
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('shows "Saving…" on Privacy tab when isSaving is true', async () => {
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      jest.fn(),
+      { isLoading: true }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /^privacy$/i }));
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('covers null profile fields triggering ?? fallbacks in toProfileForm', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        ...makeProfile(),
+        profile: {
+          avatar: 'https://example.com/avatar.png',
+          avatarMouseoverText: null,
+          profileTitle: null,
+          profileInfo: null
+        },
+        userSettings: {
+          ...makeProfile().userSettings,
+          externalStylesheet: null
+        }
+      },
+      isLoading: false
+    });
+    renderWithProviders(<Settings />);
+    expect(
+      (screen.getByLabelText(/avatar url/i) as HTMLInputElement).value
+    ).toBe('https://example.com/avatar.png');
+  });
+
+  it('shows unknown paranoia level with empty string fallback', async () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        ...makeProfile(),
+        userSettings: { ...makeProfile().userSettings, paranoia: 99 }
+      },
+      isLoading: false
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /^privacy$/i }));
+    expect(screen.getByText(/current: level 99/i)).toBeInTheDocument();
+  });
+
+  it('shows "Saving…" on Security tab when isChangingPw is true', async () => {
+    mockUseChangePasswordMutation.mockReturnValue([
+      jest.fn(),
+      { isLoading: true }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('shows "Saving…" for email form when isChangingEmail is true', async () => {
+    mockUseChangeEmailMutation.mockReturnValue([
+      jest.fn(),
+      { isLoading: true }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('shows sessions spinner when sessionsLoading is true', async () => {
+    mockUseGetSessionsQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /security/i }));
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
 });

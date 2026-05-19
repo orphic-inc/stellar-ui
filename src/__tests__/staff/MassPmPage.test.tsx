@@ -7,9 +7,10 @@ import MassPmPage from '../../components/staff/MassPmPage';
 const mockSendMassPm = jest.fn();
 const mockUseGetUserRanksQuery = jest.fn();
 const mockDispatch = jest.fn();
+let mockIsSending = false;
 
 jest.mock('../../store/services/messagesApi', () => ({
-  useSendMassPmMutation: () => [mockSendMassPm, { isLoading: false }]
+  useSendMassPmMutation: () => [mockSendMassPm, { isLoading: mockIsSending }]
 }));
 
 jest.mock('../../store/services/userApi', () => ({
@@ -24,6 +25,7 @@ jest.mock('react-redux', () => ({
 describe('MassPmPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsSending = false;
     window.confirm = jest.fn().mockReturnValue(true);
     mockUseGetUserRanksQuery.mockReturnValue({
       data: [
@@ -88,6 +90,19 @@ describe('MassPmPage', () => {
     );
   });
 
+  it('resets targetRankId to empty string when selecting "All users"', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<MassPmPage />);
+    await user.type(screen.getByLabelText(/subject/i), 'Broadcast');
+    await user.type(screen.getByLabelText(/message/i), 'Hello all.');
+    await user.selectOptions(screen.getByRole('combobox'), '2');
+    await user.selectOptions(screen.getByRole('combobox'), '');
+    await user.click(screen.getByRole('button', { name: /send mass pm/i }));
+    expect(mockSendMassPm).toHaveBeenCalledWith(
+      expect.objectContaining({ targetRankId: undefined })
+    );
+  });
+
   it('shows success result count after send', async () => {
     const user = userEvent.setup();
     renderWithProviders(<MassPmPage />);
@@ -122,5 +137,39 @@ describe('MassPmPage', () => {
         payload: expect.objectContaining({ alertType: 'danger' })
       })
     );
+  });
+
+  it('dispatches fallback danger alert when rejection has no API message', async () => {
+    mockSendMassPm.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<MassPmPage />);
+    await user.type(screen.getByLabelText(/subject/i), 'Hi');
+    await user.type(screen.getByLabelText(/message/i), 'Hello everyone');
+    await user.click(screen.getByRole('button', { name: /send mass pm/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Failed to send mass PM.',
+          alertType: 'danger'
+        })
+      })
+    );
+  });
+
+  it('shows spinner while ranks are loading', () => {
+    mockUseGetUserRanksQuery.mockReturnValue({ data: undefined, isLoading: true });
+    renderWithProviders(<MassPmPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('shows "Sending…" button label when isSending is true', () => {
+    mockIsSending = true;
+    renderWithProviders(<MassPmPage />);
+    expect(
+      screen.getByRole('button', { name: /sending…/i })
+    ).toBeInTheDocument();
   });
 });

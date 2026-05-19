@@ -86,4 +86,47 @@ describe('DraftsPage', () => {
     renderWithProviders(<DraftsPage />, { store });
     expect(screen.getByText('Failed to load drafts.')).toBeInTheDocument();
   });
+
+  it('dispatches fallback danger alert when delete fails with no API message', async () => {
+    mockDeleteDraft.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    renderWithProviders(<DraftsPage />, { store });
+    await user.click(screen.getByTitle('Delete draft'));
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === 'Failed to delete draft.')).toBe(true);
+    });
+  });
+
+  it('renders spinner when isLoading is true', () => {
+    mockUseGetDraftsQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<DraftsPage />);
+    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('shows "(no subject)" and dash when draft has no subject or toUser', () => {
+    mockUseGetDraftsQuery.mockReturnValue({
+      data: [
+        {
+          id: 2,
+          subject: '',
+          body: '',
+          updatedAt: '2026-05-17T12:00:00.000Z',
+          toUser: null
+        }
+      ],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DraftsPage />);
+    expect(screen.getByRole('link', { name: '(no subject)' })).toBeInTheDocument();
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
 });

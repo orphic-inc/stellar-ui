@@ -10,9 +10,12 @@ const mockCreateDraft = jest.fn();
 const mockNavigate = jest.fn();
 const mockUseSearchParams = jest.fn();
 
+let mockIsComposing = false;
+let mockIsSavingDraft = false;
+
 jest.mock('../../store/services/messagesApi', () => ({
-  useComposeMessageMutation: () => [mockCompose, { isLoading: false }],
-  useCreateDraftMutation: () => [mockCreateDraft, { isLoading: false }]
+  useComposeMessageMutation: () => [mockCompose, { isLoading: mockIsComposing }],
+  useCreateDraftMutation: () => [mockCreateDraft, { isLoading: mockIsSavingDraft }]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -24,6 +27,8 @@ jest.mock('react-router-dom', () => ({
 describe('ComposeForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsComposing = false;
+    mockIsSavingDraft = false;
     mockUseSearchParams.mockReturnValue([new URLSearchParams('to=alice')]);
     mockCompose.mockReturnValue({
       unwrap: () => Promise.resolve({ id: 12 })
@@ -101,5 +106,67 @@ describe('ComposeForm', () => {
       alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Recipient not found')).toBe(true);
     });
+  });
+
+  it('dispatches fallback danger alert when compose fails with no API message', async () => {
+    mockCompose.mockReturnValue({ unwrap: () => Promise.reject({}) });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    renderWithProviders(<ComposeForm />, { store });
+    await user.type(screen.getByLabelText(/^subject$/i), 'Test');
+    await user.type(screen.getByLabelText(/^message$/i), 'Body');
+    await user.click(screen.getByRole('button', { name: /^send$/i }));
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === 'Failed to send message.')).toBe(true);
+    });
+  });
+
+  it('dispatches danger alert when createDraft fails', async () => {
+    mockCreateDraft.mockReturnValue({ unwrap: () => Promise.reject({}) });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    renderWithProviders(<ComposeForm />, { store });
+    await user.type(screen.getByLabelText(/^message$/i), 'Body only');
+    await user.click(screen.getByRole('button', { name: /save draft/i }));
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === 'Failed to save draft.')).toBe(true);
+    });
+  });
+
+  it('saves draft with "(no subject)" when subject is empty but body has content', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    renderWithProviders(<ComposeForm />, { store });
+
+    await user.type(screen.getByLabelText(/^message$/i), 'Just a body');
+    await user.click(screen.getByRole('button', { name: /save draft/i }));
+
+    await waitFor(() => {
+      expect(mockCreateDraft).toHaveBeenCalledWith({
+        subject: '(no subject)',
+        body: 'Just a body'
+      });
+    });
+  });
+
+  it('navigates to /private/messages when Cancel is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ComposeForm />);
+    await user.click(screen.getByRole('button', { name: /^cancel$/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/private/messages');
+  });
+
+  it('shows "Sending…" when isLoading is true', () => {
+    mockIsComposing = true;
+    renderWithProviders(<ComposeForm />);
+    expect(screen.getByRole('button', { name: /sending…/i })).toBeInTheDocument();
+  });
+
+  it('shows "Saving…" when isSavingDraft is true', () => {
+    mockIsSavingDraft = true;
+    renderWithProviders(<ComposeForm />);
+    expect(screen.getByRole('button', { name: /saving…/i })).toBeInTheDocument();
   });
 });

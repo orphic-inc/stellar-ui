@@ -9,11 +9,13 @@ const mockCreateForumCategory = jest.fn();
 const mockUpdateForumCategory = jest.fn();
 const mockDeleteForumCategory = jest.fn();
 
+let mockIsCreating = false;
+
 jest.mock('../../store/services/forumApi', () => ({
   useGetForumCategoriesAdminQuery: () => mockGetForumCategoriesAdminQuery(),
   useCreateForumCategoryMutation: () => [
     mockCreateForumCategory,
-    { isLoading: false }
+    { isLoading: mockIsCreating }
   ],
   useUpdateForumCategoryMutation: () => [mockUpdateForumCategory],
   useDeleteForumCategoryMutation: () => [mockDeleteForumCategory]
@@ -35,6 +37,7 @@ const makeCategory = (id: number) => ({
 describe('ForumCategoryControlPanel', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsCreating = false;
     window.confirm = jest.fn().mockReturnValue(true);
     mockCreateForumCategory.mockReturnValue({
       unwrap: () => Promise.resolve({})
@@ -122,6 +125,65 @@ describe('ForumCategoryControlPanel', () => {
     await user.click(screen.getByRole('button', { name: /edit/i }));
     await user.click(screen.getByRole('button', { name: /cancel/i }));
     expect(screen.queryByDisplayValue('Category 1')).not.toBeInTheDocument();
+  });
+
+  it('shows "Creating…" when isCreating is true', () => {
+    mockIsCreating = true;
+    mockGetForumCategoriesAdminQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ForumCategoryControlPanel />);
+    expect(
+      screen.getByRole('button', { name: /creating…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('saves with sort=0 when sort field is cleared (parseInt NaN fallback)', async () => {
+    const user = userEvent.setup();
+    mockGetForumCategoriesAdminQuery.mockReturnValue({
+      data: [makeCategory(1)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ForumCategoryControlPanel />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    const sortInputs = screen.getAllByRole('spinbutton');
+    await user.clear(sortInputs[0]);
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(mockUpdateForumCategory).toHaveBeenCalledWith(
+      expect.objectContaining({ sort: 0 })
+    );
+  });
+
+  it('updates sort value in create form', async () => {
+    const user = userEvent.setup();
+    mockGetForumCategoriesAdminQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ForumCategoryControlPanel />);
+    const sortInput = screen.getByLabelText(/sort order/i) as HTMLInputElement;
+    await user.clear(sortInput);
+    await user.type(sortInput, '50');
+    expect(sortInput.value).toBe('50');
+  });
+
+  it('updates sort value in edit form', async () => {
+    const user = userEvent.setup();
+    mockGetForumCategoriesAdminQuery.mockReturnValue({
+      data: [makeCategory(1)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ForumCategoryControlPanel />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    const sortInputs = screen.getAllByRole('spinbutton');
+    await user.clear(sortInputs[0]);
+    await user.type(sortInputs[0], '99');
+    expect((sortInputs[0] as HTMLInputElement).value).toBe('99');
   });
 
   it('calls deleteCategory after confirm', async () => {

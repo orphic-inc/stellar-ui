@@ -6,9 +6,10 @@ import NewUserForm from '../../components/admin/NewUserForm';
 
 const mockCreateUser = jest.fn();
 const mockNavigate = jest.fn();
+let mockIsLoading = false;
 
 jest.mock('../../store/services/userApi', () => ({
-  useCreateUserMutation: () => [mockCreateUser, { isLoading: false }]
+  useCreateUserMutation: () => [mockCreateUser, { isLoading: mockIsLoading }]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -22,6 +23,7 @@ jest.mock('react-router-dom', () => ({
 describe('NewUserForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsLoading = false;
   });
 
   it('renders username, email, password fields and Create User button', () => {
@@ -75,5 +77,28 @@ describe('NewUserForm', () => {
       expect(screen.getByText('Username already taken.')).toBeInTheDocument();
     });
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows fallback error when rejection has no API message', async () => {
+    mockCreateUser.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<NewUserForm />);
+    await user.type(screen.getByLabelText(/username/i), 'someone');
+    await user.type(screen.getByLabelText(/email/i), 'someone@example.com');
+    await user.type(screen.getByLabelText(/password/i), 'password1');
+    await user.click(screen.getByRole('button', { name: /create user/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Failed to create user.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows "Creating…" button label when isLoading is true', () => {
+    mockIsLoading = true;
+    renderWithProviders(<NewUserForm />);
+    expect(
+      screen.getByRole('button', { name: /creating…/i })
+    ).toBeInTheDocument();
   });
 });

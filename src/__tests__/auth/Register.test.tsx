@@ -133,6 +133,32 @@ describe('Register', () => {
     });
   });
 
+  it('shows invite key field and submits with inviteKey in invite mode', async () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'invite' }
+    });
+    mockRegister.mockReturnValue({
+      unwrap: () => Promise.resolve({ id: 2 })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<Register />);
+
+    expect(screen.getByText(/enter your invite key to register/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/invite key/i)).toBeInTheDocument();
+
+    await fillForm(user);
+    await user.type(screen.getByLabelText(/invite key/i), 'KEY-1234');
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    await waitFor(() => {
+      expect(mockRegister).toHaveBeenCalledWith(
+        expect.objectContaining({ inviteKey: 'KEY-1234' })
+      );
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === 'Account created.')).toBe(true);
+    });
+  });
+
   it('falls back to generic message when error has no recognized shape', async () => {
     mockRegister.mockReturnValue({
       unwrap: () => Promise.reject({ status: 500 })

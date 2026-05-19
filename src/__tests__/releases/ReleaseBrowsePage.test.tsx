@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import ReleaseBrowsePage from '../../components/releases/ReleaseBrowsePage';
@@ -159,6 +159,137 @@ describe('ReleaseBrowsePage', () => {
     expect(mockUseSearchReleasesQuery).toHaveBeenCalledWith(
       expect.objectContaining({ q: 'jazz', tags: 'modal', page: 2 })
     );
+  });
+
+  it('shows pagination buttons and navigates when a page is clicked', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 7, userRank: { permissions: { advanced_search: true } } }
+    });
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: {
+        data: [makeRelease(1)],
+        meta: { total: 50, page: 1, totalPages: 3 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '2' }));
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('page')).toBe('2');
+  });
+
+  it('shows and hides advanced options when the toggle is clicked', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 7, userRank: { permissions: { advanced_search: true } } }
+    });
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    expect(screen.queryByLabelText(/artist name/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /advanced options/i }));
+    expect(screen.getByLabelText(/artist name/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /hide advanced/i })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /hide advanced/i }));
+    expect(screen.queryByLabelText(/artist name/i)).not.toBeInTheDocument();
+  });
+
+  it('submits advanced search with canAdvanced=true including checked flags', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 7, userRank: { permissions: { advanced_search: true } } }
+    });
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0 } },
+      isLoading: false,
+      error: undefined
+    });
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('hasLog=true&hasCue=true&isScene=true&vanityHouse=true'),
+      mockSetSearchParams
+    ]);
+    renderWithProviders(<ReleaseBrowsePage />);
+    // Show advanced fields so checkboxes are in the DOM (pre-checked from URL)
+    await user.click(screen.getByRole('button', { name: /advanced options/i }));
+    fireEvent.submit(document.querySelector('form')!);
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('hasLog')).toBe('true');
+    expect(params.get('hasCue')).toBe('true');
+  });
+
+  it('submits with canAdvanced=true but no checked flags (covers false branches of hasLog etc.)', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 7, userRank: { permissions: { advanced_search: true } } }
+    });
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    // Submit without opening advanced options → checkboxes not in DOM → all fd.get() returns null
+    fireEvent.submit(document.querySelector('form')!);
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('hasLog')).toBeNull();
+  });
+
+  it('resets search params when Reset button is clicked', async () => {
+    const user = userEvent.setup();
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    await user.click(screen.getByRole('button', { name: /^reset$/i }));
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.toString()).toBe('');
+  });
+
+  it('shows singular "result" label when total is 1', () => {
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [makeRelease(1)], meta: { total: 1, page: 1, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    expect(screen.getByText('1 result')).toBeInTheDocument();
+  });
+
+  it('renders release as plain text when communityId is null', () => {
+    const releaseNoCommunity = { ...makeRelease(5), communityId: null };
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [releaseNoCommunity], meta: { total: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    expect(screen.getByText('Release 5')).toBeInTheDocument();
+  });
+
+  it('submits with non-default tagMode, orderBy, and order', async () => {
+    const user = userEvent.setup();
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    await user.click(screen.getByRole('radio', { name: /all/i }));
+    await user.selectOptions(screen.getByLabelText(/order by/i), 'year');
+    await user.selectOptions(screen.getAllByRole('combobox').find(el => (el as HTMLSelectElement).value === 'desc')!, 'asc');
+    fireEvent.submit(document.querySelector('form')!);
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('tagMode')).toBe('all');
+    expect(params.get('orderBy')).toBe('year');
+    expect(params.get('order')).toBe('asc');
   });
 
   it('shows random release and artist links', () => {

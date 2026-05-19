@@ -47,4 +47,11 @@ describe('Alert', () => {
     expect(screen.queryByText('Timed out')).not.toBeInTheDocument();
     jest.useRealTimers();
   });
+
+  it('falls back to info styling for unknown alertType', () => {
+    const store = createTestStore();
+    store.dispatch(addAlert('Unknown type', 'unknown' as never));
+    renderWithProviders(<Alert />, { store });
+    expect(screen.getByText('Unknown type')).toBeInTheDocument();
+  });
 });

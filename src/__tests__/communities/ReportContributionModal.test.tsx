@@ -1,16 +1,17 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import ReportContributionModal from '../../components/communities/ReportContributionModal';
 
 const mockReportContribution = jest.fn();
 const mockDispatch = jest.fn();
+let mockIsLoading = false;
 
 jest.mock('../../store/services/downloadApi', () => ({
   useReportContributionMutation: () => [
     mockReportContribution,
-    { isLoading: false }
+    { isLoading: mockIsLoading }
   ]
 }));
 
@@ -23,6 +24,7 @@ describe('ReportContributionModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsLoading = false;
     mockReportContribution.mockReturnValue({
       unwrap: () => Promise.resolve({})
     });
@@ -80,6 +82,16 @@ describe('ReportContributionModal', () => {
     expect(mockOnClose).not.toHaveBeenCalled();
   });
 
+  it('shows "Submitting…" button label when isLoading is true', () => {
+    mockIsLoading = true;
+    renderWithProviders(
+      <ReportContributionModal contributionId={5} onClose={mockOnClose} />
+    );
+    expect(
+      screen.getByRole('button', { name: /submitting…/i })
+    ).toBeInTheDocument();
+  });
+
   it('calls onClose on Cancel click', async () => {
     const user = userEvent.setup();
     renderWithProviders(
@@ -87,5 +99,15 @@ describe('ReportContributionModal', () => {
     );
     await user.click(screen.getByRole('button', { name: /cancel/i }));
     expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it('does not call reportContribution when reason is empty', () => {
+    renderWithProviders(
+      <ReportContributionModal contributionId={5} onClose={mockOnClose} />
+    );
+    const submitButton = screen.getByRole('button', { name: /submit report/i });
+    submitButton.removeAttribute('disabled');
+    fireEvent.click(submitButton);
+    expect(mockReportContribution).not.toHaveBeenCalled();
   });
 });

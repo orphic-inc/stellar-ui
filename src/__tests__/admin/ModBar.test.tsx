@@ -72,4 +72,12 @@ describe('ModBar', () => {
     renderWithProviders(<ModBar />);
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
+
+  it('uses 0 fallback when reportCounts is undefined', () => {
+    mockUseAppSelector.mockReturnValue(staffUser);
+    mockUseGetReportCountsQuery.mockReturnValue({ data: undefined });
+    renderWithProviders(<ModBar />);
+    expect(screen.queryByText('0')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /reports/i })).toBeInTheDocument();
+  });
 });

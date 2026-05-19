@@ -9,10 +9,18 @@ const mockResetPassword = jest.fn();
 const mockNavigate = jest.fn();
 const mockDispatch = jest.fn();
 const mockUseSearchParams = jest.fn();
+let mockIsRequesting = false;
+let mockIsResetting = false;
 
 jest.mock('../../store/services/authApi', () => ({
-  useRequestRecoveryMutation: () => [mockRequestRecovery, { isLoading: false }],
-  useResetPasswordMutation: () => [mockResetPassword, { isLoading: false }]
+  useRequestRecoveryMutation: () => [
+    mockRequestRecovery,
+    { isLoading: mockIsRequesting }
+  ],
+  useResetPasswordMutation: () => [
+    mockResetPassword,
+    { isLoading: mockIsResetting }
+  ]
 }));
 
 jest.mock('react-redux', () => ({
@@ -77,7 +85,7 @@ describe('Recovery — request form (no token)', () => {
     expect(screen.getByText(/if an account exists/i)).toBeInTheDocument();
   });
 
-  it('dispatches danger alert on request failure', async () => {
+  it('dispatches danger alert on request failure with API message', async () => {
     mockRequestRecovery.mockReturnValue({
       unwrap: () => Promise.reject({ data: { msg: 'Server error.' } })
     });
@@ -89,9 +97,40 @@ describe('Recovery — request form (no token)', () => {
     );
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        payload: expect.objectContaining({ alertType: 'danger' })
+        payload: expect.objectContaining({
+          msg: 'Server error.',
+          alertType: 'danger'
+        })
       })
     );
+  });
+
+  it('dispatches fallback danger alert on request failure without API message', async () => {
+    mockRequestRecovery.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Recovery />);
+    await user.type(screen.getByLabelText(/email address/i), 'bad@email.com');
+    await user.click(
+      screen.getByRole('button', { name: /send recovery email/i })
+    );
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Failed to send recovery email.',
+          alertType: 'danger'
+        })
+      })
+    );
+  });
+
+  it('shows "Sending…" button label when isLoading is true', () => {
+    mockIsRequesting = true;
+    renderWithProviders(<Recovery />);
+    expect(
+      screen.getByRole('button', { name: /sending…/i })
+    ).toBeInTheDocument();
   });
 });
 
@@ -129,6 +168,44 @@ describe('Recovery — reset form (with token)', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 
+  it('dispatches success alert on successful reset', async () => {
+    mockResetPassword.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Recovery />);
+    await user.type(screen.getByLabelText(/^new password/i), 'newpass123');
+    await user.type(screen.getByLabelText(/confirm new password/i), 'newpass123');
+    await user.click(screen.getByRole('button', { name: /reset password/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Password reset successfully. Please log in.',
+          alertType: 'success'
+        })
+      })
+    );
+  });
+
+  it('dispatches fallback danger alert on reset API failure', async () => {
+    mockResetPassword.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<Recovery />);
+    await user.type(screen.getByLabelText(/^new password/i), 'newpass123');
+    await user.type(screen.getByLabelText(/confirm new password/i), 'newpass123');
+    await user.click(screen.getByRole('button', { name: /reset password/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Failed to reset password.',
+          alertType: 'danger'
+        })
+      })
+    );
+  });
+
   it('dispatches danger alert when passwords do not match', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Recovery />);
@@ -144,5 +221,13 @@ describe('Recovery — reset form (with token)', () => {
       })
     );
     expect(mockResetPassword).not.toHaveBeenCalled();
+  });
+
+  it('shows "Resetting…" button label when isLoading is true', () => {
+    mockIsResetting = true;
+    renderWithProviders(<Recovery />);
+    expect(
+      screen.getByRole('button', { name: /resetting…/i })
+    ).toBeInTheDocument();
   });
 });

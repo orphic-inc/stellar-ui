@@ -9,10 +9,12 @@ const mockCreateCommunity = jest.fn();
 const mockUpdateCommunity = jest.fn();
 const mockDispatch = jest.fn();
 
+let mockIsCreating = false;
+
 jest.mock('../../store/services/communityApi', () => ({
   useGetCommunitiesQuery: (...args: unknown[]) =>
     mockGetCommunitiesQuery(...args),
-  useCreateCommunityMutation: () => [mockCreateCommunity, { isLoading: false }],
+  useCreateCommunityMutation: () => [mockCreateCommunity, { isLoading: mockIsCreating }],
   useUpdateCommunityMutation: () => [mockUpdateCommunity, { isLoading: false }]
 }));
 
@@ -42,6 +44,7 @@ const makeCommunity = (id: number) => ({
 describe('CommunityManager', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsCreating = false;
     mockCreateCommunity.mockReturnValue({
       unwrap: () => Promise.resolve({ id: 99 })
     });
@@ -244,6 +247,192 @@ describe('CommunityManager', () => {
     expect(screen.getByText('mod-alice')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '×' }));
     expect(screen.queryByText('mod-alice')).toBeNull();
+  });
+
+  it('changes name, description, and registration in the edit row', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(3)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+
+    const nameInput = screen.getByDisplayValue('Community 3');
+    await user.clear(nameInput);
+    await user.type(nameInput, 'Renamed');
+
+    const descInput = screen.getByDisplayValue('Desc 3');
+    await user.clear(descInput);
+    await user.type(descInput, 'New desc');
+
+    await user.selectOptions(
+      screen.getAllByDisplayValue('Open')[0],
+      'Invite only'
+    );
+
+    expect((nameInput as HTMLInputElement).value).toBe('Renamed');
+    expect((descInput as HTMLInputElement).value).toBe('New desc');
+  });
+
+  it('saves edit row with staff members and fires map callback', async () => {
+    const user = userEvent.setup();
+    const community = { ...makeCommunity(8), staff: [{ id: 20, username: 'staffer' }] };
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [community] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    await waitFor(() => {
+      expect(mockUpdateCommunity).toHaveBeenCalledWith(
+        expect.objectContaining({ staffIds: [20] })
+      );
+    });
+  });
+
+  it('does not add a staff member when user ID is zero or empty', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(9)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    const staffInput = screen.getByPlaceholderText('User ID');
+    await user.type(staffInput, '0');
+    await user.click(screen.getByRole('button', { name: /add/i }));
+    expect(screen.queryByText('#0')).toBeNull();
+  });
+
+  it('does not add a duplicate staff member', async () => {
+    const user = userEvent.setup();
+    const community = { ...makeCommunity(10), staff: [{ id: 30, username: 'existing' }] };
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [community] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    const staffInput = screen.getByPlaceholderText('User ID');
+    await user.type(staffInput, '30');
+    await user.click(screen.getByRole('button', { name: /add/i }));
+    // 'existing' should appear exactly once (no duplicate)
+    expect(screen.getAllByText('existing').length).toBe(1);
+  });
+
+  it('allows typing in the owner ID field when registration is invite-only', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.selectOptions(screen.getByLabelText(/registration/i), 'Invite only');
+    const ownerInput = screen.getByLabelText(/owner user id/i);
+    await user.type(ownerInput, '5');
+    expect((ownerInput as HTMLInputElement).value).toBe('5');
+  });
+
+  it('shows Creating… when isCreating is true', () => {
+    mockIsCreating = true;
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    expect(screen.getByRole('button', { name: /creating…/i })).toBeInTheDocument();
+  });
+
+  it('renders community with null type and description as dashes', () => {
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 11,
+            name: 'Sparse Community',
+            type: undefined,
+            description: undefined,
+            registrationStatus: 'open',
+            allowDuplicateFormats: false,
+            staffIds: [],
+            _count: undefined
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+  });
+
+  it('opens edit for community with null description and uses toRegistrationStatus fallback', async () => {
+    const user = userEvent.setup();
+    const community = {
+      id: 12,
+      name: 'No Desc',
+      type: 'Music' as const,
+      description: undefined,
+      registrationStatus: undefined,
+      allowDuplicateFormats: false,
+      staffIds: [],
+      _count: { releases: 0 }
+    };
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [community] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    expect(screen.getByDisplayValue('No Desc')).toBeInTheDocument();
+  });
+
+  it('creates community with owner ID when invite registration is selected', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.type(screen.getByLabelText(/^name/i), 'Invite Community');
+    await user.selectOptions(screen.getByLabelText(/registration \*/i), 'Invite only');
+    await user.type(screen.getByLabelText(/owner user id/i), '7');
+    await user.click(screen.getByRole('button', { name: /create community/i }));
+    await waitFor(() => {
+      expect(mockCreateCommunity).toHaveBeenCalledWith(
+        expect.objectContaining({ ownerId: 7 })
+      );
+    });
+  });
+
+  it('dispatches fallback danger alert when create fails with no API message', async () => {
+    mockCreateCommunity.mockReturnValue({ unwrap: () => Promise.reject({}) });
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.type(screen.getByLabelText(/^name/i), 'Test');
+    await user.click(screen.getByRole('button', { name: /create community/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ msg: 'Failed to create community.' })
+        })
+      );
+    });
   });
 
   it('toggles allowDuplicateFormats checkbox in edit row', async () => {

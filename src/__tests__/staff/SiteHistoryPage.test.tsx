@@ -10,10 +10,13 @@ const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
 const mockDispatch = jest.fn();
 
+let mockIsCreating = false;
+let mockIsUpdating = false;
+
 jest.mock('../../store/services/siteHistoryApi', () => ({
   useGetSiteHistoryQuery: () => mockUseGetSiteHistoryQuery(),
-  useCreateSiteHistoryMutation: () => [mockCreate, { isLoading: false }],
-  useUpdateSiteHistoryMutation: () => [mockUpdate, { isLoading: false }],
+  useCreateSiteHistoryMutation: () => [mockCreate, { isLoading: mockIsCreating }],
+  useUpdateSiteHistoryMutation: () => [mockUpdate, { isLoading: mockIsUpdating }],
   useDeleteSiteHistoryMutation: () => [mockDelete, { isLoading: false }]
 }));
 
@@ -35,6 +38,8 @@ const makeEntry = (id: number) => ({
 describe('SiteHistoryPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsCreating = false;
+    mockIsUpdating = false;
     window.confirm = jest.fn().mockReturnValue(true);
     mockCreate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockUpdate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -195,6 +200,71 @@ describe('SiteHistoryPage', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('shows "Saving…" in save button when isCreating is true', async () => {
+    mockIsCreating = true;
+    const user = userEvent.setup();
+    mockUseGetSiteHistoryQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SiteHistoryPage />);
+    await user.click(screen.getByRole('button', { name: /\+ add entry/i }));
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
+  });
+
+  it('dispatches fallback danger alert when save fails with no API message', async () => {
+    mockCreate.mockReturnValue({ unwrap: () => Promise.reject({}) });
+    const user = userEvent.setup();
+    mockUseGetSiteHistoryQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SiteHistoryPage />);
+    await user.click(screen.getByRole('button', { name: /\+ add entry/i }));
+    await user.type(screen.getByLabelText(/title/i), 'X');
+    await user.type(screen.getByLabelText(/body/i), 'Y');
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ msg: 'Failed to save.' })
+      })
+    );
+  });
+
+  it('does not call deleteEntry when confirm is cancelled', async () => {
+    window.confirm = jest.fn().mockReturnValue(false);
+    const user = userEvent.setup();
+    mockUseGetSiteHistoryQuery.mockReturnValue({
+      data: [makeEntry(7)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SiteHistoryPage />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+    expect(mockDelete).not.toHaveBeenCalled();
+  });
+
+  it('dispatches fallback danger alert when delete fails with no API message', async () => {
+    mockDelete.mockReturnValue({ unwrap: () => Promise.reject({}) });
+    const user = userEvent.setup();
+    mockUseGetSiteHistoryQuery.mockReturnValue({
+      data: [makeEntry(9)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SiteHistoryPage />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ msg: 'Failed to delete.' })
       })
     );
   });

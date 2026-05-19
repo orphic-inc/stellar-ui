@@ -1,7 +1,9 @@
 import { createTestStore } from '../testUtils';
 import { ensureRequestPolyfill, makeResponse } from '../fetchTestUtils';
 import { communityApi } from '../../store/services/communityApi';
+import { downloadApi } from '../../store/services/downloadApi';
 import { profileApi } from '../../store/services/profileApi';
+import { reportsApi } from '../../store/services/reportsApi';
 import { requestApi } from '../../store/services/requestApi';
 import { userApi } from '../../store/services/userApi';
 import { wikiApi } from '../../store/services/wikiApi';
@@ -567,6 +569,124 @@ describe('resource-oriented service APIs', () => {
       fetchMock.mockResolvedValueOnce(makeResponse(testCase.response));
       await testCase.run(store).unwrap();
       expect(await getLastRequest()).toEqual(testCase.expected);
+    }
+  });
+
+  it('builds downloadApi requests covering both branches of idempotencyKey and reason', async () => {
+    const cases = [
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
+            downloadApi.endpoints.grantAccess.initiate({
+              contributionId: 5,
+              idempotencyKey: 'key-abc'
+            })
+          ),
+        response: { status: 200, body: { id: 1 } },
+        expected: {
+          url: '/api/contributions/5/access',
+          method: 'POST',
+          body: JSON.stringify({ idempotencyKey: 'key-abc' })
+        }
+      },
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
+            downloadApi.endpoints.grantAccess.initiate({ contributionId: 7 })
+          ),
+        response: { status: 200, body: { id: 2 } },
+        expected: {
+          url: '/api/contributions/7/access',
+          method: 'POST',
+          body: '{}'
+        }
+      },
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
+            downloadApi.endpoints.reverseGrant.initiate({
+              grantId: 10,
+              reason: 'Bad link'
+            })
+          ),
+        response: { status: 200, body: { grantId: 10, status: 'reversed' } },
+        expected: {
+          url: '/api/downloads/10/reverse',
+          method: 'POST',
+          body: JSON.stringify({ reason: 'Bad link' })
+        }
+      },
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
+            downloadApi.endpoints.reverseGrant.initiate({ grantId: 11 })
+          ),
+        response: { status: 200, body: { grantId: 11, status: 'reversed' } },
+        expected: {
+          url: '/api/downloads/11/reverse',
+          method: 'POST',
+          body: '{}'
+        }
+      },
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
+            downloadApi.endpoints.reportContribution.initiate({
+              contributionId: 3,
+              reason: 'Dead link'
+            })
+          ),
+        response: { status: 200, body: { msg: 'Reported' } },
+        expected: {
+          url: '/api/contributions/3/report',
+          method: 'POST',
+          body: JSON.stringify({ reason: 'Dead link' })
+        }
+      }
+    ];
+
+    for (const testCase of cases) {
+      const store = createTestStore();
+      fetchMock.mockResolvedValueOnce(makeResponse(testCase.response));
+      await testCase.run(store).unwrap();
+      expect(await getLastRequest()).toEqual(testCase.expected);
+    }
+  });
+
+  it('builds reportsApi requests covering reporterUsername branch', async () => {
+    const cases = [
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
+            reportsApi.endpoints.getReports.initiate({ reporterUsername: 'alice' })
+          ),
+        response: { status: 200, body: { total: 0, page: 1, pageSize: 25, reports: [] } },
+        expected: {
+          url: expect.stringContaining('reporterUsername=alice'),
+          method: 'GET',
+          body: ''
+        }
+      },
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
+            reportsApi.endpoints.getReports.initiate({})
+          ),
+        response: { status: 200, body: { total: 0, page: 1, pageSize: 25, reports: [] } },
+        expected: {
+          url: expect.not.stringContaining('reporterUsername'),
+          method: 'GET',
+          body: ''
+        }
+      }
+    ];
+
+    for (const testCase of cases) {
+      const store = createTestStore();
+      fetchMock.mockResolvedValueOnce(makeResponse(testCase.response));
+      await testCase.run(store).unwrap();
+      const req = await getLastRequest();
+      expect(req.url).toEqual(testCase.expected.url);
     }
   });
 });

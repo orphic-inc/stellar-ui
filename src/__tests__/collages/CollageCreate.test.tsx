@@ -6,9 +6,10 @@ import CollageCreate from '../../components/collages/CollageCreate';
 
 const mockCreateCollage = jest.fn();
 const mockNavigate = jest.fn();
+let mockIsLoading = false;
 
 jest.mock('../../store/services/collageApi', () => ({
-  useCreateCollageMutation: () => [mockCreateCollage, { isLoading: false }]
+  useCreateCollageMutation: () => [mockCreateCollage, { isLoading: mockIsLoading }]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -19,6 +20,7 @@ jest.mock('react-router-dom', () => ({
 describe('CollageCreate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsLoading = false;
     mockCreateCollage.mockReturnValue({
       unwrap: () => Promise.resolve({ id: 88 })
     });
@@ -51,6 +53,14 @@ describe('CollageCreate', () => {
     });
   });
 
+  it('shows "Creating…" button label when isLoading is true', () => {
+    mockIsLoading = true;
+    renderWithProviders(<CollageCreate />);
+    expect(
+      screen.getByRole('button', { name: /creating…/i })
+    ).toBeInTheDocument();
+  });
+
   it('shows the backend error when creation fails', async () => {
     const user = userEvent.setup();
     mockCreateCollage.mockReturnValue({
@@ -70,5 +80,29 @@ describe('CollageCreate', () => {
       expect(screen.getByText('Name already exists')).toBeInTheDocument();
       expect(mockNavigate).not.toHaveBeenCalled();
     });
+  });
+
+  it('shows fallback error message when creation fails with no API message', async () => {
+    const user = userEvent.setup();
+    mockCreateCollage.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    renderWithProviders(<CollageCreate />);
+    await user.type(screen.getByLabelText(/^name$/i), 'Test');
+    await user.type(
+      screen.getByLabelText(/description/i),
+      'A long enough description for the collage form.'
+    );
+    await user.click(screen.getByRole('button', { name: /create collage/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Failed to create collage.')).toBeInTheDocument();
+    });
+  });
+
+  it('navigates to /private/collages when Cancel is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CollageCreate />);
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/private/collages');
   });
 });

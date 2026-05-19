@@ -14,14 +14,17 @@ jest.mock('../../store/services/forumApi', () => ({
     mockUseGetTopicsByForumQuery(...args)
 }));
 
+let mockForumId: string | undefined = '9';
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => ({ forumId: '9' })
+  useParams: () => ({ forumId: mockForumId })
 }));
 
 describe('ForumPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockForumId = '9';
     mockUseGetForumByIdQuery.mockReturnValue({
       data: {
         id: 9,
@@ -81,6 +84,50 @@ describe('ForumPage', () => {
       forumId: 9,
       page: 1
     });
+  });
+
+  it('renders spinner when forumLoading is true', () => {
+    mockUseGetForumByIdQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    renderWithProviders(<ForumPage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('renders topics with isSticky=false (covers non-sticky row class)', () => {
+    mockUseGetTopicsByForumQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 55,
+            title: 'Regular topic',
+            isLocked: false,
+            isSticky: false,
+            numPosts: 3,
+            author: { username: 'bob' },
+            lastPost: { createdAt: '2026-05-17T12:00:00.000Z' }
+          }
+        ],
+        meta: { totalPages: 1 }
+      },
+      isLoading: false
+    });
+    renderWithProviders(<ForumPage />);
+    expect(screen.getByRole('link', { name: 'Regular topic' })).toBeInTheDocument();
+    expect(screen.queryByText('[Locked]')).not.toBeInTheDocument();
+  });
+
+  it('uses forumId 0 when param is undefined', () => {
+    mockForumId = undefined;
+    mockUseGetForumByIdQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 404 }
+    });
+    renderWithProviders(<ForumPage />);
+    expect(screen.getByText('Forum not found.')).toBeInTheDocument();
   });
 
   it('shows empty and missing-forum states', () => {

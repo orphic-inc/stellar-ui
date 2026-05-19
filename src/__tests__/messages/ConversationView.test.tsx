@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ConversationView from '../../components/messages/ConversationView';
 import { createTestStore, renderWithProviders } from '../testUtils';
@@ -108,6 +108,88 @@ describe('ConversationView', () => {
       expect(mockDeleteConv).toHaveBeenCalledWith(1);
       expect(backMock).toHaveBeenCalled();
     });
+  });
+
+  it('does not send reply when body is empty (fireEvent bypass)', () => {
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'me',
+        userRank: { permissions: {} }
+      } as never)
+    );
+    renderWithProviders(<ConversationView />, { store });
+    const form = document.querySelector('form');
+    if (form) fireEvent.submit(form);
+    expect(mockReply).not.toHaveBeenCalled();
+  });
+
+  it('renders System span when message sender is null', () => {
+    mockUseGetConversationQuery.mockReturnValue({
+      data: {
+        id: 1,
+        subject: 'System Notice',
+        participants: [{ userId: 7, isSticky: false, user: { username: 'me' } }],
+        messages: [
+          {
+            id: 20,
+            body: 'Auto-generated',
+            createdAt: '2026-05-17T12:00:00.000Z',
+            sender: null
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({ id: 7, username: 'me', userRank: { permissions: {} } } as never)
+    );
+    renderWithProviders(<ConversationView />, { store });
+    expect(screen.getByText('System')).toBeInTheDocument();
+  });
+
+  it('renders conversation with null participants and null messages', () => {
+    mockUseGetConversationQuery.mockReturnValue({
+      data: {
+        id: 1,
+        subject: 'Empty Conv',
+        participants: null,
+        messages: null
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({ id: 7, username: 'me', userRank: { permissions: {} } } as never)
+    );
+    renderWithProviders(<ConversationView />, { store });
+    expect(screen.getByText('Empty Conv')).toBeInTheDocument();
+  });
+
+  it('renders participant without username as plain text', () => {
+    mockUseGetConversationQuery.mockReturnValue({
+      data: {
+        id: 1,
+        subject: 'Anon Conv',
+        participants: [
+          { userId: 7, isSticky: false, user: { username: 'me' } },
+          { userId: 9, isSticky: false, user: { username: null } }
+        ],
+        messages: []
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({ id: 7, username: 'me', userRank: { permissions: {} } } as never)
+    );
+    renderWithProviders(<ConversationView />, { store });
+    expect(screen.getByText('Anon Conv')).toBeInTheDocument();
   });
 
   it('shows not found and reply failure states', async () => {
