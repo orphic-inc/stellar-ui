@@ -8,6 +8,9 @@ import RequestDetailPage from '../../components/requests/RequestDetailPage';
 
 const mockUseGetRequestQuery = jest.fn();
 const mockUseGetRequestBountyHistoryQuery = jest.fn();
+const mockCommentsSection = jest.fn((_: unknown) => (
+  <div>Comments Section</div>
+));
 const mockAddBounty = jest.fn();
 const mockFillRequest = jest.fn();
 const mockUnfillRequest = jest.fn();
@@ -32,6 +35,11 @@ jest.mock('../../store/services/bookmarkApi', () => ({
     mockToggleBookmark,
     { isLoading: false }
   ]
+}));
+
+jest.mock('../../components/layout/CommentsSection', () => ({
+  __esModule: true,
+  default: (props: unknown) => mockCommentsSection(props)
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -145,6 +153,10 @@ describe('RequestDetailPage', () => {
       });
       expect(mockDeleteRequest).toHaveBeenCalledWith(12);
       expect(mockNavigate).toHaveBeenCalledWith('/private/requests');
+      expect(mockCommentsSection).toHaveBeenCalledWith({
+        page: 'requests',
+        pageId: 12
+      });
       expect(screen.getAllByText('100.00 MiB').length).toBeGreaterThan(0);
       const alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Request bookmarked.')).toBe(true);

@@ -14,6 +14,7 @@ import {
 import { useToggleRequestBookmarkMutation } from '../../store/services/bookmarkApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
+import CommentsSection from '../layout/CommentsSection';
 import { addAlert } from '../../store/slices/alertSlice';
 import { useAppDispatch } from '../../store/hooks';
 
@@ -394,6 +395,8 @@ const RequestDetailPage = () => {
           </div>
         )}
       </div>
+
+      <CommentsSection page="requests" pageId={requestId} />
     </div>
   );
 };

@@ -6,7 +6,6 @@ export type CommentPage = NonNullable<
 >['page'] extends infer T
   ? Exclude<T, undefined>
   : never;
-
 type CommentQueryParams = NonNullable<
   paths['/comments']['get']['parameters']['query']
 >;

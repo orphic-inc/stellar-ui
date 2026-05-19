@@ -194,6 +194,20 @@ describe('CommentsSection', () => {
     });
   });
 
+  it('calls createComment with requestId on submit for requests page', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="requests" pageId={13} />);
+    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Support');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(mockCreateComment).toHaveBeenCalledWith({
+        page: 'requests',
+        body: 'Support',
+        requestId: 13
+      });
+    });
+  });
+
   it('clears comment body after successful submission', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CommentsSection page="release" pageId={5} />);

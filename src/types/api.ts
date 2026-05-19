@@ -3009,7 +3009,13 @@ export interface paths {
     get: {
       parameters: {
         query?: {
-          page?: 'artist' | 'collages' | 'requests' | 'communities' | 'release';
+          page?:
+            | 'artist'
+            | 'collages'
+            | 'contributions'
+            | 'requests'
+            | 'communities'
+            | 'release';
           pageId?: number;
         };
         header?: never;
@@ -3044,12 +3050,14 @@ export interface paths {
             page:
               | 'artist'
               | 'collages'
+              | 'contributions'
               | 'requests'
               | 'communities'
               | 'release';
             body: string;
             communityId?: number;
             contributionId?: number;
+            requestId?: number;
             artistId?: number;
             releaseId?: number;
             collageId?: number;
@@ -5864,6 +5872,280 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/top10/releases': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Top releases */
+    get: {
+      parameters: {
+        query?: {
+          type?:
+            | 'day'
+            | 'week'
+            | 'month'
+            | 'year'
+            | 'overall'
+            | 'consumed'
+            | 'contributed';
+          limit?: number | null;
+          excludeTags?: string;
+          format?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Top releases list */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              items: components['schemas']['Top10ReleaseItem'][];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/top10/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Top users */
+    get: {
+      parameters: {
+        query?: {
+          type?:
+            | 'contributed'
+            | 'consumed'
+            | 'numContributions'
+            | 'contributionSpeed'
+            | 'consumeSpeed';
+          limit?: number | null;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Top users list */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              items: components['schemas']['Top10UserItem'][];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/top10/tags': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Top tags */
+    get: {
+      parameters: {
+        query?: {
+          type?: 'used' | 'voted';
+          limit?: number | null;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Top tags list */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              items: components['schemas']['Top10TagItem'][];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/top10/votes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Top voted releases (BPCI ranked) */
+    get: {
+      parameters: {
+        query?: {
+          limit?: number | null;
+          tags?: string;
+          year?: number | null;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Top voted releases */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              items: components['schemas']['Top10VoteItem'][];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/top10/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Top 10 history snapshot (staff) */
+    get: {
+      parameters: {
+        query?: {
+          type?: 'Daily' | 'Weekly';
+          date?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description History snapshot */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Top10Snapshot'];
+          };
+        };
+        /** @description No snapshot found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/top10/snapshot': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Trigger a history snapshot (admin/cron) */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            /** @enum {string} */
+            type?: 'Daily' | 'Weekly';
+          };
+        };
+      };
+      responses: {
+        /** @description Snapshot created */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -6620,6 +6902,73 @@ export interface components {
       registrationStatus: 'open' | 'invite' | 'closed';
       maxUsers: number;
       updatedAt: string;
+    };
+    Top10Tag: {
+      id: number;
+      name: string;
+    };
+    Top10ReleaseItem: {
+      rank: number;
+      releaseId: number;
+      title: string;
+      year: number;
+      artistId: number;
+      artistName: string;
+      type: string;
+      releaseType: string;
+      tags: components['schemas']['Top10Tag'][];
+      consumerCount: number;
+      totalBytesConsumed: string;
+      contributionCount: number;
+    };
+    Top10UserItem: {
+      rank: number;
+      userId: number;
+      username: string;
+      avatar: string | null;
+      contributed: string;
+      consumed: string;
+      ratio: number;
+      numContributions: number;
+      contributionSpeed: number;
+      consumeSpeed: number;
+      joinedAt: string;
+      rankName: string;
+      rankLevel: number;
+    };
+    Top10TagItem: {
+      rank: number;
+      tagId: number;
+      name: string;
+      uses: number;
+      positiveVotes: number;
+      negativeVotes: number;
+    };
+    Top10VoteItem: {
+      rank: number;
+      releaseId: number;
+      title: string;
+      year: number;
+      artistName: string;
+      ups: number;
+      downs: number;
+      total: number;
+      score: number;
+      positivePercent: number;
+    };
+    Top10SnapshotEntry: {
+      rank: number;
+      releaseId: number | null;
+      releaseTitle: string;
+      tagString: string;
+      deleted: boolean;
+    };
+    Top10Snapshot: {
+      snapshotId: number;
+      /** @enum {string} */
+      type: 'Daily' | 'Weekly';
+      date: string;
+      entries: components['schemas']['Top10SnapshotEntry'][];
     };
   };
   responses: never;

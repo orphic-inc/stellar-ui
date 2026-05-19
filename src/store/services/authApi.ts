@@ -19,6 +19,21 @@ export interface SessionItem {
   isCurrent: boolean;
 }
 
+const getRejectedStatus = (err: unknown): number | undefined => {
+  if (typeof err !== 'object' || err === null) return undefined;
+
+  const maybeError = err as {
+    status?: number;
+    error?: { status?: number; originalStatus?: number };
+  };
+
+  return (
+    maybeError.status ??
+    maybeError.error?.status ??
+    maybeError.error?.originalStatus
+  );
+};
+
 export const authApi = api.injectEndpoints({
   endpoints: (build) => ({
     getMe: build.query<CurrentUserResponse, void>({
@@ -29,7 +44,7 @@ export const authApi = api.injectEndpoints({
           const { data } = await queryFulfilled;
           dispatch(setCredentials(data));
         } catch (err: unknown) {
-          const status = (err as { status?: number })?.status;
+          const status = getRejectedStatus(err);
           if (status === 401 || status === 403) {
             dispatch(logoutAction());
           }

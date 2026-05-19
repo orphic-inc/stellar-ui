@@ -3,28 +3,36 @@ import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import NotificationCorner from '../../components/layout/NotificationCorner';
+import type { Notification } from '../../store/services/notificationApi';
 
 const mockMarkRead = jest.fn();
 const mockMarkAllRead = jest.fn();
 const mockDeleteNotification = jest.fn();
 
-const mockNotifications = [
+const mockNotifications: Notification[] = [
   {
     id: 1,
+    userId: 1,
+    quoterId: 10,
+    createdAt: '2024-01-01',
     readAt: null,
     pageId: 10,
     page: 'forums',
     postId: 5,
     source: { forumId: 2, title: 'Jazz Talk' },
-    quoter: { username: 'alice' }
+    quoter: { id: 10, username: 'alice', avatar: null }
   },
   {
     id: 2,
+    userId: 1,
+    quoterId: 11,
+    createdAt: '2024-01-02',
     readAt: '2024-01-01',
     pageId: 20,
     page: 'artist',
+    postId: null,
     source: { title: 'Miles Davis' },
-    quoter: { username: 'bob' }
+    quoter: { id: 11, username: 'bob', avatar: null }
   }
 ];
 
@@ -155,50 +163,65 @@ describe('NotificationCorner', () => {
     mockNotificationsData = [
       {
         id: 3,
+        userId: 1,
+        quoterId: 12,
+        createdAt: '2024-01-03',
         readAt: null,
         pageId: 30,
         page: 'collages',
         postId: null,
         source: { title: 'Cool Collage' },
-        quoter: { username: 'carol' }
+        quoter: { id: 12, username: 'carol', avatar: null }
       },
       {
         id: 4,
+        userId: 1,
+        quoterId: 13,
+        createdAt: '2024-01-04',
         readAt: null,
         pageId: 40,
         page: 'requests',
         postId: null,
         source: { title: 'A Request' },
-        quoter: { username: 'dave' }
+        quoter: { id: 13, username: 'dave', avatar: null }
       },
       {
         id: 5,
+        userId: 1,
+        quoterId: 14,
+        createdAt: '2024-01-05',
         readAt: null,
         pageId: 50,
         page: 'communities',
         postId: null,
         source: { title: 'Jazz Heads' },
-        quoter: { username: 'eve' }
+        quoter: { id: 14, username: 'eve', avatar: null }
       },
       {
         id: 6,
+        userId: 1,
+        quoterId: 15,
+        createdAt: '2024-01-06',
         readAt: null,
         pageId: 60,
         page: 'unknown',
         postId: null,
         source: { title: 'Who Knows' },
-        quoter: { username: 'frank' }
+        quoter: { id: 15, username: 'frank', avatar: null }
       },
       {
         id: 7,
+        userId: 1,
+        quoterId: 16,
+        createdAt: '2024-01-07',
         readAt: null,
         pageId: 70,
         page: 'forums',
         postId: null,
         source: null,
-        quoter: { username: 'grace' }
+        quoter: { id: 16, username: 'grace', avatar: null }
       }
-    ] as typeof mockNotifications;
+    ];
     mockUnreadCount = 5;
 
     const user = userEvent.setup();

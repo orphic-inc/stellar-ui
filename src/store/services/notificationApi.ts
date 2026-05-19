@@ -18,7 +18,7 @@ export interface Notification {
   quoter: NotificationQuoter;
   page: string;
   pageId: number;
-  postId: number;
+  postId: number | null;
   readAt: string | null;
   createdAt: string;
   source: NotificationSource | null;
