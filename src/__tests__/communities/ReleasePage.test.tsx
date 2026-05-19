@@ -343,4 +343,250 @@ describe('ReleasePage', () => {
       '/private/communities/1/releases/5/contribute'
     );
   });
+
+  it('navigates to /contribute when clicking "Be the first to contribute" in empty contributions', async () => {
+    const user = userEvent.setup();
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ contributions: [] }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByRole('button', { name: /be the first to contribute/i }));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/private/communities/1/releases/5/contribute'
+    );
+  });
+
+  it('calls voteOn with positive=false on downvote', async () => {
+    const user = userEvent.setup();
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ myVote: null }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByRole('button', { name: /▼/ }));
+    expect(mockVoteOn).toHaveBeenCalledWith({
+      communityId: 1,
+      releaseId: 5,
+      positive: false
+    });
+  });
+
+  it('calls removeVote when clicking already-active downvote', async () => {
+    const user = userEvent.setup();
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ myVote: 'down' }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByRole('button', { name: /▼/ }));
+    expect(mockRemoveVote).toHaveBeenCalledWith({ communityId: 1, releaseId: 5 });
+    expect(mockVoteOn).not.toHaveBeenCalled();
+  });
+
+  it('dispatches danger alert on bookmark failure', async () => {
+    const user = userEvent.setup();
+    mockToggleBookmark.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('fail'))
+    });
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByRole('button', { name: /bookmark/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ alertType: 'danger' })
+        })
+      );
+    });
+  });
+
+  it('dispatches danger alert on vote failure', async () => {
+    const user = userEvent.setup();
+    mockVoteOn.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('fail'))
+    });
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ myVote: null }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByRole('button', { name: /▲/ }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ alertType: 'danger' })
+        })
+      );
+    });
+  });
+
+  it('dispatches API error message on addTag failure with data.msg', async () => {
+    const user = userEvent.setup();
+    mockAddTag.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Tag already exists' } })
+    });
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ tags: [] }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.type(screen.getByPlaceholderText(/add tag/i), 'blues');
+    await user.click(screen.getByRole('button', { name: '+' }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: 'Tag already exists',
+            alertType: 'danger'
+          })
+        })
+      );
+    });
+  });
+
+  it('dispatches fallback error on addTag failure without data.msg', async () => {
+    const user = userEvent.setup();
+    mockAddTag.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ tags: [] }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.type(screen.getByPlaceholderText(/add tag/i), 'blues');
+    await user.click(screen.getByRole('button', { name: '+' }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: 'Failed to add tag.',
+            alertType: 'danger'
+          })
+        })
+      );
+    });
+  });
+
+  it('dispatches danger alert on removeTag failure', async () => {
+    const user = userEvent.setup();
+    mockRemoveTag.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('fail'))
+    });
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ tags: [{ id: 7, name: 'jazz' }] }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByTitle('Remove tag'));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ alertType: 'danger' })
+        })
+      );
+    });
+  });
+
+  it('renders cover image when release has an image', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ image: 'https://example.com/cover.jpg' }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    const img = document.querySelector('img') as HTMLImageElement;
+    expect(img).toBeInTheDocument();
+    expect(img.src).toContain('cover.jpg');
+  });
+
+  it('shows — for missing sizeInBytes and releaseDescription', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({
+        contributions: [
+          {
+            id: 101,
+            type: 'MP3',
+            sizeInBytes: null,
+            user: { id: 3, username: 'sparse-user' },
+            releaseDescription: null,
+            linkStatus: null
+          }
+        ]
+      }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    const dashes = screen.getAllByText('—');
+    expect(dashes.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows singular vote count when total is 1', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ voteAggregate: { ups: 1, total: 1 } }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    const ratingEl = document.querySelector('.text-xs.text-gray-500.text-center');
+    expect(ratingEl?.textContent).toMatch(/1 vote(?!s)/);
+  });
+
+  it('hides artist sidebar section when release has no artist', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ artist: null }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    expect(screen.queryByText('Artist')).not.toBeInTheDocument();
+  });
+
+  it('shows Community fallback in breadcrumb when community data absent', () => {
+    mockGetCommunityByIdQuery.mockReturnValue({ data: undefined });
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    expect(screen.getByText('Community')).toBeInTheDocument();
+  });
+
+  it('dispatches "Bookmark removed." alert when bookmarked is false', async () => {
+    const user = userEvent.setup();
+    mockToggleBookmark.mockReturnValue({
+      unwrap: () => Promise.resolve({ bookmarked: false })
+    });
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByRole('button', { name: /bookmark/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: 'Bookmark removed.',
+            alertType: 'success'
+          })
+        })
+      );
+    });
+  });
 });
