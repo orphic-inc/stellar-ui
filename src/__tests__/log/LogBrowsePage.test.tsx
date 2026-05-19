@@ -151,6 +151,51 @@ describe('LogBrowsePage', () => {
     expect(params.toString()).toBe('');
   });
 
+  it('renders post results when type=post', () => {
+    mockUseSearchLogQuery.mockReturnValue({
+      data: {
+        data: [makePostResult(5)],
+        meta: { total: 1, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('type=post'),
+      mockSetSearchParams
+    ]);
+    renderWithProviders(<LogBrowsePage />);
+    expect(screen.getByText(/post by bob/i)).toBeInTheDocument();
+    expect(screen.getByText(/post body 5/i)).toBeInTheDocument();
+  });
+
+  it('renders topic pagination buttons and setPage updates page param', async () => {
+    const user = userEvent.setup();
+    mockUseSearchLogQuery.mockReturnValue({
+      data: {
+        data: [makeTopicResult(1)],
+        meta: { total: 50, totalPages: 3 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('type=topic&page=1'),
+      mockSetSearchParams
+    ]);
+    renderWithProviders(<LogBrowsePage />);
+
+    expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '3' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '2' }));
+
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
+    expect(params.get('page')).toBe('2');
+  });
+
   it('queries with parsed params from URL', () => {
     mockUseSearchLogQuery.mockReturnValue({
       data: undefined,
