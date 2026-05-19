@@ -135,6 +135,65 @@ describe('CommentsSection', () => {
     });
   });
 
+  it('calls createComment with communityId on submit for communities page', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="communities" pageId={7} />);
+    await user.type(
+      screen.getByPlaceholderText(/add a comment/i),
+      'Great community'
+    );
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(mockCreateComment).toHaveBeenCalledWith({
+        page: 'communities',
+        body: 'Great community',
+        communityId: 7
+      });
+    });
+  });
+
+  it('calls createComment with artistId on submit for artist page', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Fan');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(mockCreateComment).toHaveBeenCalledWith({
+        page: 'artist',
+        body: 'Fan',
+        artistId: 3
+      });
+    });
+  });
+
+  it('calls createComment with collageId on submit for collages page', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="collages" pageId={9} />);
+    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Nice');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(mockCreateComment).toHaveBeenCalledWith({
+        page: 'collages',
+        body: 'Nice',
+        collageId: 9
+      });
+    });
+  });
+
+  it('calls createComment with contributionId on submit for contributions page', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="contributions" pageId={11} />);
+    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Thanks');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(mockCreateComment).toHaveBeenCalledWith({
+        page: 'contributions',
+        body: 'Thanks',
+        contributionId: 11
+      });
+    });
+  });
+
   it('clears comment body after successful submission', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CommentsSection page="release" pageId={5} />);
