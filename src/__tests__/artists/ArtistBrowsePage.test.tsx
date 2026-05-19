@@ -159,6 +159,65 @@ describe('ArtistBrowsePage', () => {
     expect(screen.queryByText(/advanced options/i)).not.toBeInTheDocument();
   });
 
+  it('renders pagination buttons and navigates to a page', async () => {
+    const user = userEvent.setup();
+    mockUseSearchArtistsQuery.mockReturnValue({
+      data: {
+        data: [makeArtist(1, 'Miles Davis')],
+        meta: { total: 30, totalPages: 3 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ArtistBrowsePage />);
+    const page2Btn = screen.getByRole('button', { name: '2' });
+    await user.click(page2Btn);
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('page')).toBe('2');
+  });
+
+  it('sets non-default tagMode, orderBy, order, and vanityHouse params on submit', async () => {
+    const user = userEvent.setup();
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { advanced_search: true } } }
+    });
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('vanityHouse=true'),
+      mockSetSearchParams
+    ]);
+    mockUseSearchArtistsQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+
+    renderWithProviders(<ArtistBrowsePage />);
+
+    // Show advanced options and tick vanityHouse checkbox
+    await user.click(screen.getByRole('button', { name: /\+ advanced options/i }));
+
+    // Select non-default orderBy and order
+    await user.selectOptions(screen.getByRole('combobox', { name: /order/i }), 'random');
+    const orderSelects = screen.getAllByRole('combobox');
+    await user.selectOptions(orderSelects[1], 'desc');
+
+    // Switch tagMode radio to 'all'
+    await user.click(screen.getByRole('radio', { name: /tags: all/i }));
+
+    // Tick vanityHouse checkbox (already defaultChecked from URL)
+    const checkbox = screen.getByRole('checkbox', { name: /vanity house only/i });
+    if (!checkbox.hasAttribute('checked')) {
+      await user.click(checkbox);
+    }
+
+    await user.click(screen.getByRole('button', { name: /^search$/i }));
+    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    expect(params.get('tagMode')).toBe('all');
+    expect(params.get('orderBy')).toBe('random');
+    expect(params.get('order')).toBe('desc');
+    expect(params.get('vanityHouse')).toBe('true');
+  });
+
   it('shows advanced options toggle for users with advanced_search permission', async () => {
     const user = userEvent.setup();
     mockUseGetMeQuery.mockReturnValue({
