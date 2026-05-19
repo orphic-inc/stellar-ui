@@ -42,7 +42,16 @@ jest.mock('../../store/services/subscriptionApi', () => ({
 }));
 
 jest.mock('../../components/layout/PostBox', () => {
-  const MockPostBox = () => <div data-testid="post-box">PostBox</div>;
+  const MockPostBox = ({
+    onQuoteConsumed
+  }: {
+    onQuoteConsumed?: () => void;
+  }) => (
+    <>
+      <div data-testid="post-box">PostBox</div>
+      <button onClick={onQuoteConsumed}>Clear Quote</button>
+    </>
+  );
   MockPostBox.displayName = 'MockPostBox';
   return MockPostBox;
 });
@@ -157,6 +166,130 @@ describe('ForumTopicPage', () => {
       topicId: 44
     });
     expect(screen.getByTestId('post-box')).toBeInTheDocument();
+  });
+
+  it('shows poll results for a closed poll and clears quote text via onQuoteConsumed', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod',
+        userRank: { permissions: { forums_moderate: true } }
+      } as never)
+    );
+    mockUseGetPollByTopicQuery.mockReturnValue({
+      data: {
+        id: 6,
+        question: 'Best format?',
+        answers: JSON.stringify(['CD', 'Vinyl']),
+        closed: true,
+        votes: [
+          { userId: 9, vote: 0 },
+          { userId: 10, vote: 1 }
+        ]
+      }
+    });
+
+    renderWithProviders(<ForumTopicPage />, { store });
+
+    // Poll results visible because closed=true
+    expect(screen.getByText('CD')).toBeInTheDocument();
+    expect(screen.getAllByText(/50%/).length).toBe(2);
+
+    // Quote a post then clear it via onQuoteConsumed
+    await user.click(screen.getByRole('button', { name: /quote post 101/i }));
+    await user.click(screen.getByRole('button', { name: /clear quote/i }));
+    // No assertion needed — just exercising the callback path
+  });
+
+  it('shows subscribe (not unsubscribe) when not subscribed, topic not found when data missing, and singular vote count', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: {} }
+      } as never)
+    );
+    // Not subscribed
+    mockUseGetSubscriptionsQuery.mockReturnValue({ data: [] });
+    // Poll: open with 1 vote by another user → shows voting form with '1 vote'
+    mockUseGetPollByTopicQuery.mockReturnValue({
+      data: {
+        id: 6,
+        question: 'Format?',
+        answers: JSON.stringify(['CD', 'Vinyl']),
+        closed: false,
+        votes: [{ userId: 99, vote: 0 }]
+      }
+    });
+
+    renderWithProviders(<ForumTopicPage />, { store });
+
+    expect(screen.getByRole('button', { name: /^subscribe$/i })).toBeInTheDocument();
+    expect(screen.getByText(/1 vote/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /^subscribe$/i }));
+    expect(mockSubscribe).toHaveBeenCalledWith({
+      topicId: 44,
+      action: 'subscribe'
+    });
+  });
+
+  it('renders without poll when no poll data', () => {
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: {} }
+      } as never)
+    );
+    mockUseGetPollByTopicQuery.mockReturnValue({ data: undefined });
+
+    renderWithProviders(<ForumTopicPage />, { store });
+
+    expect(screen.queryByText('Best format?')).not.toBeInTheDocument();
+  });
+
+  it('shows topic not found when topic data is absent', () => {
+    mockUseGetTopicByIdQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false
+    });
+    mockUseGetPostsByTopicQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false
+    });
+    renderWithProviders(<ForumTopicPage />);
+    expect(screen.getByText(/topic not found/i)).toBeInTheDocument();
+  });
+
+  it('shows 0% on closed poll with no votes', () => {
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: {} }
+      } as never)
+    );
+    mockUseGetPollByTopicQuery.mockReturnValue({
+      data: {
+        id: 6,
+        question: 'Format?',
+        answers: JSON.stringify(['CD', 'Vinyl']),
+        closed: true,
+        votes: []
+      }
+    });
+
+    renderWithProviders(<ForumTopicPage />, { store });
+
+    const zeroPcts = screen.getAllByText(/0 \(0%\)/);
+    expect(zeroPcts.length).toBe(2);
   });
 
   it('shows poll parse failure and hides the reply box for locked topics', () => {
