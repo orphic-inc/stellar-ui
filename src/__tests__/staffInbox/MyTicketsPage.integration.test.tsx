@@ -183,6 +183,30 @@ describe('MyTicketsPage RTK Query integration', () => {
     });
   });
 
+  it('navigates back to page 1 when Previous is clicked from page 2', async () => {
+    const user = userEvent.setup();
+    setupFetch({
+      tickets: [makeTicket(1)],
+      meta: { total: 60, pageSize: 25 }
+    });
+    renderWithProviders(<MyTicketsPage />);
+
+    await screen.findByText('Ticket 1');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /previous/i })
+      ).not.toBeDisabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: /previous/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
+    });
+  });
+
   it('hides pagination buttons when only one page', async () => {
     setupFetch({ tickets: [makeTicket(1)] });
     renderWithProviders(<MyTicketsPage />);

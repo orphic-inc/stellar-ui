@@ -184,6 +184,29 @@ describe('MyReportsPage RTK Query integration', () => {
     });
   });
 
+  it('navigates back to page 1 when Previous is clicked from page 2', async () => {
+    const user = userEvent.setup();
+    setupFetch({ reports: [makeReport(1)], meta: { total: 60, pageSize: 25 } });
+    renderWithProviders(<MyReportsPage />);
+
+    await screen.findByText('Spam');
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    // Now on page 2 — Previous button should be enabled and page counter updates
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /previous/i })
+      ).not.toBeDisabled();
+    });
+
+    await user.click(screen.getByRole('button', { name: /previous/i }));
+
+    // Back on page 1: Previous should be disabled again
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
+    });
+  });
+
   it('hides pagination buttons when only one page', async () => {
     setupFetch({ reports: [makeReport(1)] });
     renderWithProviders(<MyReportsPage />);
