@@ -6,9 +6,14 @@ import Register from '../../components/auth/Register';
 import { selectAlerts } from '../../store/slices/alertSlice';
 
 const mockRegister = jest.fn();
+const mockUseGetInstallStatusQuery = jest.fn();
 
 jest.mock('../../store/services/authApi', () => ({
   useRegisterMutation: () => [mockRegister, { isLoading: false }]
+}));
+
+jest.mock('../../store/services/installApi', () => ({
+  useGetInstallStatusQuery: () => mockUseGetInstallStatusQuery()
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -41,6 +46,35 @@ const fillForm = async (
 describe('Register', () => {
   beforeEach(() => {
     mockRegister.mockReset();
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'open' }
+    });
+  });
+
+  it('dispatches success alert and navigates on successful registration', async () => {
+    mockRegister.mockReturnValue({
+      unwrap: () => Promise.resolve({ id: 1 })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<Register />);
+
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === 'Account created.')).toBe(true);
+    });
+  });
+
+  it('shows closed-registration message when registrationStatus is closed', () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'closed' }
+    });
+    renderWithProviders(<Register />);
+    expect(
+      screen.getByText(/registration is currently closed/i)
+    ).toBeInTheDocument();
   });
 
   it('shows "Passwords do not match" when passwords differ', async () => {
