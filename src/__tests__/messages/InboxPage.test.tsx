@@ -87,6 +87,58 @@ describe('InboxPage', () => {
     expect(mockUseGetInboxQuery).toHaveBeenLastCalledWith({ page: 2 });
   });
 
+  it('deselects an item and supports select-all / deselect-all', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<InboxPage />);
+
+    const [headerCheckbox, row1Checkbox] = screen.getAllByRole('checkbox');
+
+    await user.click(row1Checkbox);
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    await user.click(row1Checkbox); // deselect (filter branch)
+    expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
+
+    await user.click(headerCheckbox); // select all
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    await user.click(headerCheckbox); // deselect all ([] branch)
+    expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
+  });
+
+  it('covers markUnread and bulk delete toolbar actions', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<InboxPage />);
+
+    const [, row1Checkbox] = screen.getAllByRole('checkbox');
+
+    await user.click(row1Checkbox);
+    await user.click(screen.getByRole('button', { name: /mark unread/i }));
+    await waitFor(() =>
+      expect(mockBulkUpdate).toHaveBeenCalledWith({
+        ids: [1],
+        action: 'markUnread'
+      })
+    );
+
+    await user.click(row1Checkbox);
+    await user.click(screen.getByRole('button', { name: /^delete$/i }));
+    await waitFor(() =>
+      expect(mockBulkUpdate).toHaveBeenCalledWith({
+        ids: [1],
+        action: 'delete'
+      })
+    );
+  });
+
+  it('navigates to page 2 then back via Previous', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<InboxPage />);
+
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    expect(mockUseGetInboxQuery).toHaveBeenLastCalledWith({ page: 2 });
+    await user.click(screen.getByRole('button', { name: /previous/i }));
+    expect(mockUseGetInboxQuery).toHaveBeenLastCalledWith({ page: 1 });
+  });
+
   it('shows empty and error states', () => {
     mockUseGetInboxQuery.mockReturnValue({
       data: { total: 0, page: 1, pageSize: 25, conversations: [] },
