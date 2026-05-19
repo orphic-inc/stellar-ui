@@ -108,6 +108,138 @@ describe('TicketView', () => {
     });
   });
 
+  it('shows spinner while loading', () => {
+    mockUseGetTicketQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
+    );
+    renderWithProviders(<TicketView />, { store });
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('shows error state when ticket is not found', () => {
+    mockUseGetTicketQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 404 }
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
+    );
+    renderWithProviders(<TicketView />, { store });
+    expect(screen.getByText(/ticket not found/i)).toBeInTheDocument();
+  });
+
+  it('does not submit reply when body is empty', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
+    );
+    renderWithProviders(<TicketView />, { store });
+
+    // Leave reply body empty and click Send Reply
+    await user.click(screen.getByRole('button', { name: /send reply/i }));
+    expect(mockReplyToTicket).not.toHaveBeenCalled();
+  });
+
+  it('dispatches danger alert when resolve fails', async () => {
+    mockResolveTicket.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('server error'))
+    });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
+    );
+    renderWithProviders(<TicketView />, { store });
+
+    await user.click(screen.getByRole('button', { name: /^resolve$/i }));
+
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === 'Failed to resolve ticket.')).toBe(
+        true
+      );
+    });
+  });
+
+  it('calls unresolveTicket when Unresolve is clicked on a resolved ticket', async () => {
+    mockUseGetTicketQuery.mockReturnValue({
+      data: {
+        id: 15,
+        subject: 'Need moderator help',
+        status: 'Resolved',
+        user: { id: 7, username: 'regular' },
+        assignedUser: null,
+        messages: []
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
+    );
+    renderWithProviders(<TicketView />, { store });
+
+    await user.click(screen.getByRole('button', { name: /unresolve/i }));
+
+    await waitFor(() => {
+      expect(mockUnresolveTicket).toHaveBeenCalledWith(15);
+    });
+  });
+
+  it('assigns with null userId when username field is empty', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
+    );
+    renderWithProviders(<TicketView />, { store });
+
+    // Submit assign form with empty username (should unassign)
+    await user.click(screen.getByRole('button', { name: /^assign$/i }));
+
+    await waitFor(() => {
+      expect(mockAssignTicket).toHaveBeenCalledWith({
+        id: 15,
+        assignedUserId: null
+      });
+    });
+  });
+
   it('shows an alert when assignment fails', async () => {
     const user = userEvent.setup();
     mockAssignTicket.mockReturnValue({
