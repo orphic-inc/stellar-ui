@@ -88,6 +88,68 @@ describe('ReportsQueuePage', () => {
     });
   });
 
+  it('collapses notes after expanding them', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ReportsQueuePage />);
+
+    // Expand if not already open (button text may be '1 note' or 'hide')
+    const expandBtn = screen
+      .getAllByRole('button')
+      .find((b) => /\d+ note/i.test(b.textContent ?? ''));
+    if (expandBtn) {
+      await user.click(expandBtn);
+      await waitFor(() =>
+        expect(screen.getByText('Investigated')).toBeInTheDocument()
+      );
+    }
+
+    await user.click(screen.getByRole('button', { name: /^hide$/i }));
+    await waitFor(() =>
+      expect(screen.queryByText('Investigated')).not.toBeInTheDocument()
+    );
+  });
+
+  it('clears reporter filter via × button', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ReportsQueuePage />);
+
+    await user.type(screen.getByLabelText('Reporter:'), 'alice');
+    await user.click(screen.getByRole('button', { name: /^filter$/i }));
+    expect(mockUseGetReportsQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ reporterUsername: 'alice' })
+    );
+
+    await user.click(screen.getByRole('button', { name: '×' }));
+    expect(mockUseGetReportsQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ reporterUsername: undefined })
+    );
+  });
+
+  it('shows pagination and supports Previous and Next', async () => {
+    const user = userEvent.setup();
+    mockUseGetReportsQuery.mockImplementation((params) => ({
+      data: {
+        total: 50,
+        page: params.page ?? 1,
+        pageSize: 25,
+        reports: []
+      },
+      isLoading: false,
+      error: undefined
+    }));
+    renderWithProviders(<ReportsQueuePage />);
+
+    await user.click(screen.getByRole('button', { name: /next/i }));
+    expect(mockUseGetReportsQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: 2 })
+    );
+
+    await user.click(screen.getByRole('button', { name: /previous/i }));
+    expect(mockUseGetReportsQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: 1 })
+    );
+  });
+
   it('renders staff stats when the stats tab is selected', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ReportsQueuePage />);
