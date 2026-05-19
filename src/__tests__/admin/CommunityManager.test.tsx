@@ -170,4 +170,98 @@ describe('CommunityManager', () => {
     );
     expect(screen.getByLabelText(/owner user id/i)).toBeInTheDocument();
   });
+
+  it('allows changing type and description in create form', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.selectOptions(screen.getByLabelText(/^type/i), 'Applications');
+    await user.type(
+      screen.getByLabelText(/description/i),
+      'A great collection'
+    );
+    expect((screen.getByLabelText(/^type/i) as HTMLSelectElement).value).toBe(
+      'Applications'
+    );
+    expect(
+      (screen.getByLabelText(/description/i) as HTMLInputElement).value
+    ).toBe('A great collection');
+  });
+
+  it('toggles allow-duplicate-formats checkbox in create form', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    // The create form's "allow duplicate formats" checkbox is the first one
+    // Create form starts with allowDuplicateFormats = true by default
+    const checkboxes = screen.getAllByLabelText(/allow duplicate formats/i);
+    const checkbox = checkboxes[0] as HTMLInputElement;
+    expect(checkbox.checked).toBe(true);
+    await user.click(checkbox);
+    expect(checkbox.checked).toBe(false);
+  });
+
+  it('adds a staff member in the edit row', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(5)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+
+    const staffInput = screen.getByPlaceholderText('User ID');
+    await user.type(staffInput, '42');
+    await user.click(screen.getByRole('button', { name: /add/i }));
+
+    // Staff member should appear as a tag
+    expect(screen.getByText('#42')).toBeInTheDocument();
+  });
+
+  it('removes a staff member when × is clicked', async () => {
+    const user = userEvent.setup();
+    const community = {
+      ...makeCommunity(6),
+      staff: [{ id: 10, username: 'mod-alice' }]
+    };
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [community] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+
+    expect(screen.getByText('mod-alice')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '×' }));
+    expect(screen.queryByText('mod-alice')).toBeNull();
+  });
+
+  it('toggles allowDuplicateFormats checkbox in edit row', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(7)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+
+    // After opening edit row there are two "allow duplicate formats" checkboxes:
+    // index 0 is the edit row's, index 1 is the create form's
+    const checkboxes = screen.getAllByLabelText(/allow duplicate formats/i);
+    const editCheckbox = checkboxes[0] as HTMLInputElement;
+    const initial = editCheckbox.checked;
+    await user.click(editCheckbox);
+    expect(editCheckbox.checked).toBe(!initial);
+  });
 });
