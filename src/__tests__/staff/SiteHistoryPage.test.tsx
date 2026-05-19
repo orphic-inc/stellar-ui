@@ -15,8 +15,14 @@ let mockIsUpdating = false;
 
 jest.mock('../../store/services/siteHistoryApi', () => ({
   useGetSiteHistoryQuery: () => mockUseGetSiteHistoryQuery(),
-  useCreateSiteHistoryMutation: () => [mockCreate, { isLoading: mockIsCreating }],
-  useUpdateSiteHistoryMutation: () => [mockUpdate, { isLoading: mockIsUpdating }],
+  useCreateSiteHistoryMutation: () => [
+    mockCreate,
+    { isLoading: mockIsCreating }
+  ],
+  useUpdateSiteHistoryMutation: () => [
+    mockUpdate,
+    { isLoading: mockIsUpdating }
+  ],
   useDeleteSiteHistoryMutation: () => [mockDelete, { isLoading: false }]
 }));
 

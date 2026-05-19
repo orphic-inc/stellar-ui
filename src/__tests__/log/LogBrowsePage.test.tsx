@@ -217,7 +217,9 @@ describe('LogBrowsePage', () => {
 
     await user.click(screen.getByRole('button', { name: '2' }));
 
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('page')).toBe('2');
   });
 
@@ -231,10 +233,15 @@ describe('LogBrowsePage', () => {
     renderWithProviders(<LogBrowsePage />);
 
     await user.click(screen.getByRole('radio', { name: /topics/i }));
-    await user.selectOptions(screen.getByRole('combobox', { name: /order/i }), 'asc');
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /order/i }),
+      'asc'
+    );
     await user.click(screen.getByRole('button', { name: /^search$/i }));
 
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('type')).toBe('topic');
     expect(params.get('order')).toBe('asc');
     expect(params.get('q')).toBeNull();

@@ -14,8 +14,14 @@ let mockIsComposing = false;
 let mockIsSavingDraft = false;
 
 jest.mock('../../store/services/messagesApi', () => ({
-  useComposeMessageMutation: () => [mockCompose, { isLoading: mockIsComposing }],
-  useCreateDraftMutation: () => [mockCreateDraft, { isLoading: mockIsSavingDraft }]
+  useComposeMessageMutation: () => [
+    mockCompose,
+    { isLoading: mockIsComposing }
+  ],
+  useCreateDraftMutation: () => [
+    mockCreateDraft,
+    { isLoading: mockIsSavingDraft }
+  ]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -118,7 +124,9 @@ describe('ComposeForm', () => {
     await user.click(screen.getByRole('button', { name: /^send$/i }));
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
-      expect(alerts.some((a) => a.msg === 'Failed to send message.')).toBe(true);
+      expect(alerts.some((a) => a.msg === 'Failed to send message.')).toBe(
+        true
+      );
     });
   });
 
@@ -161,12 +169,16 @@ describe('ComposeForm', () => {
   it('shows "Sending…" when isLoading is true', () => {
     mockIsComposing = true;
     renderWithProviders(<ComposeForm />);
-    expect(screen.getByRole('button', { name: /sending…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /sending…/i })
+    ).toBeInTheDocument();
   });
 
   it('shows "Saving…" when isSavingDraft is true', () => {
     mockIsSavingDraft = true;
     renderWithProviders(<ComposeForm />);
-    expect(screen.getByRole('button', { name: /saving…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
   });
 });

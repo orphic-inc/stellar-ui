@@ -20,7 +20,10 @@ jest.mock('../../store/services/staffInboxApi', () => ({
   useGetTicketQuery: (...args: unknown[]) => mockUseGetTicketQuery(...args),
   useGetCannedResponsesQuery: (...args: unknown[]) =>
     mockUseGetCannedResponsesQuery(...args),
-  useReplyToTicketMutation: () => [mockReplyToTicket, { isLoading: mockIsReplying }],
+  useReplyToTicketMutation: () => [
+    mockReplyToTicket,
+    { isLoading: mockIsReplying }
+  ],
   useResolveTicketMutation: () => [mockResolveTicket, { isLoading: false }],
   useUnresolveTicketMutation: () => [mockUnresolveTicket, { isLoading: false }],
   useAssignTicketMutation: () => [mockAssignTicket, { isLoading: false }]
@@ -279,11 +282,18 @@ describe('TicketView', () => {
     );
     renderWithProviders(<TicketView />, { store });
 
-    await user.selectOptions(screen.getByLabelText(/use canned response/i), '2');
-    expect(screen.getByLabelText('Reply')).toHaveValue('Use this canned reply.');
+    await user.selectOptions(
+      screen.getByLabelText(/use canned response/i),
+      '2'
+    );
+    expect(screen.getByLabelText('Reply')).toHaveValue(
+      'Use this canned reply.'
+    );
 
     await user.selectOptions(screen.getByLabelText(/use canned response/i), '');
-    expect(screen.getByLabelText('Reply')).toHaveValue('Use this canned reply.');
+    expect(screen.getByLabelText('Reply')).toHaveValue(
+      'Use this canned reply.'
+    );
   });
 
   it('dispatches danger alert when unresolve fails', async () => {
@@ -317,19 +327,31 @@ describe('TicketView', () => {
 
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
-      expect(alerts.some((a) => a.msg === 'Failed to unresolve ticket.')).toBe(true);
+      expect(alerts.some((a) => a.msg === 'Failed to unresolve ticket.')).toBe(
+        true
+      );
     });
   });
 
   it('shows My Tickets link and Resolve button for non-staff ticket owner', () => {
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 7, username: 'regular', userRank: { permissions: {} } } as never)
+      setCredentials({
+        id: 7,
+        username: 'regular',
+        userRank: { permissions: {} }
+      } as never)
     );
     renderWithProviders(<TicketView />, { store });
-    expect(screen.getByRole('link', { name: /← my tickets/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^resolve$/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /^assign$/i })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /← my tickets/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^resolve$/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^assign$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows fallback badge for unknown ticket status', () => {
@@ -347,7 +369,11 @@ describe('TicketView', () => {
     });
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 9, username: 'mod-one', userRank: { permissions: { staff: true } } } as never)
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
     );
     renderWithProviders(<TicketView />, { store });
     expect(screen.getByText('CustomStatus')).toBeInTheDocument();
@@ -368,7 +394,11 @@ describe('TicketView', () => {
     });
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 9, username: 'mod-one', userRank: { permissions: { staff: true } } } as never)
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
     );
     renderWithProviders(<TicketView />, { store });
     expect(screen.getByText('Test')).toBeInTheDocument();
@@ -382,14 +412,25 @@ describe('TicketView', () => {
         status: 'Unanswered',
         user: { id: 7, username: 'regular' },
         assignedUser: null,
-        messages: [{ id: 5, body: 'Auto-reply', createdAt: '2026-05-17T12:00:00.000Z', sender: null }]
+        messages: [
+          {
+            id: 5,
+            body: 'Auto-reply',
+            createdAt: '2026-05-17T12:00:00.000Z',
+            sender: null
+          }
+        ]
       },
       isLoading: false,
       error: undefined
     });
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 9, username: 'mod-one', userRank: { permissions: { staff: true } } } as never)
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
     );
     renderWithProviders(<TicketView />, { store });
     expect(screen.getByText('System')).toBeInTheDocument();
@@ -403,14 +444,25 @@ describe('TicketView', () => {
         status: 'Unanswered',
         user: { id: 7, username: 'regular' },
         assignedUser: null,
-        messages: [{ id: 2, body: 'Staff reply', createdAt: '2026-05-17T12:00:00.000Z', sender: { id: 9, username: 'mod-one' } }]
+        messages: [
+          {
+            id: 2,
+            body: 'Staff reply',
+            createdAt: '2026-05-17T12:00:00.000Z',
+            sender: { id: 9, username: 'mod-one' }
+          }
+        ]
       },
       isLoading: false,
       error: undefined
     });
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 9, username: 'mod-one', userRank: { permissions: { staff: true } } } as never)
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
     );
     renderWithProviders(<TicketView />, { store });
     expect(screen.getByText('Staff')).toBeInTheDocument();
@@ -420,10 +472,16 @@ describe('TicketView', () => {
     mockIsReplying = true;
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 9, username: 'mod-one', userRank: { permissions: { staff: true } } } as never)
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
     );
     renderWithProviders(<TicketView />, { store });
-    expect(screen.getByRole('button', { name: /sending…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /sending…/i })
+    ).toBeInTheDocument();
   });
 
   it('shows an alert when assignment fails', async () => {

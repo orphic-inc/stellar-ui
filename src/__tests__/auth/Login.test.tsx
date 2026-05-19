@@ -96,7 +96,9 @@ describe('Login', () => {
   });
 
   it('shows notice banner when location state has a notice', () => {
-    mockLocationState = { notice: 'Your session expired. Please log in again.' };
+    mockLocationState = {
+      notice: 'Your session expired. Please log in again.'
+    };
     renderWithProviders(<Login />);
     expect(
       screen.getByText('Your session expired. Please log in again.')
@@ -112,7 +114,9 @@ describe('Login', () => {
   it('hides Register link when registrationStatus is not open', () => {
     mockInstallStatus = { registrationStatus: 'closed' };
     renderWithProviders(<Login />);
-    expect(screen.queryByRole('link', { name: /register/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /register/i })
+    ).not.toBeInTheDocument();
   });
 
   it('redirects to /private when user is already logged in', async () => {
@@ -141,9 +145,9 @@ describe('Login', () => {
 
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
-      expect(
-        alerts.some((a) => a.msg === 'Invalid email or password.')
-      ).toBe(true);
+      expect(alerts.some((a) => a.msg === 'Invalid email or password.')).toBe(
+        true
+      );
     });
   });
 });

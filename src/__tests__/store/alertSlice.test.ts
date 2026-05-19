@@ -34,7 +34,9 @@ describe('alertSlice', () => {
   });
 
   it('selectAlerts returns alert array from state', () => {
-    const state = { alert: [{ id: '1', msg: 'Hi', alertType: 'info' as const }] };
+    const state = {
+      alert: [{ id: '1', msg: 'Hi', alertType: 'info' as const }]
+    };
     expect(selectAlerts(state)).toHaveLength(1);
   });
 });

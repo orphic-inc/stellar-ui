@@ -143,7 +143,9 @@ describe('Register', () => {
     const user = userEvent.setup();
     const { store } = renderWithProviders(<Register />);
 
-    expect(screen.getByText(/enter your invite key to register/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter your invite key to register/i)
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/invite key/i)).toBeInTheDocument();
 
     await fillForm(user);

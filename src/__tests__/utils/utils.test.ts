@@ -41,12 +41,16 @@ describe('readableTime', () => {
   });
 
   it('returns days ago for dates less than 30 days old', () => {
-    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    const threeDaysAgo = new Date(
+      Date.now() - 3 * 24 * 60 * 60 * 1000
+    ).toISOString();
     expect(readableTime(threeDaysAgo)).toBe('3d ago');
   });
 
   it('returns formatted date for dates older than 30 days', () => {
-    const twoMonthsAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString();
+    const twoMonthsAgo = new Date(
+      Date.now() - 60 * 24 * 60 * 60 * 1000
+    ).toISOString();
     const result = readableTime(twoMonthsAgo);
     expect(result).toMatch(/\d{4}/);
   });

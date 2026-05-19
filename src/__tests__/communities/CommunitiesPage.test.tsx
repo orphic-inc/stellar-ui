@@ -82,7 +82,9 @@ describe('CommunitiesPage', () => {
     });
     renderWithProviders(<CommunitiesPage />);
     expect(screen.getByText('Communities')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /previous/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /previous/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows pagination and advances pages when total exceeds page size', async () => {

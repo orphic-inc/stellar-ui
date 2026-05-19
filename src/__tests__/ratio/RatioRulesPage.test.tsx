@@ -54,7 +54,13 @@ describe('RatioRulesPage', () => {
         contributionCoverage: 1.5,
         meetsRequirement: false,
         bracket: { label: '20–30 GiB', maxRequired: 0.3, minRequired: 0.05 },
-        policy: { status: 'OK', watchStartedAt: null, watchExpiresAt: null, leechDisabledAt: null, lastEvaluatedAt: null }
+        policy: {
+          status: 'OK',
+          watchStartedAt: null,
+          watchExpiresAt: null,
+          leechDisabledAt: null,
+          lastEvaluatedAt: null
+        }
       }
     });
     renderWithProviders(<RatioRulesPage />);

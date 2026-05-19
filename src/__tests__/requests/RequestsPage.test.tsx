@@ -104,7 +104,9 @@ describe('RequestsPage', () => {
     const user = userEvent.setup();
     renderWithProviders(<RequestsPage />);
     await user.click(screen.getByRole('button', { name: /^all$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('status')).toBeNull();
   });
 
@@ -113,7 +115,11 @@ describe('RequestsPage', () => {
     const user = userEvent.setup();
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 7, username: 'alice', userRank: { permissions: {} } } as never)
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: {} }
+      } as never)
     );
     renderWithProviders(<RequestsPage />, { store });
     await user.click(screen.getByRole('button', { name: /^delete$/i }));
@@ -126,7 +132,11 @@ describe('RequestsPage', () => {
     const user = userEvent.setup();
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 7, username: 'alice', userRank: { permissions: {} } } as never)
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: {} }
+      } as never)
     );
     renderWithProviders(<RequestsPage />, { store });
     await user.click(screen.getByRole('button', { name: /^delete$/i }));

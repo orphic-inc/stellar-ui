@@ -352,7 +352,9 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    await user.click(screen.getByRole('button', { name: /be the first to contribute/i }));
+    await user.click(
+      screen.getByRole('button', { name: /be the first to contribute/i })
+    );
     expect(mockNavigate).toHaveBeenCalledWith(
       '/private/communities/1/releases/5/contribute'
     );
@@ -383,7 +385,10 @@ describe('ReleasePage', () => {
     });
     renderWithProviders(<ReleasePage />);
     await user.click(screen.getByRole('button', { name: /▼/ }));
-    expect(mockRemoveVote).toHaveBeenCalledWith({ communityId: 1, releaseId: 5 });
+    expect(mockRemoveVote).toHaveBeenCalledWith({
+      communityId: 1,
+      releaseId: 5
+    });
     expect(mockVoteOn).not.toHaveBeenCalled();
   });
 
@@ -541,7 +546,9 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    const ratingEl = document.querySelector('.text-xs.text-gray-500.text-center');
+    const ratingEl = document.querySelector(
+      '.text-xs.text-gray-500.text-center'
+    );
     expect(ratingEl?.textContent).toMatch(/1 vote(?!s)/);
   });
 

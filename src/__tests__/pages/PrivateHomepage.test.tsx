@@ -192,7 +192,9 @@ describe('PrivateHomepage', () => {
     renderWithUser();
     expect(screen.getByRole('img', { name: 'Rare Album' })).toBeInTheDocument();
     expect(screen.getByText('Unknown artist')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /view release/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /view release/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows vanity house image and unknown artist/no year fallbacks', () => {
@@ -210,7 +212,9 @@ describe('PrivateHomepage', () => {
       }
     });
     renderWithUser();
-    expect(screen.getByRole('img', { name: 'Obscure House' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: 'Obscure House' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Unknown artist')).toBeInTheDocument();
   });
 });

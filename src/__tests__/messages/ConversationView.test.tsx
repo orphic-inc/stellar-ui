@@ -130,7 +130,9 @@ describe('ConversationView', () => {
       data: {
         id: 1,
         subject: 'System Notice',
-        participants: [{ userId: 7, isSticky: false, user: { username: 'me' } }],
+        participants: [
+          { userId: 7, isSticky: false, user: { username: 'me' } }
+        ],
         messages: [
           {
             id: 20,
@@ -145,7 +147,11 @@ describe('ConversationView', () => {
     });
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 7, username: 'me', userRank: { permissions: {} } } as never)
+      setCredentials({
+        id: 7,
+        username: 'me',
+        userRank: { permissions: {} }
+      } as never)
     );
     renderWithProviders(<ConversationView />, { store });
     expect(screen.getByText('System')).toBeInTheDocument();
@@ -164,7 +170,11 @@ describe('ConversationView', () => {
     });
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 7, username: 'me', userRank: { permissions: {} } } as never)
+      setCredentials({
+        id: 7,
+        username: 'me',
+        userRank: { permissions: {} }
+      } as never)
     );
     renderWithProviders(<ConversationView />, { store });
     expect(screen.getByText('Empty Conv')).toBeInTheDocument();
@@ -186,7 +196,11 @@ describe('ConversationView', () => {
     });
     const store = createTestStore();
     store.dispatch(
-      setCredentials({ id: 7, username: 'me', userRank: { permissions: {} } } as never)
+      setCredentials({
+        id: 7,
+        username: 'me',
+        userRank: { permissions: {} }
+      } as never)
     );
     renderWithProviders(<ConversationView />, { store });
     expect(screen.getByText('Anon Conv')).toBeInTheDocument();

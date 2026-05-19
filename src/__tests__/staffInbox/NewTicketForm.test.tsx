@@ -95,7 +95,9 @@ describe('NewTicketForm', () => {
   it('shows "Submitting…" label when mutation is loading', () => {
     mockTicketMutationIsLoading = true;
     renderWithProviders(<NewTicketForm />);
-    expect(screen.getByRole('button', { name: /submitting…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /submitting…/i })
+    ).toBeInTheDocument();
   });
 
   it('navigates back on cancel click', async () => {

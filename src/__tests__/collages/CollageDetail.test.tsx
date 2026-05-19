@@ -136,7 +136,9 @@ describe('CollageDetail', () => {
     await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('Failed to update subscription.');
+      expect(window.alert).toHaveBeenCalledWith(
+        'Failed to update subscription.'
+      );
       expect(window.alert).toHaveBeenCalledWith('Failed to update bookmark.');
       expect(window.alert).toHaveBeenCalledWith('Failed to delete collage.');
     });
@@ -160,7 +162,9 @@ describe('CollageDetail', () => {
 
     // Submit with empty input → shows validation error
     await user.click(screen.getByRole('button', { name: /^add$/i }));
-    expect(await screen.findByText('Enter a valid release ID.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Enter a valid release ID.')
+    ).toBeInTheDocument();
 
     // Type a valid ID and submit → API error message shown
     await user.type(screen.getByPlaceholderText(/release id/i), '99');
@@ -253,9 +257,15 @@ describe('CollageDetail', () => {
     renderWithProviders(<CollageDetail />);
     expect(screen.getByText('Locked')).toBeInTheDocument();
     expect(screen.getByText('Deleted')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^subscribed$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^bookmarked$/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /^delete$/i })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^subscribed$/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^bookmarked$/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^delete$/i })
+    ).not.toBeInTheDocument();
     expect(screen.getByText('No entries yet.')).toBeInTheDocument();
     expect(screen.getByText('—')).toBeInTheDocument();
   });
@@ -294,7 +304,9 @@ describe('CollageDetail', () => {
     renderWithProviders(<CollageDetail />, { store });
 
     // personal category → no Add form (locked owner, categoryId=0 → canManageEntries=false)
-    expect(screen.queryByPlaceholderText(/release id/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/release id/i)
+    ).not.toBeInTheDocument();
 
     // click delete: confirm is called with the personal message
     await user.click(screen.getByRole('button', { name: /^delete$/i }));
@@ -339,7 +351,9 @@ describe('CollageDetail', () => {
     });
     renderWithProviders(<CollageDetail />);
     expect(screen.getByText('Untitled')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /\[x\]/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /\[x\]/i })
+    ).not.toBeInTheDocument();
   });
 
   it('lets the owner subscribe, bookmark, add, remove, and delete', async () => {

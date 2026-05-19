@@ -108,12 +108,18 @@ jest.mock('../../store/services/userApi', () => ({
   useDeleteUserNoteMutation: () => [mockDeleteUserNote],
   useDisableUserMutation: () => [mockDisableUser, { isLoading: false }],
   useEnableUserMutation: () => [mockEnableUser, { isLoading: false }],
-  useSetUserRankMutation: () => [mockSetUserRank, { isLoading: mockSetUserRankLoading }],
+  useSetUserRankMutation: () => [
+    mockSetUserRank,
+    { isLoading: mockSetUserRankLoading }
+  ],
   useGetUserIpHistoryQuery: () => ({ data: mockIpHistory }),
   useGetUserEmailHistoryQuery: () => ({ data: mockEmailHistory }),
   useGetUserRanksQuery: () => ({ data: mockUserRanks }),
   useGetDonorRanksQuery: () => ({ data: mockDonorRanks }),
-  useGrantDonorMutation: () => [mockGrantDonor, { isLoading: mockGrantDonorLoading }],
+  useGrantDonorMutation: () => [
+    mockGrantDonor,
+    { isLoading: mockGrantDonorLoading }
+  ],
   useRevokeDonorMutation: () => [mockRevokeDonor, { isLoading: false }],
   useRemoveUserWarningMutation: () => [mockRemoveUserWarning],
   useGetSnatchListByUserIdQuery: () => ({ data: mockSnatchListByUser }),
@@ -210,7 +216,9 @@ describe('UserProfile', () => {
     mockSetUserRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockAddUserNote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockDeleteUserNote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    mockRemoveUserWarning.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockRemoveUserWarning.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
     mockGrantDonor.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRevokeDonor.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
@@ -304,7 +312,12 @@ describe('UserProfile', () => {
   it('renders Hidden when stats value is null', () => {
     mockProfileData = {
       ...mockProfile,
-      stats: { ...mockProfile.stats, contributed: null, consumed: null, buffer: null }
+      stats: {
+        ...mockProfile.stats,
+        contributed: null,
+        consumed: null,
+        buffer: null
+      }
     } as never;
     renderWithProviders(<UserProfile />);
     expect(screen.getAllByText('Hidden').length).toBeGreaterThan(0);
@@ -319,7 +332,11 @@ describe('UserProfile', () => {
   it('renders profileInfo when present', () => {
     mockProfileData = {
       ...mockProfile,
-      profile: { profileTitle: 'Jazz Fan', profileInfo: '<p>Bio content here</p>', avatar: null }
+      profile: {
+        profileTitle: 'Jazz Fan',
+        profileInfo: '<p>Bio content here</p>',
+        avatar: null
+      }
     } as never;
     renderWithProviders(<UserProfile />);
     expect(screen.getByText('Bio content here')).toBeInTheDocument();
@@ -344,7 +361,13 @@ describe('UserProfile', () => {
       ...mockProfile,
       collageShelves: {
         featuredPersonalCollages: [
-          { id: 7, name: 'Empty Shelf', numEntries: 0, coverImages: [], categoryId: 0 }
+          {
+            id: 7,
+            name: 'Empty Shelf',
+            numEntries: 0,
+            coverImages: [],
+            categoryId: 0
+          }
         ],
         publicCollages: [
           {
@@ -464,7 +487,9 @@ describe('UserProfile', () => {
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
       await user.click(screen.getByRole('button', { name: /warn user/i }));
-      expect(screen.getByRole('heading', { name: 'Warn User' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Warn User' })
+      ).toBeInTheDocument();
       const expiresInput = screen.getByLabelText(/expires at/i);
       fireEvent.change(expiresInput, { target: { value: '2026-12-31T00:00' } });
       await user.type(screen.getByLabelText(/^reason$/i), 'Bad behavior');
@@ -509,7 +534,9 @@ describe('UserProfile', () => {
       ];
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /moderation notes/i }));
+      await user.click(
+        screen.getByRole('button', { name: /moderation notes/i })
+      );
       await user.click(screen.getByRole('button', { name: '✕' }));
       await waitFor(() => {
         expect(mockDeleteUserNote).toHaveBeenCalled();
@@ -517,7 +544,9 @@ describe('UserProfile', () => {
     });
 
     it('dispatches danger alert when remove warning fails', async () => {
-      mockRemoveUserWarning.mockReturnValue({ unwrap: () => Promise.reject({}) });
+      mockRemoveUserWarning.mockReturnValue({
+        unwrap: () => Promise.reject({})
+      });
       mockWarnings = [
         { id: 5, reason: 'Offense', createdAt: '2026-01-01T00:00:00Z' }
       ];
@@ -534,7 +563,10 @@ describe('UserProfile', () => {
       mockGrantDonor.mockReturnValue({ unwrap: () => Promise.reject({}) });
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.selectOptions(screen.getByDisplayValue('Select donor rank…'), '20');
+      await user.selectOptions(
+        screen.getByDisplayValue('Select donor rank…'),
+        '20'
+      );
       await user.click(screen.getByRole('button', { name: /^grant$/i }));
       await waitFor(() => {
         expect(mockGrantDonor).toHaveBeenCalled();
@@ -545,7 +577,9 @@ describe('UserProfile', () => {
       mockRevokeDonor.mockReturnValue({ unwrap: () => Promise.reject({}) });
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /revoke donor status/i }));
+      await user.click(
+        screen.getByRole('button', { name: /revoke donor status/i })
+      );
       await waitFor(() => {
         expect(mockRevokeDonor).toHaveBeenCalled();
       });
@@ -576,10 +610,7 @@ describe('UserProfile', () => {
     it('selects a rank and clicks Save', async () => {
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.selectOptions(
-        screen.getByDisplayValue('Select rank…'),
-        '10'
-      );
+      await user.selectOptions(screen.getByDisplayValue('Select rank…'), '10');
       await user.click(screen.getByRole('button', { name: /^save$/i }));
       await waitFor(() => {
         expect(mockSetUserRank).toHaveBeenCalledWith({
@@ -651,7 +682,9 @@ describe('UserProfile', () => {
         }
       ];
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /moderation notes/i }));
+      await user.click(
+        screen.getByRole('button', { name: /moderation notes/i })
+      );
       expect(screen.getByText('Suspicious activity')).toBeInTheDocument();
       await user.click(screen.getByRole('button', { name: '✕' }));
       await waitFor(() => {
@@ -665,7 +698,9 @@ describe('UserProfile', () => {
     it('adds a note via the note form', async () => {
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /moderation notes/i }));
+      await user.click(
+        screen.getByRole('button', { name: /moderation notes/i })
+      );
       const noteInput = screen.getByPlaceholderText(/add a note/i);
       await user.type(noteInput, 'New mod note');
       fireEvent.submit(noteInput.closest('form')!);
@@ -683,7 +718,9 @@ describe('UserProfile', () => {
       });
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /moderation notes/i }));
+      await user.click(
+        screen.getByRole('button', { name: /moderation notes/i })
+      );
       const noteInput = screen.getByPlaceholderText(/add a note/i);
       await user.type(noteInput, 'Will fail');
       fireEvent.submit(noteInput.closest('form')!);
@@ -703,9 +740,7 @@ describe('UserProfile', () => {
         }
       ];
       renderWithProviders(<UserProfile />);
-      await user.click(
-        screen.getByRole('button', { name: /^warnings/i })
-      );
+      await user.click(screen.getByRole('button', { name: /^warnings/i }));
       expect(screen.getByText('Spamming')).toBeInTheDocument();
       await user.click(screen.getByRole('button', { name: '✕' }));
       await waitFor(() => {
@@ -727,9 +762,7 @@ describe('UserProfile', () => {
         }
       ];
       renderWithProviders(<UserProfile />);
-      await user.click(
-        screen.getByRole('button', { name: /^warnings/i })
-      );
+      await user.click(screen.getByRole('button', { name: /^warnings/i }));
       await user.click(screen.getByRole('button', { name: '✕' }));
       expect(mockRemoveUserWarning).not.toHaveBeenCalled();
     });
@@ -739,19 +772,25 @@ describe('UserProfile', () => {
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
       await user.click(screen.getByRole('button', { name: /warn user/i }));
-      expect(screen.getByRole('button', { name: /issuing…/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /issuing…/i })
+      ).toBeInTheDocument();
     });
 
     it('shows "Saving…" label when setUserRank mutation is loading', () => {
       mockSetUserRankLoading = true;
       renderWithProviders(<UserProfile />);
-      expect(screen.getByRole('button', { name: /saving…/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /saving…/i })
+      ).toBeInTheDocument();
     });
 
     it('shows "Granting…" label when grantDonor mutation is loading', () => {
       mockGrantDonorLoading = true;
       renderWithProviders(<UserProfile />);
-      expect(screen.getByRole('button', { name: /granting…/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /granting…/i })
+      ).toBeInTheDocument();
     });
 
     it('renders staffPmOverview with empty conversations (shows no table)', () => {
@@ -813,7 +852,9 @@ describe('UserProfile', () => {
       ];
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /moderation notes/i }));
+      await user.click(
+        screen.getByRole('button', { name: /moderation notes/i })
+      );
       expect(screen.getByText('Authorless note')).toBeInTheDocument();
       expect(screen.getByText(/Unknown/)).toBeInTheDocument();
     });
@@ -870,7 +911,9 @@ describe('UserProfile', () => {
     it('clicks Disable Account and calls disableUser', async () => {
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /disable account/i }));
+      await user.click(
+        screen.getByRole('button', { name: /disable account/i })
+      );
       await waitFor(() => {
         expect(mockDisableUser).toHaveBeenCalledWith(42);
       });
@@ -880,7 +923,9 @@ describe('UserProfile', () => {
       mockDisableUser.mockReturnValue({ unwrap: () => Promise.reject({}) });
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.click(screen.getByRole('button', { name: /disable account/i }));
+      await user.click(
+        screen.getByRole('button', { name: /disable account/i })
+      );
       await waitFor(() => {
         expect(mockDisableUser).toHaveBeenCalledWith(42);
       });
@@ -974,7 +1019,9 @@ describe('UserProfile', () => {
       }
     } as never;
     renderWithProviders(<UserProfile />);
-    expect(screen.getByRole('link', { name: 'Open Ticket' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Open Ticket' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Closed Ticket')).toBeInTheDocument();
     expect(screen.getByText('mod-one')).toBeInTheDocument();
     expect(screen.getByText('Class / unassigned')).toBeInTheDocument();
@@ -1002,4 +1049,3 @@ describe('UserProfile', () => {
     expect(screen.getByText('Miles Davis')).toBeInTheDocument();
   });
 });
-

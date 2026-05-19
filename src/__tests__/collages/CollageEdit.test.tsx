@@ -44,13 +44,19 @@ describe('CollageEdit', () => {
   });
 
   it('shows spinner while loading', () => {
-    mockUseGetCollageQuery.mockReturnValue({ data: undefined, isLoading: true });
+    mockUseGetCollageQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true
+    });
     renderWithProviders(<CollageEdit />);
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
   it('shows not found when collage is absent', () => {
-    mockUseGetCollageQuery.mockReturnValue({ data: undefined, isLoading: false });
+    mockUseGetCollageQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false
+    });
     renderWithProviders(<CollageEdit />);
     expect(screen.getByText(/collage not found/i)).toBeInTheDocument();
   });

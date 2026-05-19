@@ -21,8 +21,14 @@ let mockIsUpdating = false;
 
 jest.mock('../../store/services/wikiApi', () => ({
   useGetWikiPageQuery: (...args: unknown[]) => mockUseGetWikiPageQuery(...args),
-  useCreateWikiPageMutation: () => [mockCreateWikiPage, { isLoading: mockIsCreating }],
-  useUpdateWikiPageMutation: () => [mockUpdateWikiPage, { isLoading: mockIsUpdating }]
+  useCreateWikiPageMutation: () => [
+    mockCreateWikiPage,
+    { isLoading: mockIsCreating }
+  ],
+  useUpdateWikiPageMutation: () => [
+    mockUpdateWikiPage,
+    { isLoading: mockIsUpdating }
+  ]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -190,13 +196,22 @@ describe('WikiEditPage', () => {
       error: undefined
     });
     renderWithProviders(<WikiEditPage />);
-    expect(screen.getByRole('button', { name: /saving…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /saving…/i })
+    ).toBeInTheDocument();
   });
 
   it('dispatches fallback danger alert when save fails with no API message', async () => {
     mockUseParams.mockReturnValue({ id: '12' });
     mockUseGetWikiPageQuery.mockReturnValue({
-      data: { id: 12, title: 'Existing', body: '<p>Old</p>', slug: 'existing', minReadLevel: 0, minEditLevel: 0 },
+      data: {
+        id: 12,
+        title: 'Existing',
+        body: '<p>Old</p>',
+        slug: 'existing',
+        minReadLevel: 0,
+        minEditLevel: 0
+      },
       isLoading: false,
       error: undefined
     });
@@ -213,11 +228,22 @@ describe('WikiEditPage', () => {
 
   it('omits manager fields in update when user is not a manager', async () => {
     mockUseGetMeQuery.mockReturnValue({
-      data: { id: 5, username: 'editor', userRank: { permissions: { wiki_edit: true } } }
+      data: {
+        id: 5,
+        username: 'editor',
+        userRank: { permissions: { wiki_edit: true } }
+      }
     });
     mockUseParams.mockReturnValue({ id: '12' });
     mockUseGetWikiPageQuery.mockReturnValue({
-      data: { id: 12, title: 'Existing', body: '<p>Old</p>', slug: 'existing', minReadLevel: 0, minEditLevel: 0 },
+      data: {
+        id: 12,
+        title: 'Existing',
+        body: '<p>Old</p>',
+        slug: 'existing',
+        minReadLevel: 0,
+        minEditLevel: 0
+      },
       isLoading: false,
       error: undefined
     });

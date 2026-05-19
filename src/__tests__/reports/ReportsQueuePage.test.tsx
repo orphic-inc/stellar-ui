@@ -178,7 +178,9 @@ describe('ReportsQueuePage', () => {
       error: { status: 500 }
     }));
     renderWithProviders(<ReportsQueuePage />);
-    expect(screen.getByText(/failed to load reports queue/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/failed to load reports queue/i)
+    ).toBeInTheDocument();
   });
 
   it('shows spinner in stats tab when stats are loading', async () => {
@@ -271,8 +273,18 @@ describe('ReportsQueuePage', () => {
             createdAt: '2026-05-17T12:00:00.000Z',
             reporter: { username: 'dave' },
             notes: [
-              { id: 1, body: 'Note A', createdAt: '2026-05-17T12:00:00.000Z', author: { username: 'mod' } },
-              { id: 2, body: 'Note B', createdAt: '2026-05-17T12:00:00.000Z', author: { username: 'mod' } }
+              {
+                id: 1,
+                body: 'Note A',
+                createdAt: '2026-05-17T12:00:00.000Z',
+                author: { username: 'mod' }
+              },
+              {
+                id: 2,
+                body: 'Note B',
+                createdAt: '2026-05-17T12:00:00.000Z',
+                author: { username: 'mod' }
+              }
             ]
           }
         ]
@@ -281,6 +293,8 @@ describe('ReportsQueuePage', () => {
       error: undefined
     }));
     renderWithProviders(<ReportsQueuePage />);
-    expect(screen.getByRole('button', { name: /2 notes/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /2 notes/i })
+    ).toBeInTheDocument();
   });
 });

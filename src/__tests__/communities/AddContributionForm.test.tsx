@@ -146,7 +146,10 @@ describe('AddContributionForm', () => {
     const user = userEvent.setup();
     renderWithProviders(<AddContributionForm />);
 
-    await user.type(screen.getByLabelText(/download url/i), 'https://example.com/file.flac');
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/file.flac'
+    );
     await user.clear(screen.getByLabelText(/file size/i));
     await user.type(screen.getByLabelText(/file size/i), '500');
     await user.type(screen.getByLabelText(/bitrate/i), '320');
@@ -200,7 +203,9 @@ describe('AddContributionForm', () => {
   it('shows "Adding…" label when mutation is loading', () => {
     mockMutationIsLoading = true;
     renderWithProviders(<AddContributionForm />);
-    expect(screen.getByRole('button', { name: /adding…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /adding…/i })
+    ).toBeInTheDocument();
   });
 
   it('dispatches fallback error message when rejection has no API message', async () => {

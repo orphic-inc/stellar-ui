@@ -257,8 +257,12 @@ describe('ArtistPage', () => {
       error: undefined
     });
     renderWithProviders(<ArtistPage />);
-    expect(screen.getByRole('link', { name: 'John Coltrane' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Bill Evans' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'John Coltrane' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Bill Evans' })
+    ).toBeInTheDocument();
   });
 
   it('falls back to empty arrays when artist fields are null', () => {
@@ -306,8 +310,22 @@ describe('ArtistPage', () => {
     mockUseGetArtistByIdQuery.mockReturnValue({
       data: makeArtist({
         releases: [
-          { id: 1, title: 'First', year: 1959, type: 'Album', communityId: 1, community: { id: 1, name: 'Jazz Vault' } },
-          { id: 2, title: 'Second', year: 1959, type: 'EP', communityId: 1, community: { id: 1, name: 'Jazz Vault' } }
+          {
+            id: 1,
+            title: 'First',
+            year: 1959,
+            type: 'Album',
+            communityId: 1,
+            community: { id: 1, name: 'Jazz Vault' }
+          },
+          {
+            id: 2,
+            title: 'Second',
+            year: 1959,
+            type: 'EP',
+            communityId: 1,
+            community: { id: 1, name: 'Jazz Vault' }
+          }
         ]
       }),
       isLoading: false,

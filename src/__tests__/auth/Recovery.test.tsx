@@ -175,7 +175,10 @@ describe('Recovery — reset form (with token)', () => {
     const user = userEvent.setup();
     renderWithProviders(<Recovery />);
     await user.type(screen.getByLabelText(/^new password/i), 'newpass123');
-    await user.type(screen.getByLabelText(/confirm new password/i), 'newpass123');
+    await user.type(
+      screen.getByLabelText(/confirm new password/i),
+      'newpass123'
+    );
     await user.click(screen.getByRole('button', { name: /reset password/i }));
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -194,7 +197,10 @@ describe('Recovery — reset form (with token)', () => {
     const user = userEvent.setup();
     renderWithProviders(<Recovery />);
     await user.type(screen.getByLabelText(/^new password/i), 'newpass123');
-    await user.type(screen.getByLabelText(/confirm new password/i), 'newpass123');
+    await user.type(
+      screen.getByLabelText(/confirm new password/i),
+      'newpass123'
+    );
     await user.click(screen.getByRole('button', { name: /reset password/i }));
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -211,9 +211,9 @@ describe('ReportDetailPage', () => {
     await user.click(unclaimBtn);
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
-      expect(
-        alerts.some((a) => a.msg === 'Failed to unclaim report.')
-      ).toBe(true);
+      expect(alerts.some((a) => a.msg === 'Failed to unclaim report.')).toBe(
+        true
+      );
     });
   });
 
@@ -282,24 +282,22 @@ describe('ReportDetailPage', () => {
 
     // Open resolve form and submit
     await user.click(screen.getByRole('button', { name: /^resolve$/i }));
-    await user.type(screen.getByLabelText(/resolution notes/i), 'Some resolution');
+    await user.type(
+      screen.getByLabelText(/resolution notes/i),
+      'Some resolution'
+    );
     await user.click(screen.getByRole('button', { name: /confirm resolve/i }));
 
     // Add note and submit
-    await user.type(
-      screen.getByLabelText(/add moderator note/i),
-      'A note'
-    );
+    await user.type(screen.getByLabelText(/add moderator note/i), 'A note');
     await user.click(screen.getByRole('button', { name: /add note/i }));
 
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
-      expect(
-        alerts.some((a) => a.msg === 'Failed to resolve report.')
-      ).toBe(true);
-      expect(
-        alerts.some((a) => a.msg === 'Failed to add note.')
-      ).toBe(true);
+      expect(alerts.some((a) => a.msg === 'Failed to resolve report.')).toBe(
+        true
+      );
+      expect(alerts.some((a) => a.msg === 'Failed to add note.')).toBe(true);
     });
   });
 
@@ -393,7 +391,9 @@ describe('ReportDetailPage', () => {
     expect(screen.getByText('User warned about behavior.')).toBeInTheDocument();
     expect(screen.getByText(/resolved by mod-one/i)).toBeInTheDocument();
     // Resolve button hidden when already resolved
-    expect(screen.queryByRole('button', { name: /^resolve$/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^resolve$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('renders non-staff view with My Reports back link', () => {
@@ -408,9 +408,13 @@ describe('ReportDetailPage', () => {
 
     renderWithProviders(<ReportDetailPage />, { store });
 
-    expect(screen.getByRole('link', { name: /my reports/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /my reports/i })
+    ).toBeInTheDocument();
     // Staff-only actions not visible
-    expect(screen.queryByRole('button', { name: /^claim$/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^claim$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('changes resolutionAction select and cancels resolve form', async () => {
@@ -438,6 +442,8 @@ describe('ReportDetailPage', () => {
 
     // Cancel closes the form
     await user.click(screen.getByRole('button', { name: /^cancel$/i }));
-    expect(screen.queryByLabelText(/resolution notes/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/resolution notes/i)
+    ).not.toBeInTheDocument();
   });
 });

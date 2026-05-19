@@ -97,7 +97,9 @@ describe('DraftsPage', () => {
     await user.click(screen.getByTitle('Delete draft'));
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
-      expect(alerts.some((a) => a.msg === 'Failed to delete draft.')).toBe(true);
+      expect(alerts.some((a) => a.msg === 'Failed to delete draft.')).toBe(
+        true
+      );
     });
   });
 
@@ -126,7 +128,9 @@ describe('DraftsPage', () => {
       error: undefined
     });
     renderWithProviders(<DraftsPage />);
-    expect(screen.getByRole('link', { name: '(no subject)' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: '(no subject)' })
+    ).toBeInTheDocument();
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 });

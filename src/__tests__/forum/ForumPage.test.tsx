@@ -115,7 +115,9 @@ describe('ForumPage', () => {
       isLoading: false
     });
     renderWithProviders(<ForumPage />);
-    expect(screen.getByRole('link', { name: 'Regular topic' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Regular topic' })
+    ).toBeInTheDocument();
     expect(screen.queryByText('[Locked]')).not.toBeInTheDocument();
   });
 

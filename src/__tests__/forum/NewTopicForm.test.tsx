@@ -102,7 +102,9 @@ describe('NewTopicForm', () => {
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
       expect(
-        alerts.some((a) => a.msg === 'Failed to create topic. Please try again.')
+        alerts.some(
+          (a) => a.msg === 'Failed to create topic. Please try again.'
+        )
       ).toBe(true);
     });
   });

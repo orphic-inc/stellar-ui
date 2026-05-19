@@ -20,7 +20,10 @@ jest.mock('../../store/services/announcementApi', () => ({
     { isLoading: mockCreatingNews }
   ],
   useDeleteAnnouncementMutation: () => [mockDeleteAnnouncement],
-  useCreateBlogPostMutation: () => [mockCreateBlogPost, { isLoading: mockCreatingBlog }],
+  useCreateBlogPostMutation: () => [
+    mockCreateBlogPost,
+    { isLoading: mockCreatingBlog }
+  ],
   useDeleteBlogPostMutation: () => [mockDeleteBlogPost]
 }));
 

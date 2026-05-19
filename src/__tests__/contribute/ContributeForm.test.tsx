@@ -10,7 +10,12 @@ const mockDispatch = jest.fn();
 const mockNavigate = jest.fn();
 
 let mockIsSubmitting = false;
-let mockUser: { id: number; username: string; avatar: null; userRank: { level: number; name: string; color: string } } | null = null;
+let mockUser: {
+  id: number;
+  username: string;
+  avatar: null;
+  userRank: { level: number; name: string; color: string };
+} | null = null;
 
 jest.mock('../../store/services/communityApi', () => ({
   useGetCommunitiesQuery: (...args: unknown[]) =>
@@ -227,18 +232,31 @@ describe('ContributeForm', () => {
   it('changes collaborator importance select and file type select', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
-    await user.selectOptions(screen.getByDisplayValue('Main artist'), 'Remixer');
+    await user.selectOptions(
+      screen.getByDisplayValue('Main artist'),
+      'Remixer'
+    );
     await user.selectOptions(screen.getByLabelText(/file type/i), 'flac');
-    expect((screen.getByDisplayValue('Remixer') as HTMLSelectElement).value).toBe('Remixer');
+    expect(
+      (screen.getByDisplayValue('Remixer') as HTMLSelectElement).value
+    ).toBe('Remixer');
   });
 
   it('types in tags, image, and release description fields', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
     await user.type(screen.getByLabelText(/tags/i), 'jazz, blues');
-    await user.type(screen.getByLabelText(/cover image url/i), 'https://img.example.com/cover.jpg');
-    await user.type(screen.getByLabelText(/release description/i), '24-bit remaster');
-    expect((screen.getByLabelText(/tags/i) as HTMLInputElement).value).toBe('jazz, blues');
+    await user.type(
+      screen.getByLabelText(/cover image url/i),
+      'https://img.example.com/cover.jpg'
+    );
+    await user.type(
+      screen.getByLabelText(/release description/i),
+      '24-bit remaster'
+    );
+    expect((screen.getByLabelText(/tags/i) as HTMLInputElement).value).toBe(
+      'jazz, blues'
+    );
   });
 
   it('types in description textarea after switching to non-Music type', async () => {
@@ -246,7 +264,9 @@ describe('ContributeForm', () => {
     renderWithProviders(<ContributeForm />);
     await user.selectOptions(screen.getByLabelText(/content type/i), 'EBooks');
     await user.type(screen.getByLabelText(/^description/i), 'A great ebook.');
-    expect((screen.getByLabelText(/^description/i) as HTMLTextAreaElement).value).toBe('A great ebook.');
+    expect(
+      (screen.getByLabelText(/^description/i) as HTMLTextAreaElement).value
+    ).toBe('A great ebook.');
   });
 
   it('submits EBooks type and covers non-Music title, undefined sizeInBytes, and undefined releaseDescription', async () => {
@@ -273,19 +293,31 @@ describe('ContributeForm', () => {
   });
 
   it('dispatches fallback danger alert when submit fails with no API message', async () => {
-    mockCreateContribution.mockReturnValue({ unwrap: () => Promise.reject({}) });
+    mockCreateContribution.mockReturnValue({
+      unwrap: () => Promise.reject({})
+    });
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
-    await user.selectOptions(screen.getByLabelText(/community/i), 'Jazz Community');
+    await user.selectOptions(
+      screen.getByLabelText(/community/i),
+      'Jazz Community'
+    );
     await user.type(screen.getByPlaceholderText(/artist name/i), 'Artist');
     await user.type(screen.getByLabelText(/album title/i), 'Album');
     await user.type(screen.getByLabelText(/file size/i), '100');
-    await user.type(screen.getByLabelText(/download url/i), 'https://example.com/a.flac');
-    await user.click(screen.getByRole('button', { name: /contribute release/i }));
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/a.flac'
+    );
+    await user.click(
+      screen.getByRole('button', { name: /contribute release/i })
+    );
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
-          payload: expect.objectContaining({ msg: 'Failed to submit contribution. Please try again.' })
+          payload: expect.objectContaining({
+            msg: 'Failed to submit contribution. Please try again.'
+          })
         })
       );
     });
@@ -303,7 +335,9 @@ describe('ContributeForm', () => {
   it('shows Submitting… when isLoading is true', () => {
     mockIsSubmitting = true;
     renderWithProviders(<ContributeForm />);
-    expect(screen.getByRole('button', { name: /submitting…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /submitting…/i })
+    ).toBeInTheDocument();
   });
 
   it('shows submit request link when community not found', () => {

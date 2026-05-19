@@ -147,7 +147,9 @@ describe('UserRankFormPage — edit mode', () => {
     });
     renderWithProviders(<UserRankFormPage />);
     await waitFor(() => {
-      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe('Basic');
+      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe(
+        'Basic'
+      );
     });
   });
 
@@ -158,7 +160,9 @@ describe('UserRankFormPage — edit mode', () => {
     const user = userEvent.setup();
     renderWithProviders(<UserRankFormPage />);
     await waitFor(() =>
-      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe('Staff')
+      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe(
+        'Staff'
+      )
     );
     await user.click(screen.getByRole('button', { name: /save changes/i }));
     await waitFor(() => {

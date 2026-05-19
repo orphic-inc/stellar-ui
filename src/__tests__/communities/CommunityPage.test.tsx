@@ -440,20 +440,39 @@ describe('CommunityPage', () => {
       error: undefined
     });
     mockUseGetReleasesByCommunityQuery.mockReturnValue({
-      data: makeReleasesResponse([{
-        ...makeRelease(1),
-        contributions: [
-          { id: 101, type: 'FLAC', sizeInBytes: 1073741824, linkStatus: 'ALIVE', user: { id: 10, username: 'alice' }, _count: { consumers: 1 } },
-          { id: 102, type: 'MP3', sizeInBytes: null, linkStatus: null, user: { id: 11, username: 'bob' }, _count: { consumers: 0 } }
-        ]
-      }]),
+      data: makeReleasesResponse([
+        {
+          ...makeRelease(1),
+          contributions: [
+            {
+              id: 101,
+              type: 'FLAC',
+              sizeInBytes: 1073741824,
+              linkStatus: 'ALIVE',
+              user: { id: 10, username: 'alice' },
+              _count: { consumers: 1 }
+            },
+            {
+              id: 102,
+              type: 'MP3',
+              sizeInBytes: null as never,
+              linkStatus: null as never,
+              user: { id: 11, username: 'bob' },
+              _count: { consumers: 0 }
+            }
+          ]
+        }
+      ]),
       isLoading: false
     });
     renderWithProviders(<CommunityPage />);
     expect(screen.getByText(/2 contributors/)).toBeInTheDocument();
     // "1 snatch" text is split across nodes — check via combined textContent
     const statsEl = Array.from(document.querySelectorAll('div')).find(
-      (el) => el.textContent?.includes('1 snatch') && !el.textContent?.includes('snatches') && el.children.length === 0
+      (el) =>
+        el.textContent?.includes('1 snatch') &&
+        !el.textContent?.includes('snatches') &&
+        el.children.length === 0
     );
     expect(statsEl).toBeDefined();
   });
@@ -536,15 +555,18 @@ describe('CommunityPage', () => {
       error: undefined
     });
     mockUseGetReleasesByCommunityQuery.mockReturnValue({
-      data: makeReleasesResponse([{
-        id: 9,
-        title: 'Sparse Release',
-        artist: null,
-        year: null,
-        type: null,
-        image: null
-        // no tags or contributions properties
-      }]),
+      data: makeReleasesResponse([
+        {
+          id: 9,
+          title: 'Sparse Release',
+          artist: null as never,
+          year: null as never,
+          type: null as never,
+          image: null,
+          tags: [],
+          contributions: []
+        } as ReturnType<typeof makeRelease>
+      ]),
       isLoading: false
     });
     renderWithProviders(<CommunityPage />);

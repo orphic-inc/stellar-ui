@@ -85,6 +85,9 @@ describe('Top10Layout', () => {
       data: { id: 1, userRank: { permissions: {} } }
     });
     renderWithProviders(<Top10Layout />);
-    expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', 'releases');
+    expect(screen.getByTestId('navigate')).toHaveAttribute(
+      'data-to',
+      'releases'
+    );
   });
 });

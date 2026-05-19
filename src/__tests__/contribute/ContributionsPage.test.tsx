@@ -114,13 +114,21 @@ describe('ContributionsPage', () => {
     });
     renderWithProviders(<ContributionsPage />);
     expect(screen.getByText('Orphaned Release')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Orphaned Release' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Orphaned Release' })
+    ).not.toBeInTheDocument();
   });
 
   it('shows dash when releaseDescription or sizeInBytes is null', () => {
     mockUseGetContributionsQuery.mockReturnValue({
       data: {
-        data: [{ ...makeContribution(1), releaseDescription: null, sizeInBytes: null }]
+        data: [
+          {
+            ...makeContribution(1),
+            releaseDescription: null,
+            sizeInBytes: null
+          }
+        ]
       },
       isLoading: false,
       error: undefined

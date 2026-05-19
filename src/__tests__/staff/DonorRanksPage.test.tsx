@@ -12,7 +12,10 @@ let mockIsCreating = false;
 
 jest.mock('../../store/services/userApi', () => ({
   useGetDonorRanksQuery: () => mockGetDonorRanksQuery(),
-  useCreateDonorRankMutation: () => [mockCreateDonorRank, { isLoading: mockIsCreating }]
+  useCreateDonorRankMutation: () => [
+    mockCreateDonorRank,
+    { isLoading: mockIsCreating }
+  ]
 }));
 
 jest.mock('react-redux', () => ({
@@ -209,7 +212,9 @@ describe('DonorRanksPage', () => {
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
-          payload: expect.objectContaining({ msg: 'Failed to create donor rank.' })
+          payload: expect.objectContaining({
+            msg: 'Failed to create donor rank.'
+          })
         })
       );
     });

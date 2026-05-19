@@ -256,7 +256,9 @@ describe('WikiHistoryPage', () => {
     const store = createTestStore();
     renderWithProviders(<WikiHistoryPage />, { store });
     await user.click(screen.getAllByRole('button', { name: /^view$/i })[0]);
-    await user.click(screen.getByRole('button', { name: /rollback to this revision/i }));
+    await user.click(
+      screen.getByRole('button', { name: /rollback to this revision/i })
+    );
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Rollback failed.')).toBe(true);

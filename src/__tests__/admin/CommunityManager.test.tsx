@@ -14,7 +14,10 @@ let mockIsCreating = false;
 jest.mock('../../store/services/communityApi', () => ({
   useGetCommunitiesQuery: (...args: unknown[]) =>
     mockGetCommunitiesQuery(...args),
-  useCreateCommunityMutation: () => [mockCreateCommunity, { isLoading: mockIsCreating }],
+  useCreateCommunityMutation: () => [
+    mockCreateCommunity,
+    { isLoading: mockIsCreating }
+  ],
   useUpdateCommunityMutation: () => [mockUpdateCommunity, { isLoading: false }]
 }));
 
@@ -278,7 +281,10 @@ describe('CommunityManager', () => {
 
   it('saves edit row with staff members and fires map callback', async () => {
     const user = userEvent.setup();
-    const community = { ...makeCommunity(8), staff: [{ id: 20, username: 'staffer' }] };
+    const community = {
+      ...makeCommunity(8),
+      staff: [{ id: 20, username: 'staffer' }]
+    };
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [community] },
       isLoading: false,
@@ -311,7 +317,10 @@ describe('CommunityManager', () => {
 
   it('does not add a duplicate staff member', async () => {
     const user = userEvent.setup();
-    const community = { ...makeCommunity(10), staff: [{ id: 30, username: 'existing' }] };
+    const community = {
+      ...makeCommunity(10),
+      staff: [{ id: 30, username: 'existing' }]
+    };
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [community] },
       isLoading: false,
@@ -334,7 +343,10 @@ describe('CommunityManager', () => {
       error: undefined
     });
     renderWithProviders(<CommunityManager />);
-    await user.selectOptions(screen.getByLabelText(/registration/i), 'Invite only');
+    await user.selectOptions(
+      screen.getByLabelText(/registration/i),
+      'Invite only'
+    );
     const ownerInput = screen.getByLabelText(/owner user id/i);
     await user.type(ownerInput, '5');
     expect((ownerInput as HTMLInputElement).value).toBe('5');
@@ -348,7 +360,9 @@ describe('CommunityManager', () => {
       error: undefined
     });
     renderWithProviders(<CommunityManager />);
-    expect(screen.getByRole('button', { name: /creating…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /creating…/i })
+    ).toBeInTheDocument();
   });
 
   it('renders community with null type and description as dashes', () => {
@@ -405,7 +419,10 @@ describe('CommunityManager', () => {
     });
     renderWithProviders(<CommunityManager />);
     await user.type(screen.getByLabelText(/^name/i), 'Invite Community');
-    await user.selectOptions(screen.getByLabelText(/registration \*/i), 'Invite only');
+    await user.selectOptions(
+      screen.getByLabelText(/registration \*/i),
+      'Invite only'
+    );
     await user.type(screen.getByLabelText(/owner user id/i), '7');
     await user.click(screen.getByRole('button', { name: /create community/i }));
     await waitFor(() => {
@@ -429,7 +446,9 @@ describe('CommunityManager', () => {
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
-          payload: expect.objectContaining({ msg: 'Failed to create community.' })
+          payload: expect.objectContaining({
+            msg: 'Failed to create community.'
+          })
         })
       );
     });

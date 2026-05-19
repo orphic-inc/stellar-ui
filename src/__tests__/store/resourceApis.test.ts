@@ -658,9 +658,14 @@ describe('resource-oriented service APIs', () => {
       {
         run: (store: ReturnType<typeof createTestStore>) =>
           store.dispatch(
-            reportsApi.endpoints.getReports.initiate({ reporterUsername: 'alice' })
+            reportsApi.endpoints.getReports.initiate({
+              reporterUsername: 'alice'
+            })
           ),
-        response: { status: 200, body: { total: 0, page: 1, pageSize: 25, reports: [] } },
+        response: {
+          status: 200,
+          body: { total: 0, page: 1, pageSize: 25, reports: [] }
+        },
         expected: {
           url: expect.stringContaining('reporterUsername=alice'),
           method: 'GET',
@@ -669,10 +674,11 @@ describe('resource-oriented service APIs', () => {
       },
       {
         run: (store: ReturnType<typeof createTestStore>) =>
-          store.dispatch(
-            reportsApi.endpoints.getReports.initiate({})
-          ),
-        response: { status: 200, body: { total: 0, page: 1, pageSize: 25, reports: [] } },
+          store.dispatch(reportsApi.endpoints.getReports.initiate({})),
+        response: {
+          status: 200,
+          body: { total: 0, page: 1, pageSize: 25, reports: [] }
+        },
         expected: {
           url: expect.not.stringContaining('reporterUsername'),
           method: 'GET',

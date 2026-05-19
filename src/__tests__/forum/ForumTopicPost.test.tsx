@@ -218,7 +218,7 @@ describe('ForumTopicPost', () => {
   it('uses "unknown" fallback for author username when author is null', async () => {
     const user = userEvent.setup();
     const mockOnQuote = jest.fn();
-    const postWithNullAuthor = { ...mockPost, author: null };
+    const postWithNullAuthor = { ...mockPost, author: undefined };
     renderWithProviders(
       <ForumTopicPost
         post={postWithNullAuthor}

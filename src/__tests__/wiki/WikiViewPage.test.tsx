@@ -183,7 +183,9 @@ describe('WikiViewPage', () => {
     await user.click(screen.getByTitle('Remove alias'));
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
-      expect(alerts.some((a) => a.msg === 'Failed to remove alias.')).toBe(true);
+      expect(alerts.some((a) => a.msg === 'Failed to remove alias.')).toBe(
+        true
+      );
     });
   });
 
@@ -292,7 +294,9 @@ describe('WikiViewPage', () => {
     });
     renderWithProviders(<WikiViewPage />);
     expect(screen.getByRole('link', { name: /^edit$/i })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /^delete$/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /^delete$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('hides Edit for a wiki_edit user whose rank is below minEditLevel', () => {
@@ -321,7 +325,9 @@ describe('WikiViewPage', () => {
       error: undefined
     });
     renderWithProviders(<WikiViewPage />);
-    expect(screen.queryByRole('link', { name: /^edit$/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /^edit$/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows fallback danger alert when alias add fails with no API message', async () => {

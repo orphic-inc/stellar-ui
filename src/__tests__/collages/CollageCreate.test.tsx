@@ -9,7 +9,10 @@ const mockNavigate = jest.fn();
 let mockIsLoading = false;
 
 jest.mock('../../store/services/collageApi', () => ({
-  useCreateCollageMutation: () => [mockCreateCollage, { isLoading: mockIsLoading }]
+  useCreateCollageMutation: () => [
+    mockCreateCollage,
+    { isLoading: mockIsLoading }
+  ]
 }));
 
 jest.mock('react-router-dom', () => ({

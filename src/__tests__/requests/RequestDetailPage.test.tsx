@@ -352,7 +352,16 @@ describe('RequestDetailPage', () => {
         filledContributionId: null,
         community: null,
         user: null,
-        bounties: [{ id: 1, requestId: 12, userId: 99, amount: '256', createdAt: '2026-01-01', user: null }]
+        bounties: [
+          {
+            id: 1,
+            requestId: 12,
+            userId: 99,
+            amount: '256',
+            createdAt: '2026-01-01',
+            user: null
+          }
+        ]
       },
       isLoading: false,
       error: undefined
