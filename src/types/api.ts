@@ -200,6 +200,7 @@ export interface paths {
               installed: boolean;
               /** @enum {string} */
               registrationStatus: 'open' | 'invite' | 'closed';
+              configWarnings: string[];
             };
           };
         };

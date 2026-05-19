@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
   installApi,
+  useGetInstallStatusQuery,
   useInstallMutation
 } from '../../../store/services/installApi';
 import { useAppDispatch } from '../../../store/hooks';
@@ -20,6 +21,7 @@ const Install = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [install, { isLoading }] = useInstallMutation();
+  const { data: installStatus } = useGetInstallStatusQuery();
 
   const {
     register,
@@ -39,10 +41,10 @@ const Install = () => {
 
       dispatch(setCredentials(user));
       dispatch(
-        installApi.util.updateQueryData('getInstallStatus', undefined, () => ({
-          installed: true,
-          registrationStatus: 'open' as const
-        }))
+        installApi.util.updateQueryData('getInstallStatus', undefined, (draft) => {
+          draft.installed = true;
+          draft.registrationStatus = 'open';
+        })
       );
       dispatch(addAlert('Installation complete. Welcome, SysOp.', 'success'));
       navigate('/private');
@@ -53,121 +55,150 @@ const Install = () => {
     }
   };
 
-  return (
-    <div className="thin">
-      <h2>Stellar — First-Time Setup</h2>
-      <p className="lead">
-        No ranks or users exist yet. Create the initial SysOp account to get
-        started. This form is only available on a fresh installation and will be
-        locked once complete.
-      </p>
+  const warnings = installStatus?.configWarnings ?? [];
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <table className="layout">
-          <tbody>
-            <tr>
-              <td className="label">Username</td>
-              <td>
-                <input
-                  type="text"
-                  {...register('username', {
-                    required: 'Username is required'
-                  })}
-                  autoComplete="username"
-                />
-                {errors.username && (
-                  <span className="error">{errors.username.message}</span>
-                )}
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Email</td>
-              <td>
-                <input
-                  type="email"
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /\S+@\S+\.\S+/,
-                      message: 'Invalid email address'
-                    }
-                  })}
-                  autoComplete="email"
-                />
-                {errors.email && (
-                  <span className="error">{errors.email.message}</span>
-                )}
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Password</td>
-              <td>
-                <input
-                  type="password"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 8,
-                      message: 'Password must be at least 8 characters'
-                    }
-                  })}
-                  autoComplete="new-password"
-                />
-                {errors.password && (
-                  <span className="error">{errors.password.message}</span>
-                )}
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Confirm Password</td>
-              <td>
-                <input
-                  type="password"
-                  {...register('confirmPassword', {
-                    required: 'Please confirm your password',
-                    validate: (v) => v === password || 'Passwords do not match'
-                  })}
-                  autoComplete="new-password"
-                />
-                {errors.confirmPassword && (
-                  <span className="error">
-                    {errors.confirmPassword.message}
-                  </span>
-                )}
-              </td>
-            </tr>
-            <tr>
-              <td />
-              <td>
-                <input
-                  type="submit"
-                  value={isLoading ? 'Installing…' : 'Install'}
-                  disabled={isLoading}
-                  className="button"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  return (
+    <div className="w-full max-w-md">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-2">
+          Stellar
+        </h1>
+        <p className="text-gray-400 text-sm">First-time setup</p>
+      </div>
+
+      {warnings.length > 0 && (
+        <div className="mb-6 bg-amber-900/40 border border-amber-700 rounded-lg p-4">
+          <p className="text-amber-300 text-sm font-medium mb-2">
+            Environment configuration notes
+          </p>
+          <ul className="space-y-1">
+            {warnings.map((w, i) => (
+              <li key={i} className="text-amber-200 text-xs">
+                {w}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4"
+      >
+        <div>
+          <label
+            htmlFor="install-username"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Username
+          </label>
+          <input
+            id="install-username"
+            type="text"
+            {...register('username', { required: 'Username is required' })}
+            autoComplete="username"
+            placeholder="sysop"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
+          />
+          {errors.username && (
+            <p className="mt-1 text-xs text-red-400">{errors.username.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="install-email"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Email
+          </label>
+          <input
+            id="install-email"
+            type="email"
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /\S+@\S+\.\S+/,
+                message: 'Invalid email address'
+              }
+            })}
+            autoComplete="email"
+            placeholder="you@example.com"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
+          />
+          {errors.email && (
+            <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="install-password"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Password
+          </label>
+          <input
+            id="install-password"
+            type="password"
+            {...register('password', {
+              required: 'Password is required',
+              minLength: {
+                value: 8,
+                message: 'Password must be at least 8 characters'
+              }
+            })}
+            autoComplete="new-password"
+            placeholder="8+ characters"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
+          />
+          {errors.password && (
+            <p className="mt-1 text-xs text-red-400">{errors.password.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="install-confirm"
+            className="block text-sm font-medium text-gray-300 mb-1"
+          >
+            Confirm Password
+          </label>
+          <input
+            id="install-confirm"
+            type="password"
+            {...register('confirmPassword', {
+              required: 'Please confirm your password',
+              validate: (v) => v === password || 'Passwords do not match'
+            })}
+            autoComplete="new-password"
+            placeholder="••••••••"
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
+          />
+          {errors.confirmPassword && (
+            <p className="mt-1 text-xs text-red-400">
+              {errors.confirmPassword.message}
+            </p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+        >
+          {isLoading ? 'Installing…' : 'Install'}
+        </button>
       </form>
 
-      <div className="thin">
-        <h3>What this will create</h3>
-        <ul>
-          <li>
-            <strong>User</strong> (level 100) — default registration rank
-          </li>
-          <li>
-            <strong>Power User</strong> (level 200) — promoted members
-          </li>
-          <li>
-            <strong>Staff</strong> (level 500) — moderators and staff
-          </li>
-          <li>
-            <strong>SysOp</strong> (level 1000) — full administrative access
-          </li>
-        </ul>
-        <p>Your account will be assigned the SysOp rank.</p>
+      <div className="mt-6 bg-gray-800/50 border border-gray-700 rounded-lg p-4 text-xs text-gray-400 space-y-1">
+        <p className="font-medium text-gray-300 mb-2">What this creates</p>
+        <p>User ranks: User (100) · Power User (200) · Staff (500) · SysOp (1000)</p>
+        <p>Default forum structure (Site, Community, Music, Help, Staff, Trash)</p>
+        <p>Your account will be assigned the SysOp rank with a 5 GiB startup buffer.</p>
+        <p className="pt-1 text-gray-500">
+          A pre-launch configuration checklist will be waiting in your staff inbox.
+        </p>
       </div>
     </div>
   );

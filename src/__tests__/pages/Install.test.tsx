@@ -9,16 +9,25 @@ const mockNavigate = jest.fn();
 const mockDispatch = jest.fn();
 let mockIsInstalling = false;
 
+let mockConfigWarnings: string[] = [];
+
 jest.mock('../../store/services/installApi', () => ({
   installApi: {
     util: {
       updateQueryData: jest.fn((...args: unknown[]) => {
         const fn = args[2];
-        if (typeof fn === 'function') fn({});
+        if (typeof fn === 'function') fn({ installed: false, registrationStatus: 'open', configWarnings: [] });
         return { type: 'mock' };
       })
     }
   },
+  useGetInstallStatusQuery: () => ({
+    data: {
+      installed: false,
+      registrationStatus: 'open',
+      configWarnings: mockConfigWarnings
+    }
+  }),
   useInstallMutation: () => [mockInstall, { isLoading: mockIsInstalling }]
 }));
 
@@ -40,48 +49,54 @@ const fillForm = async (
     confirm = 'secret123'
   } = {}
 ) => {
-  await user.type(
-    document.querySelector('input[autocomplete="username"]') as HTMLElement,
-    username
-  );
-  await user.type(
-    document.querySelector('input[autocomplete="email"]') as HTMLElement,
-    email
-  );
-  const passwordInputs = document.querySelectorAll(
-    'input[autocomplete="new-password"]'
-  );
-  await user.type(passwordInputs[0] as HTMLElement, password);
-  await user.type(passwordInputs[1] as HTMLElement, confirm);
+  await user.type(screen.getByLabelText(/username/i), username);
+  await user.type(screen.getByLabelText(/^email$/i), email);
+  await user.type(screen.getByLabelText(/^password$/i), password);
+  await user.type(screen.getByLabelText(/confirm password/i), confirm);
 };
 
 describe('Install', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsInstalling = false;
+    mockConfigWarnings = [];
   });
 
-  it('renders username, email, password, confirm fields and Install button', () => {
+  it('renders labeled fields and Install button', () => {
     renderWithProviders(<Install />);
-    expect(
-      document.querySelector('input[autocomplete="username"]')
-    ).toBeInTheDocument();
-    expect(
-      document.querySelector('input[autocomplete="email"]')
-    ).toBeInTheDocument();
-    const passwordInputs = document.querySelectorAll(
-      'input[autocomplete="new-password"]'
-    );
-    expect(passwordInputs.length).toBe(2);
-    expect(
-      screen.getByRole('button', { name: /^install$/i })
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^install$/i })).toBeInTheDocument();
   });
 
   it('shows explanatory text about what will be created', () => {
     renderWithProviders(<Install />);
     expect(screen.getByText(/first-time setup/i)).toBeInTheDocument();
     expect(screen.getAllByText(/sysop/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/5 gib/i)).toBeInTheDocument();
+    expect(screen.getByText(/pre-launch configuration checklist/i)).toBeInTheDocument();
+  });
+
+  it('shows configWarnings from install status when present', () => {
+    mockConfigWarnings = [
+      'STELLAR_SITE_URL is not set or uses the development default.',
+      'SMTP is not configured.'
+    ];
+    renderWithProviders(<Install />);
+    expect(
+      screen.getByText(/STELLAR_SITE_URL is not set or uses the development default./i)
+    ).toBeInTheDocument();
+    expect(screen.getByText(/SMTP is not configured./i)).toBeInTheDocument();
+  });
+
+  it('does not render the warnings panel when configWarnings is empty', () => {
+    mockConfigWarnings = [];
+    renderWithProviders(<Install />);
+    expect(
+      screen.queryByText(/environment configuration notes/i)
+    ).not.toBeInTheDocument();
   });
 
   it('calls install mutation with correct values on submit', async () => {
@@ -150,7 +165,7 @@ describe('Install', () => {
   it('shows "Installing…" when isLoading is true', () => {
     mockIsInstalling = true;
     renderWithProviders(<Install />);
-    expect(screen.getByDisplayValue(/installing…/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /installing…/i })).toBeInTheDocument();
   });
 
   it('dispatches fallback danger alert when install fails with no API message', async () => {
