@@ -135,6 +135,70 @@ describe('SiteHistoryPage', () => {
     });
   });
 
+  it('calls update when edit modal is saved', async () => {
+    const user = userEvent.setup();
+    mockUseGetSiteHistoryQuery.mockReturnValue({
+      data: [makeEntry(5)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SiteHistoryPage />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    const titleInput = screen.getByLabelText(/title/i);
+    await user.clear(titleInput);
+    await user.type(titleInput, 'Revised title');
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 5, title: 'Revised title' })
+    );
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'success' })
+      })
+    );
+  });
+
+  it('dispatches danger alert when save fails', async () => {
+    mockCreate.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Server error.' } })
+    });
+    const user = userEvent.setup();
+    mockUseGetSiteHistoryQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SiteHistoryPage />);
+    await user.click(screen.getByRole('button', { name: /\+ add entry/i }));
+    await user.type(screen.getByLabelText(/title/i), 'Bad');
+    await user.type(screen.getByLabelText(/body/i), 'Bad body.');
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
+  it('dispatches danger alert when delete fails', async () => {
+    mockDelete.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Server error.' } })
+    });
+    const user = userEvent.setup();
+    mockUseGetSiteHistoryQuery.mockReturnValue({
+      data: [makeEntry(9)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<SiteHistoryPage />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ alertType: 'danger' })
+      })
+    );
+  });
+
   it('calls deleteEntry after confirm', async () => {
     const user = userEvent.setup();
     mockUseGetSiteHistoryQuery.mockReturnValue({
