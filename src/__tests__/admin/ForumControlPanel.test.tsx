@@ -97,6 +97,37 @@ describe('ForumControlPanel', () => {
     ).toBeInTheDocument();
   });
 
+  it('updates optional form fields: sort, description, and access levels', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ForumControlPanel />);
+
+    const sortInput = screen.getByLabelText(/sort order/i) as HTMLInputElement;
+    await user.clear(sortInput);
+    await user.type(sortInput, '5');
+    expect(sortInput.value).toBe('5');
+
+    const descInput = screen.getByLabelText(/description/i) as HTMLInputElement;
+    await user.type(descInput, 'A test description');
+    expect(descInput.value).toBe('A test description');
+
+    const readInput = screen.getByLabelText(/^read$/i) as HTMLInputElement;
+    await user.clear(readInput);
+    await user.type(readInput, '100');
+    expect(readInput.value).toBe('100');
+
+    const writeInput = screen.getByLabelText(/^write$/i) as HTMLInputElement;
+    await user.clear(writeInput);
+    await user.type(writeInput, '200');
+    expect(writeInput.value).toBe('200');
+
+    const createInput = screen.getByLabelText(
+      /create topics/i
+    ) as HTMLInputElement;
+    await user.clear(createInput);
+    await user.type(createInput, '300');
+    expect(createInput.value).toBe('300');
+  });
+
   it('calls createForum with correct payload on submit', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ForumControlPanel />);
