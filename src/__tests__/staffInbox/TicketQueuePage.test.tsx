@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import TicketQueuePage from '../../components/staffInbox/TicketQueuePage';
@@ -49,6 +49,53 @@ describe('TicketQueuePage', () => {
     });
   });
 
+  it('shows spinner while loading', () => {
+    mockUseGetTicketQueueQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: undefined
+    });
+    renderWithProviders(<TicketQueuePage />);
+    expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('shows error state on failure', () => {
+    mockUseGetTicketQueueQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 500 }
+    });
+    renderWithProviders(<TicketQueuePage />);
+    expect(
+      screen.getByText(/failed to load ticket queue/i)
+    ).toBeInTheDocument();
+  });
+
+  it('shows empty state when no tickets match filter', () => {
+    mockUseGetTicketQueueQuery.mockReturnValue({
+      data: { total: 0, pageSize: 25, conversations: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<TicketQueuePage />);
+    expect(
+      screen.getByText(/no tickets match this filter/i)
+    ).toBeInTheDocument();
+  });
+
+  it('renders ticket rows with subject links, status badges, and assigned user', () => {
+    renderWithProviders(<TicketQueuePage />);
+    expect(
+      screen.getByRole('link', { name: /first ticket/i })
+    ).toBeInTheDocument();
+    // "Unanswered" appears in both the status filter dropdown and the badge
+    expect(screen.getAllByText('Unanswered').length).toBeGreaterThan(0);
+    expect(screen.getByText('alice')).toBeInTheDocument();
+    expect(screen.getAllByText('Open').length).toBeGreaterThan(0);
+    expect(screen.getByText('bob')).toBeInTheDocument();
+    expect(screen.getByText('mod-one')).toBeInTheDocument();
+  });
+
   it('applies queue filters and bulk resolves selected tickets', async () => {
     const user = userEvent.setup();
     renderWithProviders(<TicketQueuePage />);
@@ -72,5 +119,64 @@ describe('TicketQueuePage', () => {
       expect(mockBulkResolve).toHaveBeenCalledWith({ ids: [1, 2] });
       expect(window.alert).toHaveBeenCalledWith('Resolved 2 ticket(s).');
     });
+  });
+
+  it('deselects a ticket when its checkbox is clicked twice', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TicketQueuePage />);
+
+    // Find the checkbox in the row that contains "First ticket"
+    const row = screen
+      .getByRole('link', { name: /first ticket/i })
+      .closest('tr')!;
+    const ticketCheckbox = within(row).getByRole('checkbox');
+
+    await user.click(ticketCheckbox); // select
+    expect(screen.getByText('1 selected')).toBeInTheDocument();
+    await user.click(ticketCheckbox); // deselect
+    expect(screen.queryByText(/selected/)).toBeNull();
+  });
+
+  it('toggles select-all and deselect-all via the header checkbox', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TicketQueuePage />);
+
+    const thead = document.querySelector('thead')!;
+    const headerCheckbox = within(thead).getByRole('checkbox');
+
+    await user.click(headerCheckbox); // select all
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+
+    await user.click(headerCheckbox); // deselect all
+    expect(screen.queryByText(/selected/)).toBeNull();
+  });
+
+  it('shows pagination and navigates to next page', async () => {
+    const user = userEvent.setup();
+    mockUseGetTicketQueueQuery.mockReturnValue({
+      data: { total: 50, pageSize: 25, conversations: [] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<TicketQueuePage />);
+
+    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /next/i }));
+
+    expect(mockUseGetTicketQueueQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: 2 })
+    );
+  });
+
+  it('toggles Unassigned filter and clears Assigned to me', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TicketQueuePage />);
+
+    await user.click(screen.getByLabelText('Assigned to me'));
+    await user.click(screen.getByLabelText('Unassigned only'));
+
+    expect(mockUseGetTicketQueueQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ assignedToMe: false, unassigned: true })
+    );
   });
 });
