@@ -212,8 +212,8 @@ const Install = () => {
           buffer.
         </p>
         <p className="pt-1 text-gray-500">
-          A pre-launch configuration checklist will be waiting in your staff
-          inbox.
+          Launch configuration reminders will remain visible in the staff bar
+          until they are addressed.
         </p>
       </div>
     </div>

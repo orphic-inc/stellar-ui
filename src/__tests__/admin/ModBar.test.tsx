@@ -5,6 +5,7 @@ import ModBar from '../../components/admin/ModBar';
 
 const mockUseAppSelector = jest.fn();
 const mockUseGetReportCountsQuery = jest.fn();
+const mockUseGetInstallStatusQuery = jest.fn();
 
 jest.mock('../../store/hooks', () => ({
   useAppSelector: (...args: unknown[]) => mockUseAppSelector(...args)
@@ -12,6 +13,10 @@ jest.mock('../../store/hooks', () => ({
 
 jest.mock('../../store/services/reportsApi', () => ({
   useGetReportCountsQuery: () => mockUseGetReportCountsQuery()
+}));
+
+jest.mock('../../store/services/installApi', () => ({
+  useGetInstallStatusQuery: () => mockUseGetInstallStatusQuery()
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -44,6 +49,9 @@ describe('ModBar', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseGetReportCountsQuery.mockReturnValue({ data: { open: 0 } });
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { setupChecklist: [] }
+    });
   });
 
   it('renders nothing for non-staff users', () => {
@@ -79,5 +87,42 @@ describe('ModBar', () => {
     renderWithProviders(<ModBar />);
     expect(screen.queryByText('0')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /reports/i })).toBeInTheDocument();
+  });
+
+  it('shows unresolved launch checklist items when setup is incomplete', () => {
+    mockUseAppSelector.mockReturnValue(staffUser);
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: {
+        setupChecklist: [
+          'registrationStatus is still "open".',
+          'STELLAR_SITE_URL is not set.'
+        ]
+      }
+    });
+
+    renderWithProviders(<ModBar />);
+
+    expect(
+      screen.getByText(/configuration steps to complete before launch/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/registrationStatus is still "open"/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/STELLAR_SITE_URL is not set/i)
+    ).toBeInTheDocument();
+  });
+
+  it('hides the launch checklist when there are no unresolved items', () => {
+    mockUseAppSelector.mockReturnValue(staffUser);
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { setupChecklist: [] }
+    });
+
+    renderWithProviders(<ModBar />);
+
+    expect(
+      screen.queryByText(/configuration steps to complete before launch/i)
+    ).not.toBeInTheDocument();
   });
 });

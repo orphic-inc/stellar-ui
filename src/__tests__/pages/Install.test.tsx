@@ -16,7 +16,13 @@ jest.mock('../../store/services/installApi', () => ({
     util: {
       updateQueryData: jest.fn((...args: unknown[]) => {
         const fn = args[2];
-        if (typeof fn === 'function') fn({ installed: false, registrationStatus: 'open', configWarnings: [] });
+        if (typeof fn === 'function')
+          fn({
+            installed: false,
+            registrationStatus: 'open',
+            configWarnings: [],
+            setupChecklist: []
+          });
         return { type: 'mock' };
       })
     }
@@ -25,7 +31,8 @@ jest.mock('../../store/services/installApi', () => ({
     data: {
       installed: false,
       registrationStatus: 'open',
-      configWarnings: mockConfigWarnings
+      configWarnings: mockConfigWarnings,
+      setupChecklist: []
     }
   }),
   useInstallMutation: () => [mockInstall, { isLoading: mockIsInstalling }]
@@ -68,7 +75,9 @@ describe('Install', () => {
     expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^install$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^install$/i })
+    ).toBeInTheDocument();
   });
 
   it('shows explanatory text about what will be created', () => {
@@ -76,7 +85,9 @@ describe('Install', () => {
     expect(screen.getByText(/first-time setup/i)).toBeInTheDocument();
     expect(screen.getAllByText(/sysop/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/5 gib/i)).toBeInTheDocument();
-    expect(screen.getByText(/pre-launch configuration checklist/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/launch configuration reminders will remain visible/i)
+    ).toBeInTheDocument();
   });
 
   it('shows configWarnings from install status when present', () => {
@@ -86,7 +97,9 @@ describe('Install', () => {
     ];
     renderWithProviders(<Install />);
     expect(
-      screen.getByText(/STELLAR_SITE_URL is not set or uses the development default./i)
+      screen.getByText(
+        /STELLAR_SITE_URL is not set or uses the development default./i
+      )
     ).toBeInTheDocument();
     expect(screen.getByText(/SMTP is not configured./i)).toBeInTheDocument();
   });
@@ -165,7 +178,9 @@ describe('Install', () => {
   it('shows "Installing…" when isLoading is true', () => {
     mockIsInstalling = true;
     renderWithProviders(<Install />);
-    expect(screen.getByRole('button', { name: /installing…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /installing…/i })
+    ).toBeInTheDocument();
   });
 
   it('dispatches fallback danger alert when install fails with no API message', async () => {

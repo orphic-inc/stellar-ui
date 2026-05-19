@@ -201,6 +201,7 @@ export interface paths {
               /** @enum {string} */
               registrationStatus: 'open' | 'invite' | 'closed';
               configWarnings: string[];
+              setupChecklist: string[];
             };
           };
         };
