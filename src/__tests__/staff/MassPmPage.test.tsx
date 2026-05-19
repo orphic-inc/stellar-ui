@@ -160,7 +160,10 @@ describe('MassPmPage', () => {
   });
 
   it('shows spinner while ranks are loading', () => {
-    mockUseGetUserRanksQuery.mockReturnValue({ data: undefined, isLoading: true });
+    mockUseGetUserRanksQuery.mockReturnValue({
+      data: undefined,
+      isLoading: true
+    });
     renderWithProviders(<MassPmPage />);
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });

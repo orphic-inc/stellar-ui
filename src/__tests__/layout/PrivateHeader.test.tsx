@@ -45,12 +45,16 @@ jest.mock('react-router-dom', () => ({
     className?: ((arg: { isActive: boolean }) => string) | string;
   }) => {
     const inactiveClass =
-      typeof className === 'function' ? className({ isActive: false }) : (className ?? '');
+      typeof className === 'function'
+        ? className({ isActive: false })
+        : className ?? '';
     const activeClass =
       typeof className === 'function' ? className({ isActive: true }) : '';
     return (
       <a href={to} className={inactiveClass} data-active-class={activeClass}>
-        {typeof children === 'function' ? children({ isActive: false }) : children}
+        {typeof children === 'function'
+          ? children({ isActive: false })
+          : children}
       </a>
     );
   }

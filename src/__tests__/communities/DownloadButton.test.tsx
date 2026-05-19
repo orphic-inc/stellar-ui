@@ -104,6 +104,8 @@ describe('DownloadButton', () => {
     renderWithProviders(
       <DownloadButton contributionId={1} canDownload={true} />
     );
-    expect(screen.getByRole('button', { name: /loading…/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /loading…/i })
+    ).toBeInTheDocument();
   });
 });

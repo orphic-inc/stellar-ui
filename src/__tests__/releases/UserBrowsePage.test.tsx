@@ -237,7 +237,9 @@ describe('UserBrowsePage', () => {
       mockSetSearchParams
     ]);
     renderWithProviders(<UserBrowsePage />);
-    const select = screen.getByRole('combobox', { name: /status/i }) as HTMLSelectElement;
+    const select = screen.getByRole('combobox', {
+      name: /status/i
+    }) as HTMLSelectElement;
     expect(select.value).toBe('true');
     expect(screen.getByText('—')).toBeInTheDocument();
   });
@@ -253,11 +255,22 @@ describe('UserBrowsePage', () => {
       error: undefined
     });
     renderWithProviders(<UserBrowsePage />);
-    await user.selectOptions(screen.getByRole('combobox', { name: /order by/i }), 'createdAt');
-    await user.selectOptions(screen.getByRole('combobox', { name: /direction/i }), 'desc');
-    await user.selectOptions(screen.getByRole('combobox', { name: /status/i }), 'false');
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /order by/i }),
+      'createdAt'
+    );
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /direction/i }),
+      'desc'
+    );
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /status/i }),
+      'false'
+    );
     await user.click(screen.getByRole('button', { name: /^search$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('orderBy')).toBe('createdAt');
     expect(params.get('order')).toBe('desc');
     expect(params.get('disabled')).toBe('false');
@@ -277,7 +290,9 @@ describe('UserBrowsePage', () => {
       mockSetSearchParams
     ]);
     renderWithProviders(<UserBrowsePage />);
-    const select = screen.getByRole('combobox', { name: /status/i }) as HTMLSelectElement;
+    const select = screen.getByRole('combobox', {
+      name: /status/i
+    }) as HTMLSelectElement;
     expect(select.value).toBe('false');
   });
 
@@ -293,7 +308,9 @@ describe('UserBrowsePage', () => {
     });
     renderWithProviders(<UserBrowsePage />);
     await user.click(screen.getByRole('button', { name: /^search$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('disabled')).toBeNull();
   });
 
@@ -309,7 +326,9 @@ describe('UserBrowsePage', () => {
     });
     renderWithProviders(<UserBrowsePage />);
     await user.click(screen.getByRole('button', { name: /reset/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.toString()).toBe('');
   });
 

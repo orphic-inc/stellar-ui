@@ -228,7 +228,9 @@ describe('ForumTopicPage', () => {
 
     renderWithProviders(<ForumTopicPage />, { store });
 
-    expect(screen.getByRole('button', { name: /^subscribe$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^subscribe$/i })
+    ).toBeInTheDocument();
     expect(screen.getByText(/1 vote/)).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /^subscribe$/i }));

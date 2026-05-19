@@ -177,7 +177,9 @@ describe('ReleaseBrowsePage', () => {
     renderWithProviders(<ReleaseBrowsePage />);
     expect(screen.getByRole('button', { name: '2' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: '2' }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('page')).toBe('2');
   });
 
@@ -195,7 +197,9 @@ describe('ReleaseBrowsePage', () => {
     expect(screen.queryByLabelText(/artist name/i)).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /advanced options/i }));
     expect(screen.getByLabelText(/artist name/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /hide advanced/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /hide advanced/i })
+    ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /hide advanced/i }));
     expect(screen.queryByLabelText(/artist name/i)).not.toBeInTheDocument();
   });
@@ -211,14 +215,18 @@ describe('ReleaseBrowsePage', () => {
       error: undefined
     });
     mockUseSearchParams.mockReturnValue([
-      new URLSearchParams('hasLog=true&hasCue=true&isScene=true&vanityHouse=true'),
+      new URLSearchParams(
+        'hasLog=true&hasCue=true&isScene=true&vanityHouse=true'
+      ),
       mockSetSearchParams
     ]);
     renderWithProviders(<ReleaseBrowsePage />);
     // Show advanced fields so checkboxes are in the DOM (pre-checked from URL)
     await user.click(screen.getByRole('button', { name: /advanced options/i }));
     fireEvent.submit(document.querySelector('form')!);
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('hasLog')).toBe('true');
     expect(params.get('hasCue')).toBe('true');
   });
@@ -236,7 +244,9 @@ describe('ReleaseBrowsePage', () => {
     renderWithProviders(<ReleaseBrowsePage />);
     // Submit without opening advanced options → checkboxes not in DOM → all fd.get() returns null
     fireEvent.submit(document.querySelector('form')!);
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('hasLog')).toBeNull();
   });
 
@@ -249,13 +259,18 @@ describe('ReleaseBrowsePage', () => {
     });
     renderWithProviders(<ReleaseBrowsePage />);
     await user.click(screen.getByRole('button', { name: /^reset$/i }));
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.toString()).toBe('');
   });
 
   it('shows singular "result" label when total is 1', () => {
     mockUseSearchReleasesQuery.mockReturnValue({
-      data: { data: [makeRelease(1)], meta: { total: 1, page: 1, totalPages: 1 } },
+      data: {
+        data: [makeRelease(1)],
+        meta: { total: 1, page: 1, totalPages: 1 }
+      },
       isLoading: false,
       error: undefined
     });
@@ -284,9 +299,16 @@ describe('ReleaseBrowsePage', () => {
     renderWithProviders(<ReleaseBrowsePage />);
     await user.click(screen.getByRole('radio', { name: /all/i }));
     await user.selectOptions(screen.getByLabelText(/order by/i), 'year');
-    await user.selectOptions(screen.getAllByRole('combobox').find(el => (el as HTMLSelectElement).value === 'desc')!, 'asc');
+    await user.selectOptions(
+      screen
+        .getAllByRole('combobox')
+        .find((el) => (el as HTMLSelectElement).value === 'desc')!,
+      'asc'
+    );
     fireEvent.submit(document.querySelector('form')!);
-    const params = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
+    const params = mockSetSearchParams.mock.calls.at(
+      -1
+    )?.[0] as URLSearchParams;
     expect(params.get('tagMode')).toBe('all');
     expect(params.get('orderBy')).toBe('year');
     expect(params.get('order')).toBe('asc');
