@@ -232,7 +232,6 @@ describe('ReleaseBrowsePage', () => {
   });
 
   it('submits with canAdvanced=true but no checked flags (covers false branches of hasLog etc.)', async () => {
-    const user = userEvent.setup();
     mockUseGetMeQuery.mockReturnValue({
       data: { id: 7, userRank: { permissions: { advanced_search: true } } }
     });

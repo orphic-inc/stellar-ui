@@ -332,6 +332,24 @@ describe('UserBrowsePage', () => {
     expect(params.toString()).toBe('');
   });
 
+  it('links to /private/user/:id (singular), not /private/users/:id', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 1, userRank: { permissions: {} } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: {
+        data: [makeUser(42)],
+        meta: { total: 1, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserBrowsePage />);
+    const link = screen.getByText('user42').closest('a');
+    expect(link).toHaveAttribute('href', '/private/user/42');
+    expect(link).not.toHaveAttribute('href', '/private/users/42');
+  });
+
   it('includes disabled filter in search params when privileged user submits', async () => {
     const user = userEvent.setup();
     mockUseGetMeQuery.mockReturnValue({

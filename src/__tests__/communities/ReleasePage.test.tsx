@@ -242,10 +242,10 @@ describe('ReleasePage', () => {
     expect(mockVoteOn).not.toHaveBeenCalled();
   });
 
-  it('shows vote aggregate percentage and count', () => {
+  it('shows vote aggregate percentage, count, and score', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
       data: makeRelease({
-        voteAggregate: { ups: 8, total: 10 }
+        voteAggregate: { ups: 8, total: 10, score: 0.578 }
       }),
       isLoading: false,
       error: undefined
@@ -253,6 +253,7 @@ describe('ReleasePage', () => {
     renderWithProviders(<ReleasePage />);
     expect(screen.getByText(/80% positive/i)).toBeInTheDocument();
     expect(screen.getByText(/10 votes/i)).toBeInTheDocument();
+    expect(screen.getByText(/score:\s*57\.8/i)).toBeInTheDocument();
   });
 
   it('shows existing tags', () => {
@@ -541,7 +542,7 @@ describe('ReleasePage', () => {
 
   it('shows singular vote count when total is 1', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ voteAggregate: { ups: 1, total: 1 } }),
+      data: makeRelease({ voteAggregate: { ups: 1, total: 1, score: 0.2 } }),
       isLoading: false,
       error: undefined
     });

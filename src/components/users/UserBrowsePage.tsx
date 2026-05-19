@@ -178,7 +178,7 @@ const UserBrowsePage = () => {
                     >
                       <td className="py-2 pr-4">
                         <Link
-                          to={`/private/users/${u.id}`}
+                          to={`/private/user/${u.id}`}
                           className="text-indigo-400 hover:text-indigo-300 font-medium"
                         >
                           {u.username}

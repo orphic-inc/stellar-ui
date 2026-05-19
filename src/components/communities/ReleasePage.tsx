@@ -339,6 +339,11 @@ const ReleasePage = () => {
                   {agg.total} vote{agg.total !== 1 ? 's' : ''}
                 </p>
               )}
+              {agg && agg.total > 0 && (
+                <p className="text-xs text-gray-500 text-center">
+                  Score: {(agg.score * 100).toFixed(1)}
+                </p>
+              )}
             </div>
           </div>
 
