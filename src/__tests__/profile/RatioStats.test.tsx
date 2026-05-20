@@ -16,7 +16,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 const baseStats: {
-  totalEarned: number;
+  contributed: number;
   consumed: number;
   ratio: number;
   requiredRatio: number;
@@ -26,7 +26,7 @@ const baseStats: {
   eligibleContributionBytes: number;
   policy: { status: string } | null;
 } = {
-  totalEarned: 2000000000,
+  contributed: 2000000000,
   consumed: 500000000,
   ratio: 4.0,
   requiredRatio: 0.6,

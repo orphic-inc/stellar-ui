@@ -62,7 +62,7 @@ const RatioRulesPage = () => {
               Uploaded
             </span>
             <p className="text-base font-medium mt-0.5 text-gray-200">
-              {formatBytes(Number(stats.totalEarned))}
+              {formatBytes(Number(stats.contributed))}
             </p>
           </div>
           <div>

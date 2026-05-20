@@ -305,7 +305,11 @@ const WikiHistoryPage = () => {
           <span className="text-xs text-gray-400">Compare:</span>
           <select
             value={compareOld ?? ''}
-            onChange={(e) => setCompareOld(Number(e.target.value))}
+            onChange={(e) =>
+              setCompareOld(
+                e.target.value === '' ? null : Number(e.target.value)
+              )
+            }
             className="rounded bg-gray-800 border border-gray-600 text-white text-xs px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           >
             <option value="">Old rev…</option>
@@ -318,7 +322,11 @@ const WikiHistoryPage = () => {
           <span className="text-gray-500 text-xs">→</span>
           <select
             value={compareNew ?? ''}
-            onChange={(e) => setCompareNew(Number(e.target.value))}
+            onChange={(e) =>
+              setCompareNew(
+                e.target.value === '' ? null : Number(e.target.value)
+              )
+            }
             className="rounded bg-gray-800 border border-gray-600 text-white text-xs px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           >
             <option value="">New rev…</option>

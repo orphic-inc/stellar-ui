@@ -6260,7 +6260,6 @@ export interface components {
     ProfileStats: {
       contributed: string | null;
       consumed: string | null;
-      totalEarned: string | null;
       ratio: string | null;
       buffer: string | null;
     };

@@ -19,7 +19,7 @@ describe('RatioRulesPage', () => {
       data: {
         ratio: 0.42,
         requiredRatio: 0.3,
-        totalEarned: '10737418240',
+        contributed: '10737418240',
         consumed: '26843545600',
         eligibleContributionBytes: '5368709120',
         contributionCoverage: 0.5,
@@ -48,7 +48,7 @@ describe('RatioRulesPage', () => {
       data: {
         ratio: 0.1,
         requiredRatio: 0.3,
-        totalEarned: '10737418240',
+        contributed: '10737418240',
         consumed: '26843545600',
         eligibleContributionBytes: '5368709120',
         contributionCoverage: 1.5,

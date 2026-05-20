@@ -219,6 +219,17 @@ describe('WikiHistoryPage', () => {
     expect(screen.queryByText(/compare r/i)).not.toBeInTheDocument();
   });
 
+  it('compare button stays disabled after selecting then reverting old select to placeholder', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<WikiHistoryPage />);
+    // Select a real revision in Old, then revert to the placeholder
+    const oldSelect = screen.getByDisplayValue('Old rev…');
+    await user.selectOptions(oldSelect, '2');
+    // Display now shows "r2" — revert back to empty
+    await user.selectOptions(screen.getByDisplayValue('r2'), '');
+    expect(screen.getByRole('button', { name: /^compare$/i })).toBeDisabled();
+  });
+
   it('does not open compare modal when only Old is selected but New is null', async () => {
     const user = userEvent.setup();
     renderWithProviders(<WikiHistoryPage />);

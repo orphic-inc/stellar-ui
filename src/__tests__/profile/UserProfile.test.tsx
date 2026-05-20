@@ -16,11 +16,6 @@ jest.mock('../../components/layout/Time', () => ({
   default: ({ date }: { date: string }) => <span>{date}</span>
 }));
 
-jest.mock('../../components/profile/RatioStats', () => ({
-  __esModule: true,
-  default: () => <div>RatioStats</div>
-}));
-
 jest.mock('../../components/layout/UserBadges', () => ({
   __esModule: true,
   default: () => null
@@ -179,6 +174,17 @@ const mockProfile = {
 let mockProfileData: typeof mockProfile | undefined = mockProfile;
 let mockIsLoading = false;
 let mockError: unknown = undefined;
+let mockMyRatioStats = {
+  ratio: 2,
+  requiredRatio: 0.15,
+  meetsRequirement: true,
+  bracket: { label: '0–5 GiB', maxRequired: 0, minRequired: 0 },
+  contributed: '1000000000',
+  consumed: '500000000',
+  eligibleContributionBytes: '500000000',
+  contributionCoverage: 1,
+  policy: null
+};
 
 jest.mock('../../store/services/profileApi', () => ({
   useGetProfileByUserIdQuery: () => ({
@@ -186,7 +192,7 @@ jest.mock('../../store/services/profileApi', () => ({
     isLoading: mockIsLoading,
     error: mockError
   }),
-  useGetMyRatioStatsQuery: () => ({ data: null, isLoading: false })
+  useGetMyRatioStatsQuery: () => ({ data: mockMyRatioStats, isLoading: false })
 }));
 
 describe('UserProfile', () => {
@@ -195,6 +201,17 @@ describe('UserProfile', () => {
     mockProfileData = mockProfile;
     mockIsLoading = false;
     mockError = undefined;
+    mockMyRatioStats = {
+      ratio: 2,
+      requiredRatio: 0.15,
+      meetsRequirement: true,
+      bracket: { label: '0–5 GiB', maxRequired: 0, minRequired: 0 },
+      contributed: '1000000000',
+      consumed: '500000000',
+      eligibleContributionBytes: '500000000',
+      contributionCoverage: 1,
+      policy: null
+    };
     mockCurrentUser = { id: 99, username: 'bob' };
     mockHasAnyPermission = false;
     mockUserRanks = [];
@@ -289,10 +306,18 @@ describe('UserProfile', () => {
     expect(screen.queryByText('Staff Actions')).not.toBeInTheDocument();
   });
 
-  it('shows RatioStats on own profile', () => {
+  it('shows required ratio details in Stats on own profile', () => {
     mockCurrentUser = { id: 42, username: 'alice' };
     renderWithProviders(<UserProfile />);
-    expect(screen.getByText('RatioStats')).toBeInTheDocument();
+    expect(screen.getByText('Required ratio:')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /ratio rules/i })
+    ).toBeInTheDocument();
+  });
+
+  it('does not render a separate Transfer Stats card', () => {
+    renderWithProviders(<UserProfile />);
+    expect(screen.queryByText('Transfer Stats')).not.toBeInTheDocument();
   });
 
   it('shows user class and rank name', () => {

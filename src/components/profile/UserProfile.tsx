@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import DOMPurify from 'dompurify';
-import { useGetProfileByUserIdQuery } from '../../store/services/profileApi';
+import {
+  useGetMyRatioStatsQuery,
+  useGetProfileByUserIdQuery
+} from '../../store/services/profileApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import {
   useWarnUserMutation,
@@ -28,7 +31,6 @@ import { getApiErrorMessage } from '../../utils/apiError';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
-import RatioStats from './RatioStats';
 import UserBadges from '../layout/UserBadges';
 
 const COLLAGE_CATEGORY_LABELS: Record<number, string> = {
@@ -759,6 +761,10 @@ const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
   const currentUser = useSelector(selectCurrentUser);
   const { data: profile, isLoading, error } = useGetProfileByUserIdQuery(id!);
+  const isOwnProfile = currentUser?.id === Number(id);
+  const { data: myRatioStats } = useGetMyRatioStatsQuery(undefined, {
+    skip: !isOwnProfile
+  });
 
   if (isLoading) return <Spinner />;
   if (error) {
@@ -779,7 +785,6 @@ const UserProfile = () => {
   }
   if (!profile) return <Spinner />;
 
-  const isOwnProfile = currentUser?.id === profile.id;
   const isStaff = hasAnyPermission(currentUser, [
     'staff',
     'admin',
@@ -911,16 +916,6 @@ const UserProfile = () => {
                   </li>
                 )}
               {profileIsDonor && <li className="text-pink-400">Donor ♥</li>}
-            </ul>
-          </div>
-
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Transfer Stats
-              </span>
-            </div>
-            <ul className="px-3 py-2 space-y-1 text-xs text-gray-300">
               <li>
                 <span className="text-gray-500">Contributed:</span>{' '}
                 {formatCount(profileStats.contributed)}
@@ -937,10 +932,28 @@ const UserProfile = () => {
                 <span className="text-gray-500">Buffer:</span>{' '}
                 {formatCount(profileStats.buffer)}
               </li>
+              {isOwnProfile && myRatioStats && (
+                <>
+                  <li>
+                    <span className="text-gray-500">Required ratio:</span>{' '}
+                    {myRatioStats.requiredRatio.toFixed(3)}
+                  </li>
+                  <li>
+                    <span className="text-gray-500">Bracket:</span>{' '}
+                    {myRatioStats.bracket.label}
+                  </li>
+                  <li>
+                    <Link
+                      to="/private/ratio"
+                      className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                      Ratio rules →
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
-
-          {isOwnProfile && <RatioStats />}
         </div>
 
         {/* Main content */}
