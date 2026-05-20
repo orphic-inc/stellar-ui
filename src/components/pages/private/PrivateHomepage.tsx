@@ -124,6 +124,7 @@ const PrivateHomepage = () => {
               </h2>
             </div>
             <div className="px-4 py-3">
+              <StatRow label="Max users" value={stats?.maxUsers} />
               <StatRow label="Total users" value={stats?.totalUsers} />
               <StatRow label="Enabled users" value={stats?.enabledUsers} />
               <StatRow label="Active today" value={stats?.activeToday} />

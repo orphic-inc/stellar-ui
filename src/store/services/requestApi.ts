@@ -35,19 +35,41 @@ export interface UpdateRequestPayload {
 }
 
 export interface ListRequestsQuery {
+  q?: string;
+  artist?: string;
+  type?: ReleaseType;
+  year?: number;
   page?: number;
   communityId?: number;
   status?: RequestStatus;
+  orderBy?: 'createdAt' | 'voteCount' | 'random';
+  order?: 'asc' | 'desc';
 }
 
 export const requestApi = api.injectEndpoints({
   endpoints: (builder) => ({
     listRequests: builder.query<RequestsListResponse, ListRequestsQuery>({
-      query: ({ page = 1, communityId, status } = {}) => {
+      query: ({
+        q,
+        artist,
+        type,
+        year,
+        page = 1,
+        communityId,
+        status,
+        orderBy,
+        order
+      } = {}) => {
         const params = new URLSearchParams();
         params.set('page', String(page));
+        if (q) params.set('q', q);
+        if (artist) params.set('artist', artist);
+        if (type) params.set('type', type);
+        if (year != null) params.set('year', String(year));
         if (communityId != null) params.set('communityId', String(communityId));
         if (status != null) params.set('status', status);
+        if (orderBy) params.set('orderBy', orderBy);
+        if (order) params.set('order', order);
         return `/requests?${params.toString()}`;
       },
       providesTags: (result) =>

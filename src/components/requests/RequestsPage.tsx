@@ -1,8 +1,10 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { useSearchRequestsQuery } from '../../store/services/searchApi';
-import { useDeleteRequestMutation } from '../../store/services/requestApi';
+import {
+  useDeleteRequestMutation,
+  useListRequestsQuery
+} from '../../store/services/requestApi';
 import type { RequestStatus } from '../../types';
 import Spinner from '../layout/Spinner';
 
@@ -20,6 +22,22 @@ const RELEASE_TYPES = [
   'Comedy',
   'Comics'
 ];
+
+function formatBytes(bytesStr?: string | null): string {
+  const bytes = Number(bytesStr);
+  if (!Number.isFinite(bytes) || bytes < 0) return '—';
+  if (bytes >= 1073741824) return `${(bytes / 1073741824).toFixed(2)} GiB`;
+  if (bytes >= 1048576) return `${(bytes / 1048576).toFixed(2)} MiB`;
+  if (bytes >= 1024) return `${(bytes / 1024).toFixed(2)} KiB`;
+  return `${bytes} B`;
+}
+
+function getBountyCount(request: {
+  _count?: { bounties: number };
+  bounties?: Array<unknown>;
+}) {
+  return request._count?.bounties ?? request.bounties?.length ?? 0;
+}
 
 const inputCls =
   'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
@@ -45,7 +63,7 @@ const RequestsPage = () => {
   const order = (searchParams.get('order') ?? 'desc') as 'asc' | 'desc';
   const page = Number(searchParams.get('page') ?? 1);
 
-  const { data, isLoading, error } = useSearchRequestsQuery({
+  const { data, isLoading, error } = useListRequestsQuery({
     q,
     artist,
     type,
@@ -268,11 +286,10 @@ const RequestsPage = () => {
                 </td>
                 <td className="py-2 pr-4 text-gray-400">{r.type}</td>
                 <td className="py-2 pr-4 text-gray-400">
-                  {(r as { community?: { name: string } }).community?.name ??
-                    '—'}
+                  {r.community?.name ?? '—'}
                 </td>
                 <td className="py-2 pr-4 text-right font-mono text-yellow-400">
-                  {r._count.bounties > 0 ? `${r._count.bounties} bounty` : '—'}
+                  {getBountyCount(r) > 0 ? formatBytes(r.totalBounty) : '—'}
                 </td>
                 <td className="py-2 text-center">
                   <span
@@ -286,7 +303,7 @@ const RequestsPage = () => {
                   </span>
                 </td>
                 <td className="py-2 text-right">
-                  {user?.id === r.user.id && r.status === 'open' && (
+                  {user?.id === r.user?.id && r.status === 'open' && (
                     <button
                       onClick={() => handleDelete(r.id)}
                       className="text-xs text-red-500 hover:text-red-400"

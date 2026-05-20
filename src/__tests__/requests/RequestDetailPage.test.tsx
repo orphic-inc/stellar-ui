@@ -128,7 +128,7 @@ describe('RequestDetailPage', () => {
 
     renderWithProviders(<RequestDetailPage />, { store });
 
-    await user.click(screen.getByTitle('Vote'));
+    await user.click(screen.getByRole('button', { name: /votes/i }));
     await user.click(screen.getByTitle('Bookmark'));
     await user.type(
       screen.getByPlaceholderText(/bytes \(e\.g\. 104857600\)/i),
@@ -257,7 +257,7 @@ describe('RequestDetailPage', () => {
 
     renderWithProviders(<RequestDetailPage />, { store });
 
-    await user.click(screen.getByTitle('Vote'));
+    await user.click(screen.getByRole('button', { name: /votes/i }));
     await user.click(screen.getByTitle('Bookmark'));
 
     await user.type(

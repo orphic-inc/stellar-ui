@@ -5,17 +5,14 @@ import { createTestStore, renderWithProviders } from '../testUtils';
 import { setCredentials } from '../../store/slices/authSlice';
 import RequestsPage from '../../components/requests/RequestsPage';
 
-const mockUseSearchRequestsQuery = jest.fn();
+const mockUseListRequestsQuery = jest.fn();
 const mockDeleteRequest = jest.fn();
 const mockSetSearchParams = jest.fn();
 const mockUseSearchParams = jest.fn();
 
-jest.mock('../../store/services/searchApi', () => ({
-  useSearchRequestsQuery: (...args: unknown[]) =>
-    mockUseSearchRequestsQuery(...args)
-}));
-
 jest.mock('../../store/services/requestApi', () => ({
+  useListRequestsQuery: (...args: unknown[]) =>
+    mockUseListRequestsQuery(...args),
   useDeleteRequestMutation: () => [mockDeleteRequest, { isLoading: false }]
 }));
 
@@ -34,7 +31,7 @@ describe('RequestsPage', () => {
       ),
       mockSetSearchParams
     ]);
-    mockUseSearchRequestsQuery.mockReturnValue({
+    mockUseListRequestsQuery.mockReturnValue({
       data: {
         data: [
           {
@@ -44,6 +41,7 @@ describe('RequestsPage', () => {
             status: 'open',
             user: { id: 7, username: 'alice' },
             community: { id: 2, name: 'Jazz' },
+            totalBounty: '2048',
             _count: { bounties: 2 }
           }
         ],
@@ -70,7 +68,7 @@ describe('RequestsPage', () => {
 
     renderWithProviders(<RequestsPage />, { store });
 
-    expect(mockUseSearchRequestsQuery).toHaveBeenCalledWith({
+    expect(mockUseListRequestsQuery).toHaveBeenCalledWith({
       q: 'jazz',
       artist: 'miles',
       type: 'Music',
@@ -83,6 +81,7 @@ describe('RequestsPage', () => {
     expect(
       screen.getByRole('button', { name: /^delete$/i })
     ).toBeInTheDocument();
+    expect(screen.getByText('2.00 KiB')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /^filled$/i }));
     let next = mockSetSearchParams.mock.calls.at(-1)?.[0] as URLSearchParams;
@@ -154,7 +153,7 @@ describe('RequestsPage', () => {
         userRank: { permissions: {} }
       } as never)
     );
-    mockUseSearchRequestsQuery.mockReturnValue({
+    mockUseListRequestsQuery.mockReturnValue({
       data: undefined,
       isLoading: false,
       error: { status: 500 }
@@ -166,5 +165,31 @@ describe('RequestsPage', () => {
     expect(
       screen.queryByRole('button', { name: /^delete$/i })
     ).not.toBeInTheDocument();
+  });
+
+  it('falls back to an em dash when bounty totals are missing', () => {
+    mockUseListRequestsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 12,
+            title: 'Kind of Blue vinyl rip',
+            type: 'Music',
+            status: 'open',
+            user: { id: 7, username: 'alice' },
+            community: { id: 2, name: 'Jazz' },
+            _count: { bounties: 2 }
+          }
+        ],
+        meta: { total: 1, page: 1, limit: 25, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+
+    renderWithProviders(<RequestsPage />);
+
+    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.queryByText('NaN B')).not.toBeInTheDocument();
   });
 });

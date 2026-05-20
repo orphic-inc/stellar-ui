@@ -213,7 +213,7 @@ const Install = () => {
         </p>
         <p className="pt-1 text-gray-500">
           Launch configuration reminders will remain visible in the staff bar
-          until they are addressed.
+          until they are addressed or dismissed.
         </p>
       </div>
     </div>

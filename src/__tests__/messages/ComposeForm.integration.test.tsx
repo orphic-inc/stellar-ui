@@ -68,6 +68,7 @@ describe('ComposeForm RTK Query integration', () => {
       expect(draftRequest.method).toBe('POST');
       expect(await draftRequest.text()).toBe(
         JSON.stringify({
+          toUsername: 'alice',
           subject: 'Hello',
           body: 'How are you?'
         })

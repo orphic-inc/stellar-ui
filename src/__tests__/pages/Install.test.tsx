@@ -86,7 +86,9 @@ describe('Install', () => {
     expect(screen.getAllByText(/sysop/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/5 gib/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/launch configuration reminders will remain visible/i)
+      screen.getByText(
+        /launch configuration reminders will remain visible in the staff bar until they are addressed or dismissed/i
+      )
     ).toBeInTheDocument();
   });
 

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   useComposeMessageMutation,
-  useCreateDraftMutation
+  useCreateDraftMutation,
+  useUpdateDraftMutation,
+  useGetDraftsQuery
 } from '../../store/services/messagesApi';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
@@ -12,6 +14,8 @@ const ComposeForm = () => {
   const [params] = useSearchParams();
   const dispatch = useAppDispatch();
 
+  const draftId = params.get('draft') ? Number(params.get('draft')) : null;
+
   // `to` query param accepts a username (not a numeric userId)
   const [toUsername, setToUsername] = useState(params.get('to') ?? '');
   const [subject, setSubject] = useState('');
@@ -19,6 +23,20 @@ const ComposeForm = () => {
 
   const [compose, { isLoading }] = useComposeMessageMutation();
   const [createDraft, { isLoading: isSavingDraft }] = useCreateDraftMutation();
+  const [updateDraft] = useUpdateDraftMutation();
+
+  const { data: drafts } = useGetDraftsQuery(undefined, { skip: !draftId });
+  const draftToLoad = draftId ? drafts?.find((d) => d.id === draftId) : null;
+
+  useEffect(() => {
+    if (!draftToLoad) return;
+    if (draftToLoad.toUser?.username)
+      setToUsername(draftToLoad.toUser.username);
+    setSubject(
+      draftToLoad.subject === '(no subject)' ? '' : draftToLoad.subject
+    );
+    setBody(draftToLoad.body);
+  }, [draftToLoad]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +65,20 @@ const ComposeForm = () => {
       return;
     }
     try {
-      await createDraft({ subject: subject || '(no subject)', body }).unwrap();
+      if (draftId) {
+        await updateDraft({
+          id: draftId,
+          toUsername: toUsername.trim() || undefined,
+          subject: subject || '(no subject)',
+          body
+        }).unwrap();
+      } else {
+        await createDraft({
+          toUsername: toUsername.trim() || undefined,
+          subject: subject || '(no subject)',
+          body
+        }).unwrap();
+      }
       dispatch(addAlert('Draft saved.', 'success'));
     } catch {
       dispatch(addAlert('Failed to save draft.', 'danger'));

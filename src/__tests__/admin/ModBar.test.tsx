@@ -1,11 +1,13 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import ModBar from '../../components/admin/ModBar';
 
 const mockUseAppSelector = jest.fn();
 const mockUseGetReportCountsQuery = jest.fn();
 const mockUseGetInstallStatusQuery = jest.fn();
+const mockDismissInstallChecklistItem = jest.fn();
 
 jest.mock('../../store/hooks', () => ({
   useAppSelector: (...args: unknown[]) => mockUseAppSelector(...args)
@@ -16,7 +18,10 @@ jest.mock('../../store/services/reportsApi', () => ({
 }));
 
 jest.mock('../../store/services/installApi', () => ({
-  useGetInstallStatusQuery: () => mockUseGetInstallStatusQuery()
+  useGetInstallStatusQuery: () => mockUseGetInstallStatusQuery(),
+  useDismissInstallChecklistItemMutation: () => [
+    mockDismissInstallChecklistItem
+  ]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -94,8 +99,14 @@ describe('ModBar', () => {
     mockUseGetInstallStatusQuery.mockReturnValue({
       data: {
         setupChecklist: [
-          'registrationStatus is still "open".',
-          'STELLAR_SITE_URL is not set.'
+          {
+            id: 'registration-open',
+            message: 'registrationStatus is still "open".'
+          },
+          {
+            id: 'site-url-default',
+            message: 'STELLAR_SITE_URL is not set.'
+          }
         ]
       }
     });
@@ -111,6 +122,34 @@ describe('ModBar', () => {
     expect(
       screen.getByText(/STELLAR_SITE_URL is not set/i)
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /open settings/i })
+    ).toHaveAttribute('href', '/private/staff/tools/settings');
+  });
+
+  it('dismisses a checklist item', async () => {
+    const user = userEvent.setup();
+    mockUseAppSelector.mockReturnValue(staffUser);
+    mockDismissInstallChecklistItem.mockReturnValue({ unwrap: jest.fn() });
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: {
+        setupChecklist: [
+          {
+            id: 'max-users-default',
+            message: 'maxUsers is still the default value.'
+          }
+        ]
+      }
+    });
+
+    renderWithProviders(<ModBar />);
+    await user.click(
+      screen.getByRole('button', { name: /dismiss max-users-default/i })
+    );
+
+    expect(mockDismissInstallChecklistItem).toHaveBeenCalledWith(
+      'max-users-default'
+    );
   });
 
   it('hides the launch checklist when there are no unresolved items', () => {

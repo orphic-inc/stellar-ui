@@ -20,6 +20,7 @@ const makeRequest = (id: number, overrides: Record<string, unknown> = {}) => ({
   createdAt: '2024-01-10T00:00:00Z',
   user: { id: 99, username: 'alice' },
   artists: [],
+  totalBounty: '0',
   _count: { bounties: 0 },
   community: { id: 1, name: 'Jazz Vault' },
   ...overrides
@@ -60,7 +61,7 @@ const setupFetch = (opts: FetchOpts = {}) => {
       method: request.method
     };
 
-    if (pathname === '/api/search/requests') {
+    if (pathname === '/api/requests') {
       return Promise.resolve(
         makeResponse({
           status: requestStatus,
@@ -90,8 +91,7 @@ const getSearchRequests = () =>
   (global.fetch as jest.Mock).mock.calls
     .map((call) => call[0] as Request)
     .filter(
-      (req) =>
-        new URL(req.url, 'http://localhost').pathname === '/api/search/requests'
+      (req) => new URL(req.url, 'http://localhost').pathname === '/api/requests'
     );
 
 // ── render helper ─────────────────────────────────────────────────────────────
@@ -118,7 +118,7 @@ describe('RequestsPage RTK Query integration', () => {
     window.confirm = jest.fn(() => true);
   });
 
-  it('sends a real GET /api/search/requests request on mount', async () => {
+  it('sends a real GET /api/requests request on mount', async () => {
     setupFetch();
     renderAs(OTHER);
 
@@ -132,8 +132,7 @@ describe('RequestsPage RTK Query integration', () => {
   it('shows a spinner while the query is pending', () => {
     (global.fetch as jest.Mock).mockImplementation((request: Request) => {
       const url = new URL(request.url, 'http://localhost');
-      if (url.pathname === '/api/search/requests')
-        return new Promise(() => undefined);
+      if (url.pathname === '/api/requests') return new Promise(() => undefined);
       return Promise.resolve(makeResponse({ status: 404, body: {} }));
     });
     renderAs(OTHER);
@@ -200,10 +199,17 @@ describe('RequestsPage RTK Query integration', () => {
   });
 
   it('shows bounty count when bounties > 0', async () => {
-    setupFetch({ requests: [makeRequest(4, { _count: { bounties: 3 } })] });
+    setupFetch({
+      requests: [
+        makeRequest(4, {
+          _count: { bounties: 3 },
+          totalBounty: '314572800'
+        })
+      ]
+    });
     renderAs(OTHER);
 
-    expect(await screen.findByText('3 bounty')).toBeInTheDocument();
+    expect(await screen.findByText('300.00 MiB')).toBeInTheDocument();
   });
 
   it('shows Delete button for owner of an open request', async () => {

@@ -1,15 +1,38 @@
 import { api } from '../api';
 import type { paths } from '../../types/api';
 
-type SiteStatsResponse =
-  paths['/stats']['get']['responses'][200]['content']['application/json'];
+interface SiteStatsResponse {
+  maxUsers: number;
+  totalUsers: number;
+  enabledUsers: number;
+  activeToday: number;
+  activeThisWeek: number;
+  activeThisMonth: number;
+  communities: number;
+  releases: number;
+  artists: number;
+  contributedLinks: number;
+  contributedLinkDownloads: number;
+  announcements: number;
+  blogPosts: number;
+  comments: number;
+}
 type StylesheetsResponse =
   paths['/stylesheet']['get']['responses'][200]['content']['application/json'];
-type SiteSettingsResponse =
-  paths['/settings']['get']['responses'][200]['content']['application/json'];
-type UpdateSettingsBody = NonNullable<
-  paths['/settings']['put']['requestBody']
->['content']['application/json'];
+interface SiteSettingsResponse {
+  id: number;
+  approvedDomains: string[];
+  registrationStatus: 'open' | 'invite' | 'closed';
+  maxUsers: number;
+  dismissedLaunchChecklist: string[];
+  updatedAt: string;
+}
+interface UpdateSettingsBody {
+  approvedDomains?: string[];
+  registrationStatus?: 'open' | 'invite' | 'closed';
+  maxUsers?: number;
+  dismissedLaunchChecklist?: string[];
+}
 
 export const siteApi = api.injectEndpoints({
   endpoints: (build) => ({

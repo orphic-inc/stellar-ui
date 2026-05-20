@@ -96,6 +96,7 @@ export interface RequestItem {
   user?: { id: number; username: string };
   filler?: { id: number; username: string } | null;
   community?: { id: number; name: string };
+  _count?: { bounties: number };
   bounties?: RequestBounty[];
   artists?: Array<{ artistId: number; artist: { id: number; name: string } }>;
 }

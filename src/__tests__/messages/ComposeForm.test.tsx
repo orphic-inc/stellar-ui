@@ -7,6 +7,7 @@ import { selectAlerts } from '../../store/slices/alertSlice';
 
 const mockCompose = jest.fn();
 const mockCreateDraft = jest.fn();
+const mockUpdateDraft = jest.fn();
 const mockNavigate = jest.fn();
 const mockUseSearchParams = jest.fn();
 
@@ -21,7 +22,9 @@ jest.mock('../../store/services/messagesApi', () => ({
   useCreateDraftMutation: () => [
     mockCreateDraft,
     { isLoading: mockIsSavingDraft }
-  ]
+  ],
+  useUpdateDraftMutation: () => [mockUpdateDraft, {}],
+  useGetDraftsQuery: () => ({ data: undefined })
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -67,6 +70,7 @@ describe('ComposeForm', () => {
     await user.click(screen.getByRole('button', { name: /save draft/i }));
     await waitFor(() => {
       expect(mockCreateDraft).toHaveBeenCalledWith({
+        toUsername: 'alice',
         subject: 'Hello',
         body: 'How are you?'
       });
@@ -153,6 +157,7 @@ describe('ComposeForm', () => {
 
     await waitFor(() => {
       expect(mockCreateDraft).toHaveBeenCalledWith({
+        toUsername: 'alice',
         subject: '(no subject)',
         body: 'Just a body'
       });

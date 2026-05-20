@@ -147,27 +147,14 @@ const RequestDetailPage = () => {
           <h2 className="text-xl font-semibold">{req.title}</h2>
           <div className="flex items-center gap-2 shrink-0">
             {user && (
-              <>
-                <button
-                  onClick={handleVote}
-                  disabled={voting}
-                  title="Vote"
-                  className="flex items-center gap-1 px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-sm text-gray-300 transition-colors disabled:opacity-50"
-                >
-                  ▲{' '}
-                  <span className="text-xs">
-                    {(req as { voteCount?: number }).voteCount ?? 0}
-                  </span>
-                </button>
-                <button
-                  onClick={handleBookmark}
-                  disabled={bookmarking}
-                  title="Bookmark"
-                  className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-sm text-gray-400 hover:text-yellow-300 transition-colors disabled:opacity-50"
-                >
-                  🔖
-                </button>
-              </>
+              <button
+                onClick={handleBookmark}
+                disabled={bookmarking}
+                title="Bookmark"
+                className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-sm text-gray-400 hover:text-yellow-300 transition-colors disabled:opacity-50"
+              >
+                🔖
+              </button>
             )}
             <span
               className={`text-xs px-2 py-1 rounded-full ${
@@ -180,7 +167,7 @@ const RequestDetailPage = () => {
             </span>
           </div>
         </div>
-        <div className="text-sm text-gray-400 mt-1 space-x-4">
+        <div className="text-sm text-gray-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
           <span>Type: {req.type}</span>
           {req.year && <span>Year: {req.year}</span>}
           {req.community && <span>Community: {req.community.name}</span>}
@@ -194,6 +181,18 @@ const RequestDetailPage = () => {
                 {req.user.username}
               </Link>
             </span>
+          )}
+          {user && (
+            <button
+              onClick={handleVote}
+              disabled={voting}
+              className="flex items-center gap-1 text-gray-400 hover:text-indigo-300 transition-colors disabled:opacity-50"
+            >
+              {' '}
+              <span>
+                ▲ {(req as { voteCount?: number }).voteCount ?? 0} votes
+              </span>
+            </button>
           )}
         </div>
       </div>
@@ -401,8 +400,9 @@ const RequestDetailPage = () => {
   );
 };
 
-function formatBytes(bytesStr: string): string {
+function formatBytes(bytesStr?: string | null): string {
   const bytes = Number(bytesStr);
+  if (!Number.isFinite(bytes) || bytes < 0) return '—';
   if (bytes >= 1073741824) return `${(bytes / 1073741824).toFixed(2)} GiB`;
   if (bytes >= 1048576) return `${(bytes / 1048576).toFixed(2)} MiB`;
   if (bytes >= 1024) return `${(bytes / 1024).toFixed(2)} KiB`;

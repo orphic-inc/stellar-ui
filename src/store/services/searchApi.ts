@@ -114,7 +114,9 @@ export interface RequestSearchResult {
   communityId: number;
   createdAt: string;
   user: UserRef;
+  community?: { id: number; name: string };
   artists: Array<{ artist: ArtistRef }>;
+  totalBounty: string;
   _count: { bounties: number };
 }
 

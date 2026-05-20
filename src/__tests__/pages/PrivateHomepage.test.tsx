@@ -116,9 +116,10 @@ describe('PrivateHomepage', () => {
 
   it('renders site stats', () => {
     mockUseGetSiteStatsQuery.mockReturnValue({
-      data: { totalUsers: 42, releases: 100 }
+      data: { maxUsers: 5000, totalUsers: 42, releases: 100 }
     });
     renderWithUser();
+    expect(screen.getByText('5000')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('100')).toBeInTheDocument();
   });

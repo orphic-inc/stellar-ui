@@ -114,14 +114,14 @@ export const messagesApi = api.injectEndpoints({
     }),
     createDraft: build.mutation<
       { id: number },
-      { toUserId?: number; subject: string; body: string }
+      { toUsername?: string; subject: string; body: string }
     >({
       query: (body) => ({ url: '/messages/drafts', method: 'POST', body }),
       invalidatesTags: ['Draft']
     }),
     updateDraft: build.mutation<
       void,
-      { id: number; toUserId?: number; subject?: string; body?: string }
+      { id: number; toUsername?: string; subject?: string; body?: string }
     >({
       query: ({ id, ...body }) => ({
         url: `/messages/drafts/${id}`,
