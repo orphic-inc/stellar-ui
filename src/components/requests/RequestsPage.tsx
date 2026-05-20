@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import {
   useDeleteRequestMutation,
-  useListRequestsQuery
+  useListRequestsQuery,
+  type ReleaseType
 } from '../../store/services/requestApi';
 import type { RequestStatus } from '../../types';
 import Spinner from '../layout/Spinner';
@@ -13,7 +14,7 @@ const STATUS_LABELS: Record<RequestStatus, string> = {
   filled: 'Filled'
 };
 
-const RELEASE_TYPES = [
+const RELEASE_TYPES: ReleaseType[] = [
   'Music',
   'Applications',
   'EBooks',
@@ -49,7 +50,10 @@ const RequestsPage = () => {
 
   const q = searchParams.get('q') ?? undefined;
   const artist = searchParams.get('artist') ?? undefined;
-  const type = searchParams.get('type') ?? undefined;
+  const typeParam = searchParams.get('type');
+  const type = RELEASE_TYPES.includes(typeParam as ReleaseType)
+    ? (typeParam as ReleaseType)
+    : undefined;
   const year = searchParams.get('year')
     ? Number(searchParams.get('year'))
     : undefined;

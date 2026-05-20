@@ -1,4 +1,5 @@
 import { api } from '../api';
+import type { AuthUser } from '../../types';
 
 export interface LaunchChecklistItem {
   id: string;
@@ -19,28 +20,7 @@ interface InstallArgs {
 }
 
 interface InstallResponse {
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    avatar: string | null;
-    userRank: {
-      level: number;
-      name: string;
-      color: string | null;
-      badge?: string;
-      permissions: Record<string, boolean>;
-    };
-    isArtist: boolean;
-    isDonor: boolean;
-    canDownload: boolean;
-    inviteCount: number;
-    dateRegistered: string;
-    lastLogin: string | null;
-    contributed: string;
-    consumed: string;
-    ratio: number;
-  };
+  user: AuthUser;
 }
 
 export const installApi = api.injectEndpoints({
