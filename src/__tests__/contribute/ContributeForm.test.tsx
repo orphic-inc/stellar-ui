@@ -45,6 +45,28 @@ const communities = [
   { id: 2, name: 'Rock Community' }
 ];
 
+const fillMusicForm = async (user: ReturnType<typeof userEvent.setup>) => {
+  await user.selectOptions(
+    screen.getByLabelText(/community/i),
+    'Jazz Community'
+  );
+  fireEvent.change(screen.getByPlaceholderText(/artist name/i), {
+    target: { value: 'Miles Davis' }
+  });
+  fireEvent.change(screen.getByLabelText(/album title/i), {
+    target: { value: 'Kind of Blue' }
+  });
+  fireEvent.change(screen.getByLabelText(/year/i), {
+    target: { value: '1959' }
+  });
+  fireEvent.change(screen.getByLabelText(/file size/i), {
+    target: { value: '500' }
+  });
+  fireEvent.change(screen.getByLabelText(/download url/i), {
+    target: { value: 'https://example.com/kob.flac' }
+  });
+};
+
 describe('ContributeForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -133,20 +155,7 @@ describe('ContributeForm', () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
 
-    await user.selectOptions(
-      screen.getByLabelText(/community/i),
-      'Jazz Community'
-    );
-    await user.type(screen.getByPlaceholderText(/artist name/i), 'Miles Davis');
-    await user.clear(screen.getByLabelText(/album title/i));
-    await user.type(screen.getByLabelText(/album title/i), 'Kind of Blue');
-    await user.clear(screen.getByLabelText(/year/i));
-    await user.type(screen.getByLabelText(/year/i), '1959');
-    await user.type(screen.getByLabelText(/file size/i), '500');
-    await user.type(
-      screen.getByLabelText(/download url/i),
-      'https://example.com/kob.flac'
-    );
+    await fillMusicForm(user);
 
     await user.click(
       screen.getByRole('button', { name: /contribute release/i })
@@ -175,13 +184,18 @@ describe('ContributeForm', () => {
       screen.getByLabelText(/community/i),
       'Jazz Community'
     );
-    await user.type(screen.getByPlaceholderText(/artist name/i), 'Artist');
-    await user.type(screen.getByLabelText(/album title/i), 'Album');
-    await user.type(screen.getByLabelText(/file size/i), '100');
-    await user.type(
-      screen.getByLabelText(/download url/i),
-      'https://example.com/a.flac'
-    );
+    fireEvent.change(screen.getByPlaceholderText(/artist name/i), {
+      target: { value: 'Artist' }
+    });
+    fireEvent.change(screen.getByLabelText(/album title/i), {
+      target: { value: 'Album' }
+    });
+    fireEvent.change(screen.getByLabelText(/file size/i), {
+      target: { value: '100' }
+    });
+    fireEvent.change(screen.getByLabelText(/download url/i), {
+      target: { value: 'https://example.com/a.flac' }
+    });
     await user.click(
       screen.getByRole('button', { name: /contribute release/i })
     );
@@ -202,13 +216,18 @@ describe('ContributeForm', () => {
       screen.getByLabelText(/community/i),
       'Jazz Community'
     );
-    await user.type(screen.getByPlaceholderText(/artist name/i), 'Artist');
-    await user.type(screen.getByLabelText(/album title/i), 'Album');
-    await user.type(screen.getByLabelText(/file size/i), '100');
-    await user.type(
-      screen.getByLabelText(/download url/i),
-      'https://example.com/a.flac'
-    );
+    fireEvent.change(screen.getByPlaceholderText(/artist name/i), {
+      target: { value: 'Artist' }
+    });
+    fireEvent.change(screen.getByLabelText(/album title/i), {
+      target: { value: 'Album' }
+    });
+    fireEvent.change(screen.getByLabelText(/file size/i), {
+      target: { value: '100' }
+    });
+    fireEvent.change(screen.getByLabelText(/download url/i), {
+      target: { value: 'https://example.com/a.flac' }
+    });
     await user.click(
       screen.getByRole('button', { name: /contribute release/i })
     );
@@ -243,17 +262,16 @@ describe('ContributeForm', () => {
   });
 
   it('types in tags, image, and release description fields', async () => {
-    const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
-    await user.type(screen.getByLabelText(/tags/i), 'jazz, blues');
-    await user.type(
-      screen.getByLabelText(/cover image url/i),
-      'https://img.example.com/cover.jpg'
-    );
-    await user.type(
-      screen.getByLabelText(/release description/i),
-      '24-bit remaster'
-    );
+    fireEvent.change(screen.getByLabelText(/tags/i), {
+      target: { value: 'jazz, blues' }
+    });
+    fireEvent.change(screen.getByLabelText(/cover image url/i), {
+      target: { value: 'https://img.example.com/cover.jpg' }
+    });
+    fireEvent.change(screen.getByLabelText(/release description/i), {
+      target: { value: '24-bit remaster' }
+    });
     expect((screen.getByLabelText(/tags/i) as HTMLInputElement).value).toBe(
       'jazz, blues'
     );
@@ -302,13 +320,18 @@ describe('ContributeForm', () => {
       screen.getByLabelText(/community/i),
       'Jazz Community'
     );
-    await user.type(screen.getByPlaceholderText(/artist name/i), 'Artist');
-    await user.type(screen.getByLabelText(/album title/i), 'Album');
-    await user.type(screen.getByLabelText(/file size/i), '100');
-    await user.type(
-      screen.getByLabelText(/download url/i),
-      'https://example.com/a.flac'
-    );
+    fireEvent.change(screen.getByPlaceholderText(/artist name/i), {
+      target: { value: 'Artist' }
+    });
+    fireEvent.change(screen.getByLabelText(/album title/i), {
+      target: { value: 'Album' }
+    });
+    fireEvent.change(screen.getByLabelText(/file size/i), {
+      target: { value: '100' }
+    });
+    fireEvent.change(screen.getByLabelText(/download url/i), {
+      target: { value: 'https://example.com/a.flac' }
+    });
     await user.click(
       screen.getByRole('button', { name: /contribute release/i })
     );
