@@ -20,7 +20,13 @@ const ForumCategoryPage = () => {
           <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t text-sm font-semibold text-gray-200">
             {category.name}
           </div>
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col />
+              <col className="w-20" />
+              <col className="w-20" />
+              <col className="w-48" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-700 text-left text-gray-400">
                 <th className="px-4 py-2 font-medium">Forum</th>

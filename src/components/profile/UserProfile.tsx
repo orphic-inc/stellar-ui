@@ -854,109 +854,7 @@ const UserProfile = () => {
       </div>
 
       <div className="flex gap-6 items-start">
-        {/* Sidebar */}
-        <div className="w-44 shrink-0 space-y-4">
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Avatar
-              </span>
-            </div>
-            <div className="p-3 flex justify-center">
-              <img
-                width={150}
-                alt={`${profile.username}'s avatar`}
-                className="rounded object-cover w-full"
-                src={
-                  profile.profile?.avatar ??
-                  profile.avatar ??
-                  '/static/common/avatars/default.png'
-                }
-              />
-            </div>
-          </div>
-
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Stats
-              </span>
-            </div>
-            <ul className="px-3 py-2 space-y-1 text-xs text-gray-300">
-              {profile.dateRegistered && (
-                <li>
-                  <span className="text-gray-500">Joined:</span>{' '}
-                  <Time date={profile.dateRegistered} />
-                </li>
-              )}
-              {profile.lastSeen && (
-                <li>
-                  <span className="text-gray-500">Last seen:</span>{' '}
-                  <Time date={profile.lastSeen} />
-                </li>
-              )}
-              {profile.email && (
-                <li className="break-all">
-                  <span className="text-gray-500">Email:</span> {profile.email}
-                </li>
-              )}
-              {profile.userRank && (
-                <li>
-                  <span className="text-gray-500">Class:</span>{' '}
-                  <span style={{ color: profile.userRank.color }}>
-                    {profile.userRank.name}
-                  </span>
-                </li>
-              )}
-              {profile.inviteCount !== null &&
-                profile.inviteCount !== undefined && (
-                  <li>
-                    <span className="text-gray-500">Invites:</span>{' '}
-                    {profile.inviteCount}
-                  </li>
-                )}
-              {profileIsDonor && <li className="text-pink-400">Donor ♥</li>}
-              <li>
-                <span className="text-gray-500">Contributed:</span>{' '}
-                {formatCount(profileStats.contributed)}
-              </li>
-              <li>
-                <span className="text-gray-500">Consumed:</span>{' '}
-                {formatCount(profileStats.consumed)}
-              </li>
-              <li>
-                <span className="text-gray-500">Ratio:</span>{' '}
-                {profileStats.ratio ?? 'Hidden'}
-              </li>
-              <li>
-                <span className="text-gray-500">Buffer:</span>{' '}
-                {formatCount(profileStats.buffer)}
-              </li>
-              {isOwnProfile && myRatioStats && (
-                <>
-                  <li>
-                    <span className="text-gray-500">Required ratio:</span>{' '}
-                    {myRatioStats.requiredRatio.toFixed(3)}
-                  </li>
-                  <li>
-                    <span className="text-gray-500">Bracket:</span>{' '}
-                    {myRatioStats.bracket.label}
-                  </li>
-                  <li>
-                    <Link
-                      to="/private/ratio"
-                      className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                    >
-                      Ratio rules →
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
-        </div>
-
-        {/* Main content */}
+        {/* Main content (left) */}
         <div className="flex-1 space-y-4 min-w-0">
           {profile.profile?.profileInfo && (
             <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
@@ -1079,82 +977,6 @@ const UserProfile = () => {
               </div>
             </div>
           )}
-
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-              <span className="text-sm font-semibold text-gray-200">
-                Community Stats
-              </span>
-            </div>
-            <div className="grid gap-px bg-gray-800 sm:grid-cols-2 lg:grid-cols-5">
-              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
-                <div className="text-gray-500 text-xs uppercase tracking-wide">
-                  Contributions
-                </div>
-                <div className="mt-1 text-lg text-white">
-                  {activitySummary.contributions}
-                </div>
-              </div>
-              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
-                <div className="text-gray-500 text-xs uppercase tracking-wide">
-                  Requests
-                </div>
-                <div className="mt-1 text-lg text-white">
-                  {activitySummary.requestsCreated} created /{' '}
-                  {activitySummary.requestsFilled} filled
-                </div>
-              </div>
-              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
-                <div className="text-gray-500 text-xs uppercase tracking-wide">
-                  Forums
-                </div>
-                <div className="mt-1 text-lg text-white">
-                  {activitySummary.forumTopics} topics /{' '}
-                  {activitySummary.forumPosts} posts
-                </div>
-              </div>
-              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
-                <div className="text-gray-500 text-xs uppercase tracking-wide">
-                  Collections
-                </div>
-                <div className="mt-1 text-lg text-white">
-                  {activitySummary.collagesStarted} collages /{' '}
-                  {activitySummary.collageEntries} entries
-                </div>
-              </div>
-              <div className="bg-gray-900 px-4 py-3 text-sm text-gray-300">
-                <div className="text-gray-500 text-xs uppercase tracking-wide">
-                  Comments
-                </div>
-                <div className="mt-1 text-lg text-white">
-                  {activitySummary.comments}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-              <span className="text-sm font-semibold text-gray-200">
-                Percentile Rankings
-              </span>
-            </div>
-            <div className="grid gap-px bg-gray-800 sm:grid-cols-2 lg:grid-cols-5">
-              {percentileItems.map(({ label, value }) => (
-                <div key={label} className="bg-gray-900 px-4 py-3">
-                  <div className="text-xs uppercase tracking-wide text-gray-500">
-                    {label}
-                  </div>
-                  <div className="mt-1 text-base font-semibold text-white">
-                    {formatPercentile(value.percentile)}
-                  </div>
-                  <div className="mt-1 text-xs text-gray-500">
-                    Rank {value.rank} of {value.total}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {(featuredShelves.length > 0 || publicShelves.length > 0) && (
             <div className="space-y-4">
@@ -1339,6 +1161,182 @@ const UserProfile = () => {
           {!isOwnProfile && isStaff && (
             <StaffActionsPanel profileId={profile.id} />
           )}
+        </div>
+
+        {/* Sidebar (right) */}
+        <div className="w-44 shrink-0 space-y-4">
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Avatar
+              </span>
+            </div>
+            <div className="p-3 flex justify-center">
+              <img
+                width={150}
+                alt={`${profile.username}'s avatar`}
+                className="rounded object-cover w-full"
+                src={
+                  profile.profile?.avatar ??
+                  profile.avatar ??
+                  '/static/common/avatars/default.png'
+                }
+              />
+            </div>
+          </div>
+
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Statistics
+              </span>
+            </div>
+            <ul className="px-3 py-2 space-y-1 text-xs text-gray-300">
+              {profile.dateRegistered && (
+                <li>
+                  <span className="text-gray-500">Joined:</span>{' '}
+                  <Time date={profile.dateRegistered} />
+                </li>
+              )}
+              {profile.lastSeen && (
+                <li>
+                  <span className="text-gray-500">Last seen:</span>{' '}
+                  <Time date={profile.lastSeen} />
+                </li>
+              )}
+              {profile.email && (
+                <li className="break-all">
+                  <span className="text-gray-500">Email:</span> {profile.email}
+                </li>
+              )}
+              {profile.userRank && (
+                <li>
+                  <span className="text-gray-500">Class:</span>{' '}
+                  <span style={{ color: profile.userRank.color }}>
+                    {profile.userRank.name}
+                  </span>
+                </li>
+              )}
+              {profile.inviteCount !== null &&
+                profile.inviteCount !== undefined && (
+                  <li>
+                    <span className="text-gray-500">Invites:</span>{' '}
+                    {profile.inviteCount}
+                  </li>
+                )}
+              {profileIsDonor && <li className="text-pink-400">Donor ♥</li>}
+              <li>
+                <span className="text-gray-500">Contributed:</span>{' '}
+                {formatCount(profileStats.contributed)}
+              </li>
+              <li>
+                <span className="text-gray-500">Consumed:</span>{' '}
+                {formatCount(profileStats.consumed)}
+              </li>
+              <li>
+                <span className="text-gray-500">Ratio:</span>{' '}
+                {profileStats.ratio ?? 'Hidden'}
+              </li>
+              <li>
+                <span className="text-gray-500">Buffer:</span>{' '}
+                {formatCount(profileStats.buffer)}
+              </li>
+              {isOwnProfile && myRatioStats && (
+                <>
+                  <li>
+                    <span className="text-gray-500">Required ratio:</span>{' '}
+                    {myRatioStats.requiredRatio.toFixed(3)}
+                  </li>
+                  <li>
+                    <span className="text-gray-500">Bracket:</span>{' '}
+                    {myRatioStats.bracket.label}
+                  </li>
+                  <li>
+                    <Link
+                      to="/private/ratio"
+                      className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                    >
+                      Ratio rules →
+                    </Link>
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Community Stats
+              </span>
+            </div>
+            <div className="grid gap-px bg-gray-800 grid-cols-1">
+              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
+                <div className="text-gray-500 uppercase tracking-wide">
+                  Contributions
+                </div>
+                <div className="mt-0.5 text-sm text-white">
+                  {activitySummary.contributions}
+                </div>
+              </div>
+              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
+                <div className="text-gray-500 uppercase tracking-wide">
+                  Requests
+                </div>
+                <div className="mt-0.5 text-sm text-white">
+                  {activitySummary.requestsCreated}c /{' '}
+                  {activitySummary.requestsFilled}f
+                </div>
+              </div>
+              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
+                <div className="text-gray-500 uppercase tracking-wide">
+                  Forums
+                </div>
+                <div className="mt-0.5 text-sm text-white">
+                  {activitySummary.forumTopics}t / {activitySummary.forumPosts}p
+                </div>
+              </div>
+              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
+                <div className="text-gray-500 uppercase tracking-wide">
+                  Collections
+                </div>
+                <div className="mt-0.5 text-sm text-white">
+                  {activitySummary.collagesStarted} collages
+                </div>
+              </div>
+              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
+                <div className="text-gray-500 uppercase tracking-wide">
+                  Comments
+                </div>
+                <div className="mt-0.5 text-sm text-white">
+                  {activitySummary.comments}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Percentile Rankings
+              </span>
+            </div>
+            <div className="grid gap-px bg-gray-800 grid-cols-1">
+              {percentileItems.map(({ label, value }) => (
+                <div key={label} className="bg-gray-900 px-3 py-2">
+                  <div className="text-xs uppercase tracking-wide text-gray-500">
+                    {label}
+                  </div>
+                  <div className="mt-0.5 text-sm font-semibold text-white">
+                    {formatPercentile(value.percentile)}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    #{value.rank} of {value.total}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

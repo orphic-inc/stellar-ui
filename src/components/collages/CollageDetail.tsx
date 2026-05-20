@@ -39,6 +39,7 @@ const CollageDetail = () => {
 
   const [releaseIdInput, setReleaseIdInput] = useState('');
   const [addError, setAddError] = useState('');
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
 
   if (isLoading) return <Spinner />;
   if (error || !collage)
@@ -112,10 +113,19 @@ const CollageDetail = () => {
     }
   };
 
+  const scrollToEntry = (releaseId: number) => {
+    setHighlightedId(releaseId);
+    const el = document.getElementById(`entry-${releaseId}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => setHighlightedId(null), 1500);
+    }
+  };
+
   const coverImages = (collage.entries ?? [])
     .filter((e) => e.release?.image)
     .slice(0, 12)
-    .map((e) => e.release!.image!);
+    .map((e) => ({ src: e.release!.image!, releaseId: e.releaseId }));
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -202,40 +212,27 @@ const CollageDetail = () => {
           {/* Cover art mosaic */}
           {coverImages.length > 0 && (
             <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
+                <span className="text-sm font-semibold text-gray-200">
+                  Cover Art
+                </span>
+              </div>
               <div className="grid grid-cols-4 sm:grid-cols-6">
-                {coverImages.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt=""
-                    className="w-full aspect-square object-cover"
-                  />
+                {coverImages.map(({ src, releaseId }) => (
+                  <button
+                    key={releaseId}
+                    onClick={() => scrollToEntry(releaseId)}
+                    className="focus:outline-none"
+                    title="Scroll to release"
+                  >
+                    <img
+                      src={src}
+                      alt=""
+                      className="w-full aspect-square object-cover hover:opacity-80 transition-opacity cursor-pointer"
+                    />
+                  </button>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Add entry */}
-          {canManageEntries && (
-            <div>
-              <form onSubmit={handleAddEntry} className="flex gap-2">
-                <input
-                  type="number"
-                  value={releaseIdInput}
-                  onChange={(e) => setReleaseIdInput(e.target.value)}
-                  placeholder="Release ID"
-                  className="w-40 px-3 py-1.5 bg-gray-900 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-blue-500"
-                />
-                <button
-                  type="submit"
-                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
-                >
-                  Add
-                </button>
-              </form>
-              {addError && (
-                <p className="mt-1 text-xs text-red-400">{addError}</p>
-              )}
             </div>
           )}
 
@@ -255,8 +252,13 @@ const CollageDetail = () => {
               <div className="divide-y divide-gray-800">
                 {collage.entries.map((entry, i) => (
                   <div
+                    id={`entry-${entry.releaseId}`}
                     key={entry.id}
-                    className="flex items-center gap-3 px-4 py-2 hover:bg-gray-800/30"
+                    className={`flex items-center gap-3 px-4 py-2 transition-colors ${
+                      highlightedId === entry.releaseId
+                        ? 'bg-indigo-900/30'
+                        : 'hover:bg-gray-800/30'
+                    }`}
                   >
                     <span className="text-xs text-gray-600 w-6 shrink-0 text-right">
                       {i + 1}
@@ -301,8 +303,6 @@ const CollageDetail = () => {
               </div>
             )}
           </div>
-
-          <CommentsSection page="collages" pageId={collageId} />
         </div>
 
         {/* Sidebar */}
@@ -348,10 +348,10 @@ const CollageDetail = () => {
             </div>
           )}
 
-          {/* Collector info */}
+          {/* Statistics */}
           <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Collector
+              Statistics
             </div>
             <div className="px-3 py-2 text-xs text-gray-400 space-y-1">
               <div className="flex justify-between">
@@ -375,6 +375,38 @@ const CollageDetail = () => {
               </div>
             </div>
           </div>
+
+          {/* Add entry */}
+          {canManageEntries && (
+            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Add Release
+              </div>
+              <div className="px-3 py-2">
+                <form onSubmit={handleAddEntry} className="flex gap-2">
+                  <input
+                    type="number"
+                    value={releaseIdInput}
+                    onChange={(e) => setReleaseIdInput(e.target.value)}
+                    placeholder="Release ID"
+                    className="w-full px-2 py-1 bg-gray-800 border border-gray-700 rounded text-xs text-gray-200 focus:outline-none focus:border-blue-500"
+                  />
+                  <button
+                    type="submit"
+                    className="px-2 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded shrink-0"
+                  >
+                    Add
+                  </button>
+                </form>
+                {addError && (
+                  <p className="mt-1 text-xs text-red-400">{addError}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Comments */}
+          <CommentsSection page="collages" pageId={collageId} />
         </div>
       </div>
     </div>
