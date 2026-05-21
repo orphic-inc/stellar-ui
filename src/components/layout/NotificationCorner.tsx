@@ -6,9 +6,33 @@ import {
   useMarkNotificationReadMutation,
   useMarkAllNotificationsReadMutation,
   useDeleteNotificationMutation,
-  type Notification
+  type Notification,
+  type NotificationType
 } from '../../store/services/notificationApi';
 import { useGetUnreadCountQuery } from '../../store/services/messagesApi';
+
+function renderNotificationText(
+  type: NotificationType,
+  actorName: string | undefined,
+  sourceTitle: string | undefined
+): string {
+  const actor = actorName ?? 'Someone';
+  const title = sourceTitle ?? 'an item';
+  switch (type) {
+    case 'forum_quote':
+      return `${actor} quoted you in ${title}`;
+    case 'forum_sub':
+      return `${actor} posted in ${title}`;
+    case 'request_filled':
+      return `${actor} filled a request for ${title}`;
+    case 'collage_updated':
+      return `${actor} added to ${title}`;
+    case 'comment_sub':
+      return `${actor} commented on ${title}`;
+    default:
+      return `New notification in ${title}`;
+  }
+}
 
 function sourcePath(n: Notification): string | null {
   if (!n.source) return null;
@@ -126,20 +150,27 @@ const NotificationCorner = () => {
                         isUnread ? 'text-white' : 'text-gray-400'
                       }`}
                     >
-                      {n.quoter.username} quoted you in{' '}
-                      {n.source && sourcePath(n) ? (
+                      {sourcePath(n) ? (
                         <Link
                           to={sourcePath(n)!}
                           onClick={() => {
                             if (isUnread) markRead(n.id);
                             setOpen(false);
                           }}
-                          className="text-indigo-400 hover:text-indigo-300 underline"
+                          className="hover:text-indigo-300 transition-colors"
                         >
-                          {n.source.title}
+                          {renderNotificationText(
+                            n.type,
+                            n.actor?.username,
+                            n.source?.title
+                          )}
                         </Link>
                       ) : (
-                        `${n.page} #${n.pageId}`
+                        renderNotificationText(
+                          n.type,
+                          n.actor?.username,
+                          `${n.page} #${n.pageId}`
+                        )
                       )}
                     </span>
                     <button

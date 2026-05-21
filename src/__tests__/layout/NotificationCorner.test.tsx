@@ -13,26 +13,28 @@ const mockNotifications: Notification[] = [
   {
     id: 1,
     userId: 1,
-    quoterId: 10,
+    type: 'forum_quote',
+    actorId: 10,
     createdAt: '2024-01-01',
     readAt: null,
     pageId: 10,
     page: 'forums',
     postId: 5,
     source: { forumId: 2, title: 'Jazz Talk' },
-    quoter: { id: 10, username: 'alice', avatar: null }
+    actor: { id: 10, username: 'alice', avatar: null }
   },
   {
     id: 2,
     userId: 1,
-    quoterId: 11,
+    type: 'forum_sub',
+    actorId: 11,
     createdAt: '2024-01-02',
     readAt: '2024-01-01',
     pageId: 20,
     page: 'artist',
     postId: null,
     source: { title: 'Miles Davis' },
-    quoter: { id: 11, username: 'bob', avatar: null }
+    actor: { id: 11, username: 'bob', avatar: null }
   }
 ];
 
@@ -132,19 +134,28 @@ describe('NotificationCorner', () => {
     expect(mockMarkAllRead).toHaveBeenCalled();
   });
 
-  it('renders notification source link and quoter reference', async () => {
+  it('renders forum_quote notification as a link with correct text', async () => {
     const user = userEvent.setup();
     renderWithProviders(<NotificationCorner />);
     await user.click(screen.getByRole('button', { name: /notifications/i }));
-    expect(screen.getByRole('link', { name: 'Jazz Talk' })).toBeInTheDocument();
-    expect(screen.getByText(/alice quoted you in/i)).toBeInTheDocument();
+    // The entire notification text is now a link
+    const link = screen.getByRole('link', {
+      name: /alice quoted you in Jazz Talk/i
+    });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute(
+      'href',
+      '/private/forums/2/topics/10#post5'
+    );
   });
 
   it('calls markRead when clicking an unread notification link', async () => {
     const user = userEvent.setup();
     renderWithProviders(<NotificationCorner />);
     await user.click(screen.getByRole('button', { name: /notifications/i }));
-    await user.click(screen.getByRole('link', { name: 'Jazz Talk' }));
+    await user.click(
+      screen.getByRole('link', { name: /alice quoted you in Jazz Talk/i })
+    );
     await waitFor(() => {
       expect(mockMarkRead).toHaveBeenCalledWith(1);
     });
@@ -164,62 +175,67 @@ describe('NotificationCorner', () => {
       {
         id: 3,
         userId: 1,
-        quoterId: 12,
+        type: 'collage_updated',
+        actorId: 12,
         createdAt: '2024-01-03',
         readAt: null,
         pageId: 30,
         page: 'collages',
         postId: null,
         source: { title: 'Cool Collage' },
-        quoter: { id: 12, username: 'carol', avatar: null }
+        actor: { id: 12, username: 'carol', avatar: null }
       },
       {
         id: 4,
         userId: 1,
-        quoterId: 13,
+        type: 'request_filled',
+        actorId: 13,
         createdAt: '2024-01-04',
         readAt: null,
         pageId: 40,
         page: 'requests',
         postId: null,
         source: { title: 'A Request' },
-        quoter: { id: 13, username: 'dave', avatar: null }
+        actor: { id: 13, username: 'dave', avatar: null }
       },
       {
         id: 5,
         userId: 1,
-        quoterId: 14,
+        type: 'comment_sub',
+        actorId: 14,
         createdAt: '2024-01-05',
         readAt: null,
         pageId: 50,
         page: 'communities',
         postId: null,
         source: { title: 'Jazz Heads' },
-        quoter: { id: 14, username: 'eve', avatar: null }
+        actor: { id: 14, username: 'eve', avatar: null }
       },
       {
         id: 6,
         userId: 1,
-        quoterId: 15,
+        type: 'forum_sub',
+        actorId: 15,
         createdAt: '2024-01-06',
         readAt: null,
         pageId: 60,
         page: 'unknown',
         postId: null,
         source: { title: 'Who Knows' },
-        quoter: { id: 15, username: 'frank', avatar: null }
+        actor: { id: 15, username: 'frank', avatar: null }
       },
       {
         id: 7,
         userId: 1,
-        quoterId: 16,
+        type: 'forum_sub',
+        actorId: 16,
         createdAt: '2024-01-07',
         readAt: null,
         pageId: 70,
         page: 'forums',
         postId: null,
         source: null,
-        quoter: { id: 16, username: 'grace', avatar: null }
+        actor: { id: 16, username: 'grace', avatar: null }
       }
     ];
     mockUnreadCount = 5;
@@ -228,18 +244,15 @@ describe('NotificationCorner', () => {
     renderWithProviders(<NotificationCorner />);
     await user.click(screen.getByRole('button', { name: /notifications/i }));
 
-    expect(screen.getByRole('link', { name: 'Cool Collage' })).toHaveAttribute(
-      'href',
-      '/private/collages/30'
-    );
-    expect(screen.getByRole('link', { name: 'A Request' })).toHaveAttribute(
-      'href',
-      '/private/requests/40'
-    );
-    expect(screen.getByRole('link', { name: 'Jazz Heads' })).toHaveAttribute(
-      'href',
-      '/private/communities/50'
-    );
+    expect(
+      screen.getByRole('link', { name: /carol added to Cool Collage/i })
+    ).toHaveAttribute('href', '/private/collages/30');
+    expect(
+      screen.getByRole('link', { name: /dave filled a request for A Request/i })
+    ).toHaveAttribute('href', '/private/requests/40');
+    expect(
+      screen.getByRole('link', { name: /eve commented on Jazz Heads/i })
+    ).toHaveAttribute('href', '/private/communities/50');
     expect(screen.getByText(/unknown #60/i)).toBeInTheDocument();
     expect(screen.getByText(/forums #70/i)).toBeInTheDocument();
   });
@@ -309,7 +322,9 @@ describe('NotificationCorner', () => {
     const user = userEvent.setup();
     renderWithProviders(<NotificationCorner />);
     await user.click(screen.getByRole('button', { name: /notifications/i }));
-    await user.click(screen.getByRole('link', { name: 'Miles Davis' }));
+    await user.click(
+      screen.getByRole('link', { name: /bob posted in Miles Davis/i })
+    );
     expect(mockMarkRead).not.toHaveBeenCalled();
   });
 

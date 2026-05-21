@@ -1,6 +1,13 @@
 import { api } from '../api';
 
-export interface NotificationQuoter {
+export type NotificationType =
+  | 'forum_quote'
+  | 'forum_sub'
+  | 'request_filled'
+  | 'collage_updated'
+  | 'comment_sub';
+
+export interface NotificationActor {
   id: number;
   username: string;
   avatar: string | null;
@@ -14,8 +21,9 @@ export interface NotificationSource {
 export interface Notification {
   id: number;
   userId: number;
-  quoterId: number;
-  quoter: NotificationQuoter;
+  type: NotificationType;
+  actorId: number | null;
+  actor: NotificationActor | null;
   page: string;
   pageId: number;
   postId: number | null;
