@@ -44,6 +44,7 @@ function sourcePath(n: Notification): string | null {
     case 'artist':
       return `/private/artists/${n.pageId}`;
     case 'contributions':
+    case 'release':
       if (!n.source?.releaseId || !n.source?.communityId) return null;
       return `/private/communities/${n.source.communityId}/releases/${n.source.releaseId}`;
     case 'collages':

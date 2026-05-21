@@ -27,6 +27,13 @@ jest.mock('../../store/services/subscriptionApi', () => ({
   ]
 }));
 
+jest.mock('../../components/layout/CommentsSection', () => ({
+  __esModule: true,
+  default: ({ page, pageId }: { page: string; pageId: number }) => (
+    <div data-testid="artist-comments">{`${page}:${pageId}`}</div>
+  )
+}));
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ id: '42' })
@@ -117,6 +124,9 @@ describe('ArtistPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Jazz Vault')).toBeInTheDocument();
     expect(screen.getByText('1959')).toBeInTheDocument();
+    expect(screen.getByTestId('artist-comments')).toHaveTextContent(
+      'artist:42'
+    );
   });
 
   it('shows vanity house badge when applicable', () => {
