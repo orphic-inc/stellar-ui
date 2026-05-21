@@ -347,7 +347,9 @@ describe('ForumTopicPost', () => {
       />
     );
 
-    await user.click(screen.getByRole('button', { name: /view edit history/i }));
+    await user.click(
+      screen.getByRole('button', { name: /view edit history/i })
+    );
 
     expect(screen.getAllByText('2024-03-03T00:00:00Z')).toHaveLength(2);
     expect(screen.getAllByText('2024-03-02T00:00:00Z')).toHaveLength(1);
@@ -370,8 +372,12 @@ describe('ForumTopicPost', () => {
       />
     );
 
-    await user.click(screen.getByRole('button', { name: /view edit history/i }));
-    await user.click(screen.getByRole('button', { name: /hide edit history/i }));
+    await user.click(
+      screen.getByRole('button', { name: /view edit history/i })
+    );
+    await user.click(
+      screen.getByRole('button', { name: /hide edit history/i })
+    );
 
     expect(screen.queryByText('Second draft')).not.toBeInTheDocument();
     expect(screen.queryByText('Original body')).not.toBeInTheDocument();

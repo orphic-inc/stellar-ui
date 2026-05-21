@@ -37,7 +37,6 @@ const ForumTopicPost = ({
   const isOwner = !!currentUserId && currentUserId === author?.id;
   const canEdit = isOwner || canModerate;
   const canDelete = isOwner || canModerate;
-  const latestEdit = edits.length > 0 ? edits[edits.length - 1] : null;
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +64,12 @@ const ForumTopicPost = ({
       ADD_TAGS: ['blockquote', 'cite', 'u', 's', 'pre', 'code', 'ul', 'li'],
       ADD_ATTR: ['style', 'class', 'rel', 'target']
     });
+
+  const latestEdit = edits.length > 0 ? edits[edits.length - 1] : null;
+  const renderedEdits = [...edits].reverse().map((edit) => ({
+    ...edit,
+    renderedPreviousBody: renderPostBody(edit.previousBody)
+  }));
 
   return (
     <div
@@ -195,7 +200,7 @@ const ForumTopicPost = ({
 
               {showEditHistory && (
                 <div className="mt-3 space-y-3 rounded border border-gray-800 bg-gray-950/60 p-3">
-                  {[...edits].reverse().map((edit, index) => (
+                  {renderedEdits.map((edit, index) => (
                     <div
                       key={edit.id}
                       className={
@@ -221,7 +226,7 @@ const ForumTopicPost = ({
                       <div
                         className="text-sm text-gray-300 bbcode-content"
                         dangerouslySetInnerHTML={{
-                          __html: renderPostBody(edit.previousBody)
+                          __html: edit.renderedPreviousBody
                         }}
                       />
                     </div>
