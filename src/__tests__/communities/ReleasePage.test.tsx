@@ -10,11 +10,19 @@ const mockVoteOn = jest.fn();
 const mockRemoveVote = jest.fn();
 const mockToggleBookmark = jest.fn();
 const mockAddTag = jest.fn();
+const mockVoteTag = jest.fn();
 const mockRemoveTag = jest.fn();
 const mockSubscribeComments = jest.fn();
 const mockGetCommentSubscription = jest.fn();
 const mockDispatch = jest.fn();
 const mockNavigate = jest.fn();
+const mockCurrentUser = {
+  id: 1,
+  username: 'testuser',
+  avatar: null,
+  canDownload: true,
+  userRank: { level: 100, name: 'User', color: '#fff', permissions: {} }
+};
 
 jest.mock('../../store/services/communityApi', () => ({
   useGetReleaseByIdQuery: (...args: unknown[]) =>
@@ -24,6 +32,7 @@ jest.mock('../../store/services/communityApi', () => ({
   useVoteOnReleaseMutation: () => [mockVoteOn, { isLoading: false }],
   useRemoveVoteOnReleaseMutation: () => [mockRemoveVote, { isLoading: false }],
   useAddTagToReleaseMutation: () => [mockAddTag, { isLoading: false }],
+  useVoteOnReleaseTagMutation: () => [mockVoteTag, { isLoading: false }],
   useRemoveTagFromReleaseMutation: () => [mockRemoveTag, { isLoading: false }]
 }));
 
@@ -37,18 +46,15 @@ jest.mock('../../store/services/bookmarkApi', () => ({
 jest.mock('../../store/services/subscriptionApi', () => ({
   useGetCommentSubscriptionQuery: (...args: unknown[]) =>
     mockGetCommentSubscription(...args),
-  useSubscribeCommentsMutation: () => [mockSubscribeComments, { isLoading: false }]
+  useSubscribeCommentsMutation: () => [
+    mockSubscribeComments,
+    { isLoading: false }
+  ]
 }));
 
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
-  useSelector: () => ({
-    id: 1,
-    username: 'testuser',
-    avatar: null,
-    canDownload: true,
-    userRank: { level: 100, name: 'User', color: '#fff' }
-  }),
+  useSelector: () => mockCurrentUser,
   useDispatch: () => mockDispatch
 }));
 
@@ -114,7 +120,8 @@ const makeRelease = (overrides: Record<string, unknown> = {}) => ({
   ],
   myVote: null,
   voteAggregate: null,
-  tags: [],
+  releaseTags: [],
+  historyEntries: [],
   ...overrides
 });
 
@@ -133,7 +140,9 @@ describe('ReleasePage', () => {
       unwrap: () => Promise.resolve({ bookmarked: true })
     });
     mockAddTag.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockVoteTag.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveTag.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockCurrentUser.userRank.permissions = {};
   });
 
   it('shows spinner while loading', () => {
@@ -270,9 +279,29 @@ describe('ReleasePage', () => {
   it('shows existing tags', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
       data: makeRelease({
-        tags: [
-          { id: 1, name: 'jazz' },
-          { id: 2, name: 'modal' }
+        releaseTags: [
+          {
+            id: 1,
+            tagId: 1,
+            name: 'jazz',
+            occurrences: 4,
+            score: 6,
+            positiveVotes: 7,
+            negativeVotes: 1,
+            createdAt: '2024-01-01T00:00:00Z',
+            myVotes: { up: false, down: false }
+          },
+          {
+            id: 2,
+            tagId: 2,
+            name: 'modal',
+            occurrences: 3,
+            score: 2,
+            positiveVotes: 2,
+            negativeVotes: 0,
+            createdAt: '2024-01-01T00:00:00Z',
+            myVotes: { up: false, down: false }
+          }
         ]
       }),
       isLoading: false,
@@ -286,7 +315,7 @@ describe('ReleasePage', () => {
   it('calls addTag and clears input after adding a tag', async () => {
     const user = userEvent.setup();
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ tags: [] }),
+      data: makeRelease({ releaseTags: [] }),
       isLoading: false,
       error: undefined
     });
@@ -303,7 +332,7 @@ describe('ReleasePage', () => {
   it('calls addTag on Enter key in tag input', async () => {
     const user = userEvent.setup();
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ tags: [] }),
+      data: makeRelease({ releaseTags: [] }),
       isLoading: false,
       error: undefined
     });
@@ -312,10 +341,25 @@ describe('ReleasePage', () => {
     expect(mockAddTag).toHaveBeenCalled();
   });
 
-  it('calls removeTag when × button on a tag is clicked', async () => {
+  it('calls removeTag when a manager clicks remove on a tag', async () => {
     const user = userEvent.setup();
+    mockCurrentUser.userRank.permissions = { communities_manage: true };
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ tags: [{ id: 7, name: 'jazz' }] }),
+      data: makeRelease({
+        releaseTags: [
+          {
+            id: 7,
+            tagId: 7,
+            name: 'jazz',
+            occurrences: 4,
+            score: 3,
+            positiveVotes: 3,
+            negativeVotes: 0,
+            createdAt: '2024-01-01T00:00:00Z',
+            myVotes: { up: false, down: false }
+          }
+        ]
+      }),
       isLoading: false,
       error: undefined
     });
@@ -326,6 +370,88 @@ describe('ReleasePage', () => {
       releaseId: 5,
       tagId: 7
     });
+  });
+
+  it('calls voteOnReleaseTag with the selected direction', async () => {
+    const user = userEvent.setup();
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({
+        releaseTags: [
+          {
+            id: 7,
+            tagId: 7,
+            name: 'jazz',
+            occurrences: 4,
+            score: 3,
+            positiveVotes: 3,
+            negativeVotes: 0,
+            createdAt: '2024-01-01T00:00:00Z',
+            myVotes: { up: false, down: false }
+          }
+        ]
+      }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    await user.click(screen.getByRole('button', { name: /vote tag jazz up/i }));
+    expect(mockVoteTag).toHaveBeenCalledWith({
+      communityId: 1,
+      releaseId: 5,
+      tagId: 7,
+      direction: 'up'
+    });
+  });
+
+  it('does not show remove tag control to non-managers', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({
+        releaseTags: [
+          {
+            id: 7,
+            tagId: 7,
+            name: 'jazz',
+            occurrences: 4,
+            score: 3,
+            positiveVotes: 3,
+            negativeVotes: 0,
+            createdAt: '2024-01-01T00:00:00Z',
+            myVotes: { up: false, down: false }
+          }
+        ]
+      }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    expect(screen.queryByTitle('Remove tag')).not.toBeInTheDocument();
+  });
+
+  it('renders release history entries and snapshot details', async () => {
+    const user = userEvent.setup();
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({
+        historyEntries: [
+          {
+            id: 4,
+            action: 'edit',
+            summary: 'Updated title, tags',
+            changedFields: ['title', 'tags'],
+            before: { title: 'Old Title' },
+            after: { title: 'Kind of Blue' },
+            createdAt: '2024-01-02T00:00:00Z',
+            actor: { id: 9, username: 'editor' }
+          }
+        ]
+      }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    expect(screen.getByText(/updated title, tags/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'editor' })).toBeInTheDocument();
+    await user.click(screen.getByText(/view snapshot/i));
+    expect(screen.getByText(/old title/i)).toBeInTheDocument();
   });
 
   it('opens report modal on [Report] click and closes on close', async () => {
@@ -452,7 +578,7 @@ describe('ReleasePage', () => {
       unwrap: () => Promise.reject({ data: { msg: 'Tag already exists' } })
     });
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ tags: [] }),
+      data: makeRelease({ releaseTags: [] }),
       isLoading: false,
       error: undefined
     });
@@ -477,7 +603,7 @@ describe('ReleasePage', () => {
       unwrap: () => Promise.reject({})
     });
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ tags: [] }),
+      data: makeRelease({ releaseTags: [] }),
       isLoading: false,
       error: undefined
     });
@@ -498,11 +624,26 @@ describe('ReleasePage', () => {
 
   it('dispatches danger alert on removeTag failure', async () => {
     const user = userEvent.setup();
+    mockCurrentUser.userRank.permissions = { communities_manage: true };
     mockRemoveTag.mockReturnValue({
       unwrap: () => Promise.reject(new Error('fail'))
     });
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ tags: [{ id: 7, name: 'jazz' }] }),
+      data: makeRelease({
+        releaseTags: [
+          {
+            id: 7,
+            tagId: 7,
+            name: 'jazz',
+            occurrences: 4,
+            score: 3,
+            positiveVotes: 3,
+            negativeVotes: 0,
+            createdAt: '2024-01-01T00:00:00Z',
+            myVotes: { up: false, down: false }
+          }
+        ]
+      }),
       isLoading: false,
       error: undefined
     });

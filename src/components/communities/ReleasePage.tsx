@@ -9,9 +9,15 @@ import {
   useVoteOnReleaseMutation,
   useRemoveVoteOnReleaseMutation,
   useAddTagToReleaseMutation,
+  useVoteOnReleaseTagMutation,
   useRemoveTagFromReleaseMutation
 } from '../../store/services/communityApi';
-import type { MyVote, VoteAggregate } from '../../store/services/communityApi';
+import type {
+  MyVote,
+  ReleaseHistoryEntry,
+  ReleaseTag,
+  VoteAggregate
+} from '../../store/services/communityApi';
 import { useToggleReleaseBookmarkMutation } from '../../store/services/bookmarkApi';
 import {
   useGetCommentSubscriptionQuery,
@@ -19,6 +25,7 @@ import {
 } from '../../store/services/subscriptionApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
+import Time from '../layout/Time';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
@@ -28,7 +35,14 @@ import type { LinkHealthStatus } from '../../types';
 type ReleaseWithVote = {
   myVote?: MyVote;
   voteAggregate?: VoteAggregate | null;
-  tags?: Array<{ id: number; name: string }>;
+  releaseTags?: ReleaseTag[];
+  historyEntries?: ReleaseHistoryEntry[];
+};
+
+const formatHistoryValue = (value: unknown) => {
+  if (value === null || value === undefined) return '—';
+  if (typeof value === 'string') return value;
+  return JSON.stringify(value, null, 2);
 };
 
 const ReleasePage = () => {
@@ -56,7 +70,9 @@ const ReleasePage = () => {
   const [removeVote, { isLoading: unvoting }] =
     useRemoveVoteOnReleaseMutation();
   const [addTag, { isLoading: addingTag }] = useAddTagToReleaseMutation();
-  const [removeTag] = useRemoveTagFromReleaseMutation();
+  const [voteTag, { isLoading: votingTag }] = useVoteOnReleaseTagMutation();
+  const [removeTag, { isLoading: removingTag }] =
+    useRemoveTagFromReleaseMutation();
   const { data: commentSubData } = useGetCommentSubscriptionQuery(
     { page: 'release', pageId: rId },
     { skip: !user }
@@ -139,14 +155,33 @@ const ReleasePage = () => {
     }
   };
 
+  const handleVoteTag = async (tagId: number, direction: 'up' | 'down') => {
+    try {
+      await voteTag({
+        communityId: cId,
+        releaseId: rId,
+        tagId,
+        direction
+      }).unwrap();
+    } catch {
+      dispatch(addAlert('Failed to record tag vote.', 'danger'));
+    }
+  };
+
   if (isLoading) return <Spinner />;
   if (error || !release)
     return <div className="p-4 text-red-400">Release not found.</div>;
 
   const r = release as typeof release & ReleaseWithVote;
-  const tags = r.tags ?? [];
+  const tags = r.releaseTags ?? [];
   const myVote = r.myVote ?? null;
   const agg = r.voteAggregate ?? null;
+  const historyEntries = r.historyEntries ?? [];
+  const canManageTags = Boolean(
+    user?.userRank?.permissions?.communities_manage ||
+      user?.userRank?.permissions?.staff ||
+      user?.userRank?.permissions?.admin
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -323,6 +358,70 @@ const ReleasePage = () => {
             </div>
           )}
 
+          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+              History
+            </div>
+            {historyEntries.length > 0 ? (
+              <div className="divide-y divide-gray-800">
+                {historyEntries.map((entry) => {
+                  const hasSnapshot = entry.before || entry.after;
+                  return (
+                    <div key={entry.id} className="px-4 py-3 text-sm">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-300">
+                        <span>{entry.summary}</span>
+                        <span className="text-gray-600">by</span>
+                        <Link
+                          to={`/private/user/${entry.actor.username}`}
+                          className="text-indigo-400 hover:text-indigo-300"
+                        >
+                          {entry.actor.username}
+                        </Link>
+                        <span className="text-gray-600">
+                          <Time date={entry.createdAt} />
+                        </span>
+                      </div>
+                      {entry.changedFields.length > 0 && (
+                        <p className="mt-1 text-xs text-gray-500">
+                          Fields: {entry.changedFields.join(', ')}
+                        </p>
+                      )}
+                      {hasSnapshot && (
+                        <details className="mt-2">
+                          <summary className="cursor-pointer text-xs text-indigo-300 hover:text-indigo-200">
+                            View snapshot
+                          </summary>
+                          <div className="mt-2 grid gap-3 md:grid-cols-2">
+                            <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
+                              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                Before
+                              </p>
+                              <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
+                                {formatHistoryValue(entry.before)}
+                              </pre>
+                            </div>
+                            <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
+                              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                After
+                              </p>
+                              <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
+                                {formatHistoryValue(entry.after)}
+                              </pre>
+                            </div>
+                          </div>
+                        </details>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="px-4 py-4 text-sm text-gray-500">
+                No release history yet.
+              </div>
+            )}
+          </div>
+
           <CommentsSection
             page="release"
             pageId={rId}
@@ -416,22 +515,65 @@ const ReleasePage = () => {
             </div>
             <div className="px-3 py-2 space-y-2">
               {tags.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="space-y-2">
                   {tags.map((t) => (
-                    <span
+                    <div
                       key={t.id}
-                      className="group flex items-center gap-1 text-xs px-2 py-0.5 bg-gray-800 text-indigo-300 rounded border border-gray-700"
+                      className="flex items-center justify-between gap-2 rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-xs"
                     >
-                      {t.name}
-                      <button
-                        type="button"
-                        title="Remove tag"
-                        onClick={() => handleRemoveTag(t.id)}
-                        className="text-gray-600 hover:text-red-400 transition-colors leading-none"
+                      <Link
+                        to={`/private/releases?tags=${encodeURIComponent(
+                          t.name
+                        )}`}
+                        className="min-w-0 truncate text-indigo-300 hover:text-indigo-200"
                       >
-                        ×
-                      </button>
-                    </span>
+                        {t.name}
+                      </Link>
+                      <div className="flex items-center gap-1 text-[11px]">
+                        <button
+                          type="button"
+                          title="Vote tag up"
+                          aria-label={`Vote tag ${t.name} up`}
+                          disabled={votingTag || t.myVotes.up}
+                          onClick={() => handleVoteTag(t.tagId, 'up')}
+                          className={`rounded border px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
+                            t.myVotes.up
+                              ? 'border-green-600 bg-green-700/60 text-white'
+                              : 'border-gray-600 text-green-400 hover:bg-green-900/40'
+                          }`}
+                        >
+                          ▲
+                        </button>
+                        <span className="min-w-8 text-center text-gray-300">
+                          {t.score}
+                        </span>
+                        <button
+                          type="button"
+                          title="Vote tag down"
+                          aria-label={`Vote tag ${t.name} down`}
+                          disabled={votingTag || t.myVotes.down}
+                          onClick={() => handleVoteTag(t.tagId, 'down')}
+                          className={`rounded border px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
+                            t.myVotes.down
+                              ? 'border-red-700 bg-red-800/60 text-white'
+                              : 'border-gray-600 text-red-400 hover:bg-red-900/40'
+                          }`}
+                        >
+                          ▼
+                        </button>
+                        {canManageTags && (
+                          <button
+                            type="button"
+                            title="Remove tag"
+                            onClick={() => handleRemoveTag(t.tagId)}
+                            disabled={removingTag}
+                            className="ml-1 text-gray-500 transition-colors hover:text-red-400 disabled:opacity-50"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : (

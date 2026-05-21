@@ -172,6 +172,23 @@ describe('resource-oriented service APIs', () => {
       {
         run: (store: ReturnType<typeof createTestStore>) =>
           store.dispatch(
+            communityApi.endpoints.voteOnReleaseTag.initiate({
+              communityId: 9,
+              releaseId: 3,
+              tagId: 6,
+              direction: 'up'
+            })
+          ),
+        response: { status: 200, body: { id: 6, name: 'modal-jazz' } },
+        expected: {
+          url: '/api/communities/9/releases/3/tags/6/vote',
+          method: 'POST',
+          body: JSON.stringify({ direction: 'up' })
+        }
+      },
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
             communityApi.endpoints.removeTagFromRelease.initiate({
               communityId: 9,
               releaseId: 3,

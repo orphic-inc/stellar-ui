@@ -17,8 +17,32 @@ export interface VoteResponse {
 
 export interface ReleaseTag {
   id: number;
+  tagId: number;
   name: string;
   occurrences: number;
+  score: number;
+  positiveVotes: number;
+  negativeVotes: number;
+  createdAt: string | null;
+  addedBy?: { id: number; username: string } | null;
+  myVotes: {
+    up: boolean;
+    down: boolean;
+  };
+}
+
+export interface ReleaseHistoryEntry {
+  id: number;
+  action: 'edit' | 'tag_added' | 'tag_removed';
+  summary: string;
+  changedFields: string[];
+  before?: Record<string, unknown> | null;
+  after?: Record<string, unknown> | null;
+  createdAt: string;
+  actor: {
+    id: number;
+    username: string;
+  };
 }
 
 interface ReleaseArgs {
@@ -32,8 +56,12 @@ type CommunityResponse =
   paths['/communities/{id}']['get']['responses'][200]['content']['application/json'];
 type CommunityReleasesResponse =
   paths['/communities/{id}/releases']['get']['responses'][200]['content']['application/json'];
-type ReleaseResponse =
+type GeneratedReleaseResponse =
   paths['/communities/{communityId}/releases/{releaseId}']['get']['responses'][200]['content']['application/json'];
+export type ReleaseResponse = GeneratedReleaseResponse & {
+  releaseTags?: ReleaseTag[];
+  historyEntries?: ReleaseHistoryEntry[];
+};
 type ContributionsResponse =
   paths['/contributions']['get']['responses'][200]['content']['application/json'];
 type CreateContributionArgs = NonNullable<
@@ -258,6 +286,20 @@ export const communityApi = api.injectEndpoints({
         ]
       }
     ),
+    voteOnReleaseTag: build.mutation<
+      ReleaseTag,
+      ReleaseArgs & { tagId: number; direction: 'up' | 'down' }
+    >({
+      query: ({ communityId, releaseId, tagId, direction }) => ({
+        url: `/communities/${communityId}/releases/${releaseId}/tags/${tagId}/vote`,
+        method: 'POST',
+        body: { direction }
+      }),
+      invalidatesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId },
+        'Top10'
+      ]
+    }),
     removeTagFromRelease: build.mutation<void, ReleaseArgs & { tagId: number }>(
       {
         query: ({ communityId, releaseId, tagId }) => ({
@@ -293,5 +335,6 @@ export const {
   useVoteOnReleaseMutation,
   useRemoveVoteOnReleaseMutation,
   useAddTagToReleaseMutation,
+  useVoteOnReleaseTagMutation,
   useRemoveTagFromReleaseMutation
 } = communityApi;
