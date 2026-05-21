@@ -26,16 +26,18 @@ const ForumTopicPost = ({
   canModerate = false,
   onQuote
 }: Props) => {
-  const { id, author, body, createdAt } = post;
+  const { id, author, body, createdAt, edits } = post;
   const [editing, setEditing] = useState(false);
+  const [showEditHistory, setShowEditHistory] = useState(false);
   const [editBody, setEditBody] = useState(body);
 
   const [updatePost, { isLoading: saving }] = useUpdatePostMutation();
   const [deletePost] = useDeletePostMutation();
 
   const isOwner = !!currentUserId && currentUserId === author?.id;
-  const canEdit = isOwner;
+  const canEdit = isOwner || canModerate;
   const canDelete = isOwner || canModerate;
+  const latestEdit = edits.length > 0 ? edits[edits.length - 1] : null;
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +59,12 @@ const ForumTopicPost = ({
     ADD_TAGS: ['blockquote', 'cite', 'u', 's', 'pre', 'code', 'ul', 'li'],
     ADD_ATTR: ['style', 'class', 'rel', 'target']
   });
+
+  const renderPostBody = (content: string) =>
+    DOMPurify.sanitize(parseBBCode(content), {
+      ADD_TAGS: ['blockquote', 'cite', 'u', 's', 'pre', 'code', 'ul', 'li'],
+      ADD_ATTR: ['style', 'class', 'rel', 'target']
+    });
 
   return (
     <div
@@ -155,6 +163,73 @@ const ForumTopicPost = ({
             className="flex-1 text-sm text-gray-300 bbcode-content"
             dangerouslySetInnerHTML={{ __html: renderedBody }}
           />
+        </div>
+      )}
+
+      {latestEdit && !editing && (
+        <div className="px-4 pb-4">
+          <div className="text-xs text-gray-500">
+            Last edited by{' '}
+            {latestEdit.editor ? (
+              <Link
+                to={`/private/user/${latestEdit.editor.username}`}
+                className="text-gray-400 hover:text-gray-200"
+              >
+                {latestEdit.editor.username}
+              </Link>
+            ) : (
+              'Unknown'
+            )}{' '}
+            <Time date={latestEdit.editedAt} />
+          </div>
+
+          {canModerate && (
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={() => setShowEditHistory((value) => !value)}
+                className="text-xs text-gray-400 hover:text-gray-200"
+              >
+                {showEditHistory ? 'Hide edit history' : 'View edit history'}
+              </button>
+
+              {showEditHistory && (
+                <div className="mt-3 space-y-3 rounded border border-gray-800 bg-gray-950/60 p-3">
+                  {[...edits].reverse().map((edit, index) => (
+                    <div
+                      key={edit.id}
+                      className={
+                        index === edits.length - 1
+                          ? ''
+                          : 'border-b border-gray-800 pb-3'
+                      }
+                    >
+                      <div className="mb-2 text-xs text-gray-500">
+                        Edited by{' '}
+                        {edit.editor ? (
+                          <Link
+                            to={`/private/user/${edit.editor.username}`}
+                            className="text-gray-400 hover:text-gray-200"
+                          >
+                            {edit.editor.username}
+                          </Link>
+                        ) : (
+                          'Unknown'
+                        )}{' '}
+                        <Time date={edit.editedAt} />
+                      </div>
+                      <div
+                        className="text-sm text-gray-300 bbcode-content"
+                        dangerouslySetInnerHTML={{
+                          __html: renderPostBody(edit.previousBody)
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

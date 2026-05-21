@@ -47,6 +47,28 @@ const mockPost = {
   updatedAt: '2024-03-01T00:00:00Z'
 };
 
+const mockEditedPost = {
+  ...mockPost,
+  edits: [
+    {
+      id: 1,
+      forumPostId: 7,
+      editorId: 10,
+      previousBody: 'Original body',
+      editedAt: '2024-03-02T00:00:00Z',
+      editor: { id: 10, username: 'alice' }
+    },
+    {
+      id: 2,
+      forumPostId: 7,
+      editorId: 12,
+      previousBody: 'Second draft',
+      editedAt: '2024-03-03T00:00:00Z',
+      editor: { id: 12, username: 'charlie' }
+    }
+  ]
+};
+
 describe('ForumTopicPost', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -95,6 +117,19 @@ describe('ForumTopicPost', () => {
     expect(
       screen.queryByRole('button', { name: /edit/i })
     ).not.toBeInTheDocument();
+  });
+
+  it('shows Edit button for moderator even without ownership', () => {
+    renderWithProviders(
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={99}
+        canModerate={true}
+      />
+    );
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
   });
 
   it('shows Delete button for post owner', () => {
@@ -152,6 +187,21 @@ describe('ForumTopicPost', () => {
     await user.click(screen.getByRole('button', { name: /edit/i }));
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
+  });
+
+  it('lets moderators open the edit form for another user post', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={99}
+        canModerate={true}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('calls updatePost on save with edited body', async () => {
@@ -263,5 +313,67 @@ describe('ForumTopicPost', () => {
     );
     await user.click(screen.getByRole('button', { name: /delete/i }));
     expect(mockDeletePost).not.toHaveBeenCalled();
+  });
+
+  it('renders the latest edit attribution for edited posts', () => {
+    renderWithProviders(
+      <ForumTopicPost post={mockEditedPost} forumId={1} topicId={5} />
+    );
+
+    expect(screen.getByText(/last edited by/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'charlie' })).toBeInTheDocument();
+    expect(screen.getByText('2024-03-03T00:00:00Z')).toBeInTheDocument();
+  });
+
+  it('does not show edit history control to non-moderators', () => {
+    renderWithProviders(
+      <ForumTopicPost post={mockEditedPost} forumId={1} topicId={5} />
+    );
+
+    expect(
+      screen.queryByRole('button', { name: /view edit history/i })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Original body')).not.toBeInTheDocument();
+  });
+
+  it('shows moderator edit history with previous revisions newest first', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <ForumTopicPost
+        post={mockEditedPost}
+        forumId={1}
+        topicId={5}
+        canModerate={true}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: /view edit history/i }));
+
+    expect(screen.getAllByText('2024-03-03T00:00:00Z')).toHaveLength(2);
+    expect(screen.getAllByText('2024-03-02T00:00:00Z')).toHaveLength(1);
+    expect(screen.getByText('Second draft')).toBeInTheDocument();
+    expect(screen.getByText('Original body')).toBeInTheDocument();
+
+    const historyBodies = screen.getAllByText(/Second draft|Original body/);
+    expect(historyBodies[0]).toHaveTextContent('Second draft');
+    expect(historyBodies[1]).toHaveTextContent('Original body');
+  });
+
+  it('hides moderator edit history after toggling closed', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <ForumTopicPost
+        post={mockEditedPost}
+        forumId={1}
+        topicId={5}
+        canModerate={true}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: /view edit history/i }));
+    await user.click(screen.getByRole('button', { name: /hide edit history/i }));
+
+    expect(screen.queryByText('Second draft')).not.toBeInTheDocument();
+    expect(screen.queryByText('Original body')).not.toBeInTheDocument();
   });
 });
