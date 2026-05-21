@@ -59,17 +59,8 @@ const ForumTopicPost = ({
     ADD_ATTR: ['style', 'class', 'rel', 'target']
   });
 
-  const renderPostBody = (content: string) =>
-    DOMPurify.sanitize(parseBBCode(content), {
-      ADD_TAGS: ['blockquote', 'cite', 'u', 's', 'pre', 'code', 'ul', 'li'],
-      ADD_ATTR: ['style', 'class', 'rel', 'target']
-    });
-
   const latestEdit = edits.length > 0 ? edits[edits.length - 1] : null;
-  const renderedEdits = [...edits].reverse().map((edit) => ({
-    ...edit,
-    renderedPreviousBody: renderPostBody(edit.previousBody)
-  }));
+  const renderedEdits = [...edits].reverse();
 
   return (
     <div
@@ -223,12 +214,9 @@ const ForumTopicPost = ({
                         )}{' '}
                         <Time date={edit.editedAt} />
                       </div>
-                      <div
-                        className="text-sm text-gray-300 bbcode-content"
-                        dangerouslySetInnerHTML={{
-                          __html: edit.renderedPreviousBody
-                        }}
-                      />
+                      <pre className="whitespace-pre-wrap break-words rounded bg-gray-900/80 p-3 text-sm text-gray-300">
+                        {edit.previousBody}
+                      </pre>
                     </div>
                   ))}
                 </div>
