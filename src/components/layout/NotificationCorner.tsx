@@ -29,6 +29,8 @@ function renderNotificationText(
       return `${actor} added to ${title}`;
     case 'comment_sub':
       return `${actor} commented on ${title}`;
+    case 'artist_release':
+      return `${actor} added a new contribution for ${title}`;
     default:
       return `New notification in ${title}`;
   }
@@ -41,6 +43,9 @@ function sourcePath(n: Notification): string | null {
       return `/private/forums/${n.source.forumId}/topics/${n.pageId}#post${n.postId}`;
     case 'artist':
       return `/private/artists/${n.pageId}`;
+    case 'contributions':
+      if (!n.source?.releaseId || !n.source?.communityId) return null;
+      return `/private/communities/${n.source.communityId}/releases/${n.source.releaseId}`;
     case 'collages':
       return `/private/collages/${n.pageId}`;
     case 'requests':

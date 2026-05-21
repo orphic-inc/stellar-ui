@@ -52,7 +52,8 @@ export const api = createApi({
     'SiteHistory',
     'Draft',
     'WikiPage',
-    'Top10'
+    'Top10',
+    'ArtistSubscription'
   ] as const,
   endpoints: () => ({})
 });

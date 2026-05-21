@@ -6767,6 +6767,7 @@ export interface components {
           name: string;
         } | null;
       }[];
+      isSubscribed?: boolean;
     };
     ArtistHistory: {
       id: number;

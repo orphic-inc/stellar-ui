@@ -5,7 +5,8 @@ export type NotificationType =
   | 'forum_sub'
   | 'request_filled'
   | 'collage_updated'
-  | 'comment_sub';
+  | 'comment_sub'
+  | 'artist_release';
 
 export interface NotificationActor {
   id: number;
@@ -16,6 +17,8 @@ export interface NotificationActor {
 export interface NotificationSource {
   title: string;
   forumId?: number;
+  releaseId?: number;
+  communityId?: number;
 }
 
 export interface Notification {

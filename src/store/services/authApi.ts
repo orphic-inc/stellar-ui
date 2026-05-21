@@ -61,6 +61,7 @@ export const authApi = api.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
+          dispatch(api.util.resetApiState());
           dispatch(setCredentials(data.user));
         } catch {
           // login component handles the error display

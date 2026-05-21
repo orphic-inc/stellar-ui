@@ -6,6 +6,8 @@ import ArtistPage from '../../components/communities/ArtistPage';
 
 const mockUseGetArtistByIdQuery = jest.fn();
 const mockUseToggleArtistBookmarkMutation = jest.fn();
+const mockSubscribeArtist = jest.fn();
+const mockUnsubscribeArtist = jest.fn();
 const mockDispatch = jest.fn();
 
 jest.mock('../../store/services/artistApi', () => ({
@@ -15,6 +17,14 @@ jest.mock('../../store/services/artistApi', () => ({
 
 jest.mock('../../store/services/bookmarkApi', () => ({
   useToggleArtistBookmarkMutation: () => mockUseToggleArtistBookmarkMutation()
+}));
+
+jest.mock('../../store/services/subscriptionApi', () => ({
+  useSubscribeArtistMutation: () => [mockSubscribeArtist, { isLoading: false }],
+  useUnsubscribeArtistMutation: () => [
+    mockUnsubscribeArtist,
+    { isLoading: false }
+  ]
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -37,6 +47,7 @@ const makeArtist = (overrides = {}) => ({
   name: 'Miles Davis',
   description: 'Jazz legend',
   vanityHouse: false,
+  isSubscribed: false,
   tags: [{ tag: { id: 1, name: 'jazz' } }],
   similarTo: [{ similarArtist: { id: 10, name: 'John Coltrane' } }],
   aliases: [],
@@ -60,6 +71,12 @@ describe('ArtistPage', () => {
       jest.fn().mockResolvedValue({ bookmarked: true }),
       { isLoading: false }
     ]);
+    mockSubscribeArtist.mockReturnValue({
+      unwrap: () => Promise.resolve({ subscribed: true })
+    });
+    mockUnsubscribeArtist.mockReturnValue({
+      unwrap: () => Promise.resolve({ subscribed: false })
+    });
   });
 
   it('shows spinner while loading', () => {
@@ -335,5 +352,84 @@ describe('ArtistPage', () => {
     expect(screen.getByText('First')).toBeInTheDocument();
     expect(screen.getByText('Second')).toBeInTheDocument();
     expect(screen.getByText('1959')).toBeInTheDocument();
+  });
+
+  it('shows Subscribe button when not subscribed', () => {
+    mockUseGetArtistByIdQuery.mockReturnValue({
+      data: makeArtist({ isSubscribed: false }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ArtistPage />);
+    expect(
+      screen.getByRole('button', { name: 'Subscribe' })
+    ).toBeInTheDocument();
+  });
+
+  it('shows Subscribed button when subscribed', () => {
+    mockUseGetArtistByIdQuery.mockReturnValue({
+      data: makeArtist({ isSubscribed: true }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ArtistPage />);
+    expect(
+      screen.getByRole('button', { name: 'Subscribed' })
+    ).toBeInTheDocument();
+  });
+
+  it('calls subscribeArtist and dispatches success alert when subscribing', async () => {
+    mockUseGetArtistByIdQuery.mockReturnValue({
+      data: makeArtist(),
+      isLoading: false,
+      error: undefined
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<ArtistPage />);
+    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+    expect(mockSubscribeArtist).toHaveBeenCalledWith(42);
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ msg: 'Subscribed to artist.' })
+      })
+    );
+  });
+
+  it('calls unsubscribeArtist and dispatches success alert when unsubscribing', async () => {
+    mockUseGetArtistByIdQuery.mockReturnValue({
+      data: makeArtist({ isSubscribed: true }),
+      isLoading: false,
+      error: undefined
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<ArtistPage />);
+    await user.click(screen.getByRole('button', { name: 'Subscribed' }));
+    expect(mockUnsubscribeArtist).toHaveBeenCalledWith(42);
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({ msg: 'Unsubscribed from artist.' })
+      })
+    );
+  });
+
+  it('dispatches danger alert when subscribe fails', async () => {
+    mockSubscribeArtist.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('error'))
+    });
+    mockUseGetArtistByIdQuery.mockReturnValue({
+      data: makeArtist(),
+      isLoading: false,
+      error: undefined
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<ArtistPage />);
+    await user.click(screen.getByRole('button', { name: 'Subscribe' }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          msg: 'Failed to update subscription.'
+        })
+      })
+    );
   });
 });

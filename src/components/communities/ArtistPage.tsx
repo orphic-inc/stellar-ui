@@ -2,6 +2,10 @@ import { Link, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useGetArtistByIdQuery } from '../../store/services/artistApi';
 import { useToggleArtistBookmarkMutation } from '../../store/services/bookmarkApi';
+import {
+  useSubscribeArtistMutation,
+  useUnsubscribeArtistMutation
+} from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
 import { useAppDispatch } from '../../store/hooks';
@@ -16,6 +20,10 @@ const ArtistPage = () => {
   const { data: artist, isLoading, error } = useGetArtistByIdQuery(artistId);
   const [toggleBookmark, { isLoading: bookmarking }] =
     useToggleArtistBookmarkMutation();
+  const [subscribeArtist, { isLoading: subscribing }] =
+    useSubscribeArtistMutation();
+  const [unsubscribeArtist, { isLoading: unsubscribing }] =
+    useUnsubscribeArtistMutation();
 
   const handleBookmark = async () => {
     try {
@@ -31,10 +39,25 @@ const ArtistPage = () => {
     }
   };
 
+  const handleSubscribe = async () => {
+    try {
+      if (isSubscribed) {
+        await unsubscribeArtist(artistId).unwrap();
+        dispatch(addAlert('Unsubscribed from artist.', 'success'));
+      } else {
+        await subscribeArtist(artistId).unwrap();
+        dispatch(addAlert('Subscribed to artist.', 'success'));
+      }
+    } catch {
+      dispatch(addAlert('Failed to update subscription.', 'danger'));
+    }
+  };
+
   if (isLoading) return <Spinner />;
   if (error || !artist)
     return <div className="p-4 text-red-400">Artist not found.</div>;
 
+  const isSubscribed = artist.isSubscribed ?? false;
   const tags = artist.tags ?? [];
   const similar = artist.similarTo ?? [];
   const aliases = artist.aliases ?? [];
@@ -66,14 +89,27 @@ const ArtistPage = () => {
             </span>
           )}
           {user && (
-            <button
-              onClick={handleBookmark}
-              disabled={bookmarking}
-              title="Bookmark artist"
-              className="ml-auto text-gray-500 hover:text-yellow-300 text-sm transition-colors disabled:opacity-50"
-            >
-              🔖
-            </button>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                onClick={handleSubscribe}
+                disabled={subscribing || unsubscribing}
+                className={`text-xs px-2 py-0.5 rounded border transition-colors disabled:opacity-50 ${
+                  isSubscribed
+                    ? 'border-indigo-600 text-indigo-400 hover:border-red-500 hover:text-red-400'
+                    : 'border-gray-600 text-gray-400 hover:border-indigo-500 hover:text-indigo-400'
+                }`}
+              >
+                {isSubscribed ? 'Subscribed' : 'Subscribe'}
+              </button>
+              <button
+                onClick={handleBookmark}
+                disabled={bookmarking}
+                title="Bookmark artist"
+                className="text-gray-500 hover:text-yellow-300 text-sm transition-colors disabled:opacity-50"
+              >
+                🔖
+              </button>
+            </div>
           )}
         </div>
         {artist.description && (

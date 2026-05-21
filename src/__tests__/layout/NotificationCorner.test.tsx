@@ -331,6 +331,35 @@ describe('NotificationCorner', () => {
     expect(mockMarkRead).not.toHaveBeenCalled();
   });
 
+  it('renders artist_release notification with correct text and link to release page', async () => {
+    mockNotificationsData = [
+      {
+        id: 8,
+        userId: 1,
+        type: 'artist_release',
+        actorId: 20,
+        createdAt: '2024-01-08',
+        readAt: null,
+        pageId: 101,
+        page: 'contributions',
+        postId: null,
+        source: { title: 'Kind of Blue', releaseId: 55, communityId: 3 },
+        actor: { id: 20, username: 'grace', avatar: null }
+      }
+    ];
+    mockUnreadCount = 1;
+
+    const user = userEvent.setup();
+    renderWithProviders(<NotificationCorner />);
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
+
+    const link = screen.getByRole('link', {
+      name: /grace added a new contribution for Kind of Blue/i
+    });
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', '/private/communities/3/releases/55');
+  });
+
   it('closes panel when close (✕) button is clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(<NotificationCorner />);

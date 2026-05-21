@@ -31,6 +31,32 @@ export const subscriptionApi = api.injectEndpoints({
         body: data
       }),
       invalidatesTags: ['Subscription']
+    }),
+    getArtistSubscription: build.query<{ subscribed: boolean }, number>({
+      query: (artistId) => `/artists/${artistId}/subscribe`,
+      providesTags: (_result, _err, artistId) => [
+        { type: 'ArtistSubscription', id: artistId }
+      ]
+    }),
+    subscribeArtist: build.mutation<{ subscribed: boolean }, number>({
+      query: (artistId) => ({
+        url: `/artists/${artistId}/subscribe`,
+        method: 'POST'
+      }),
+      invalidatesTags: (_result, _err, artistId) => [
+        { type: 'ArtistSubscription', id: artistId },
+        { type: 'Artist', id: artistId }
+      ]
+    }),
+    unsubscribeArtist: build.mutation<{ subscribed: boolean }, number>({
+      query: (artistId) => ({
+        url: `/artists/${artistId}/subscribe`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_result, _err, artistId) => [
+        { type: 'ArtistSubscription', id: artistId },
+        { type: 'Artist', id: artistId }
+      ]
     })
   })
 });
@@ -38,5 +64,8 @@ export const subscriptionApi = api.injectEndpoints({
 export const {
   useGetSubscriptionsQuery,
   useSubscribeMutation,
-  useSubscribeCommentsMutation
+  useSubscribeCommentsMutation,
+  useGetArtistSubscriptionQuery,
+  useSubscribeArtistMutation,
+  useUnsubscribeArtistMutation
 } = subscriptionApi;
