@@ -1348,7 +1348,13 @@ export interface paths {
         content: {
           'application/json': {
             /** @enum {string} */
-            page: 'forums' | 'artist' | 'collages' | 'requests' | 'communities';
+            page:
+              | 'forums'
+              | 'artist'
+              | 'collages'
+              | 'requests'
+              | 'communities'
+              | 'contributions';
             pageId: number;
             /** @enum {string} */
             action: 'subscribe' | 'unsubscribe';

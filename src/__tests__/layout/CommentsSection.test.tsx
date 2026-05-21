@@ -12,6 +12,7 @@ jest.mock('../../components/layout/Time', () => ({
 
 const mockCreateComment = jest.fn();
 const mockDeleteComment = jest.fn();
+const mockSubscribeComments = jest.fn();
 
 let mockCommentsData: unknown[] | undefined = [];
 let mockIsLoading = false;
@@ -40,6 +41,10 @@ jest.mock('../../store/services/commentApi', () => ({
   }),
   useCreateCommentMutation: () => [mockCreateComment, { isLoading: false }],
   useDeleteCommentMutation: () => [mockDeleteComment]
+}));
+
+jest.mock('../../store/services/subscriptionApi', () => ({
+  useSubscribeCommentsMutation: () => [mockSubscribeComments]
 }));
 
 let mockCurrentUser: { id: number; username: string } | null = {
@@ -76,6 +81,7 @@ describe('CommentsSection', () => {
     mockIsLoading = false;
     mockCurrentUser = { id: 99, username: 'bob' };
     mockCreateComment.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockSubscribeComments.mockReturnValue({});
   });
 
   it('shows loading state', () => {
@@ -225,5 +231,62 @@ describe('CommentsSection', () => {
     expect(
       screen.queryByPlaceholderText(/add a comment/i)
     ).not.toBeInTheDocument();
+  });
+
+  it('shows subscribe checkbox on subscribable pages (artist)', () => {
+    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    expect(
+      screen.getByRole('checkbox', { name: /subscribe to comments/i })
+    ).toBeInTheDocument();
+  });
+
+  it('does not show subscribe checkbox on release page', () => {
+    renderWithProviders(<CommentsSection page="release" pageId={5} />);
+    expect(
+      screen.queryByRole('checkbox', { name: /subscribe to comments/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('calls subscribeComments when checkbox is checked on submit', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    await user.click(
+      screen.getByRole('checkbox', { name: /subscribe to comments/i })
+    );
+    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Great');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(mockSubscribeComments).toHaveBeenCalledWith({
+        page: 'artist',
+        pageId: 3,
+        action: 'subscribe'
+      });
+    });
+  });
+
+  it('does not call subscribeComments when checkbox is unchecked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Great');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(mockCreateComment).toHaveBeenCalled();
+    });
+    expect(mockSubscribeComments).not.toHaveBeenCalled();
+  });
+
+  it('resets subscribe checkbox to unchecked after submit', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="communities" pageId={7} />);
+    const checkbox = screen.getByRole('checkbox', {
+      name: /subscribe to comments/i
+    });
+    await user.click(checkbox);
+    expect(checkbox).toBeChecked();
+    await user.type(screen.getByPlaceholderText(/add a comment/i), 'Hello');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+    await waitFor(() => {
+      expect(checkbox).not.toBeChecked();
+    });
   });
 });

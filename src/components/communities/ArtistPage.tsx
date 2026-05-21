@@ -10,6 +10,7 @@ import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
 import { useAppDispatch } from '../../store/hooks';
 import Spinner from '../layout/Spinner';
+import CommentsSection from '../layout/CommentsSection';
 
 const ArtistPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -255,6 +256,7 @@ const ArtistPage = () => {
           </table>
         )}
       </div>
+      <CommentsSection page="artist" pageId={artistId} />
     </div>
   );
 };

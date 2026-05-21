@@ -8,8 +8,18 @@ import {
   useCreateCommentMutation,
   useDeleteCommentMutation
 } from '../../store/services/commentApi';
+import { useSubscribeCommentsMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Time from './Time';
+
+// Pages where comment subscriptions are supported (SubscriptionPage enum excludes 'release')
+const SUBSCRIBABLE_PAGES: CommentPage[] = [
+  'artist',
+  'collages',
+  'communities',
+  'contributions',
+  'requests'
+];
 
 interface Props {
   page: CommentPage;
@@ -23,6 +33,9 @@ const CommentsSection = ({ page, pageId }: Props) => {
   const [deleteComment] = useDeleteCommentMutation();
 
   const [body, setBody] = useState('');
+  const [subscribe, setSubscribe] = useState(false);
+  const [subscribeComments] = useSubscribeCommentsMutation();
+  const canSubscribe = SUBSCRIBABLE_PAGES.includes(page);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +53,20 @@ const CommentsSection = ({ page, pageId }: Props) => {
     } else {
       await createComment({ page, body, requestId: pageId });
     }
+    if (subscribe && canSubscribe) {
+      subscribeComments({
+        page: page as
+          | 'artist'
+          | 'collages'
+          | 'communities'
+          | 'contributions'
+          | 'requests',
+        pageId,
+        action: 'subscribe'
+      });
+    }
     setBody('');
+    setSubscribe(false);
   };
 
   return (
@@ -114,6 +140,25 @@ const CommentsSection = ({ page, pageId }: Props) => {
             required
           />
           <br />
+          {canSubscribe && (
+            <label
+              className="small"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                marginBottom: 4
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={subscribe}
+                onChange={(e) => setSubscribe(e.target.checked)}
+              />
+              Subscribe to comments
+            </label>
+          )}
+          {canSubscribe && <br />}
           <input type="submit" value="Post comment" disabled={posting} />
         </form>
       )}
