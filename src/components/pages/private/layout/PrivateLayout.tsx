@@ -1,6 +1,11 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useAppSelector } from '../../../../store/hooks';
 import { useGetMeQuery } from '../../../../store/services/authApi';
+import {
+  selectCurrentUser,
+  selectIsAuthenticated
+} from '../../../../store/slices/authSlice';
 import PrivateHeader from './PrivateHeader';
 import PrivateFooter from './PrivateFooter';
 import NotificationCorner from '../../../layout/NotificationCorner';
@@ -11,10 +16,20 @@ interface Props {
 }
 
 const PrivateLayout = ({ children }: Props) => {
-  const { isLoading, isError, isUninitialized, data: user } = useGetMeQuery();
+  const currentUser = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const {
+    isLoading,
+    isError,
+    isUninitialized,
+    data: fetchedUser
+  } = useGetMeQuery();
+  const user = currentUser ?? fetchedUser;
 
-  if (isUninitialized || isLoading) return <Spinner />;
-  if (isError || !user) return <Navigate to="/login" replace />;
+  if (isUninitialized || (isLoading && !user)) return <Spinner />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (isError && !user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">

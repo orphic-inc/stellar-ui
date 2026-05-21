@@ -1,7 +1,8 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { renderWithProviders } from '../testUtils';
+import { createTestStore, renderWithProviders } from '../testUtils';
 import PrivateLayout from '../../components/pages/private/layout/PrivateLayout';
+import { setCredentials } from '../../store/slices/authSlice';
 
 const mockUseGetMeQuery = jest.fn();
 
@@ -75,15 +76,55 @@ describe('PrivateLayout', () => {
       data: { username: 'kai' }
     });
 
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'kai',
+        email: 'kai@example.com',
+        avatar: null,
+        canDownload: true,
+        contributed: '0',
+        consumed: '0',
+        ratio: 1,
+        userRank: {
+          name: 'User',
+          level: 100,
+          color: 'gray',
+          permissions: {}
+        }
+      })
+    );
+
     renderWithProviders(
       <PrivateLayout>
         <div>Child content</div>
-      </PrivateLayout>
+      </PrivateLayout>,
+      { store }
     );
 
     expect(screen.getByTestId('private-header')).toHaveTextContent('kai');
     expect(screen.getByText('Child content')).toBeInTheDocument();
     expect(screen.getByTestId('private-footer')).toBeInTheDocument();
     expect(screen.getByTestId('notification-corner')).toBeInTheDocument();
+  });
+
+  it('redirects after logout even when getMe still has cached user data', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      isLoading: false,
+      isUninitialized: false,
+      isError: false,
+      data: { username: 'stale-user' }
+    });
+
+    renderWithProviders(
+      <PrivateLayout>
+        <div>Child content</div>
+      </PrivateLayout>,
+      { initialEntries: ['/private/forums'] }
+    );
+
+    expect(window.location.pathname).not.toBe('/private/forums');
+    expect(screen.queryByText('Child content')).not.toBeInTheDocument();
   });
 });

@@ -68,7 +68,13 @@ jest.mock('react-router-dom', () => ({
     children: React.ReactNode;
     onClick?: () => void;
   }) => (
-    <a href={to} onClick={onClick}>
+    <a
+      href={to}
+      onClick={(event) => {
+        event.preventDefault();
+        onClick?.();
+      }}
+    >
       {children}
     </a>
   )
