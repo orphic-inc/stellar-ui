@@ -149,10 +149,7 @@ describe('NotificationCorner', () => {
       name: /alice quoted you in Jazz Talk/i
     });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute(
-      'href',
-      '/private/forums/2/topics/10#post5'
-    );
+    expect(link).toHaveAttribute('href', '/private/forums/2/topics/10#post5');
   });
 
   it('calls markRead when clicking an unread notification link', async () => {
