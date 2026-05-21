@@ -11,6 +11,8 @@ const mockRemoveVote = jest.fn();
 const mockToggleBookmark = jest.fn();
 const mockAddTag = jest.fn();
 const mockRemoveTag = jest.fn();
+const mockSubscribeComments = jest.fn();
+const mockGetCommentSubscription = jest.fn();
 const mockDispatch = jest.fn();
 const mockNavigate = jest.fn();
 
@@ -30,6 +32,12 @@ jest.mock('../../store/services/bookmarkApi', () => ({
     mockToggleBookmark,
     { isLoading: false }
   ]
+}));
+
+jest.mock('../../store/services/subscriptionApi', () => ({
+  useGetCommentSubscriptionQuery: (...args: unknown[]) =>
+    mockGetCommentSubscription(...args),
+  useSubscribeCommentsMutation: () => [mockSubscribeComments, { isLoading: false }]
 }));
 
 jest.mock('react-redux', () => ({
@@ -115,6 +123,9 @@ describe('ReleasePage', () => {
     jest.clearAllMocks();
     mockGetCommunityByIdQuery.mockReturnValue({
       data: { id: 1, name: 'Jazz Community' }
+    });
+    mockGetCommentSubscription.mockReturnValue({
+      data: { subscribed: false }
     });
     mockVoteOn.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveVote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
