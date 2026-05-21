@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import Time from '../layout/Time';
 import {
+  useLazyGetPostEditHistoryQuery,
   useUpdatePostMutation,
   useDeletePostMutation
 } from '../../store/services/forumApi';
 import { parseBBCode, quotePost } from '../../utils/bbcode';
-import type { ForumPost } from '../../types';
+import type { ForumPost, ForumPostEdit } from '../../types';
 
 interface Props {
   post: ForumPost;
@@ -26,11 +27,15 @@ const ForumTopicPost = ({
   canModerate = false,
   onQuote
 }: Props) => {
-  const { id, author, body, createdAt, edits } = post;
+  const { id, author, body, createdAt, lastEdit } = post;
   const [editing, setEditing] = useState(false);
   const [showEditHistory, setShowEditHistory] = useState(false);
   const [editBody, setEditBody] = useState(body);
 
+  const [
+    loadEditHistory,
+    { data: editHistory, isFetching: loadingEditHistory }
+  ] = useLazyGetPostEditHistoryQuery();
   const [updatePost, { isLoading: saving }] = useUpdatePostMutation();
   const [deletePost] = useDeletePostMutation();
 
@@ -59,8 +64,19 @@ const ForumTopicPost = ({
     ADD_ATTR: ['style', 'class', 'rel', 'target']
   });
 
-  const latestEdit = edits.length > 0 ? edits[edits.length - 1] : null;
-  const renderedEdits = [...edits].reverse();
+  const renderedEdits: ForumPostEdit[] = editHistory?.data ?? [];
+
+  const toggleEditHistory = async () => {
+    if (showEditHistory) {
+      setShowEditHistory(false);
+      return;
+    }
+
+    setShowEditHistory(true);
+    if (!editHistory) {
+      await loadEditHistory({ forumId, topicId, postId: id });
+    }
+  };
 
   return (
     <div
@@ -162,28 +178,28 @@ const ForumTopicPost = ({
         </div>
       )}
 
-      {latestEdit && !editing && (
+      {lastEdit && !editing && (
         <div className="px-4 pb-4">
           <div className="text-xs text-gray-500">
             Last edited by{' '}
-            {latestEdit.editor ? (
+            {lastEdit.editor ? (
               <Link
-                to={`/private/user/${latestEdit.editor.username}`}
+                to={`/private/user/${lastEdit.editor.username}`}
                 className="text-gray-400 hover:text-gray-200"
               >
-                {latestEdit.editor.username}
+                {lastEdit.editor.username}
               </Link>
             ) : (
               'Unknown'
             )}{' '}
-            <Time date={latestEdit.editedAt} />
+            <Time date={lastEdit.editedAt} />
           </div>
 
           {canModerate && (
             <div className="mt-2">
               <button
                 type="button"
-                onClick={() => setShowEditHistory((value) => !value)}
+                onClick={toggleEditHistory}
                 className="text-xs text-gray-400 hover:text-gray-200"
               >
                 {showEditHistory ? 'Hide edit history' : 'View edit history'}
@@ -191,34 +207,45 @@ const ForumTopicPost = ({
 
               {showEditHistory && (
                 <div className="mt-3 space-y-3 rounded border border-gray-800 bg-gray-950/60 p-3">
-                  {renderedEdits.map((edit, index) => (
-                    <div
-                      key={edit.id}
-                      className={
-                        index === edits.length - 1
-                          ? ''
-                          : 'border-b border-gray-800 pb-3'
-                      }
-                    >
-                      <div className="mb-2 text-xs text-gray-500">
-                        Edited by{' '}
-                        {edit.editor ? (
-                          <Link
-                            to={`/private/user/${edit.editor.username}`}
-                            className="text-gray-400 hover:text-gray-200"
-                          >
-                            {edit.editor.username}
-                          </Link>
-                        ) : (
-                          'Unknown'
-                        )}{' '}
-                        <Time date={edit.editedAt} />
-                      </div>
-                      <pre className="whitespace-pre-wrap break-words rounded bg-gray-900/80 p-3 text-sm text-gray-300">
-                        {edit.previousBody}
-                      </pre>
+                  {loadingEditHistory && (
+                    <div className="text-xs text-gray-500">
+                      Loading edit history…
                     </div>
-                  ))}
+                  )}
+                  {!loadingEditHistory && renderedEdits.length === 0 && (
+                    <div className="text-xs text-gray-500">
+                      No edit history available.
+                    </div>
+                  )}
+                  {!loadingEditHistory &&
+                    renderedEdits.map((edit, index) => (
+                      <div
+                        key={edit.id}
+                        className={
+                          index === renderedEdits.length - 1
+                            ? ''
+                            : 'border-b border-gray-800 pb-3'
+                        }
+                      >
+                        <div className="mb-2 text-xs text-gray-500">
+                          Edited by{' '}
+                          {edit.editor ? (
+                            <Link
+                              to={`/private/user/${edit.editor.username}`}
+                              className="text-gray-400 hover:text-gray-200"
+                            >
+                              {edit.editor.username}
+                            </Link>
+                          ) : (
+                            'Unknown'
+                          )}{' '}
+                          <Time date={edit.editedAt} />
+                        </div>
+                        <pre className="whitespace-pre-wrap break-words rounded bg-gray-900/80 p-3 text-sm text-gray-300">
+                          {edit.previousBody}
+                        </pre>
+                      </div>
+                    ))}
                 </div>
               )}
             </div>

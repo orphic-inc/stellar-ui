@@ -1388,7 +1388,6 @@ export interface paths {
     get: {
       parameters: {
         query: {
-          /** @enum {string} */
           page:
             | 'forums'
             | 'artist'
@@ -2179,6 +2178,65 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/forums/{forumId}/topics/{topicId}/posts/{id}/edits': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          forumId: string;
+          topicId: string;
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Moderator edit history */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['ForumPostEdit'][];
+            };
+          };
+        };
+        /** @description Insufficient permission */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -3421,6 +3479,100 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/artists/{id}/subscribe': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Subscription status */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              subscribed: boolean;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Subscribed */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              subscribed: boolean;
+            };
+          };
+        };
+        /** @description Artist not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Unsubscribed */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              subscribed: boolean;
+            };
           };
         };
       };
@@ -6546,7 +6698,14 @@ export interface components {
     };
     Notification: {
       id: number;
-      type: string;
+      /** @enum {string} */
+      type:
+        | 'forum_quote'
+        | 'forum_sub'
+        | 'request_filled'
+        | 'collage_updated'
+        | 'comment_sub'
+        | 'artist_release';
       actorId?: number | null;
       actor?: {
         id: number;
@@ -6561,6 +6720,8 @@ export interface components {
       source?: {
         title: string;
         forumId?: number;
+        releaseId?: number;
+        communityId?: number;
       } | null;
     };
     Subscription: {
@@ -6633,12 +6794,22 @@ export interface components {
         username: string;
       };
     };
+    ForumPostLastEdit: {
+      id: number;
+      forumPostId: number;
+      editorId: number;
+      editedAt: string;
+      editor?: {
+        id: number;
+        username: string;
+      };
+    };
     ForumPost: {
       id: number;
       forumTopicId: number;
       authorId: number;
       body: string;
-      edits: components['schemas']['ForumPostEdit'][];
+      lastEdit?: components['schemas']['ForumPostLastEdit'];
       author?: {
         id: number;
         username: string;

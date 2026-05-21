@@ -28,10 +28,18 @@ jest.mock('react-router-dom', () => ({
 
 const mockUpdatePost = jest.fn();
 const mockDeletePost = jest.fn();
+const mockLoadEditHistory = jest.fn();
 
 let mockIsSaving = false;
+let mockEditHistoryData: { data: Array<Record<string, unknown>> } | undefined =
+  undefined;
+let mockEditHistoryLoading = false;
 
 jest.mock('../../store/services/forumApi', () => ({
+  useLazyGetPostEditHistoryQuery: () => [
+    mockLoadEditHistory,
+    { data: mockEditHistoryData, isFetching: mockEditHistoryLoading }
+  ],
   useUpdatePostMutation: () => [mockUpdatePost, { isLoading: mockIsSaving }],
   useDeletePostMutation: () => [mockDeletePost]
 }));
@@ -42,22 +50,23 @@ const mockPost = {
   authorId: 10,
   author: { id: 10, username: 'alice', avatar: null },
   body: 'Hello forum world',
-  edits: [],
   createdAt: '2024-03-01T00:00:00Z',
   updatedAt: '2024-03-01T00:00:00Z'
 };
 
 const mockEditedPost = {
   ...mockPost,
-  edits: [
-    {
-      id: 1,
-      forumPostId: 7,
-      editorId: 10,
-      previousBody: 'Original body',
-      editedAt: '2024-03-02T00:00:00Z',
-      editor: { id: 10, username: 'alice' }
-    },
+  lastEdit: {
+    id: 2,
+    forumPostId: 7,
+    editorId: 12,
+    editedAt: '2024-03-03T00:00:00Z',
+    editor: { id: 12, username: 'charlie' }
+  }
+};
+
+const mockEditHistory = {
+  data: [
     {
       id: 2,
       forumPostId: 7,
@@ -65,6 +74,14 @@ const mockEditedPost = {
       previousBody: 'Second draft',
       editedAt: '2024-03-03T00:00:00Z',
       editor: { id: 12, username: 'charlie' }
+    },
+    {
+      id: 1,
+      forumPostId: 7,
+      editorId: 10,
+      previousBody: 'Original body',
+      editedAt: '2024-03-02T00:00:00Z',
+      editor: { id: 10, username: 'alice' }
     }
   ]
 };
@@ -73,8 +90,11 @@ describe('ForumTopicPost', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsSaving = false;
+    mockEditHistoryData = undefined;
+    mockEditHistoryLoading = false;
     mockUpdatePost.mockResolvedValue({});
     mockDeletePost.mockResolvedValue({});
+    mockLoadEditHistory.mockResolvedValue({});
     window.confirm = jest.fn(() => true);
   });
 
@@ -338,6 +358,7 @@ describe('ForumTopicPost', () => {
 
   it('shows moderator edit history with previous revisions newest first', async () => {
     const user = userEvent.setup();
+    mockEditHistoryData = mockEditHistory;
     renderWithProviders(
       <ForumTopicPost
         post={mockEditedPost}
@@ -363,6 +384,7 @@ describe('ForumTopicPost', () => {
 
   it('hides moderator edit history after toggling closed', async () => {
     const user = userEvent.setup();
+    mockEditHistoryData = mockEditHistory;
     renderWithProviders(
       <ForumTopicPost
         post={mockEditedPost}
@@ -381,5 +403,46 @@ describe('ForumTopicPost', () => {
 
     expect(screen.queryByText('Second draft')).not.toBeInTheDocument();
     expect(screen.queryByText('Original body')).not.toBeInTheDocument();
+  });
+
+  it('loads moderator edit history on first open when not already cached', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <ForumTopicPost
+        post={mockEditedPost}
+        forumId={1}
+        topicId={5}
+        canModerate={true}
+      />
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: /view edit history/i })
+    );
+
+    expect(mockLoadEditHistory).toHaveBeenCalledWith({
+      forumId: 1,
+      topicId: 5,
+      postId: 7
+    });
+  });
+
+  it('shows loading state while moderator edit history is fetching', async () => {
+    const user = userEvent.setup();
+    mockEditHistoryLoading = true;
+    renderWithProviders(
+      <ForumTopicPost
+        post={mockEditedPost}
+        forumId={1}
+        topicId={5}
+        canModerate={true}
+      />
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: /view edit history/i })
+    );
+
+    expect(screen.getByText(/loading edit history/i)).toBeInTheDocument();
   });
 });

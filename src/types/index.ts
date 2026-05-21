@@ -25,6 +25,7 @@ export type ForumCategory = components['schemas']['ForumCategory'];
 export type Forum = components['schemas']['Forum'];
 export type ForumTopic = components['schemas']['ForumTopic'];
 export type ForumPost = components['schemas']['ForumPost'];
+export type ForumPostEdit = components['schemas']['ForumPostEdit'];
 export type ForumPollVote = components['schemas']['ForumPollVote'];
 export type ForumPoll = components['schemas']['ForumPoll'];
 

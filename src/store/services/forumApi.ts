@@ -70,6 +70,8 @@ type UpdatePostArgs = PostArgs &
   >['content']['application/json'];
 type UpdatePostResponse =
   paths['/forums/{forumId}/topics/{topicId}/posts/{id}']['put']['responses'][200]['content']['application/json'];
+type PostEditHistoryResponse =
+  paths['/forums/{forumId}/topics/{topicId}/posts/{id}/edits']['get']['responses'][200]['content']['application/json'];
 
 type PollResponse =
   paths['/forums/polls/{topicId}']['get']['responses'][200]['content']['application/json'];
@@ -198,6 +200,10 @@ export const forumApi = api.injectEndpoints({
         `/forums/${forumId}/topics/${topicId}/posts`,
       providesTags: (_, __, { topicId }) => [{ type: 'ForumPost', id: topicId }]
     }),
+    getPostEditHistory: build.query<PostEditHistoryResponse, PostArgs>({
+      query: ({ forumId, topicId, postId }) =>
+        `/forums/${forumId}/topics/${topicId}/posts/${postId}/edits`
+    }),
     createPost: build.mutation<CreatePostResponse, CreatePostArgs>({
       query: ({ forumId, topicId, ...data }) => ({
         url: `/forums/${forumId}/topics/${topicId}/posts`,
@@ -285,6 +291,7 @@ export const {
   useUpdateTopicMutation,
   useDeleteTopicMutation,
   useGetPostsByTopicQuery,
+  useLazyGetPostEditHistoryQuery,
   useCreatePostMutation,
   useUpdatePostMutation,
   useDeletePostMutation,

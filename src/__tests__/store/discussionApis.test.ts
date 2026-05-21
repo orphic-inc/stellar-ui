@@ -116,6 +116,22 @@ describe('discussion-oriented service APIs', () => {
       {
         run: (store: ReturnType<typeof createTestStore>) =>
           store.dispatch(
+            forumApi.endpoints.getPostEditHistory.initiate({
+              forumId: 4,
+              topicId: 8,
+              postId: 12
+            })
+          ),
+        response: { status: 200, body: { data: [] } },
+        expected: {
+          url: '/api/forums/4/topics/8/posts/12/edits',
+          method: 'GET',
+          body: ''
+        }
+      },
+      {
+        run: (store: ReturnType<typeof createTestStore>) =>
+          store.dispatch(
             forumApi.endpoints.createPost.initiate({
               forumId: 4,
               topicId: 8,
