@@ -13,6 +13,10 @@ import {
 } from '../../store/services/communityApi';
 import type { MyVote, VoteAggregate } from '../../store/services/communityApi';
 import { useToggleReleaseBookmarkMutation } from '../../store/services/bookmarkApi';
+import {
+  useGetCommentSubscriptionQuery,
+  useSubscribeCommentsMutation
+} from '../../store/services/subscriptionApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
@@ -53,6 +57,33 @@ const ReleasePage = () => {
     useRemoveVoteOnReleaseMutation();
   const [addTag, { isLoading: addingTag }] = useAddTagToReleaseMutation();
   const [removeTag] = useRemoveTagFromReleaseMutation();
+  const { data: commentSubData } = useGetCommentSubscriptionQuery(
+    { page: 'release', pageId: rId },
+    { skip: !user }
+  );
+  const isSubscribedToComments = commentSubData?.subscribed ?? false;
+  const [subscribeComments, { isLoading: subscribingComments }] =
+    useSubscribeCommentsMutation();
+
+  const handleCommentSubscribe = async () => {
+    try {
+      await subscribeComments({
+        page: 'release',
+        pageId: rId,
+        action: isSubscribedToComments ? 'unsubscribe' : 'subscribe'
+      }).unwrap();
+      dispatch(
+        addAlert(
+          isSubscribedToComments
+            ? 'Unsubscribed from comments.'
+            : 'Subscribed to comments.',
+          'success'
+        )
+      );
+    } catch {
+      dispatch(addAlert('Failed to update comment subscription.', 'danger'));
+    }
+  };
 
   const handleBookmark = async () => {
     try {
@@ -171,6 +202,16 @@ const ReleasePage = () => {
             [🔖 Bookmark]
           </button>
         )}
+        {user && (
+          <button
+            type="button"
+            onClick={handleCommentSubscribe}
+            disabled={subscribingComments}
+            className="hover:text-indigo-300 transition-colors disabled:opacity-50"
+          >
+            {isSubscribedToComments ? '[Unsubscribe]' : '[Subscribe]'}
+          </button>
+        )}
         <Link
           to={`/private/reports/new?targetType=Release&targetId=${rId}`}
           className="hover:text-indigo-300 transition-colors"
@@ -282,7 +323,11 @@ const ReleasePage = () => {
             </div>
           )}
 
-          <CommentsSection page="release" pageId={rId} />
+          <CommentsSection
+            page="release"
+            pageId={rId}
+            alreadySubscribed={isSubscribedToComments}
+          />
         </div>
 
         {/* Sidebar */}

@@ -44,7 +44,10 @@ jest.mock('../../store/services/commentApi', () => ({
 }));
 
 jest.mock('../../store/services/subscriptionApi', () => ({
-  useSubscribeCommentsMutation: () => [mockSubscribeComments]
+  useSubscribeCommentsMutation: () => [
+    mockSubscribeComments,
+    { isLoading: false }
+  ]
 }));
 
 let mockCurrentUser: { id: number; username: string } | null = {
@@ -81,7 +84,9 @@ describe('CommentsSection', () => {
     mockIsLoading = false;
     mockCurrentUser = { id: 99, username: 'bob' };
     mockCreateComment.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    mockSubscribeComments.mockReturnValue({});
+    mockSubscribeComments.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
   });
 
   it('shows loading state', () => {
@@ -240,11 +245,11 @@ describe('CommentsSection', () => {
     ).toBeInTheDocument();
   });
 
-  it('does not show subscribe checkbox on release page', () => {
+  it('shows subscribe checkbox on release page', () => {
     renderWithProviders(<CommentsSection page="release" pageId={5} />);
     expect(
-      screen.queryByRole('checkbox', { name: /subscribe to comments/i })
-    ).not.toBeInTheDocument();
+      screen.getByRole('checkbox', { name: /subscribe to comments/i })
+    ).toBeInTheDocument();
   });
 
   it('calls subscribeComments when checkbox is checked on submit', async () => {
@@ -287,6 +292,28 @@ describe('CommentsSection', () => {
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
       expect(checkbox).not.toBeChecked();
+    });
+  });
+
+  it('keeps form state when comment creation fails', async () => {
+    mockCreateComment.mockReturnValue({
+      unwrap: () => Promise.reject(new Error('nope'))
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    const checkbox = screen.getByRole('checkbox', {
+      name: /subscribe to comments/i
+    });
+    const textarea = screen.getByPlaceholderText(/add a comment/i);
+
+    await user.click(checkbox);
+    await user.type(textarea, 'Great');
+    await user.click(screen.getByRole('button', { name: /post comment/i }));
+
+    await waitFor(() => {
+      expect(mockSubscribeComments).not.toHaveBeenCalled();
+      expect((textarea as HTMLTextAreaElement).value).toBe('Great');
+      expect(checkbox).toBeChecked();
     });
   });
 });

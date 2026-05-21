@@ -1354,7 +1354,8 @@ export interface paths {
               | 'collages'
               | 'requests'
               | 'communities'
-              | 'contributions';
+              | 'contributions'
+              | 'release';
             pageId: number;
             /** @enum {string} */
             action: 'subscribe' | 'unsubscribe';
@@ -1371,6 +1372,54 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/subscriptions/comment-status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query: {
+          /** @enum {string} */
+          page:
+            | 'forums'
+            | 'artist'
+            | 'collages'
+            | 'requests'
+            | 'communities'
+            | 'contributions'
+            | 'release';
+          pageId: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Comment subscription status */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              subscribed: boolean;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;

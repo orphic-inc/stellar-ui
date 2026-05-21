@@ -9,6 +9,10 @@ type SubscribeArgs = NonNullable<
 type SubscribeCommentsArgs = NonNullable<
   paths['/subscriptions/subscribe-comments']['post']['requestBody']
 >['content']['application/json'];
+type CommentStatusArgs =
+  paths['/subscriptions/comment-status']['get']['parameters']['query'];
+type CommentStatusResponse =
+  paths['/subscriptions/comment-status']['get']['responses'][200]['content']['application/json'];
 
 export const subscriptionApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -30,7 +34,20 @@ export const subscriptionApi = api.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['Subscription']
+      invalidatesTags: (_result, _err, { page, pageId }) => [
+        'Subscription',
+        { type: 'Subscription', id: `comment-${page}-${pageId}` }
+      ]
+    }),
+    getCommentSubscription: build.query<
+      CommentStatusResponse,
+      CommentStatusArgs
+    >({
+      query: ({ page, pageId }) =>
+        `/subscriptions/comment-status?page=${page}&pageId=${pageId}`,
+      providesTags: (_result, _err, { page, pageId }) => [
+        { type: 'Subscription', id: `comment-${page}-${pageId}` }
+      ]
     }),
     getArtistSubscription: build.query<{ subscribed: boolean }, number>({
       query: (artistId) => `/artists/${artistId}/subscribe`,
@@ -65,6 +82,7 @@ export const {
   useGetSubscriptionsQuery,
   useSubscribeMutation,
   useSubscribeCommentsMutation,
+  useGetCommentSubscriptionQuery,
   useGetArtistSubscriptionQuery,
   useSubscribeArtistMutation,
   useUnsubscribeArtistMutation

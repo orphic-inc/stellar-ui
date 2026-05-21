@@ -12,8 +12,8 @@ import { useSubscribeCommentsMutation } from '../../store/services/subscriptionA
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Time from './Time';
 
-// Pages where comment subscriptions are supported (SubscriptionPage enum excludes 'release')
 const SUBSCRIBABLE_PAGES: CommentPage[] = [
+  'release',
   'artist',
   'collages',
   'communities',
@@ -24,9 +24,14 @@ const SUBSCRIBABLE_PAGES: CommentPage[] = [
 interface Props {
   page: CommentPage;
   pageId: number;
+  alreadySubscribed?: boolean;
 }
 
-const CommentsSection = ({ page, pageId }: Props) => {
+const CommentsSection = ({
+  page,
+  pageId,
+  alreadySubscribed = false
+}: Props) => {
   const currentUser = useSelector(selectCurrentUser);
   const { data: comments, isLoading } = useGetCommentsQuery({ page, pageId });
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
@@ -34,39 +39,37 @@ const CommentsSection = ({ page, pageId }: Props) => {
 
   const [body, setBody] = useState('');
   const [subscribe, setSubscribe] = useState(false);
-  const [subscribeComments] = useSubscribeCommentsMutation();
-  const canSubscribe = SUBSCRIBABLE_PAGES.includes(page);
+  const [subscribeComments, { isLoading: subscribing }] =
+    useSubscribeCommentsMutation();
+  const canSubscribe = SUBSCRIBABLE_PAGES.includes(page) && !alreadySubscribed;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
-    if (page === 'communities') {
-      await createComment({ page, body, communityId: pageId });
-    } else if (page === 'artist') {
-      await createComment({ page, body, artistId: pageId });
-    } else if (page === 'release') {
-      await createComment({ page, body, releaseId: pageId });
-    } else if (page === 'collages') {
-      await createComment({ page, body, collageId: pageId });
-    } else if (page === 'contributions') {
-      await createComment({ page, body, contributionId: pageId });
-    } else {
-      await createComment({ page, body, requestId: pageId });
+    try {
+      if (page === 'communities') {
+        await createComment({ page, body, communityId: pageId }).unwrap();
+      } else if (page === 'artist') {
+        await createComment({ page, body, artistId: pageId }).unwrap();
+      } else if (page === 'release') {
+        await createComment({ page, body, releaseId: pageId }).unwrap();
+      } else if (page === 'collages') {
+        await createComment({ page, body, collageId: pageId }).unwrap();
+      } else if (page === 'contributions') {
+        await createComment({ page, body, contributionId: pageId }).unwrap();
+      } else {
+        await createComment({ page, body, requestId: pageId }).unwrap();
+      }
+
+      if (subscribe && canSubscribe) {
+        await subscribeComments({ page, pageId, action: 'subscribe' }).unwrap();
+      }
+
+      setBody('');
+      setSubscribe(false);
+    } catch {
+      return;
     }
-    if (subscribe && canSubscribe) {
-      subscribeComments({
-        page: page as
-          | 'artist'
-          | 'collages'
-          | 'communities'
-          | 'contributions'
-          | 'requests',
-        pageId,
-        action: 'subscribe'
-      });
-    }
-    setBody('');
-    setSubscribe(false);
   };
 
   return (
@@ -159,7 +162,11 @@ const CommentsSection = ({ page, pageId }: Props) => {
             </label>
           )}
           {canSubscribe && <br />}
-          <input type="submit" value="Post comment" disabled={posting} />
+          <input
+            type="submit"
+            value="Post comment"
+            disabled={posting || subscribing}
+          />
         </form>
       )}
     </div>
