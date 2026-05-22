@@ -1,6 +1,11 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useCreateCollageMutation } from '../../store/services/collageApi';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import {
+  useCreateCollageMutation,
+  useListCollagesQuery
+} from '../../store/services/collageApi';
 
 const CATEGORIES = [
   { id: 0, label: 'Personal' },
@@ -15,12 +20,21 @@ const CATEGORIES = [
 const CollageCreate = () => {
   const navigate = useNavigate();
   const [createCollage, { isLoading }] = useCreateCollageMutation();
+  const currentUser = useSelector(selectCurrentUser);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState(1);
   const [tagsInput, setTagsInput] = useState('');
   const [error, setError] = useState('');
+
+  const limit = currentUser?.userRank?.personalCollageLimit ?? 0;
+  const { data: personalData } = useListCollagesQuery(
+    { userId: currentUser?.id, categoryId: 0 },
+    { skip: categoryId !== 0 || !currentUser }
+  );
+  const personalCount = personalData?.meta?.total ?? 0;
+  const atLimit = categoryId === 0 && limit > 0 && personalCount >= limit;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +108,15 @@ const CollageCreate = () => {
               </option>
             ))}
           </select>
+          {categoryId === 0 && limit > 0 && (
+            <p
+              className={`text-xs mt-1 ${
+                atLimit ? 'text-red-400' : 'text-gray-400'
+              }`}
+            >
+              {personalCount} / {limit} personal collages used
+            </p>
+          )}
         </div>
 
         <div>
@@ -134,7 +157,7 @@ const CollageCreate = () => {
         <div className="flex gap-3">
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || atLimit}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm rounded"
           >
             {isLoading ? 'Creating…' : 'Create Collage'}

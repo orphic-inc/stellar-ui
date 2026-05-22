@@ -41,6 +41,7 @@ interface FormValues {
   level: number;
   name: string;
   permissions: Record<string, boolean>;
+  personalCollageLimit: number;
 }
 
 const formatPerm = (perm: string) => perm.replace(/_/g, ' ');
@@ -58,7 +59,12 @@ const UserRankFormPage = () => {
   const dispatch = useDispatch();
 
   const { register, handleSubmit, reset } = useForm<FormValues>({
-    defaultValues: { level: 0, name: '', permissions: {} }
+    defaultValues: {
+      level: 0,
+      name: '',
+      permissions: {},
+      personalCollageLimit: 0
+    }
   });
 
   useEffect(() => {
@@ -66,7 +72,8 @@ const UserRankFormPage = () => {
       reset({
         level: existing.level,
         name: existing.name,
-        permissions: existing.permissions ?? {}
+        permissions: existing.permissions ?? {},
+        personalCollageLimit: existing.personalCollageLimit ?? 0
       });
     }
   }, [existing, reset]);
@@ -156,6 +163,22 @@ const UserRankFormPage = () => {
                   })}
                   className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                 />
+              </div>
+              <div>
+                <label
+                  htmlFor="perm-collage-limit"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
+                  Personal Collage Limit
+                </label>
+                <input
+                  id="perm-collage-limit"
+                  type="number"
+                  min={0}
+                  {...register('personalCollageLimit', { valueAsNumber: true })}
+                  className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                />
+                <p className="text-xs text-gray-500 mt-1">0 = unlimited</p>
               </div>
             </div>
           </div>

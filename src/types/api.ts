@@ -3138,6 +3138,7 @@ export interface paths {
             };
             color?: string;
             badge?: string;
+            personalCollageLimit?: number;
           };
         };
       };
@@ -3225,6 +3226,7 @@ export interface paths {
             };
             color?: string;
             badge?: string;
+            personalCollageLimit?: number;
           };
         };
       };
@@ -6591,6 +6593,7 @@ export interface components {
         permissions?: {
           [key: string]: boolean;
         };
+        personalCollageLimit?: number;
       };
     };
     PublicUser: {
@@ -7130,6 +7133,7 @@ export interface components {
       };
       color?: string;
       badge?: string;
+      personalCollageLimit?: number;
       userCount?: number;
     };
     Comment: {

@@ -49,6 +49,9 @@ const UserRankManager = () => {
                 <th className="text-left px-4 py-3 font-semibold">Name</th>
                 <th className="text-left px-4 py-3 font-semibold">Level</th>
                 <th className="text-left px-4 py-3 font-semibold">Users</th>
+                <th className="text-left px-4 py-3 font-semibold">
+                  Collage Limit
+                </th>
                 <th className="text-left px-4 py-3 font-semibold">Actions</th>
               </tr>
             </thead>
@@ -56,7 +59,7 @@ const UserRankManager = () => {
               {!userRanks?.length ? (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-4 py-6 text-center text-gray-500"
                   >
                     No user ranks defined yet.
@@ -68,6 +71,7 @@ const UserRankManager = () => {
                     id: number;
                     name: string;
                     level: number;
+                    personalCollageLimit?: number;
                     userCount?: number;
                   }) => (
                     <tr
@@ -80,6 +84,11 @@ const UserRankManager = () => {
                       <td className="px-4 py-3 text-gray-400">{rank.level}</td>
                       <td className="px-4 py-3 text-gray-400">
                         {rank.userCount ?? 0}
+                      </td>
+                      <td className="px-4 py-3 text-gray-400">
+                        {rank.personalCollageLimit === 0
+                          ? '∞'
+                          : rank.personalCollageLimit ?? '∞'}
                       </td>
                       <td className="px-4 py-3 flex gap-2">
                         <Link

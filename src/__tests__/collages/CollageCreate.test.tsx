@@ -1,18 +1,24 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../testUtils';
+import { renderWithProviders, createTestStore } from '../testUtils';
 import CollageCreate from '../../components/collages/CollageCreate';
+import { setCredentials } from '../../store/slices/authSlice';
+import type { AuthUser } from '../../types';
 
 const mockCreateCollage = jest.fn();
 const mockNavigate = jest.fn();
 let mockIsLoading = false;
+let mockListCollagesData:
+  | { data: unknown[]; meta: { total: number } }
+  | undefined = undefined;
 
 jest.mock('../../store/services/collageApi', () => ({
   useCreateCollageMutation: () => [
     mockCreateCollage,
     { isLoading: mockIsLoading }
-  ]
+  ],
+  useListCollagesQuery: () => ({ data: mockListCollagesData, isLoading: false })
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -20,10 +26,41 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate
 }));
 
+const makeAuthUser = (personalCollageLimit: number): AuthUser => ({
+  id: 1,
+  username: 'testuser',
+  email: 'test@example.com',
+  avatar: null,
+  contributed: '0',
+  consumed: '0',
+  ratio: 1,
+  isArtist: false,
+  isDonor: false,
+  canDownload: true,
+  inviteCount: 0,
+  dateRegistered: new Date().toISOString(),
+  lastLogin: null,
+  userRank: {
+    level: 100,
+    name: 'User',
+    color: '',
+    badge: '',
+    permissions: {},
+    personalCollageLimit
+  }
+});
+
+const makeStoreWithUser = (personalCollageLimit: number) => {
+  const store = createTestStore();
+  store.dispatch(setCredentials(makeAuthUser(personalCollageLimit)));
+  return store;
+};
+
 describe('CollageCreate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsLoading = false;
+    mockListCollagesData = undefined;
     mockCreateCollage.mockReturnValue({
       unwrap: () => Promise.resolve({ id: 88 })
     });
@@ -107,5 +144,37 @@ describe('CollageCreate', () => {
     renderWithProviders(<CollageCreate />);
     await user.click(screen.getByRole('button', { name: /cancel/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/private/collages');
+  });
+
+  it('disables submit and shows counter when personal collage limit is reached', async () => {
+    const user = userEvent.setup();
+    mockListCollagesData = { data: [], meta: { total: 1 } };
+
+    renderWithProviders(<CollageCreate />, { store: makeStoreWithUser(1) });
+
+    await user.selectOptions(screen.getByLabelText(/category/i), '0');
+
+    expect(
+      screen.getByText('1 / 1 personal collages used')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create collage/i })
+    ).toBeDisabled();
+  });
+
+  it('shows usage counter but allows submit when under personal collage limit', async () => {
+    const user = userEvent.setup();
+    mockListCollagesData = { data: [], meta: { total: 1 } };
+
+    renderWithProviders(<CollageCreate />, { store: makeStoreWithUser(2) });
+
+    await user.selectOptions(screen.getByLabelText(/category/i), '0');
+
+    expect(
+      screen.getByText('1 / 2 personal collages used')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create collage/i })
+    ).not.toBeDisabled();
   });
 });
