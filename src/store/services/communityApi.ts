@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { paths } from '../../types/api';
+import type { components, paths } from '../../types/api';
 
 export interface VoteAggregate {
   releaseId: number;
@@ -15,35 +15,8 @@ export interface VoteResponse {
   voteAggregate: VoteAggregate | null;
 }
 
-export interface ReleaseTag {
-  id: number;
-  tagId: number;
-  name: string;
-  occurrences: number;
-  score: number;
-  positiveVotes: number;
-  negativeVotes: number;
-  createdAt: string | null;
-  addedBy?: { id: number; username: string } | null;
-  myVotes: {
-    up: boolean;
-    down: boolean;
-  };
-}
-
-export interface ReleaseHistoryEntry {
-  id: number;
-  action: 'edit' | 'tag_added' | 'tag_removed';
-  summary: string;
-  changedFields: string[];
-  before?: Record<string, unknown> | null;
-  after?: Record<string, unknown> | null;
-  createdAt: string;
-  actor: {
-    id: number;
-    username: string;
-  };
-}
+export type ReleaseTag = components['schemas']['ReleaseTagEnriched'];
+export type ReleaseHistoryEntry = components['schemas']['ReleaseHistoryEntry'];
 
 interface ReleaseArgs {
   communityId: number;
@@ -56,12 +29,10 @@ type CommunityResponse =
   paths['/communities/{id}']['get']['responses'][200]['content']['application/json'];
 type CommunityReleasesResponse =
   paths['/communities/{id}/releases']['get']['responses'][200]['content']['application/json'];
-type GeneratedReleaseResponse =
+export type ReleaseResponse =
   paths['/communities/{communityId}/releases/{releaseId}']['get']['responses'][200]['content']['application/json'];
-export type ReleaseResponse = GeneratedReleaseResponse & {
-  releaseTags?: ReleaseTag[];
-  historyEntries?: ReleaseHistoryEntry[];
-};
+type ReleaseHistoryResponse =
+  paths['/communities/{communityId}/releases/{releaseId}/history']['get']['responses'][200]['content']['application/json'];
 type ContributionsResponse =
   paths['/contributions']['get']['responses'][200]['content']['application/json'];
 type CreateContributionArgs = NonNullable<
@@ -311,7 +282,18 @@ export const communityApi = api.injectEndpoints({
           'Top10'
         ]
       }
-    )
+    ),
+
+    getReleaseHistory: build.query<
+      ReleaseHistoryResponse,
+      ReleaseArgs & { page?: number }
+    >({
+      query: ({ communityId, releaseId, page = 1 }) =>
+        `/communities/${communityId}/releases/${releaseId}/history?page=${page}`,
+      providesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId }
+      ]
+    })
   })
 });
 
@@ -336,5 +318,6 @@ export const {
   useRemoveVoteOnReleaseMutation,
   useAddTagToReleaseMutation,
   useVoteOnReleaseTagMutation,
-  useRemoveTagFromReleaseMutation
+  useRemoveTagFromReleaseMutation,
+  useGetReleaseHistoryQuery
 } = communityApi;

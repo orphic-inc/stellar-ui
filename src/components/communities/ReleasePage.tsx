@@ -6,6 +6,7 @@ import CommentsSection from '../layout/CommentsSection';
 import {
   useGetReleaseByIdQuery,
   useGetCommunityByIdQuery,
+  useGetReleaseHistoryQuery,
   useVoteOnReleaseMutation,
   useRemoveVoteOnReleaseMutation,
   useAddTagToReleaseMutation,
@@ -14,7 +15,6 @@ import {
 } from '../../store/services/communityApi';
 import type {
   MyVote,
-  ReleaseHistoryEntry,
   ReleaseTag,
   VoteAggregate
 } from '../../store/services/communityApi';
@@ -36,7 +36,6 @@ type ReleaseWithVote = {
   myVote?: MyVote;
   voteAggregate?: VoteAggregate | null;
   releaseTags?: ReleaseTag[];
-  historyEntries?: ReleaseHistoryEntry[];
 };
 
 const formatHistoryValue = (value: unknown) => {
@@ -57,6 +56,7 @@ const ReleasePage = () => {
   const user = useSelector(selectCurrentUser);
   const [reportingId, setReportingId] = useState<number | null>(null);
   const [pendingTag, setPendingTag] = useState('');
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const {
     data: release,
@@ -64,6 +64,11 @@ const ReleasePage = () => {
     error
   } = useGetReleaseByIdQuery({ communityId: cId, releaseId: rId });
   const { data: community } = useGetCommunityByIdQuery(cId);
+  const { data: historyData, isLoading: historyLoading } =
+    useGetReleaseHistoryQuery(
+      { communityId: cId, releaseId: rId },
+      { skip: !historyOpen }
+    );
   const [toggleBookmark, { isLoading: bookmarking }] =
     useToggleReleaseBookmarkMutation();
   const [voteOn, { isLoading: voting }] = useVoteOnReleaseMutation();
@@ -176,7 +181,7 @@ const ReleasePage = () => {
   const tags = r.releaseTags ?? [];
   const myVote = r.myVote ?? null;
   const agg = r.voteAggregate ?? null;
-  const historyEntries = r.historyEntries ?? [];
+  const historyEntries = historyData?.data ?? [];
   const canManageTags = Boolean(
     user?.userRank?.permissions?.communities_manage ||
       user?.userRank?.permissions?.staff ||
@@ -359,66 +364,78 @@ const ReleasePage = () => {
           )}
 
           <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-              History
-            </div>
-            {historyEntries.length > 0 ? (
-              <div className="divide-y divide-gray-800">
-                {historyEntries.map((entry) => {
-                  const hasSnapshot = entry.before || entry.after;
-                  return (
-                    <div key={entry.id} className="px-4 py-3 text-sm">
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-300">
-                        <span>{entry.summary}</span>
-                        <span className="text-gray-600">by</span>
-                        <Link
-                          to={`/private/user/${entry.actor.username}`}
-                          className="text-indigo-400 hover:text-indigo-300"
-                        >
-                          {entry.actor.username}
-                        </Link>
-                        <span className="text-gray-600">
-                          <Time date={entry.createdAt} />
-                        </span>
-                      </div>
-                      {entry.changedFields.length > 0 && (
-                        <p className="mt-1 text-xs text-gray-500">
-                          Fields: {entry.changedFields.join(', ')}
-                        </p>
-                      )}
-                      {hasSnapshot && (
-                        <details className="mt-2">
-                          <summary className="cursor-pointer text-xs text-indigo-300 hover:text-indigo-200">
-                            View snapshot
-                          </summary>
-                          <div className="mt-2 grid gap-3 md:grid-cols-2">
-                            <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
-                              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                Before
-                              </p>
-                              <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
-                                {formatHistoryValue(entry.before)}
-                              </pre>
-                            </div>
-                            <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
-                              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                After
-                              </p>
-                              <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
-                                {formatHistoryValue(entry.after)}
-                              </pre>
-                            </div>
+            <button
+              onClick={() => setHistoryOpen((o) => !o)}
+              className="w-full bg-gray-800 border-b border-gray-700 px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-200 flex items-center justify-between"
+            >
+              <span>History</span>
+              <span>{historyOpen ? '▲' : '▼'}</span>
+            </button>
+            {historyOpen && (
+              <>
+                {historyLoading ? (
+                  <div className="px-4 py-4">
+                    <Spinner />
+                  </div>
+                ) : historyEntries.length > 0 ? (
+                  <div className="divide-y divide-gray-800">
+                    {historyEntries.map((entry) => {
+                      const hasSnapshot = entry.before || entry.after;
+                      return (
+                        <div key={entry.id} className="px-4 py-3 text-sm">
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-300">
+                            <span>{entry.summary}</span>
+                            <span className="text-gray-600">by</span>
+                            <Link
+                              to={`/private/user/${entry.actor.username}`}
+                              className="text-indigo-400 hover:text-indigo-300"
+                            >
+                              {entry.actor.username}
+                            </Link>
+                            <span className="text-gray-600">
+                              <Time date={entry.createdAt} />
+                            </span>
                           </div>
-                        </details>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="px-4 py-4 text-sm text-gray-500">
-                No release history yet.
-              </div>
+                          {entry.changedFields.length > 0 && (
+                            <p className="mt-1 text-xs text-gray-500">
+                              Fields: {entry.changedFields.join(', ')}
+                            </p>
+                          )}
+                          {hasSnapshot && (
+                            <details className="mt-2">
+                              <summary className="cursor-pointer text-xs text-indigo-300 hover:text-indigo-200">
+                                View snapshot
+                              </summary>
+                              <div className="mt-2 grid gap-3 md:grid-cols-2">
+                                <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
+                                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    Before
+                                  </p>
+                                  <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
+                                    {formatHistoryValue(entry.before)}
+                                  </pre>
+                                </div>
+                                <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
+                                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    After
+                                  </p>
+                                  <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
+                                    {formatHistoryValue(entry.after)}
+                                  </pre>
+                                </div>
+                              </div>
+                            </details>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="px-4 py-4 text-sm text-gray-500">
+                    No release history yet.
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -454,6 +471,7 @@ const ReleasePage = () => {
               <div className="flex gap-2">
                 <button
                   type="button"
+                  aria-label="Vote up"
                   disabled={voting || unvoting}
                   onClick={() => handleVote(true)}
                   className={`flex-1 py-1.5 text-sm rounded border transition-colors disabled:opacity-50 ${
@@ -466,6 +484,7 @@ const ReleasePage = () => {
                 </button>
                 <button
                   type="button"
+                  aria-label="Vote down"
                   disabled={voting || unvoting}
                   onClick={() => handleVote(false)}
                   className={`flex-1 py-1.5 text-sm rounded border transition-colors disabled:opacity-50 ${
@@ -534,10 +553,10 @@ const ReleasePage = () => {
                           type="button"
                           title="Vote tag up"
                           aria-label={`Vote tag ${t.name} up`}
-                          disabled={votingTag || t.myVotes.up}
+                          disabled={votingTag || t.myVotes?.up}
                           onClick={() => handleVoteTag(t.tagId, 'up')}
                           className={`rounded border px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
-                            t.myVotes.up
+                            t.myVotes?.up
                               ? 'border-green-600 bg-green-700/60 text-white'
                               : 'border-gray-600 text-green-400 hover:bg-green-900/40'
                           }`}
@@ -551,10 +570,10 @@ const ReleasePage = () => {
                           type="button"
                           title="Vote tag down"
                           aria-label={`Vote tag ${t.name} down`}
-                          disabled={votingTag || t.myVotes.down}
+                          disabled={votingTag || t.myVotes?.down}
                           onClick={() => handleVoteTag(t.tagId, 'down')}
                           className={`rounded border px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
-                            t.myVotes.down
+                            t.myVotes?.down
                               ? 'border-red-700 bg-red-800/60 text-white'
                               : 'border-gray-600 text-red-400 hover:bg-red-900/40'
                           }`}

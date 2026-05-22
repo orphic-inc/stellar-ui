@@ -6,6 +6,7 @@ import ReleasePage from '../../components/communities/ReleasePage';
 
 const mockGetReleaseByIdQuery = jest.fn();
 const mockGetCommunityByIdQuery = jest.fn();
+const mockGetReleaseHistoryQuery = jest.fn();
 const mockVoteOn = jest.fn();
 const mockRemoveVote = jest.fn();
 const mockToggleBookmark = jest.fn();
@@ -29,6 +30,8 @@ jest.mock('../../store/services/communityApi', () => ({
     mockGetReleaseByIdQuery(...args),
   useGetCommunityByIdQuery: (...args: unknown[]) =>
     mockGetCommunityByIdQuery(...args),
+  useGetReleaseHistoryQuery: (...args: unknown[]) =>
+    mockGetReleaseHistoryQuery(...args),
   useVoteOnReleaseMutation: () => [mockVoteOn, { isLoading: false }],
   useRemoveVoteOnReleaseMutation: () => [mockRemoveVote, { isLoading: false }],
   useAddTagToReleaseMutation: () => [mockAddTag, { isLoading: false }],
@@ -134,6 +137,7 @@ describe('ReleasePage', () => {
     mockGetCommentSubscription.mockReturnValue({
       data: { subscribed: false }
     });
+    mockGetReleaseHistoryQuery.mockReturnValue({ data: undefined, isLoading: false });
     mockVoteOn.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveVote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockToggleBookmark.mockReturnValue({
@@ -238,7 +242,7 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    await user.click(screen.getByRole('button', { name: /▲/ }));
+    await user.click(screen.getByRole('button', { name: 'Vote up' }));
     expect(mockVoteOn).toHaveBeenCalledWith({
       communityId: 1,
       releaseId: 5,
@@ -254,7 +258,7 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    await user.click(screen.getByRole('button', { name: /▲/ }));
+    await user.click(screen.getByRole('button', { name: 'Vote up' }));
     expect(mockRemoveVote).toHaveBeenCalledWith({
       communityId: 1,
       releaseId: 5
@@ -430,25 +434,31 @@ describe('ReleasePage', () => {
   it('renders release history entries and snapshot details', async () => {
     const user = userEvent.setup();
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({
-        historyEntries: [
+      data: makeRelease(),
+      isLoading: false,
+      error: undefined
+    });
+    mockGetReleaseHistoryQuery.mockReturnValue({
+      data: {
+        data: [
           {
             id: 4,
             action: 'edit',
             summary: 'Updated title, tags',
-            changedFields: ['title', 'tags'],
+            changedFields: ['title'],
             before: { title: 'Old Title' },
             after: { title: 'Kind of Blue' },
             createdAt: '2024-01-02T00:00:00Z',
             actor: { id: 9, username: 'editor' }
           }
-        ]
-      }),
-      isLoading: false,
-      error: undefined
+        ],
+        meta: { total: 1, page: 1, limit: 25 }
+      },
+      isLoading: false
     });
     renderWithProviders(<ReleasePage />);
-    expect(screen.getByText(/updated title, tags/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /history/i }));
+    expect(await screen.findByText(/updated title, tags/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'editor' })).toBeInTheDocument();
     await user.click(screen.getByText(/view snapshot/i));
     expect(screen.getByText(/old title/i)).toBeInTheDocument();
@@ -506,7 +516,7 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    await user.click(screen.getByRole('button', { name: /▼/ }));
+    await user.click(screen.getByRole('button', { name: 'Vote down' }));
     expect(mockVoteOn).toHaveBeenCalledWith({
       communityId: 1,
       releaseId: 5,
@@ -522,7 +532,7 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    await user.click(screen.getByRole('button', { name: /▼/ }));
+    await user.click(screen.getByRole('button', { name: 'Vote down' }));
     expect(mockRemoveVote).toHaveBeenCalledWith({
       communityId: 1,
       releaseId: 5
@@ -562,7 +572,7 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    await user.click(screen.getByRole('button', { name: /▲/ }));
+    await user.click(screen.getByRole('button', { name: 'Vote up' }));
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({

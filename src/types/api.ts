@@ -2857,6 +2857,219 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{communityId}/releases/{releaseId}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated release history */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['ReleaseHistoryEntry'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Not a community member */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{communityId}/releases/{releaseId}/tags': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Tag added */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseTag'];
+          };
+        };
+        /** @description Release already has this tag */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{communityId}/releases/{releaseId}/tags/{tagId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+          tagId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Tag removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{communityId}/releases/{releaseId}/tags/{tagId}/vote': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+          tagId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            /** @enum {string} */
+            direction: 'up' | 'down';
+          };
+        };
+      };
+      responses: {
+        /** @description Updated tag with vote counts */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseTagEnriched'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{communityId}/releases/{releaseId}/contributions': {
     parameters: {
       query?: never;
@@ -7111,17 +7324,69 @@ export interface components {
       releaseDescription?: string | null;
       createdAt?: string;
     };
+    ReleaseTagEnriched: {
+      id: number;
+      tagId: number;
+      name: string;
+      occurrences: number;
+      score: number;
+      positiveVotes: number;
+      negativeVotes: number;
+      addedBy?: {
+        id: number;
+        username: string;
+      } | null;
+      createdAt?: string | null;
+      myVotes?: {
+        up: boolean;
+        down: boolean;
+      };
+    };
+    ReleaseHistoryEntry: {
+      id: number;
+      /** @enum {string} */
+      action:
+        | 'created'
+        | 'edit'
+        | 'tag_added'
+        | 'tag_removed'
+        | 'contribution_added';
+      summary: string;
+      changedFields: string[];
+      before?: {
+        [key: string]: unknown;
+      } | null;
+      after?: {
+        [key: string]: unknown;
+      } | null;
+      createdAt: string;
+      actor: {
+        id: number;
+        username: string;
+      };
+    };
     Release: {
       id: number;
       title: string;
       communityId: number | null;
       year?: number | null;
       type?: string | null;
+      releaseType?: string | null;
       image?: string | null;
       description?: string | null;
+      isEdition?: boolean;
+      edition?: unknown;
       createdAt?: string;
       artist?: components['schemas']['ReleaseArtist'];
       tags?: components['schemas']['ReleaseTag'][];
+      releaseTags?: components['schemas']['ReleaseTagEnriched'][];
+      /** @enum {string|null} */
+      myVote?: 'up' | 'down' | null;
+      voteAggregate?: {
+        ups: number;
+        total: number;
+        score: number;
+      } | null;
       contributions?: components['schemas']['ReleaseContribution'][];
     };
     UserRank: {
