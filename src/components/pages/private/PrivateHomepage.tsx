@@ -148,6 +148,14 @@ const PrivateHomepage = () => {
               <StatRow label="Blog posts" value={stats?.blogPosts} />
               <StatRow label="Comments" value={stats?.comments} />
             </div>
+            <div className="px-4 pb-3 text-right">
+              <Link
+                to="/private/stats/history"
+                className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                Details
+              </Link>
+            </div>
           </div>
 
           {/* Album of the Month */}

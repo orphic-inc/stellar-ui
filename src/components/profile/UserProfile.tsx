@@ -859,6 +859,14 @@ const UserProfile = () => {
               Settings
             </Link>
           )}
+          {(isOwnProfile || isStaff) && (
+            <Link
+              to={`/private/users/${profile.id}/stats`}
+              className="text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
+              Stats
+            </Link>
+          )}
           {!isOwnProfile && (
             <>
               <Link
