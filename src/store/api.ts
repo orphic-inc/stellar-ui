@@ -53,7 +53,8 @@ export const api = createApi({
     'Draft',
     'WikiPage',
     'Top10',
-    'ArtistSubscription'
+    'ArtistSubscription',
+    'RecoveryRequest'
   ] as const,
   endpoints: () => ({})
 });

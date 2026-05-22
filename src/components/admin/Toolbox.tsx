@@ -117,6 +117,11 @@ const sections: SectionProps[] = [
         label: 'Reports queue',
         to: '/private/staff/reports',
         permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Recovery queue',
+        to: '/private/staff/tools/recovery-queue',
+        permissions: ['users_edit', 'admin']
       }
     ]
   },

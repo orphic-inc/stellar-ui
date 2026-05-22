@@ -242,6 +242,32 @@ export const userApi = api.injectEndpoints({
     >({
       query: (id) => `/users/${id}/snatch-list`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+
+    // Staff recovery queue
+    getRecoveryRequests: build.query<
+      paths['/users/recovery-requests']['get']['responses'][200]['content']['application/json'],
+      { page?: number; status?: 'pending' | 'used' | 'expired' }
+    >({
+      query: ({ page = 1, status = 'pending' }) =>
+        `/users/recovery-requests?page=${page}&status=${status}`,
+      providesTags: ['RecoveryRequest']
+    }),
+    revokeRecoveryRequest: build.mutation<
+      paths['/users/recovery-requests/{reqId}']['delete']['responses'][200]['content']['application/json'],
+      number
+    >({
+      query: (id) => ({
+        url: `/users/recovery-requests/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['RecoveryRequest']
+    }),
+    triggerUserRecovery: build.mutation<
+      paths['/users/{id}/recovery']['post']['responses'][200]['content']['application/json'],
+      number
+    >({
+      query: (userId) => ({ url: `/users/${userId}/recovery`, method: 'POST' })
     })
   })
 });
@@ -272,5 +298,8 @@ export const {
   useGrantDonorMutation,
   useRevokeDonorMutation,
   useRemoveUserWarningMutation,
-  useGetSnatchListByUserIdQuery
+  useGetSnatchListByUserIdQuery,
+  useGetRecoveryRequestsQuery,
+  useRevokeRecoveryRequestMutation,
+  useTriggerUserRecoveryMutation
 } = userApi;

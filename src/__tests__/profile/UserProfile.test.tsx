@@ -118,7 +118,8 @@ jest.mock('../../store/services/userApi', () => ({
   useRevokeDonorMutation: () => [mockRevokeDonor, { isLoading: false }],
   useRemoveUserWarningMutation: () => [mockRemoveUserWarning],
   useGetSnatchListByUserIdQuery: () => ({ data: mockSnatchListByUser }),
-  useGetSnatchListQuery: () => ({ data: mockSnatchList, isLoading: false })
+  useGetSnatchListQuery: () => ({ data: mockSnatchList, isLoading: false }),
+  useTriggerUserRecoveryMutation: () => [jest.fn(), { isLoading: false }]
 }));
 
 const mockProfile = {

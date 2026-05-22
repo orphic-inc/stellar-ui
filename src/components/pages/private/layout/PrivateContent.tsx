@@ -57,6 +57,7 @@ import TicketQueuePage from '../../../staffInbox/TicketQueuePage';
 import SiteHistoryPage from '../../../staff/SiteHistoryPage';
 import MassPmPage from '../../../staff/MassPmPage';
 import DonorRanksPage from '../../../staff/DonorRanksPage';
+import RecoveryQueuePage from '../../../staff/RecoveryQueuePage';
 import SnatchList from '../snatch/SnatchList';
 import BookmarksPage from '../bookmarks/BookmarksPage';
 import WikiListPage from '../../../wiki/WikiListPage';
@@ -231,6 +232,14 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['admin']}>
           <DonorRanksPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools/recovery-queue"
+      element={
+        <StaffGate permissions={['users_edit']}>
+          <RecoveryQueuePage />
         </StaffGate>
       }
     />

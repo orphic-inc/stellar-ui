@@ -24,7 +24,8 @@ import {
   useRevokeDonorMutation,
   useRemoveUserWarningMutation,
   useGetSnatchListByUserIdQuery,
-  useGetSnatchListQuery
+  useGetSnatchListQuery,
+  useTriggerUserRecoveryMutation
 } from '../../store/services/userApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
@@ -190,6 +191,8 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
   const [grantDonor, { isLoading: isGrantingDonor }] = useGrantDonorMutation();
   const [revokeDonor, { isLoading: isRevokingDonor }] =
     useRevokeDonorMutation();
+  const [triggerRecovery, { isLoading: isSendingRecovery }] =
+    useTriggerUserRecoveryMutation();
 
   const handleDisableToggle = async () => {
     try {
@@ -287,6 +290,21 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     }
   };
 
+  const handleTriggerRecovery = async () => {
+    if (!confirm('Send a password recovery email to this user?')) return;
+    try {
+      await triggerRecovery(profileId).unwrap();
+      dispatch(addAlert('Recovery email sent.', 'success'));
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to send recovery email.',
+          'danger'
+        )
+      );
+    }
+  };
+
   const sectionClass = 'border border-gray-700 rounded-lg overflow-hidden';
   const headClass =
     'bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-700';
@@ -323,6 +341,13 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
               }`}
             >
               {isDisabled ? 'Enable Account' : 'Disable Account'}
+            </button>
+            <button
+              onClick={handleTriggerRecovery}
+              disabled={isSendingRecovery}
+              className="px-3 py-1.5 bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 text-white text-xs rounded transition-colors"
+            >
+              {isSendingRecovery ? 'Sending…' : 'Send Recovery Email'}
             </button>
           </div>
 
