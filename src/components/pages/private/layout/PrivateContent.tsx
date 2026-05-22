@@ -74,6 +74,8 @@ import TopUsersPage from '../../../top10/TopUsersPage';
 import TopTagsPage from '../../../top10/TopTagsPage';
 import TopVotesPage from '../../../top10/TopVotesPage';
 import TopHistoryPage from '../../../top10/TopHistoryPage';
+import SiteStatsHistoryPage from '../stats/SiteStatsHistoryPage';
+import UserStatsHistoryPage from '../stats/UserStatsHistoryPage';
 import DraftsPage from '../../../messages/DraftsPage';
 import { useGetMeQuery } from '../../../../store/services/authApi';
 import {
@@ -355,6 +357,9 @@ const PrivateContent = () => (
         }
       />
     </Route>
+
+    <Route path="stats/history" element={wrap(SiteStatsHistoryPage)} />
+    <Route path="users/:id/stats" element={wrap(UserStatsHistoryPage)} />
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />

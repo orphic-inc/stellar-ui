@@ -17,6 +17,35 @@ interface SiteStatsResponse {
   blogPosts: number;
   comments: number;
 }
+
+export interface SiteStatSnapshot {
+  id: number;
+  capturedAt: string;
+  maxUsers: number;
+  totalUsers: number;
+  enabledUsers: number;
+  activeToday: number;
+  activeThisWeek: number;
+  activeThisMonth: number;
+  communities: number;
+  releases: number;
+  artists: number;
+  blogPosts: number;
+  announcements: number;
+  comments: number;
+  contributedLinks: number;
+  contributedLinkDownloads: number;
+}
+
+export interface UserStatSnapshot {
+  id: number;
+  userId: number;
+  period: 'Daily' | 'Monthly' | 'Yearly';
+  capturedAt: string;
+  contributed: string | null;
+  consumed: string | null;
+  contributionCount: number;
+}
 type StylesheetsResponse =
   paths['/stylesheet']['get']['responses'][200]['content']['application/json'];
 interface SiteSettingsResponse {
@@ -54,6 +83,24 @@ export const siteApi = api.injectEndpoints({
     >({
       query: (body) => ({ url: '/settings', method: 'PUT', body }),
       invalidatesTags: ['SiteSettings']
+    }),
+    getSiteStatsHistory: build.query<SiteStatSnapshot[], void>({
+      query: () => '/stats/history',
+      providesTags: ['StatsHistory']
+    }),
+    triggerSiteSnapshot: build.mutation<void, void>({
+      query: () => ({ url: '/stats/snapshot', method: 'POST' }),
+      invalidatesTags: ['StatsHistory']
+    }),
+    getUserStatsHistory: build.query<
+      UserStatSnapshot[],
+      { userId: number; period: 'Daily' | 'Monthly' | 'Yearly' }
+    >({
+      query: ({ userId, period }) =>
+        `/users/${userId}/stats/history?period=${period}`,
+      providesTags: (_r, _e, { userId }) => [
+        { type: 'UserStats' as const, id: userId }
+      ]
     })
   })
 });
@@ -62,5 +109,8 @@ export const {
   useGetSiteStatsQuery,
   useGetStylesheetsQuery,
   useGetSiteSettingsQuery,
-  useUpdateSiteSettingsMutation
+  useUpdateSiteSettingsMutation,
+  useGetSiteStatsHistoryQuery,
+  useTriggerSiteSnapshotMutation,
+  useGetUserStatsHistoryQuery
 } = siteApi;

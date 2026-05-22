@@ -54,7 +54,9 @@ export const api = createApi({
     'WikiPage',
     'Top10',
     'ArtistSubscription',
-    'RecoveryRequest'
+    'RecoveryRequest',
+    'StatsHistory',
+    'UserStats'
   ] as const,
   endpoints: () => ({})
 });
