@@ -113,7 +113,13 @@ export const communityApi = api.injectEndpoints({
     }),
     updateRelease: build.mutation<
       ReleaseResponse,
-      ReleaseArgs & Partial<ReleaseResponse>
+      ReleaseArgs &
+        Partial<
+          Pick<
+            ReleaseResponse,
+            'title' | 'description' | 'image' | 'year' | 'isEdition' | 'edition'
+          >
+        > & { editSummary?: string }
     >({
       query: ({ communityId, releaseId, ...data }) => ({
         url: `/communities/${communityId}/releases/${releaseId}`,
@@ -293,6 +299,19 @@ export const communityApi = api.injectEndpoints({
       providesTags: (_, __, { releaseId }) => [
         { type: 'Release', id: releaseId }
       ]
+    }),
+
+    revertReleaseHistory: build.mutation<
+      ReleaseResponse,
+      ReleaseArgs & { historyId: number }
+    >({
+      query: ({ communityId, releaseId, historyId }) => ({
+        url: `/communities/${communityId}/releases/${releaseId}/history/${historyId}/revert`,
+        method: 'POST'
+      }),
+      invalidatesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId }
+      ]
     })
   })
 });
@@ -319,5 +338,6 @@ export const {
   useAddTagToReleaseMutation,
   useVoteOnReleaseTagMutation,
   useRemoveTagFromReleaseMutation,
-  useGetReleaseHistoryQuery
+  useGetReleaseHistoryQuery,
+  useRevertReleaseHistoryMutation
 } = communityApi;

@@ -13,6 +13,7 @@ const mockToggleBookmark = jest.fn();
 const mockAddTag = jest.fn();
 const mockVoteTag = jest.fn();
 const mockRemoveTag = jest.fn();
+const mockRevertHistory = jest.fn();
 const mockSubscribeComments = jest.fn();
 const mockGetCommentSubscription = jest.fn();
 const mockDispatch = jest.fn();
@@ -36,7 +37,15 @@ jest.mock('../../store/services/communityApi', () => ({
   useRemoveVoteOnReleaseMutation: () => [mockRemoveVote, { isLoading: false }],
   useAddTagToReleaseMutation: () => [mockAddTag, { isLoading: false }],
   useVoteOnReleaseTagMutation: () => [mockVoteTag, { isLoading: false }],
-  useRemoveTagFromReleaseMutation: () => [mockRemoveTag, { isLoading: false }]
+  useRemoveTagFromReleaseMutation: () => [mockRemoveTag, { isLoading: false }],
+  useRevertReleaseHistoryMutation: () => [
+    mockRevertHistory,
+    { isLoading: false }
+  ],
+  useUpdateReleaseMutation: () => [
+    jest.fn().mockResolvedValue({}),
+    { isLoading: false }
+  ]
 }));
 
 jest.mock('../../store/services/bookmarkApi', () => ({
@@ -137,7 +146,10 @@ describe('ReleasePage', () => {
     mockGetCommentSubscription.mockReturnValue({
       data: { subscribed: false }
     });
-    mockGetReleaseHistoryQuery.mockReturnValue({ data: undefined, isLoading: false });
+    mockGetReleaseHistoryQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false
+    });
     mockVoteOn.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveVote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockToggleBookmark.mockReturnValue({
@@ -460,8 +472,8 @@ describe('ReleasePage', () => {
     await user.click(screen.getByRole('button', { name: /history/i }));
     expect(await screen.findByText(/updated title, tags/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'editor' })).toBeInTheDocument();
-    await user.click(screen.getByText(/view snapshot/i));
-    expect(screen.getByText(/old title/i)).toBeInTheDocument();
+    expect(screen.getByText('Old Title')).toBeInTheDocument();
+    expect(screen.getByText('Title')).toBeInTheDocument();
   });
 
   it('opens report modal on [Report] click and closes on close', async () => {

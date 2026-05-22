@@ -11,7 +11,9 @@ import {
   useRemoveVoteOnReleaseMutation,
   useAddTagToReleaseMutation,
   useVoteOnReleaseTagMutation,
-  useRemoveTagFromReleaseMutation
+  useRemoveTagFromReleaseMutation,
+  useRevertReleaseHistoryMutation,
+  useUpdateReleaseMutation
 } from '../../store/services/communityApi';
 import type {
   MyVote,
@@ -38,10 +40,24 @@ type ReleaseWithVote = {
   releaseTags?: ReleaseTag[];
 };
 
-const formatHistoryValue = (value: unknown) => {
+const FIELD_LABELS: Record<string, string> = {
+  title: 'Title',
+  description: 'Description',
+  image: 'Cover art',
+  year: 'Year',
+  isEdition: 'Edition',
+  edition: 'Edition data'
+};
+
+const formatFieldValue = (field: string, value: unknown): string => {
   if (value === null || value === undefined) return '—';
-  if (typeof value === 'string') return value;
-  return JSON.stringify(value, null, 2);
+  if (field === 'description' && typeof value === 'string') {
+    return value.length > 120 ? value.slice(0, 120) + '…' : value;
+  }
+  if (field === 'isEdition') return value ? 'Yes' : 'No';
+  if (typeof value === 'string' || typeof value === 'number')
+    return String(value);
+  return JSON.stringify(value);
 };
 
 const ReleasePage = () => {
@@ -57,6 +73,17 @@ const ReleasePage = () => {
   const [reportingId, setReportingId] = useState<number | null>(null);
   const [pendingTag, setPendingTag] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [revertingId, setRevertingId] = useState<number | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: '',
+    description: '',
+    year: 0,
+    image: '',
+    isEdition: false,
+    editSummary: ''
+  });
+  const [editError, setEditError] = useState<string | null>(null);
 
   const {
     data: release,
@@ -78,6 +105,8 @@ const ReleasePage = () => {
   const [voteTag, { isLoading: votingTag }] = useVoteOnReleaseTagMutation();
   const [removeTag, { isLoading: removingTag }] =
     useRemoveTagFromReleaseMutation();
+  const [revertHistory] = useRevertReleaseHistoryMutation();
+  const [updateRelease, { isLoading: saving }] = useUpdateReleaseMutation();
   const { data: commentSubData } = useGetCommentSubscriptionQuery(
     { page: 'release', pageId: rId },
     { skip: !user }
@@ -187,6 +216,46 @@ const ReleasePage = () => {
       user?.userRank?.permissions?.staff ||
       user?.userRank?.permissions?.admin
   );
+  const isContributor = Boolean(
+    (release as { isContributor?: boolean }).isContributor
+  );
+  const canEdit = canManageTags || isContributor;
+
+  const handleEditOpen = () => {
+    setEditForm({
+      title: release.title ?? '',
+      description: release.description ?? '',
+      year: release.year ?? new Date().getFullYear(),
+      image: release.image ?? '',
+      isEdition: Boolean((release as { isEdition?: boolean }).isEdition),
+      editSummary: ''
+    });
+    setEditError(null);
+    setEditOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    setEditError(null);
+    try {
+      await updateRelease({
+        communityId: cId,
+        releaseId: rId,
+        title: editForm.title.trim() || undefined,
+        description: editForm.description.trim() || undefined,
+        year: editForm.year || undefined,
+        image: editForm.image.trim() || undefined,
+        isEdition: editForm.isEdition,
+        editSummary: editForm.editSummary.trim() || undefined
+      }).unwrap();
+      dispatch(addAlert('Release updated.', 'success'));
+      setEditOpen(false);
+    } catch (e: unknown) {
+      const msg =
+        (e as { data?: { msg?: string } })?.data?.msg ??
+        'Failed to save changes.';
+      setEditError(msg);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -232,6 +301,15 @@ const ReleasePage = () => {
         >
           [Add format]
         </button>
+        {canEdit && (
+          <button
+            type="button"
+            onClick={handleEditOpen}
+            className="hover:text-indigo-300 transition-colors"
+          >
+            [Edit release]
+          </button>
+        )}
         {user && (
           <button
             type="button"
@@ -380,7 +458,20 @@ const ReleasePage = () => {
                 ) : historyEntries.length > 0 ? (
                   <div className="divide-y divide-gray-800">
                     {historyEntries.map((entry) => {
-                      const hasSnapshot = entry.before || entry.after;
+                      const beforeSnap = entry.before as
+                        | Record<string, unknown>
+                        | null
+                        | undefined;
+                      const afterSnap = entry.after as
+                        | Record<string, unknown>
+                        | null
+                        | undefined;
+                      const showDiff =
+                        entry.action === 'edit' &&
+                        beforeSnap &&
+                        afterSnap &&
+                        entry.changedFields.length > 0;
+                      const isReverting = revertingId === entry.id;
                       return (
                         <div key={entry.id} className="px-4 py-3 text-sm">
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-300">
@@ -395,36 +486,92 @@ const ReleasePage = () => {
                             <span className="text-gray-600">
                               <Time date={entry.createdAt} />
                             </span>
+                            {canManageTags && entry.action === 'edit' && (
+                              <span className="ml-auto flex items-center gap-1">
+                                {isReverting ? (
+                                  <>
+                                    <span className="text-gray-400 text-xs">
+                                      Confirm?
+                                    </span>
+                                    <button
+                                      type="button"
+                                      className="text-xs text-red-400 hover:text-red-300"
+                                      onClick={async () => {
+                                        try {
+                                          await revertHistory({
+                                            communityId: cId,
+                                            releaseId: rId,
+                                            historyId: entry.id
+                                          }).unwrap();
+                                          dispatch(
+                                            addAlert(
+                                              'Release reverted successfully',
+                                              'success'
+                                            )
+                                          );
+                                        } catch {
+                                          dispatch(
+                                            addAlert(
+                                              'Failed to revert release',
+                                              'danger'
+                                            )
+                                          );
+                                        }
+                                        setRevertingId(null);
+                                      }}
+                                    >
+                                      Yes
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="text-xs text-gray-400 hover:text-gray-300"
+                                      onClick={() => setRevertingId(null)}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="text-xs text-gray-500 hover:text-gray-300"
+                                    onClick={() => setRevertingId(entry.id)}
+                                  >
+                                    Revert
+                                  </button>
+                                )}
+                              </span>
+                            )}
                           </div>
-                          {entry.changedFields.length > 0 && (
-                            <p className="mt-1 text-xs text-gray-500">
-                              Fields: {entry.changedFields.join(', ')}
-                            </p>
-                          )}
-                          {hasSnapshot && (
-                            <details className="mt-2">
-                              <summary className="cursor-pointer text-xs text-indigo-300 hover:text-indigo-200">
-                                View snapshot
-                              </summary>
-                              <div className="mt-2 grid gap-3 md:grid-cols-2">
-                                <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
-                                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Before
-                                  </p>
-                                  <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
-                                    {formatHistoryValue(entry.before)}
-                                  </pre>
-                                </div>
-                                <div className="rounded border border-gray-800 bg-gray-950/60 p-3">
-                                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    After
-                                  </p>
-                                  <pre className="whitespace-pre-wrap break-words text-xs text-gray-300">
-                                    {formatHistoryValue(entry.after)}
-                                  </pre>
-                                </div>
-                              </div>
-                            </details>
+                          {showDiff && (
+                            <table className="mt-2 w-full text-xs border-collapse">
+                              <tbody>
+                                {entry.changedFields.map((field) => (
+                                  <tr
+                                    key={field}
+                                    className="border-t border-gray-800"
+                                  >
+                                    <td className="py-1 pr-3 text-gray-500 whitespace-nowrap">
+                                      {FIELD_LABELS[field] ?? field}
+                                    </td>
+                                    <td className="py-1 pr-2 text-gray-400 max-w-xs break-words">
+                                      {formatFieldValue(
+                                        field,
+                                        beforeSnap[field]
+                                      )}
+                                    </td>
+                                    <td className="py-1 pr-2 text-gray-500">
+                                      →
+                                    </td>
+                                    <td className="py-1 text-gray-200 max-w-xs break-words">
+                                      {formatFieldValue(
+                                        field,
+                                        afterSnap[field]
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           )}
                         </div>
                       );
@@ -657,6 +804,141 @@ const ReleasePage = () => {
           contributionId={reportingId}
           onClose={() => setReportingId(null)}
         />
+      )}
+
+      {editOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-lg mx-4 shadow-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700">
+              <h2 className="text-sm font-semibold text-gray-100">
+                Edit release
+              </h2>
+              <button
+                type="button"
+                onClick={() => setEditOpen(false)}
+                className="text-gray-500 hover:text-gray-300 text-lg leading-none"
+              >
+                ×
+              </button>
+            </div>
+            <div className="px-5 py-4 space-y-4">
+              <label className="block">
+                <span className="text-xs text-gray-400 block mb-1">Title</span>
+                <input
+                  type="text"
+                  value={editForm.title}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, title: e.target.value }))
+                  }
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs text-gray-400 block mb-1">
+                  Description
+                </span>
+                <textarea
+                  value={editForm.description}
+                  rows={5}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, description: e.target.value }))
+                  }
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-y"
+                />
+              </label>
+              <div className="flex gap-3">
+                <label className="block flex-1">
+                  <span className="text-xs text-gray-400 block mb-1">Year</span>
+                  <input
+                    type="number"
+                    min={1900}
+                    max={2100}
+                    value={editForm.year}
+                    onChange={(e) =>
+                      setEditForm((f) => ({
+                        ...f,
+                        year: parseInt(e.target.value) || 0
+                      }))
+                    }
+                    className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </label>
+                <label className="flex items-center gap-2 mt-5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editForm.isEdition}
+                    onChange={(e) =>
+                      setEditForm((f) => ({
+                        ...f,
+                        isEdition: e.target.checked
+                      }))
+                    }
+                    className="accent-indigo-500 w-4 h-4"
+                  />
+                  <span className="text-xs text-gray-300">Edition</span>
+                </label>
+              </div>
+              <label className="block">
+                <span className="text-xs text-gray-400 block mb-1">
+                  Cover image URL
+                </span>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={editForm.image}
+                    onChange={(e) =>
+                      setEditForm((f) => ({ ...f, image: e.target.value }))
+                    }
+                    placeholder="https://…"
+                    className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                  {editForm.image && (
+                    <button
+                      type="button"
+                      onClick={() => setEditForm((f) => ({ ...f, image: '' }))}
+                      className="text-xs text-gray-500 hover:text-red-400 px-2"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </label>
+              <label className="block">
+                <span className="text-xs text-gray-400 block mb-1">
+                  Edit summary <span className="text-gray-600">(optional)</span>
+                </span>
+                <input
+                  type="text"
+                  value={editForm.editSummary}
+                  maxLength={255}
+                  onChange={(e) =>
+                    setEditForm((f) => ({ ...f, editSummary: e.target.value }))
+                  }
+                  placeholder="Brief description of changes…"
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </label>
+              {editError && <p className="text-xs text-red-400">{editError}</p>}
+            </div>
+            <div className="flex justify-end gap-2 px-5 py-3 border-t border-gray-700">
+              <button
+                type="button"
+                onClick={() => setEditOpen(false)}
+                className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={handleEditSave}
+                className="px-4 py-1.5 bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 text-white text-xs rounded transition-colors"
+              >
+                {saving ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

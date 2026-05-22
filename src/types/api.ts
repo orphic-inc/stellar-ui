@@ -2916,6 +2916,63 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{communityId}/releases/{releaseId}/history/{historyId}/revert': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+          historyId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Release after revert */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Release'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not an edit revision */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{communityId}/releases/{releaseId}/tags': {
     parameters: {
       query?: never;
@@ -7342,6 +7399,16 @@ export interface components {
         down: boolean;
       };
     };
+    ReleaseSnapshot: {
+      title: string;
+      description: string;
+      image: string | null;
+      year: number;
+      isEdition: boolean;
+      edition?: unknown;
+      tagIds: number[];
+      tagNames: string[];
+    };
     ReleaseHistoryEntry: {
       id: number;
       /** @enum {string} */
@@ -7359,6 +7426,7 @@ export interface components {
       after?: {
         [key: string]: unknown;
       } | null;
+      snapshot?: components['schemas']['ReleaseSnapshot'] & unknown;
       createdAt: string;
       actor: {
         id: number;
@@ -7388,6 +7456,7 @@ export interface components {
         score: number;
       } | null;
       contributions?: components['schemas']['ReleaseContribution'][];
+      isContributor?: boolean;
     };
     UserRank: {
       id: number;
