@@ -1,0 +1,151 @@
+/* Postmod — stark minimalist theme for Stellar */
+
+/* ─── Palette ──────────────────────────────────────────────────────────────── */
+:root {
+  --pm-bg-page: #000000;
+  --pm-bg-card: #0d0d0d;
+  --pm-bg-hover: #181818;
+  --pm-border: #2e2e2e;
+  --pm-border-soft: #1e1e1e;
+  --pm-text: #e8e8e8;
+  --pm-text-muted: #909090;
+  --pm-text-faint: #555555;
+  --pm-accent: #e05c3a;
+  --pm-accent-hover: #f06848;
+  --pm-accent-dim: #5c2418;
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--pm-bg-page) !important;
+  color: var(--pm-text) !important;
+}
+
+a {
+  color: var(--pm-accent) !important;
+}
+a:hover {
+  color: var(--pm-accent-hover) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--pm-text) !important;
+}
+
+input,
+textarea,
+select {
+  background-color: var(--pm-bg-card) !important;
+  color: var(--pm-text) !important;
+  border-color: var(--pm-border) !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: var(--pm-bg-page);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--pm-border);
+  border-radius: 0;
+}
+
+/* ─── Tailwind overrides ───────────────────────────────────────────────────── */
+.bg-gray-900 {
+  background-color: var(--pm-bg-page) !important;
+}
+.bg-gray-800 {
+  background-color: var(--pm-bg-card) !important;
+}
+.bg-gray-700 {
+  background-color: var(--pm-bg-hover) !important;
+}
+.bg-gray-700\/40,
+.bg-gray-700\/60 {
+  background-color: color-mix(
+    in srgb,
+    var(--pm-bg-hover) 60%,
+    transparent
+  ) !important;
+}
+
+.text-white {
+  color: var(--pm-text) !important;
+}
+.text-gray-100,
+.text-gray-200 {
+  color: var(--pm-text) !important;
+}
+.text-gray-300,
+.text-gray-400 {
+  color: var(--pm-text-muted) !important;
+}
+.text-gray-500,
+.text-gray-600 {
+  color: var(--pm-text-faint) !important;
+}
+
+.border-gray-700,
+.border-gray-600 {
+  border-color: var(--pm-border) !important;
+}
+.border-gray-700\/40 {
+  border-color: color-mix(
+    in srgb,
+    var(--pm-border) 40%,
+    transparent
+  ) !important;
+}
+
+.divide-gray-700\/40 > * + * {
+  border-color: color-mix(
+    in srgb,
+    var(--pm-border) 40%,
+    transparent
+  ) !important;
+}
+
+.bg-indigo-600 {
+  background-color: var(--pm-accent) !important;
+}
+.bg-indigo-700 {
+  background-color: var(--pm-accent-hover) !important;
+}
+.hover\:bg-indigo-700:hover {
+  background-color: var(--pm-accent-hover) !important;
+}
+.text-indigo-400 {
+  color: var(--pm-accent) !important;
+}
+.text-indigo-300 {
+  color: var(--pm-accent-hover) !important;
+}
+.border-indigo-700 {
+  border-color: var(--pm-accent-dim) !important;
+}
+.ring-indigo-500,
+.focus\:ring-indigo-500:focus {
+  --tw-ring-color: var(--pm-accent) !important;
+}
+.bg-indigo-900\/30 {
+  background-color: color-mix(
+    in srgb,
+    var(--pm-accent-dim) 30%,
+    transparent
+  ) !important;
+}
+
+.hover\:bg-gray-700\/40:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--pm-bg-hover) 40%,
+    transparent
+  ) !important;
+}
+.hover\:text-white:hover {
+  color: var(--pm-text) !important;
+}

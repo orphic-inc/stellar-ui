@@ -285,7 +285,10 @@ const Settings = () => {
               >
                 {stylesheets?.map((s) => (
                   <option key={s.name} value={s.name}>
-                    {s.name.charAt(0).toUpperCase() + s.name.slice(1)}
+                    {s.name
+                      .split('-')
+                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join(' ')}
                   </option>
                 ))}
               </select>

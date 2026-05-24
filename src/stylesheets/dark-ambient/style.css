@@ -1,0 +1,151 @@
+/* Dark Ambient — deep atmospheric theme for Stellar */
+
+/* ─── Palette ──────────────────────────────────────────────────────────────── */
+:root {
+  --da-bg-page: #050b14;
+  --da-bg-card: #0a1220;
+  --da-bg-hover: #0e1a2e;
+  --da-border: #152436;
+  --da-border-soft: #0f1c2c;
+  --da-text: #9ab0c8;
+  --da-text-muted: #5a7890;
+  --da-text-faint: #2e4a60;
+  --da-accent: #3d78c4;
+  --da-accent-hover: #4e8cd8;
+  --da-accent-dim: #1a3a60;
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--da-bg-page) !important;
+  color: var(--da-text) !important;
+}
+
+a {
+  color: var(--da-accent) !important;
+}
+a:hover {
+  color: var(--da-accent-hover) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--da-text) !important;
+}
+
+input,
+textarea,
+select {
+  background-color: var(--da-bg-card) !important;
+  color: var(--da-text) !important;
+  border-color: var(--da-border) !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: var(--da-bg-page);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--da-border);
+  border-radius: 4px;
+}
+
+/* ─── Tailwind overrides ───────────────────────────────────────────────────── */
+.bg-gray-900 {
+  background-color: var(--da-bg-page) !important;
+}
+.bg-gray-800 {
+  background-color: var(--da-bg-card) !important;
+}
+.bg-gray-700 {
+  background-color: var(--da-bg-hover) !important;
+}
+.bg-gray-700\/40,
+.bg-gray-700\/60 {
+  background-color: color-mix(
+    in srgb,
+    var(--da-bg-hover) 60%,
+    transparent
+  ) !important;
+}
+
+.text-white {
+  color: var(--da-text) !important;
+}
+.text-gray-100,
+.text-gray-200 {
+  color: var(--da-text) !important;
+}
+.text-gray-300,
+.text-gray-400 {
+  color: var(--da-text-muted) !important;
+}
+.text-gray-500,
+.text-gray-600 {
+  color: var(--da-text-faint) !important;
+}
+
+.border-gray-700,
+.border-gray-600 {
+  border-color: var(--da-border) !important;
+}
+.border-gray-700\/40 {
+  border-color: color-mix(
+    in srgb,
+    var(--da-border) 40%,
+    transparent
+  ) !important;
+}
+
+.divide-gray-700\/40 > * + * {
+  border-color: color-mix(
+    in srgb,
+    var(--da-border) 40%,
+    transparent
+  ) !important;
+}
+
+.bg-indigo-600 {
+  background-color: var(--da-accent) !important;
+}
+.bg-indigo-700 {
+  background-color: var(--da-accent-hover) !important;
+}
+.hover\:bg-indigo-700:hover {
+  background-color: var(--da-accent-hover) !important;
+}
+.text-indigo-400 {
+  color: var(--da-accent) !important;
+}
+.text-indigo-300 {
+  color: var(--da-accent-hover) !important;
+}
+.border-indigo-700 {
+  border-color: var(--da-accent-dim) !important;
+}
+.ring-indigo-500,
+.focus\:ring-indigo-500:focus {
+  --tw-ring-color: var(--da-accent) !important;
+}
+.bg-indigo-900\/30 {
+  background-color: color-mix(
+    in srgb,
+    var(--da-accent-dim) 30%,
+    transparent
+  ) !important;
+}
+
+.hover\:bg-gray-700\/40:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--da-bg-hover) 40%,
+    transparent
+  ) !important;
+}
+.hover\:text-white:hover {
+  color: var(--da-text) !important;
+}
