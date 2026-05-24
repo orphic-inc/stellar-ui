@@ -1,4 +1,4 @@
-/* Kuro — dark theme for Stellar */
+/* Kuro — dark theme */
 
 /* ─── Palette ──────────────────────────────────────────────────────────────── */
 :root {
@@ -22,10 +22,11 @@
 }
 
 /* ─── Base elements ────────────────────────────────────────────────────────── */
-body {
+body,
+.min-h-screen.bg-gray-900 {
   background-color: var(--kuro-bg-page) !important;
-  color: var(--kuro-text);
-  font-family: tahoma, helvetica, sans-serif;
+  color: var(--kuro-text) !important;
+  font-family: tahoma, helvetica, sans-serif !important;
 }
 
 a {
@@ -44,6 +45,10 @@ h4,
 h5,
 h6 {
   color: var(--kuro-link-hover);
+}
+
+h2 {
+  text-align: center;
 }
 
 ::selection {
@@ -248,9 +253,9 @@ h6 {
 input,
 textarea,
 select {
-  background-color: var(--kuro-bg-input);
-  color: var(--kuro-text);
-  border-color: var(--kuro-border);
+  background-color: var(--kuro-bg-input) !important;
+  color: var(--kuro-text) !important;
+  border-color: var(--kuro-border) !important;
 }
 input::placeholder,
 textarea::placeholder {
@@ -260,6 +265,53 @@ textarea::placeholder {
 /* ─── Accent checkbox/radio ────────────────────────────────────────────────── */
 .accent-indigo-500 {
   accent-color: var(--kuro-accent);
+}
+
+table {
+  border-collapse: collapse;
+  border: 1px solid var(--kuro-border-muted) !important;
+}
+
+thead,
+.colhead,
+.colhead_dark,
+.head {
+  background: #121212 !important;
+  color: #fff !important;
+}
+
+tbody tr:nth-child(odd),
+tr.rowa {
+  background-color: #222 !important;
+}
+
+tbody tr:nth-child(even),
+tr.rowb {
+  background-color: #2a2a2a !important;
+}
+
+th,
+td {
+  border-color: var(--kuro-border-muted) !important;
+}
+
+.similar_artist_header {
+  color: #fff !important;
+  background-color: #666 !important;
+  border: 1px solid #fff !important;
+  padding: 3px 5px !important;
+}
+
+a.similar_artist {
+  display: block;
+  padding: 1px 4px;
+  color: #fff !important;
+  background-color: #444 !important;
+  border: 1px solid #fff !important;
+}
+
+a.similar_artist:hover {
+  background-color: #555 !important;
 }
 
 /* ─── Divide lines ─────────────────────────────────────────────────────────── */
@@ -286,17 +338,50 @@ textarea::placeholder {
 .bg-gray-500\/20 {
   background-color: rgba(102, 102, 102, 0.2) !important;
 }
+.bg-green-900\/30,
+.bg-green-900\/40,
+.bg-green-900\/50 {
+  background-color: rgba(79, 122, 79, 0.28) !important;
+}
+.bg-red-900\/30,
+.bg-red-900\/50 {
+  background-color: rgba(160, 80, 80, 0.28) !important;
+}
+.bg-yellow-700,
+.bg-yellow-800 {
+  background-color: #8a7340 !important;
+}
+.bg-green-800 {
+  background-color: #4f7a4f !important;
+}
 .text-green-300 {
   color: #7aaf7a !important;
 }
+.text-green-200 {
+  color: #98c198 !important;
+}
 .text-yellow-300 {
   color: #c0a848 !important;
+}
+.text-yellow-200 {
+  color: #d6bf72 !important;
 }
 .text-blue-300 {
   color: #7aaad0 !important;
 }
 .text-gray-300 {
   color: var(--kuro-text) !important;
+}
+.border-green-700,
+.border-green-900 {
+  border-color: #4f7a4f !important;
+}
+.border-red-700,
+.border-red-800 {
+  border-color: var(--kuro-danger) !important;
+}
+.border-amber-800\/40 {
+  border-color: rgba(138, 115, 64, 0.4) !important;
 }
 
 /* ─── Ring/shadow ──────────────────────────────────────────────────────────── */
@@ -308,4 +393,18 @@ textarea::placeholder {
 }
 .shadow-xl {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+}
+
+.focus\:ring-yellow-500:focus {
+  --tw-ring-color: #c0a848 !important;
+}
+
+.focus\:border-blue-500:focus,
+.focus\:border-indigo-500:focus {
+  border-color: var(--kuro-accent) !important;
+}
+
+.hover\:bg-indigo-500:hover,
+.hover\:bg-indigo-600:hover {
+  background-color: var(--kuro-accent-hover) !important;
 }
