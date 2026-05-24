@@ -39,7 +39,8 @@ module.exports = {
           '^@reduxjs/toolkit$',
           'dompurify',
           '^@reduxjs/toolkit/query$',
-          '^@reduxjs/toolkit/query/react$'
+          '^@reduxjs/toolkit/query/react$',
+          'recharts'
         ]
       }
     ]
