@@ -48,6 +48,13 @@ export interface UserStatSnapshot {
 }
 type StylesheetsResponse =
   paths['/stylesheet']['get']['responses'][200]['content']['application/json'];
+type StylesheetStatsResponse =
+  paths['/stylesheet/admin/stats']['get']['responses'][200]['content']['application/json'];
+type UpdateStylesheetBody = NonNullable<
+  paths['/stylesheet/{id}']['put']['requestBody']
+>['content']['application/json'];
+type UpdateStylesheetResponse =
+  paths['/stylesheet/{id}']['put']['responses'][200]['content']['application/json'];
 interface SiteSettingsResponse {
   id: number;
   approvedDomains: string[];
@@ -101,6 +108,21 @@ export const siteApi = api.injectEndpoints({
       providesTags: (_r, _e, { userId }) => [
         { type: 'UserStats' as const, id: userId }
       ]
+    }),
+    getStylesheetStats: build.query<StylesheetStatsResponse, void>({
+      query: () => '/stylesheet/admin/stats',
+      providesTags: ['Stylesheet']
+    }),
+    updateStylesheet: build.mutation<
+      UpdateStylesheetResponse,
+      { id: number } & UpdateStylesheetBody
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/stylesheet/${id}`,
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: ['Stylesheet']
     })
   })
 });
@@ -112,5 +134,7 @@ export const {
   useUpdateSiteSettingsMutation,
   useGetSiteStatsHistoryQuery,
   useTriggerSiteSnapshotMutation,
-  useGetUserStatsHistoryQuery
+  useGetUserStatsHistoryQuery,
+  useGetStylesheetStatsQuery,
+  useUpdateStylesheetMutation
 } = siteApi;

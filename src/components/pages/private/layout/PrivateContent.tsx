@@ -76,6 +76,7 @@ import TopVotesPage from '../../../top10/TopVotesPage';
 import TopHistoryPage from '../../../top10/TopHistoryPage';
 import SiteStatsHistoryPage from '../stats/SiteStatsHistoryPage';
 import UserStatsHistoryPage from '../stats/UserStatsHistoryPage';
+import StylesheetManager from '../../../admin/StylesheetManager';
 import DraftsPage from '../../../messages/DraftsPage';
 import { useGetMeQuery } from '../../../../store/services/authApi';
 import {
@@ -184,6 +185,14 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['admin']}>
           <SiteSettingsPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tools/stylesheets"
+      element={
+        <StaffGate permissions={['admin']}>
+          <StylesheetManager />
         </StaffGate>
       }
     />

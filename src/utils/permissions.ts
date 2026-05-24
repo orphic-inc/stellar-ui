@@ -51,3 +51,7 @@ export const isStaffUser = (user: AuthUser | null | undefined): boolean =>
     'news_manage',
     'users_edit'
   ]);
+
+// Admits only users with literal 'admin' permission — staff alone does not pass.
+export const hasStrictAdmin = (user: AuthUser | null | undefined): boolean =>
+  !!getPermissions(user)['admin'];

@@ -6,6 +6,7 @@ import StylelintPlugin from 'stylelint-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import CopyPlugin from 'copy-webpack-plugin';
 
 const dev = process.env.NODE_ENV === 'development';
 const apiUrl = process.env.STELLAR_API_URL || 'http://localhost:8080';
@@ -24,6 +25,9 @@ const plugins = [
   }),
   new HtmlPlugin({
     template: './src/index.html'
+  }),
+  new CopyPlugin({
+    patterns: [{ from: 'src/stylesheets', to: 'stylesheets' }]
   })
 ];
 
@@ -36,6 +40,12 @@ export default {
   devtool: dev ? 'eval-cheap-module-source-map' : 'cheap-module-source-map',
   entry: './src/index.tsx',
   devServer: {
+    static: [
+      {
+        directory: resolve(__dirname, 'src/stylesheets'),
+        publicPath: '/stylesheets'
+      }
+    ],
     compress: dev,
     open: true,
     historyApiFallback: true,

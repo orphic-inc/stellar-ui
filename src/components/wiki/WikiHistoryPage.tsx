@@ -46,7 +46,7 @@ const DIFF_PREFIX: Record<string, string> = {
   unchanged: ' '
 };
 
-// Compute a simple line-level diff to mirror Gazelle's compare.php output.
+// Compute a simple line-level diff showing added/removed lines between revisions.
 function diffLines(
   oldText: string,
   newText: string

@@ -707,7 +707,7 @@ export interface paths {
             profileTitle?: string;
             profileInfo?: string;
             siteAppearance?: string;
-            externalStylesheet?: string | '';
+            externalStylesheet?: string;
             styledTooltips?: boolean;
             paranoia?: number | null;
             /** @enum {string} */
@@ -1207,6 +1207,149 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/stats/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Site-wide historical stat snapshots */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Historical site stat snapshots (ascending by capturedAt) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SiteStatSnapshot'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stats/snapshot': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Manually trigger a site stat snapshot (admin only) */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Snapshot captured */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/stats/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** User historical stat snapshots */
+    get: {
+      parameters: {
+        query: {
+          period: 'Daily' | 'Monthly' | 'Yearly';
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Historical user stat snapshots (ascending by capturedAt) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserStatSnapshot'][];
+          };
+        };
+        /** @description Stats are private */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/stylesheet': {
     parameters: {
       query?: never;
@@ -1246,8 +1389,11 @@ export interface paths {
         content: {
           'application/json': {
             name: string;
-            /** Format: uri */
+            /** @default  */
+            description?: string;
             cssUrl: string;
+            /** @default false */
+            isDefault?: boolean;
           };
         };
       };
@@ -1272,6 +1418,41 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stylesheet/admin/stats': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Stylesheet user counts (admin only) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['StylesheetStat'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -1316,7 +1497,55 @@ export interface paths {
         };
       };
     };
-    put?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name?: string;
+            description?: string;
+            cssUrl?: string;
+            isDefault?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Stylesheet updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Stylesheet'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     post?: never;
     delete: {
       parameters: {
@@ -1335,6 +1564,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Cannot delete the default stylesheet */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
@@ -7162,6 +7400,34 @@ export interface components {
       contributedLinks: number;
       contributedLinkDownloads: number;
     };
+    SiteStatSnapshot: {
+      id: number;
+      capturedAt: string;
+      maxUsers: number;
+      totalUsers: number;
+      enabledUsers: number;
+      activeToday: number;
+      activeThisWeek: number;
+      activeThisMonth: number;
+      communities: number;
+      releases: number;
+      artists: number;
+      blogPosts: number;
+      announcements: number;
+      comments: number;
+      contributedLinks: number;
+      contributedLinkDownloads: number;
+    };
+    UserStatSnapshot: {
+      id: number;
+      userId: number;
+      /** @enum {string} */
+      period: 'Daily' | 'Monthly' | 'Yearly';
+      capturedAt: string;
+      contributed: string | null;
+      consumed: string | null;
+      contributionCount: number;
+    };
     Notification: {
       id: number;
       /** @enum {string} */
@@ -7197,8 +7463,15 @@ export interface components {
     Stylesheet: {
       id: number;
       name: string;
+      description: string;
       cssUrl: string;
+      isDefault: boolean;
       createdAt: string;
+    };
+    StylesheetStat: {
+      id: number;
+      name: string;
+      userCount: number;
     };
     Forum: {
       id: number;
