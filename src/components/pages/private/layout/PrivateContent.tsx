@@ -58,6 +58,11 @@ import SiteHistoryPage from '../../../staff/SiteHistoryPage';
 import MassPmPage from '../../../staff/MassPmPage';
 import DonorRanksPage from '../../../staff/DonorRanksPage';
 import RecoveryQueuePage from '../../../staff/RecoveryQueuePage';
+import IpBansPage from '../../../staff/IpBansPage';
+import EmailBlacklistPage from '../../../staff/EmailBlacklistPage';
+import DonationLogPage from '../../../staff/DonationLogPage';
+import DuplicateIpsPage from '../../../staff/DuplicateIpsPage';
+import RegistrationLogPage from '../../../staff/RegistrationLogPage';
 import SnatchList from '../snatch/SnatchList';
 import BookmarksPage from '../bookmarks/BookmarksPage';
 import WikiListPage from '../../../wiki/WikiListPage';
@@ -242,6 +247,46 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['users_edit']}>
           <RecoveryQueuePage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/ip-bans"
+      element={
+        <StaffGate permissions={['admin']}>
+          <IpBansPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/email-blacklist"
+      element={
+        <StaffGate permissions={['admin']}>
+          <EmailBlacklistPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/donation-log"
+      element={
+        <StaffGate permissions={['admin']}>
+          <DonationLogPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/duplicate-ips"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <DuplicateIpsPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/registration-log"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <RegistrationLogPage />
         </StaffGate>
       }
     />

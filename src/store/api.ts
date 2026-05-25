@@ -56,7 +56,10 @@ export const api = createApi({
     'ArtistSubscription',
     'RecoveryRequest',
     'StatsHistory',
-    'UserStats'
+    'UserStats',
+    'IpBan',
+    'EmailBlacklist',
+    'Donation'
   ] as const,
   endpoints: () => ({})
 });

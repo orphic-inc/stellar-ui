@@ -137,6 +137,31 @@ const sections: SectionProps[] = [
         label: 'Ratio policy override',
         to: '/private/staff/tools/ratio-policy',
         permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Duplicate IPs',
+        to: '/private/staff/duplicate-ips',
+        permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Registration log',
+        to: '/private/staff/registration-log',
+        permissions: ['staff', 'admin']
+      }
+    ]
+  },
+  {
+    title: 'Moderation',
+    links: [
+      {
+        label: 'IP address bans',
+        to: '/private/staff/ip-bans',
+        permissions: ['admin']
+      },
+      {
+        label: 'Email blacklist',
+        to: '/private/staff/email-blacklist',
+        permissions: ['admin']
       }
     ]
   },
@@ -146,6 +171,11 @@ const sections: SectionProps[] = [
       {
         label: 'Donor ranks',
         to: '/private/staff/donor-ranks',
+        permissions: ['admin']
+      },
+      {
+        label: 'Donation log',
+        to: '/private/staff/donation-log',
         permissions: ['admin']
       }
     ]
