@@ -137,11 +137,19 @@ export const userApi = api.injectEndpoints({
     }),
     disableUser: build.mutation<{ msg: string }, number>({
       query: (id) => ({ url: `/users/${id}/disable`, method: 'POST' }),
-      invalidatesTags: (_, __, id) => [{ type: 'User', id }, 'Profile']
+      invalidatesTags: (_, __, id) => [
+        { type: 'User', id },
+        { type: 'Profile', id },
+        'Profile'
+      ]
     }),
     enableUser: build.mutation<{ msg: string }, number>({
       query: (id) => ({ url: `/users/${id}/enable`, method: 'POST' }),
-      invalidatesTags: (_, __, id) => [{ type: 'User', id }, 'Profile']
+      invalidatesTags: (_, __, id) => [
+        { type: 'User', id },
+        { type: 'Profile', id },
+        'Profile'
+      ]
     }),
     setUserRank: build.mutation<
       { msg: string },

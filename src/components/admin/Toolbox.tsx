@@ -49,14 +49,24 @@ const sections: SectionProps[] = [
         permissions: ['admin']
       },
       {
+        label: 'Site settings',
+        to: '/private/staff/tools/settings',
+        permissions: ['admin']
+      }
+    ]
+  },
+  {
+    title: 'User Management',
+    links: [
+      {
         label: 'Create user',
         to: '/private/staff/tools/user/new',
         permissions: ['users_edit']
       },
       {
-        label: 'Site settings',
-        to: '/private/staff/tools/settings',
-        permissions: ['admin']
+        label: 'Recovery queue',
+        to: '/private/staff/tools/recovery-queue',
+        permissions: ['users_edit', 'admin']
       }
     ]
   },
@@ -67,6 +77,16 @@ const sections: SectionProps[] = [
         label: 'News post',
         to: '/private/staff/tools/news',
         permissions: ['news_manage']
+      },
+      {
+        label: 'Mass PM',
+        to: '/private/staff/mass-pm',
+        permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Site History',
+        to: '/private/staff/site-history',
+        permissions: ['staff', 'admin']
       }
     ]
   },
@@ -91,17 +111,7 @@ const sections: SectionProps[] = [
     ]
   },
   {
-    title: 'Users',
-    links: [
-      {
-        label: 'Ratio policy override',
-        to: '/private/staff/tools/ratio-policy',
-        permissions: ['staff', 'admin']
-      }
-    ]
-  },
-  {
-    title: 'Support',
+    title: 'Managers',
     links: [
       {
         label: 'Ticket queue',
@@ -117,31 +127,21 @@ const sections: SectionProps[] = [
         label: 'Reports queue',
         to: '/private/staff/reports',
         permissions: ['staff', 'admin']
-      },
-      {
-        label: 'Recovery queue',
-        to: '/private/staff/tools/recovery-queue',
-        permissions: ['users_edit', 'admin']
       }
     ]
   },
   {
-    title: 'Communications',
+    title: 'Users',
     links: [
       {
-        label: 'Mass PM',
-        to: '/private/staff/mass-pm',
-        permissions: ['staff', 'admin']
-      },
-      {
-        label: 'Site History',
-        to: '/private/staff/site-history',
+        label: 'Ratio policy override',
+        to: '/private/staff/tools/ratio-policy',
         permissions: ['staff', 'admin']
       }
     ]
   },
   {
-    title: 'Donor System',
+    title: 'Finances',
     links: [
       {
         label: 'Donor ranks',

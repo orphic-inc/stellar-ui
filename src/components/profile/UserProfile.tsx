@@ -80,7 +80,7 @@ const WarnModal = ({
       await warnUser({
         id: userId,
         reason,
-        expiresAt: expiresAt || undefined
+        expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined
       }).unwrap();
       dispatch(addAlert('Warning issued.', 'success'));
       onClose();
@@ -179,7 +179,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
   });
 
   const { data: profile } = useGetProfileByUserIdQuery(String(profileId));
-  const isDisabled = (profile as { disabled?: boolean } | undefined)?.disabled;
+  const isDisabled = profile?.disabled;
   const staffPmOverview = profile?.staffPmOverview;
 
   const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
@@ -818,10 +818,9 @@ const UserProfile = () => {
     'users_disable'
   ]);
 
-  const profileAny = profile as Record<string, unknown>;
-  const profileDisabled = profileAny.disabled as boolean | undefined;
-  const profileWarned = profileAny.warned as string | null | undefined;
-  const profileIsDonor = profileAny.isDonor as boolean | undefined;
+  const profileDisabled = profile.disabled;
+  const profileWarned = profile.warned;
+  const profileIsDonor = profile.isDonor;
   const profileStats = profile.stats;
   const activitySummary = profile.activitySummary;
   const donorPresentation = profile.donorPresentation;

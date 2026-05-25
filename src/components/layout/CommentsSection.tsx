@@ -73,100 +73,90 @@ const CommentsSection = ({
   };
 
   return (
-    <div className="box">
-      <div className="head colhead_dark">Comments</div>
+    <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+      <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Comments
+      </div>
+
       {isLoading ? (
-        <div className="pad">Loading…</div>
+        <div className="px-3 py-2 text-xs text-gray-500">Loading…</div>
       ) : !comments?.length ? (
-        <div className="pad small">No comments yet.</div>
+        <div className="px-3 py-2 text-xs text-gray-500">No comments yet.</div>
       ) : (
-        <table className="m_table">
-          <tbody>
-            {comments.map((c) => (
-              <tr key={c.id}>
-                <td
-                  style={{ width: 120, verticalAlign: 'top' }}
-                  className="small"
-                >
-                  <strong>{c.author?.username ?? 'Unknown'}</strong>
-                  <br />
-                  <span className="time">
-                    <Time date={c.createdAt} />
-                  </span>
-                </td>
-                <td
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(c.body)
-                  }}
-                />
-                <td
-                  style={{
-                    width: 40,
-                    textAlign: 'center',
-                    verticalAlign: 'top'
-                  }}
-                >
-                  {currentUser && currentUser.id !== c.authorId && (
-                    <Link
-                      to={`/private/reports/new?targetType=Comment&targetId=${c.id}`}
-                      className="brackets btn-link text-gray-600 hover:text-gray-400"
-                      aria-label="Report comment"
-                      title="Report this comment"
-                    >
-                      !
-                    </Link>
-                  )}
-                  {currentUser?.id === c.authorId && (
-                    <button
-                      type="button"
-                      onClick={() => deleteComment(c.id)}
-                      className="brackets btn-link"
-                      aria-label="Delete comment"
-                    >
-                      ×
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="divide-y divide-gray-700/40">
+          {comments.map((c) => (
+            <div key={c.id} className="px-3 py-2 text-xs">
+              <div className="flex items-center justify-between gap-1 mb-1">
+                <span className="font-semibold text-gray-200 truncate">
+                  {c.author?.username ?? 'Unknown'}
+                </span>
+                <span className="text-gray-500 shrink-0">
+                  <Time date={c.createdAt} />
+                </span>
+              </div>
+              <div
+                className="text-gray-300 leading-relaxed break-words"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(c.body)
+                }}
+              />
+              <div className="flex gap-2 mt-1">
+                {currentUser && currentUser.id !== c.authorId && (
+                  <Link
+                    to={`/private/reports/new?targetType=Comment&targetId=${c.id}`}
+                    className="text-gray-600 hover:text-gray-400 text-xs"
+                    aria-label="Report comment"
+                    title="Report this comment"
+                  >
+                    [!]
+                  </Link>
+                )}
+                {currentUser?.id === c.authorId && (
+                  <button
+                    type="button"
+                    onClick={() => deleteComment(c.id)}
+                    className="text-gray-600 hover:text-red-400 text-xs"
+                    aria-label="Delete comment"
+                  >
+                    [×]
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
+
       {currentUser && (
-        <form className="pad" onSubmit={handleSubmit}>
+        <form
+          className="px-3 py-2 border-t border-gray-700/40"
+          onSubmit={handleSubmit}
+        >
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            rows={4}
-            cols={60}
+            className="w-full bg-gray-800 border border-gray-700 rounded text-xs text-gray-200 px-2 py-1.5 focus:outline-none focus:border-indigo-500 resize-none h-20"
             placeholder="Add a comment…"
             required
           />
-          <br />
           {canSubscribe && (
-            <label
-              className="small"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                marginBottom: 4
-              }}
-            >
+            <label className="flex items-center gap-1.5 text-xs text-gray-400 mt-1.5 mb-1">
               <input
                 type="checkbox"
                 checked={subscribe}
                 onChange={(e) => setSubscribe(e.target.checked)}
+                className="accent-indigo-500"
               />
               Subscribe to comments
             </label>
           )}
-          {canSubscribe && <br />}
-          <input
+          <button
             type="submit"
-            value="Post comment"
             disabled={posting || subscribing}
-          />
+            className="mt-1.5 px-3 py-1 bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 text-white text-xs rounded transition-colors"
+          >
+            Post comment
+          </button>
         </form>
       )}
     </div>
