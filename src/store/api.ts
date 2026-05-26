@@ -60,7 +60,8 @@ export const api = createApi({
     'IpBan',
     'EmailBlacklist',
     'Donation',
-    'StaffGroup'
+    'StaffGroup',
+    'RulesPage'
   ] as const,
   endpoints: () => ({})
 });

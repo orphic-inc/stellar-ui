@@ -34,7 +34,7 @@ const PERM_GROUPS: { title: string; perms: string[] }[] = [
   },
   {
     title: 'System',
-    perms: ['news_manage', 'staff', 'admin']
+    perms: ['news_manage', 'rules_manage', 'staff', 'admin']
   }
 ];
 

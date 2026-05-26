@@ -71,6 +71,9 @@ import WikiListPage from '../../../wiki/WikiListPage';
 import WikiViewPage from '../../../wiki/WikiViewPage';
 import WikiEditPage from '../../../wiki/WikiEditPage';
 import WikiHistoryPage from '../../../wiki/WikiHistoryPage';
+import RulesPage from '../../../rules/RulesPage';
+import RulesSubPage from '../../../rules/RulesSubPage';
+import RulesManager from '../../../admin/RulesManager';
 import ReleaseBrowsePage from '../../../releases/ReleaseBrowsePage';
 import ArtistBrowsePage from '../../../artists/ArtistBrowsePage';
 import LogBrowsePage from '../../../log/LogBrowsePage';
@@ -222,6 +225,7 @@ const PrivateContent = () => (
             'forums_moderate',
             'communities_manage',
             'news_manage',
+            'rules_manage',
             'users_edit'
           ]}
         >
@@ -387,6 +391,18 @@ const PrivateContent = () => (
     <Route path="reports/new" element={wrap(ReportForm)} />
     <Route path="reports/mine" element={wrap(MyReportsPage)} />
     <Route path="reports/:id" element={wrap(ReportDetailPage)} />
+
+    <Route
+      path="staff/tools/rules"
+      element={
+        <StaffGate permissions={['rules_manage']}>
+          <RulesManager />
+        </StaffGate>
+      }
+    />
+
+    <Route path="rules/:slug" element={wrap(RulesSubPage)} />
+    <Route path="rules" element={wrap(RulesPage)} />
 
     <Route path="wiki/new" element={wrap(WikiEditPage)} />
     <Route path="wiki/:id/edit" element={wrap(WikiEditPage)} />

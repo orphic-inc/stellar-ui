@@ -76,6 +76,16 @@ const sections: SectionProps[] = [
     ]
   },
   {
+    title: 'Content',
+    links: [
+      {
+        label: 'Rules manager',
+        to: '/private/staff/tools/rules',
+        permissions: ['rules_manage']
+      }
+    ]
+  },
+  {
     title: 'Announcements',
     links: [
       {

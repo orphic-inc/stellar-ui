@@ -24,6 +24,7 @@ const navLinks = [
   { label: 'Forums', to: '/private/forums' },
   { label: 'Top 10', to: '/private/top10' },
   { label: 'Wiki', to: '/private/wiki' },
+  { label: 'Rules', to: '/private/rules' },
   { label: 'Staff', to: '/private/staff', end: true }
 ];
 
