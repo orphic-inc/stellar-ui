@@ -31,6 +31,10 @@ function renderNotificationText(
       return `${actor} commented on ${title}`;
     case 'artist_release':
       return `${actor} added a new contribution for ${title}`;
+    case 'site_news':
+      return `New announcement: ${title}`;
+    case 'global_notice':
+      return title;
     default:
       return `New notification in ${title}`;
   }
@@ -53,6 +57,10 @@ function sourcePath(n: Notification): string | null {
       return `/private/requests/${n.pageId}`;
     case 'communities':
       return `/private/communities/${n.pageId}`;
+    case 'news':
+      return `/private/announcements`;
+    case 'global_notices':
+      return n.source?.url ?? null;
     default:
       return null;
   }
