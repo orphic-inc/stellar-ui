@@ -16,6 +16,7 @@ import { addAlert } from '../../../store/slices/alertSlice';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
 import Spinner from '../../layout/Spinner';
+import DonorSettingsTab from './DonorSettingsTab';
 import type { paths } from '../../../types/api';
 
 type ProfileForm = NonNullable<
@@ -24,7 +25,7 @@ type ProfileForm = NonNullable<
 type MyProfileResponse =
   paths['/profile/me']['get']['responses'][200]['content']['application/json'];
 
-type Tab = 'appearance' | 'privacy' | 'security';
+type Tab = 'appearance' | 'privacy' | 'security' | 'donor';
 
 const PARANOIA_LABELS: Record<number, string> = {
   0: 'No restrictions — profile fully visible',
@@ -199,6 +200,14 @@ const Settings = () => {
         >
           Security
         </button>
+        {currentUser?.isDonor && (
+          <button
+            className={tabClass('donor')}
+            onClick={() => setActiveTab('donor')}
+          >
+            Donor
+          </button>
+        )}
       </div>
 
       {/* Appearance tab */}
@@ -441,6 +450,9 @@ const Settings = () => {
           </button>
         </form>
       )}
+
+      {/* Donor tab */}
+      {activeTab === 'donor' && currentUser?.isDonor && <DonorSettingsTab />}
 
       {/* Security tab */}
       {activeTab === 'security' && (

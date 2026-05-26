@@ -65,7 +65,7 @@ const RegistrationLogPage = () => {
         )}
       </div>
 
-      {data && data.totalPages > 1 && (
+      {data && data.meta.totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 text-sm">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -75,11 +75,13 @@ const RegistrationLogPage = () => {
             Prev
           </button>
           <span className="text-gray-500">
-            {page} / {data.totalPages}
+            {page} / {data.meta.totalPages}
           </span>
           <button
-            onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
-            disabled={page === data.totalPages}
+            onClick={() =>
+              setPage((p) => Math.min(data.meta.totalPages, p + 1))
+            }
+            disabled={page === data.meta.totalPages}
             className="px-3 py-1 bg-gray-800 hover:bg-gray-700 disabled:opacity-40 text-gray-300 rounded transition-colors"
           >
             Next

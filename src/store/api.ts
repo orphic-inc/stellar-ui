@@ -60,6 +60,7 @@ export const api = createApi({
     'IpBan',
     'EmailBlacklist',
     'Donation',
+    'DonorReward',
     'StaffGroup',
     'RulesPage',
     'Friend'

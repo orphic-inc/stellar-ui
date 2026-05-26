@@ -914,6 +914,193 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/profile/me/donor-rewards': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Donor reward settings and active perks */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['DonorRewards'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No active donor rank */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            iconMouseOverText?: string;
+            avatarMouseOverText?: string;
+            customIcon?: string | '';
+            customIconLink?: string | '';
+            secondAvatar?: string | '';
+            profileInfoTitle1?: string;
+            profileInfo1?: string;
+            profileInfoTitle2?: string;
+            profileInfo2?: string;
+            profileInfoTitle3?: string;
+            profileInfo3?: string;
+            profileInfoTitle4?: string;
+            profileInfo4?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated donor reward settings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['DonorRewards'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No active donor rank */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/me/donor-title': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            prefix?: string;
+            suffix?: string;
+            useComma?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated forum title */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['DonorForumTitle'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Perk not enabled for this rank */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/home/featured': {
     parameters: {
       query?: never;
@@ -7952,6 +8139,8 @@ export interface components {
       customIcon: string | null;
       customIconLink: string | null;
       secondAvatar: string | null;
+      iconMouseOverText: string | null;
+      avatarMouseOverText: string | null;
       profileBlocks: {
         title: string;
         body: string;
@@ -8078,6 +8267,36 @@ export interface components {
       expiresAt: string;
       /** Format: date-time */
       usedAt: string | null;
+    };
+    DonorRewards: {
+      rewards: {
+        iconMouseOverText: string;
+        avatarMouseOverText: string;
+        customIcon: string;
+        customIconLink: string;
+        secondAvatar: string;
+        profileInfoTitle1: string;
+        profileInfo1: string;
+        profileInfoTitle2: string;
+        profileInfo2: string;
+        profileInfoTitle3: string;
+        profileInfo3: string;
+        profileInfoTitle4: string;
+        profileInfo4: string;
+      };
+      perks: {
+        [key: string]: boolean;
+      };
+      forumTitle: {
+        prefix: string;
+        suffix: string;
+        useComma: boolean;
+      } | null;
+    };
+    DonorForumTitle: {
+      prefix: string;
+      suffix: string;
+      useComma: boolean;
     };
     HomepageFeaturedRelease: {
       id: number;

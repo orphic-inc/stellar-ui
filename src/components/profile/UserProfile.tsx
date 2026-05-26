@@ -1065,6 +1065,9 @@ const UserProfile = () => {
                             <img
                               src={donorPresentation.customIcon}
                               alt=""
+                              title={
+                                donorPresentation.iconMouseOverText ?? undefined
+                              }
                               className="h-12 w-12 object-contain rounded border border-pink-900/40 bg-black/20"
                             />
                           </a>
@@ -1072,6 +1075,9 @@ const UserProfile = () => {
                           <img
                             src={donorPresentation.customIcon}
                             alt=""
+                            title={
+                              donorPresentation.iconMouseOverText ?? undefined
+                            }
                             className="h-12 w-12 object-contain rounded border border-pink-900/40 bg-black/20"
                           />
                         )}
@@ -1085,6 +1091,9 @@ const UserProfile = () => {
                         <img
                           src={donorPresentation.secondAvatar}
                           alt=""
+                          title={
+                            donorPresentation.avatarMouseOverText ?? undefined
+                          }
                           className="h-20 w-20 object-cover rounded border border-pink-900/40"
                         />
                       </div>

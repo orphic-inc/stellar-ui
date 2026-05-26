@@ -12,7 +12,11 @@ import Spinner from '../layout/Spinner';
 const DonationLogPage = () => {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useGetDonationsQuery(page);
+  const [filterUserId, setFilterUserId] = useState('');
+  const { data, isLoading } = useGetDonationsQuery({
+    page,
+    userId: filterUserId ? Number(filterUserId) : undefined
+  });
   const [createDonation, { isLoading: isCreating }] =
     useCreateDonationMutation();
   const [deleteDonation] = useDeleteDonationMutation();
@@ -81,6 +85,30 @@ const DonationLogPage = () => {
         >
           {showForm ? 'Cancel' : '+ Manual entry'}
         </button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          value={filterUserId}
+          onChange={(e) => {
+            setFilterUserId(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Filter by user ID…"
+          className="w-48 bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+        />
+        {filterUserId && (
+          <button
+            onClick={() => {
+              setFilterUserId('');
+              setPage(1);
+            }}
+            className="text-xs text-gray-400 hover:text-white"
+          >
+            Clear
+          </button>
+        )}
       </div>
 
       {showForm && (
@@ -264,7 +292,7 @@ const DonationLogPage = () => {
         )}
       </div>
 
-      {data && data.totalPages > 1 && (
+      {data && data.meta.totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 text-sm">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -274,11 +302,13 @@ const DonationLogPage = () => {
             Prev
           </button>
           <span className="text-gray-500">
-            {page} / {data.totalPages}
+            {page} / {data.meta.totalPages}
           </span>
           <button
-            onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
-            disabled={page === data.totalPages}
+            onClick={() =>
+              setPage((p) => Math.min(data.meta.totalPages, p + 1))
+            }
+            disabled={page === data.meta.totalPages}
             className="px-3 py-1 bg-gray-800 hover:bg-gray-700 disabled:opacity-40 text-gray-300 rounded transition-colors"
           >
             Next

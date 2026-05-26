@@ -198,7 +198,9 @@ export const userApi = api.injectEndpoints({
         name: string;
         minDonation: number;
         badge: string | null;
+        color: string | null;
         expiresAfterDays: number | null;
+        perks: Record<string, boolean> | null;
       }>,
       void
     >({
@@ -211,10 +213,38 @@ export const userApi = api.injectEndpoints({
         name: string;
         minDonation: number;
         badge?: string;
+        color?: string;
         expiresAfterDays?: number;
+        perks?: Record<string, boolean>;
       }
     >({
       query: (body) => ({ url: '/users/donor-ranks', method: 'POST', body }),
+      invalidatesTags: ['User']
+    }),
+    updateDonorRank: build.mutation<
+      { id: number; name: string },
+      {
+        rankId: number;
+        name?: string;
+        minDonation?: number;
+        badge?: string;
+        color?: string;
+        expiresAfterDays?: number;
+        perks?: Record<string, boolean>;
+      }
+    >({
+      query: ({ rankId, ...body }) => ({
+        url: `/users/donor-ranks/${rankId}`,
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: ['User']
+    }),
+    deleteDonorRank: build.mutation<void, number>({
+      query: (rankId) => ({
+        url: `/users/donor-ranks/${rankId}`,
+        method: 'DELETE'
+      }),
       invalidatesTags: ['User']
     }),
     grantDonor: build.mutation<
@@ -356,6 +386,8 @@ export const {
   useGetSnatchListQuery,
   useGetDonorRanksQuery,
   useCreateDonorRankMutation,
+  useUpdateDonorRankMutation,
+  useDeleteDonorRankMutation,
   useGrantDonorMutation,
   useRevokeDonorMutation,
   useRemoveUserWarningMutation,

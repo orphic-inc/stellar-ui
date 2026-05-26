@@ -52,10 +52,12 @@ export interface RegistrationLogUser {
 
 interface PaginatedResponse<T> {
   data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export const adminApi = api.injectEndpoints({
@@ -96,8 +98,16 @@ export const adminApi = api.injectEndpoints({
     }),
 
     // Donations
-    getDonations: build.query<PaginatedResponse<Donation>, number | void>({
-      query: (page = 1) => `/donations?page=${page}`,
+    getDonations: build.query<
+      PaginatedResponse<Donation>,
+      { page?: number; userId?: number } | void
+    >({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args?.page) params.set('page', String(args.page));
+        if (args?.userId) params.set('userId', String(args.userId));
+        return `/donations?${params.toString()}`;
+      },
       providesTags: ['Donation']
     }),
     createDonation: build.mutation<

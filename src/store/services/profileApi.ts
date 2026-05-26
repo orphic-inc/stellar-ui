@@ -1,5 +1,5 @@
 import { api } from '../api';
-import type { paths } from '../../types/api';
+import type { paths, components } from '../../types/api';
 import type { RatioStats } from '../../types';
 
 type MyProfileResponse =
@@ -14,6 +14,14 @@ type CreateInviteArgs = NonNullable<
 >['content']['application/json'];
 type CreateInviteResponse =
   paths['/profile/referral/create-invite']['post']['responses'][201]['content']['application/json'];
+
+type DonorRewardsResponse = components['schemas']['DonorRewards'];
+type UpdateDonorRewardsArgs = NonNullable<
+  paths['/profile/me/donor-rewards']['put']['requestBody']
+>['content']['application/json'];
+type UpdateDonorForumTitleArgs = NonNullable<
+  paths['/profile/me/donor-title']['put']['requestBody']
+>['content']['application/json'];
 
 export const profileApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -44,6 +52,32 @@ export const profileApi = api.injectEndpoints({
     getMyRatioStats: build.query<RatioStats, void>({
       query: () => '/profile/me/ratio',
       providesTags: ['Profile']
+    }),
+    getDonorRewards: build.query<DonorRewardsResponse, void>({
+      query: () => '/profile/me/donor-rewards',
+      providesTags: ['DonorReward']
+    }),
+    updateDonorRewards: build.mutation<
+      DonorRewardsResponse,
+      UpdateDonorRewardsArgs
+    >({
+      query: (body) => ({
+        url: '/profile/me/donor-rewards',
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: ['DonorReward', 'Profile']
+    }),
+    updateDonorForumTitle: build.mutation<
+      DonorRewardsResponse,
+      UpdateDonorForumTitleArgs
+    >({
+      query: (body) => ({
+        url: '/profile/me/donor-title',
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: ['DonorReward', 'Profile']
     })
   })
 });
@@ -54,5 +88,8 @@ export const {
   useUpdateMyProfileMutation,
   useDeleteMyProfileMutation,
   useCreateInviteMutation,
-  useGetMyRatioStatsQuery
+  useGetMyRatioStatsQuery,
+  useGetDonorRewardsQuery,
+  useUpdateDonorRewardsMutation,
+  useUpdateDonorForumTitleMutation
 } = profileApi;
