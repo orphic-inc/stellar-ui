@@ -78,6 +78,14 @@ export const staffInboxApi = api.injectEndpoints({
     }),
 
     // ─── Tickets ────────────────────────────────────────────────────────────
+    getMyTicketCount: build.query<
+      paths['/staff-inbox/tickets/count']['get']['responses'][200]['content']['application/json'],
+      void
+    >({
+      query: () => '/staff-inbox/tickets/count',
+      providesTags: ['StaffInboxTicket']
+    }),
+
     getMyTickets: build.query<PaginatedTickets, { page?: number }>({
       query: ({ page = 1 } = {}) => ({
         url: '/staff-inbox/tickets',
@@ -187,6 +195,7 @@ export const {
   useCreateCannedResponseMutation,
   useUpdateCannedResponseMutation,
   useDeleteCannedResponseMutation,
+  useGetMyTicketCountQuery,
   useGetMyTicketsQuery,
   useCreateTicketMutation,
   useGetTicketQueueQuery,

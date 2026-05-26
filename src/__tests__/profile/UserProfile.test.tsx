@@ -59,6 +59,7 @@ const mockDeleteUserNote = jest.fn();
 const mockRemoveUserWarning = jest.fn();
 const mockGrantDonor = jest.fn();
 const mockRevokeDonor = jest.fn();
+const mockSetStaffBio = jest.fn();
 
 let mockWarnUserLoading = false;
 let mockSetUserRankLoading = false;
@@ -119,7 +120,8 @@ jest.mock('../../store/services/userApi', () => ({
   useRemoveUserWarningMutation: () => [mockRemoveUserWarning],
   useGetSnatchListByUserIdQuery: () => ({ data: mockSnatchListByUser }),
   useGetSnatchListQuery: () => ({ data: mockSnatchList, isLoading: false }),
-  useTriggerUserRecoveryMutation: () => [jest.fn(), { isLoading: false }]
+  useTriggerUserRecoveryMutation: () => [jest.fn(), { isLoading: false }],
+  useSetStaffBioMutation: () => [mockSetStaffBio, { isLoading: false }]
 }));
 
 const mockProfile = {
@@ -132,7 +134,7 @@ const mockProfile = {
     avatar: null
   },
   avatar: null,
-  userRank: { name: 'Elite', color: '#ff0', level: 100 },
+  userRank: { name: 'Elite', color: '#ff0', level: 100, displayStaff: false },
   inviteCount: 3,
   dateRegistered: '2020-01-01',
   lastSeen: '2024-01-01',
@@ -167,6 +169,7 @@ const mockProfile = {
   staffPmOverview: null,
   disabled: false,
   warned: null,
+  staffBio: null as string | null,
   isDonor: false,
   recentContributions: [],
   recentSnatches: []
@@ -239,6 +242,7 @@ describe('UserProfile', () => {
     });
     mockGrantDonor.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRevokeDonor.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockSetStaffBio.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('shows spinner when loading', () => {
@@ -522,6 +526,43 @@ describe('UserProfile', () => {
       fireEvent.submit(screen.getByLabelText(/^reason$/i).closest('form')!);
       await waitFor(() => {
         expect(mockWarnUser).toHaveBeenCalled();
+      });
+    });
+
+    it('shows self-service staff bio editor for own staff-listed profile', () => {
+      mockCurrentUser = { id: 42, username: 'alice' };
+      mockProfileData = {
+        ...mockProfile,
+        userRank: { ...mockProfile.userRank, displayStaff: true }
+      };
+
+      renderWithProviders(<UserProfile />);
+
+      expect(screen.getByText('Staff Bio')).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /warn user/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it('saves own staff bio through the self-service editor', async () => {
+      mockCurrentUser = { id: 42, username: 'alice' };
+      mockProfileData = {
+        ...mockProfile,
+        staffBio: 'Existing bio',
+        userRank: { ...mockProfile.userRank, displayStaff: true }
+      };
+
+      const user = userEvent.setup();
+      renderWithProviders(<UserProfile />);
+      const bioInput = screen.getByPlaceholderText(/staff bio/i);
+      fireEvent.change(bioInput, { target: { value: 'Updated [b]bio[/b]' } });
+      await user.click(screen.getByRole('button', { name: /save bio/i }));
+
+      await waitFor(() => {
+        expect(mockSetStaffBio).toHaveBeenCalledWith({
+          id: 42,
+          staffBio: 'Updated [b]bio[/b]'
+        });
       });
     });
 

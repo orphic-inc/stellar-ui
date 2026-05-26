@@ -7,28 +7,34 @@ import type { AuthUser } from '../../../../types';
 import { isStaffUser } from '../../../../utils/permissions';
 import { formatBytes } from '../../../../utils';
 import { useGetUnreadCountQuery } from '../../../../store/services/messagesApi';
-import { useGetQueueCountQuery } from '../../../../store/services/staffInboxApi';
+import {
+  useGetQueueCountQuery,
+  useGetMyTicketCountQuery
+} from '../../../../store/services/staffInboxApi';
 
 interface Props {
   user: AuthUser;
 }
 
 const navLinks = [
-  { label: 'Home', to: '/private/' },
+  { label: 'Home', to: '/private/', end: true },
   { label: 'Communities', to: '/private/communities' },
   { label: 'Collages', to: '/private/collages' },
   { label: 'Requests', to: '/private/requests' },
   { label: 'Forums', to: '/private/forums' },
   { label: 'Top 10', to: '/private/top10' },
-  { label: 'Wiki', to: '/private/wiki' }
+  { label: 'Wiki', to: '/private/wiki' },
+  { label: 'Staff', to: '/private/staff', end: true }
 ];
 
 const PrivateHeader = ({ user }: Props) => {
   const isStaff = isStaffUser(user);
   const { data: inboxData } = useGetUnreadCountQuery();
   const { data: ticketData } = useGetQueueCountQuery();
+  const { data: myTicketData } = useGetMyTicketCountQuery();
   const inboxUnread = inboxData?.count ?? 0;
   const ticketUnread = ticketData?.count ?? 0;
+  const myTicketUnread = myTicketData?.count ?? 0;
 
   const uploaded = user.contributed
     ? formatBytes(Number(user.contributed))
@@ -82,12 +88,23 @@ const PrivateHeader = ({ user }: Props) => {
                 </span>
               )}
             </Link>
+            <Link
+              to="/private/messages/tickets"
+              className="hover:text-gray-200 transition-colors"
+            >
+              Staff Inbox
+              {myTicketUnread > 0 && (
+                <span className="ml-1 bg-amber-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+                  {myTicketUnread}
+                </span>
+              )}
+            </Link>
             {isStaff && (
               <Link
                 to="/private/staff/tickets"
                 className="hover:text-gray-200 transition-colors"
               >
-                Staff Inbox
+                Staff Queue
                 {ticketUnread > 0 && (
                   <span className="ml-1 bg-amber-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                     {ticketUnread}
@@ -114,11 +131,11 @@ const PrivateHeader = ({ user }: Props) => {
       {/* Primary nav */}
       <nav className="bg-gray-900 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 flex gap-0.5">
-          {navLinks.map(({ label, to }) => (
+          {navLinks.map(({ label, to, end }) => (
             <NavLink
               key={to}
               to={to}
-              end={to === '/private/'}
+              end={end ?? false}
               className={({ isActive }) =>
                 `px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                   isActive

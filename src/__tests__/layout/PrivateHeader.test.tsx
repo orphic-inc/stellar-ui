@@ -70,7 +70,8 @@ jest.mock('../../store/services/messagesApi', () => ({
 }));
 
 jest.mock('../../store/services/staffInboxApi', () => ({
-  useGetQueueCountQuery: () => mockUseGetQueueCountQuery()
+  useGetQueueCountQuery: () => mockUseGetQueueCountQuery(),
+  useGetMyTicketCountQuery: () => ({ data: { count: 0 } })
 }));
 
 const mockUser = {
@@ -132,18 +133,25 @@ describe('PrivateHeader', () => {
     expect(screen.getByRole('link', { name: 'Inbox' })).toBeInTheDocument();
   });
 
-  it('hides Staff Inbox link for non-staff users', () => {
+  it('shows Staff Inbox link for all users', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
     expect(
-      screen.queryByRole('link', { name: /staff inbox/i })
+      screen.getByRole('link', { name: /staff inbox/i })
+    ).toBeInTheDocument();
+  });
+
+  it('hides Staff Queue link for non-staff users', () => {
+    renderWithProviders(<PrivateHeader user={mockUser as never} />);
+    expect(
+      screen.queryByRole('link', { name: /staff queue/i })
     ).not.toBeInTheDocument();
   });
 
-  it('shows Staff Inbox link for staff users', () => {
+  it('shows Staff Queue link for staff users', () => {
     const staffUser = { ...mockUser, permissions: { staff: true } };
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
     expect(
-      screen.getByRole('link', { name: /staff inbox/i })
+      screen.getByRole('link', { name: /staff queue/i })
     ).toBeInTheDocument();
   });
 

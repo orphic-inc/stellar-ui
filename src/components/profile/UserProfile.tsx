@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import DOMPurify from 'dompurify';
@@ -25,7 +25,8 @@ import {
   useRemoveUserWarningMutation,
   useGetSnatchListByUserIdQuery,
   useGetSnatchListQuery,
-  useTriggerUserRecoveryMutation
+  useTriggerUserRecoveryMutation,
+  useSetStaffBioMutation
 } from '../../store/services/userApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
@@ -145,6 +146,70 @@ const WarnModal = ({
           </div>
         </form>
       </div>
+    </div>
+  );
+};
+
+const StaffBioEditor = ({
+  profileId,
+  initialBio
+}: {
+  profileId: number;
+  initialBio: string | null;
+}) => {
+  const dispatch = useDispatch();
+  const [staffBioValue, setStaffBioValue] = useState(initialBio ?? '');
+  const [setStaffBio, { isLoading: isSettingBio }] = useSetStaffBioMutation();
+
+  useEffect(() => {
+    setStaffBioValue(initialBio ?? '');
+  }, [initialBio, profileId]);
+
+  const handleSetStaffBio = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await setStaffBio({
+        id: profileId,
+        staffBio: staffBioValue.trim() || null
+      }).unwrap();
+      dispatch(addAlert('Staff bio updated.', 'success'));
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to update staff bio.',
+          'danger'
+        )
+      );
+    }
+  };
+
+  return (
+    <div className="border border-gray-700 rounded-lg overflow-hidden">
+      <div className="bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-700">
+        Staff Bio
+      </div>
+      <form onSubmit={handleSetStaffBio} className="px-4 py-3 space-y-2">
+        <textarea
+          value={staffBioValue}
+          onChange={(e) => setStaffBioValue(e.target.value)}
+          maxLength={500}
+          rows={3}
+          placeholder="Staff bio (BBCode supported, max 500 chars). Leave empty to clear."
+          className="w-full rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+        />
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-600">
+            {staffBioValue.length}/500
+          </span>
+          <button
+            type="submit"
+            disabled={isSettingBio}
+            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded transition-colors"
+          >
+            {isSettingBio ? 'Saving…' : 'Save Bio'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
@@ -512,7 +577,6 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
               </button>
             </div>
           </div>
-
           {/* Snatch list */}
           <div className={sectionClass}>
             <button
@@ -817,6 +881,9 @@ const UserProfile = () => {
     'users_warn',
     'users_disable'
   ]);
+  const canEditOwnStaffBio =
+    isOwnProfile &&
+    (profile.userRank.displayStaff || hasAnyPermission(currentUser, ['admin']));
 
   const profileDisabled = profile.disabled;
   const profileWarned = profile.warned;
@@ -1189,6 +1256,13 @@ const UserProfile = () => {
           )}
 
           {isOwnProfile && <SnatchListSection />}
+
+          {canEditOwnStaffBio && (
+            <StaffBioEditor
+              profileId={profile.id}
+              initialBio={profile.staffBio}
+            />
+          )}
 
           {!isOwnProfile && isStaff && (
             <StaffActionsPanel profileId={profile.id} />

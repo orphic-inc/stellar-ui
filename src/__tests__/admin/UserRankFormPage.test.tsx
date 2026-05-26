@@ -15,7 +15,8 @@ jest.mock('../../store/services/userApi', () => ({
   useGetUserRankByIdQuery: (...args: unknown[]) =>
     mockGetUserRankByIdQuery(...args),
   useCreateUserRankMutation: () => [mockCreateUserRank],
-  useUpdateUserRankMutation: () => [mockUpdateUserRank]
+  useUpdateUserRankMutation: () => [mockUpdateUserRank],
+  useGetStaffGroupsQuery: () => ({ data: [] })
 }));
 
 jest.mock('react-redux', () => ({

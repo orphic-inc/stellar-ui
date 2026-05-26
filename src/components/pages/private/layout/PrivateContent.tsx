@@ -54,6 +54,8 @@ import NewsManager from '../../../admin/NewsManager';
 import SiteSettingsPage from '../../../admin/SiteSettingsPage';
 import RatioPolicyPanel from '../../../admin/RatioPolicyPanel';
 import TicketQueuePage from '../../../staffInbox/TicketQueuePage';
+import StaffPage from '../../../staff/StaffPage';
+import StaffGroupsPage from '../../../staff/StaffGroupsPage';
 import SiteHistoryPage from '../../../staff/SiteHistoryPage';
 import MassPmPage from '../../../staff/MassPmPage';
 import DonorRanksPage from '../../../staff/DonorRanksPage';
@@ -120,6 +122,15 @@ const PrivateContent = () => (
     <Route path="ratio" element={wrap(RatioRulesPage)} />
     <Route path="bookmarks" element={wrap(BookmarksPage)} />
 
+    <Route path="staff" element={wrap(StaffPage)} />
+    <Route
+      path="staff/tools/staff-groups"
+      element={
+        <StaffGate permissions={['admin']}>
+          <StaffGroupsPage />
+        </StaffGate>
+      }
+    />
     <Route
       path="staff/tools/user/new"
       element={

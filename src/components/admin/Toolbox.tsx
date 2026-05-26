@@ -49,6 +49,11 @@ const sections: SectionProps[] = [
         permissions: ['admin']
       },
       {
+        label: 'Staff groups',
+        to: '/private/staff/tools/staff-groups',
+        permissions: ['admin']
+      },
+      {
         label: 'Site settings',
         to: '/private/staff/tools/settings',
         permissions: ['admin']

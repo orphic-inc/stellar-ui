@@ -1207,6 +1207,149 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/stats/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Site-wide historical stat snapshots */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Historical site stat snapshots (ascending by capturedAt) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SiteStatSnapshot'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stats/snapshot': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Manually trigger a site stat snapshot (admin only) */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Snapshot captured */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Forbidden */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/stats/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** User historical stat snapshots */
+    get: {
+      parameters: {
+        query: {
+          period: 'Daily' | 'Monthly' | 'Yearly';
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Historical user stat snapshots (ascending by capturedAt) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserStatSnapshot'][];
+          };
+        };
+        /** @description Stats are private */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              msg: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/stylesheet': {
     parameters: {
       query?: never;
@@ -3409,6 +3552,8 @@ export interface paths {
             color?: string;
             badge?: string;
             personalCollageLimit?: number;
+            displayStaff?: boolean;
+            staffGroupId?: number | null;
           };
         };
       };
@@ -3429,6 +3574,24 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Duplicate rank name or level */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Staff group not found */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -3497,6 +3660,8 @@ export interface paths {
             color?: string;
             badge?: string;
             personalCollageLimit?: number;
+            displayStaff?: boolean;
+            staffGroupId?: number | null;
           };
         };
       };
@@ -3512,6 +3677,24 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Duplicate rank name or level */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Staff group not found */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -3560,6 +3743,282 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/tools/staff-groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Staff groups */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['StaffGroup'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+            sortOrder: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Staff group created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['StaffGroup'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Duplicate name */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/tools/staff-groups/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name?: string;
+            sortOrder?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Staff group updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['StaffGroup'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Duplicate name */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Staff group deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Ranks still assigned */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/staff': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Staff listing grouped by staff group */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              groups: components['schemas']['StaffGroupWithMembers'][];
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/staff-bio': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            staffBio: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description Staff bio updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -5307,6 +5766,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/staff-inbox/tickets/count': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Count of tickets with unread staff replies */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              count: number;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/staff-inbox/queue': {
     parameters: {
       query?: never;
@@ -6896,6 +7392,7 @@ export interface components {
       name: string;
       color: string;
       badge?: string;
+      displayStaff?: boolean;
     };
     UserSettings: {
       id: number;
@@ -7044,6 +7541,7 @@ export interface components {
       disabled: boolean;
       warned: string | null;
       inviteCount: number | null;
+      staffBio: string | null;
       stats: components['schemas']['ProfileStats'];
       userRank: components['schemas']['UserRankSummary'] & {
         id: number;
@@ -7072,6 +7570,7 @@ export interface components {
       disabled: boolean;
       warned: string | null;
       inviteCount: number | null;
+      staffBio: string | null;
       stats: components['schemas']['ProfileStats'];
       userRank: components['schemas']['UserRankSummary'] & {
         id: number;
@@ -7161,6 +7660,34 @@ export interface components {
       comments: number;
       contributedLinks: number;
       contributedLinkDownloads: number;
+    };
+    SiteStatSnapshot: {
+      id: number;
+      capturedAt: string;
+      maxUsers: number;
+      totalUsers: number;
+      enabledUsers: number;
+      activeToday: number;
+      activeThisWeek: number;
+      activeThisMonth: number;
+      communities: number;
+      releases: number;
+      artists: number;
+      blogPosts: number;
+      announcements: number;
+      comments: number;
+      contributedLinks: number;
+      contributedLinkDownloads: number;
+    };
+    UserStatSnapshot: {
+      id: number;
+      userId: number;
+      /** @enum {string} */
+      period: 'Daily' | 'Monthly' | 'Yearly';
+      capturedAt: string;
+      contributed: string | null;
+      consumed: string | null;
+      contributionCount: number;
     };
     Notification: {
       id: number;
@@ -7468,7 +7995,29 @@ export interface components {
       color?: string;
       badge?: string;
       personalCollageLimit?: number;
+      displayStaff?: boolean;
+      staffGroupId?: number | null;
       userCount?: number;
+    };
+    StaffGroup: {
+      id: number;
+      name: string;
+      sortOrder: number;
+      rankCount?: number;
+    };
+    StaffMember: {
+      userId: number;
+      username: string;
+      rankName: string;
+      rankColor: string;
+      lastSeen: string | null;
+      staffBio: string | null;
+    };
+    StaffGroupWithMembers: {
+      id: number | null;
+      name: string;
+      sortOrder: number;
+      members: components['schemas']['StaffMember'][];
     };
     Comment: {
       id: number;

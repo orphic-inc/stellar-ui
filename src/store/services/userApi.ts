@@ -276,6 +276,59 @@ export const userApi = api.injectEndpoints({
       number
     >({
       query: (userId) => ({ url: `/users/${userId}/recovery`, method: 'POST' })
+    }),
+
+    // Staff groups (admin-only CRUD, lives here alongside rank mutations)
+    getStaffGroups: build.query<
+      paths['/tools/staff-groups']['get']['responses'][200]['content']['application/json'],
+      void
+    >({
+      query: () => '/tools/staff-groups',
+      providesTags: ['StaffGroup']
+    }),
+    createStaffGroup: build.mutation<
+      paths['/tools/staff-groups']['post']['responses'][201]['content']['application/json'],
+      NonNullable<
+        paths['/tools/staff-groups']['post']['requestBody']
+      >['content']['application/json']
+    >({
+      query: (body) => ({ url: '/tools/staff-groups', method: 'POST', body }),
+      invalidatesTags: ['StaffGroup']
+    }),
+    updateStaffGroup: build.mutation<
+      paths['/tools/staff-groups/{id}']['put']['responses'][200]['content']['application/json'],
+      { id: number } & NonNullable<
+        paths['/tools/staff-groups/{id}']['put']['requestBody']
+      >['content']['application/json']
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/tools/staff-groups/${id}`,
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: ['StaffGroup']
+    }),
+    deleteStaffGroup: build.mutation<void, number>({
+      query: (id) => ({ url: `/tools/staff-groups/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['StaffGroup']
+    }),
+
+    // Staff bio (admin-only, per-user)
+    setStaffBio: build.mutation<
+      paths['/users/{id}/staff-bio']['put']['responses'][200]['content']['application/json'],
+      { id: number; staffBio: string | null }
+    >({
+      query: ({ id, staffBio }) => ({
+        url: `/users/${id}/staff-bio`,
+        method: 'PUT',
+        body: { staffBio }
+      }),
+      invalidatesTags: (_, __, { id }) => [
+        'StaffGroup',
+        { type: 'User', id },
+        { type: 'Profile', id },
+        'Profile'
+      ]
     })
   })
 });
@@ -309,5 +362,10 @@ export const {
   useGetSnatchListByUserIdQuery,
   useGetRecoveryRequestsQuery,
   useRevokeRecoveryRequestMutation,
-  useTriggerUserRecoveryMutation
+  useTriggerUserRecoveryMutation,
+  useGetStaffGroupsQuery,
+  useCreateStaffGroupMutation,
+  useUpdateStaffGroupMutation,
+  useDeleteStaffGroupMutation,
+  useSetStaffBioMutation
 } = userApi;

@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import {
   useGetUserRankByIdQuery,
   useCreateUserRankMutation,
-  useUpdateUserRankMutation
+  useUpdateUserRankMutation,
+  useGetStaffGroupsQuery
 } from '../../store/services/userApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
@@ -42,6 +43,8 @@ interface FormValues {
   name: string;
   permissions: Record<string, boolean>;
   personalCollageLimit: number;
+  displayStaff: boolean;
+  staffGroupId: number | '';
 }
 
 const formatPerm = (perm: string) => perm.replace(/_/g, ' ');
@@ -54,18 +57,23 @@ const UserRankFormPage = () => {
   const { data: existing, isLoading } = useGetUserRankByIdQuery(id!, {
     skip: !isEditing
   });
+  const { data: staffGroups } = useGetStaffGroupsQuery();
   const [createUserRank] = useCreateUserRankMutation();
   const [updateUserRank] = useUpdateUserRankMutation();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit, reset } = useForm<FormValues>({
+  const { register, handleSubmit, reset, watch } = useForm<FormValues>({
     defaultValues: {
       level: 0,
       name: '',
       permissions: {},
-      personalCollageLimit: 0
+      personalCollageLimit: 0,
+      displayStaff: false,
+      staffGroupId: ''
     }
   });
+
+  const displayStaff = watch('displayStaff');
 
   useEffect(() => {
     if (existing) {
@@ -73,17 +81,23 @@ const UserRankFormPage = () => {
         level: existing.level,
         name: existing.name,
         permissions: existing.permissions ?? {},
-        personalCollageLimit: existing.personalCollageLimit ?? 0
+        personalCollageLimit: existing.personalCollageLimit ?? 0,
+        displayStaff: existing.displayStaff ?? false,
+        staffGroupId: existing.staffGroupId ?? ''
       });
     }
   }, [existing, reset]);
 
   const onSubmit = async (data: FormValues) => {
+    const payload = {
+      ...data,
+      staffGroupId: data.staffGroupId !== '' ? Number(data.staffGroupId) : null
+    };
     try {
       if (isEditing && id) {
-        await updateUserRank({ id: parseInt(id), ...data }).unwrap();
+        await updateUserRank({ id: parseInt(id), ...payload }).unwrap();
       } else {
-        await createUserRank(data).unwrap();
+        await createUserRank(payload).unwrap();
       }
       navigate('/private/staff/tools/user-ranks');
     } catch {
@@ -216,6 +230,46 @@ const UserRankFormPage = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Staff display */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+          <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
+              Staff Display
+            </h3>
+          </div>
+          <div className="p-4 space-y-4">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                {...register('displayStaff')}
+                className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+              />
+              <span className="text-sm text-gray-300">Show on staff page</span>
+            </label>
+            <div>
+              <label
+                htmlFor="staff-group-id"
+                className="block text-sm font-medium text-gray-300 mb-1"
+              >
+                Staff Group
+              </label>
+              <select
+                id="staff-group-id"
+                {...register('staffGroupId')}
+                disabled={!displayStaff}
+                className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm disabled:opacity-40"
+              >
+                <option value="">— None (ungrouped) —</option>
+                {staffGroups?.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
