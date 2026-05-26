@@ -6,6 +6,8 @@ import DonorRanksPage from '../../components/staff/DonorRanksPage';
 
 const mockGetDonorRanksQuery = jest.fn();
 const mockCreateDonorRank = jest.fn();
+const mockUpdateDonorRank = jest.fn();
+const mockDeleteDonorRank = jest.fn();
 const mockDispatch = jest.fn();
 
 let mockIsCreating = false;
@@ -15,7 +17,9 @@ jest.mock('../../store/services/userApi', () => ({
   useCreateDonorRankMutation: () => [
     mockCreateDonorRank,
     { isLoading: mockIsCreating }
-  ]
+  ],
+  useUpdateDonorRankMutation: () => [mockUpdateDonorRank, { isLoading: false }],
+  useDeleteDonorRankMutation: () => [mockDeleteDonorRank, { isLoading: false }]
 }));
 
 jest.mock('react-redux', () => ({
@@ -36,6 +40,8 @@ describe('DonorRanksPage', () => {
     jest.clearAllMocks();
     mockIsCreating = false;
     mockCreateDonorRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUpdateDonorRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockDeleteDonorRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('shows spinner while loading', () => {

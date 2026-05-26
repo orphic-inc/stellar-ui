@@ -246,7 +246,7 @@ const DonorRanksPage = () => {
                   htmlFor="donor-rank-color"
                   className="block text-xs text-gray-400 mb-1"
                 >
-                  Badge color (hex, optional)
+                  Color (hex, optional)
                 </label>
                 <input
                   id="donor-rank-color"
@@ -330,13 +330,16 @@ const DonorRanksPage = () => {
                     className="font-medium text-sm"
                     style={{ color: rank.color || undefined }}
                   >
-                    {rank.badge && <span className="mr-1">{rank.badge}</span>}
+                    <span className="mr-1">{rank.badge ?? '—'}</span>
                     {rank.name}
                   </span>
                   <span className="ml-3 text-xs text-gray-500">
                     ${rank.minDonation}
-                    {rank.expiresAfterDays != null &&
-                      ` · ${rank.expiresAfterDays}d`}
+                  </span>
+                  <span className="ml-2 text-xs text-gray-500">
+                    {rank.expiresAfterDays != null
+                      ? `${rank.expiresAfterDays} days`
+                      : 'Never'}
                   </span>
                 </div>
                 <button
