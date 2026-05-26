@@ -6,6 +6,12 @@ import Time from '../layout/Time';
 
 const STATUSES = ['PENDING', 'ACCEPTED', 'EXPIRED', 'USED', 'CANCELLED'];
 
+function inviteStatusColor(status: string): string {
+  if (status === 'USED' || status === 'ACCEPTED') return 'text-green-400';
+  if (status === 'EXPIRED' || status === 'CANCELLED') return 'text-red-400';
+  return 'text-yellow-400';
+}
+
 const InvitePoolPage = () => {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
@@ -102,16 +108,7 @@ const InvitePoolPage = () => {
                       {inv.email}
                     </td>
                     <td className="px-4 py-2 text-xs">
-                      <span
-                        className={
-                          inv.status === 'USED' || inv.status === 'ACCEPTED'
-                            ? 'text-green-400'
-                            : inv.status === 'EXPIRED' ||
-                              inv.status === 'CANCELLED'
-                            ? 'text-red-400'
-                            : 'text-yellow-400'
-                        }
-                      >
+                      <span className={inviteStatusColor(inv.status)}>
                         {inv.status.charAt(0) +
                           inv.status.slice(1).toLowerCase()}
                       </span>

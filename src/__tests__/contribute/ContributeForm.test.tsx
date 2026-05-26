@@ -23,7 +23,8 @@ jest.mock('../../store/services/communityApi', () => ({
   useCreateContributionMutation: () => [
     mockCreateContribution,
     { isLoading: mockIsSubmitting }
-  ]
+  ],
+  useGetDncListQuery: () => ({ data: undefined })
 }));
 
 jest.mock('react-redux', () => ({
