@@ -4,7 +4,7 @@ import Alert from '../../../layout/Alert';
 import ModBar from '../../../admin/ModBar';
 import QuickSearch from '../../../layout/QuickSearch';
 import type { AuthUser } from '../../../../types';
-import { isStaffUser } from '../../../../utils/permissions';
+import { canSeeModBar, isStaffUser } from '../../../../utils/permissions';
 import { formatBytes } from '../../../../utils';
 import { useGetUnreadCountQuery } from '../../../../store/services/messagesApi';
 import {
@@ -30,6 +30,7 @@ const navLinks = [
 
 const PrivateHeader = ({ user }: Props) => {
   const isStaff = isStaffUser(user);
+  const showModBar = canSeeModBar(user);
   const { data: inboxData } = useGetUnreadCountQuery();
   const { data: ticketData } = useGetQueueCountQuery();
   const { data: myTicketData } = useGetMyTicketCountQuery();
@@ -158,7 +159,7 @@ const PrivateHeader = ({ user }: Props) => {
       </nav>
 
       <QuickSearch />
-      {isStaff && <ModBar />}
+      {showModBar && <ModBar />}
       <Alert />
     </header>
   );

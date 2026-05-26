@@ -43,7 +43,12 @@ const staffUser = {
     level: 500,
     name: 'Staff',
     color: '#fff',
-    permissions: { staff: true }
+    permissions: {
+      staff: true,
+      staff_inbox_manage: true,
+      reports_manage: true,
+      messages_mass_pm: true
+    }
   }
 };
 

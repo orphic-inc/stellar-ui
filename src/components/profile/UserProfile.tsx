@@ -15,6 +15,7 @@ import {
   useDeleteUserNoteMutation,
   useDisableUserMutation,
   useEnableUserMutation,
+  useGetUserRankAssignmentQuery,
   useSetUserRankMutation,
   useGetUserIpHistoryQuery,
   useGetUserEmailHistoryQuery,
@@ -229,10 +230,14 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
   const [showSnatchList, setShowSnatchList] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [selectedRankId, setSelectedRankId] = useState<number | ''>('');
+  const [selectedSecondaryRankIds, setSelectedSecondaryRankIds] = useState<
+    number[]
+  >([]);
   const [donorRankId, setDonorRankId] = useState<number | ''>('');
   const [donorExpiry, setDonorExpiry] = useState('');
 
   const { data: userRanks } = useGetUserRanksQuery();
+  const { data: rankAssignment } = useGetUserRankAssignmentQuery(profileId);
   const { data: donorRanks } = useGetDonorRanksQuery();
   const { data: ipHistory } = useGetUserIpHistoryQuery(profileId, {
     skip: !showIpHistory
@@ -251,6 +256,20 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
   const { data: profile } = useGetProfileByUserIdQuery(String(profileId));
   const isDisabled = profile?.disabled;
   const staffPmOverview = profile?.staffPmOverview;
+  const primaryRanks =
+    userRanks
+      ?.filter((rank) => !rank.secondary)
+      .sort((a, b) => a.level - b.level) ?? [];
+  const secondaryRanks =
+    userRanks
+      ?.filter((rank) => rank.secondary)
+      .sort((a, b) => a.level - b.level) ?? [];
+
+  useEffect(() => {
+    if (!rankAssignment) return;
+    setSelectedRankId(rankAssignment.userRankId);
+    setSelectedSecondaryRankIds(rankAssignment.secondaryRankIds);
+  }, [rankAssignment]);
 
   const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
   const [enableUser, { isLoading: isEnabling }] = useEnableUserMutation();
@@ -297,7 +316,8 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     try {
       await setUserRank({
         id: profileId,
-        userRankId: Number(selectedRankId)
+        userRankId: Number(selectedRankId),
+        secondaryRankIds: selectedSecondaryRankIds
       }).unwrap();
       dispatch(addAlert('Rank updated.', 'success'));
     } catch (err) {
@@ -305,6 +325,14 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
         addAlert(getApiErrorMessage(err) ?? 'Failed to set rank.', 'danger')
       );
     }
+  };
+
+  const handleToggleSecondaryRank = (rankId: number) => {
+    setSelectedSecondaryRankIds((current) =>
+      current.includes(rankId)
+        ? current.filter((id) => id !== rankId)
+        : [...current, rankId].sort((a, b) => a - b)
+    );
   };
 
   const handleDeleteNote = async (noteId: number) => {
@@ -512,30 +540,62 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
 
           <div className={sectionClass}>
             <div className={headClass}>Change Rank</div>
-            <div className={`${bodyClass} flex gap-2`}>
-              <select
-                value={selectedRankId}
-                onChange={(e) =>
-                  setSelectedRankId(
-                    e.target.value ? Number(e.target.value) : ''
-                  )
-                }
-                className="flex-1 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              >
-                <option value="">Select rank…</option>
-                {userRanks?.map((rank) => (
-                  <option key={rank.id} value={rank.id}>
-                    {rank.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={handleSetRank}
-                disabled={!selectedRankId || isSettingRank}
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded transition-colors"
-              >
-                {isSettingRank ? 'Saving…' : 'Save'}
-              </button>
+            <div className={`${bodyClass} space-y-3`}>
+              <div className="flex gap-2">
+                <select
+                  value={selectedRankId}
+                  onChange={(e) =>
+                    setSelectedRankId(
+                      e.target.value ? Number(e.target.value) : ''
+                    )
+                  }
+                  className="flex-1 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                >
+                  <option value="">Select rank…</option>
+                  {primaryRanks.map((rank) => (
+                    <option key={rank.id} value={rank.id}>
+                      {rank.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleSetRank}
+                  disabled={!selectedRankId || isSettingRank}
+                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded transition-colors"
+                >
+                  {isSettingRank ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+              {secondaryRanks.length > 0 ? (
+                <div className="rounded border border-gray-800 bg-gray-950/60 p-3 space-y-2">
+                  <div className="text-xs uppercase tracking-wide text-gray-500">
+                    Secondary Classes
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {secondaryRanks.map((rank) => (
+                      <label
+                        key={rank.id}
+                        className="flex items-start gap-3 rounded border border-gray-800 px-3 py-2 cursor-pointer hover:border-gray-700"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSecondaryRankIds.includes(rank.id)}
+                          onChange={() => handleToggleSecondaryRank(rank.id)}
+                          className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+                        />
+                        <span className="min-w-0">
+                          <span className="block text-sm text-gray-200">
+                            {rank.name}
+                          </span>
+                          <span className="block text-xs text-gray-500">
+                            Level {rank.level}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
 

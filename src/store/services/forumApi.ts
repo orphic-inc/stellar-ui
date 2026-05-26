@@ -91,8 +91,14 @@ export type { CreateTopicArgs };
 
 export const forumApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getForumCategories: build.query<ForumCategoriesResponse, void>({
-      query: () => '/forums/categories',
+    getForumCategories: build.query<
+      ForumCategoriesResponse,
+      { all?: boolean } | void
+    >({
+      query: (args) => {
+        const all = args && 'all' in args ? args.all : false;
+        return all ? '/forums/categories?all=true' : '/forums/categories';
+      },
       providesTags: ['ForumCategory']
     }),
     createForumCategory: build.mutation<

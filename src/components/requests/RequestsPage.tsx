@@ -8,6 +8,7 @@ import {
 } from '../../store/services/requestApi';
 import type { RequestStatus } from '../../types';
 import Spinner from '../layout/Spinner';
+import { hasPermission } from '../../utils/permissions';
 
 const STATUS_LABELS: Record<RequestStatus, string> = {
   open: 'Open',
@@ -132,17 +133,20 @@ const RequestsPage = () => {
 
   const requests = data?.data ?? [];
   const meta = data?.meta;
+  const canCreateRequest = hasPermission(user, 'requests_create');
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Requests</h2>
-        <Link
-          to="/private/requests/new"
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
-        >
-          New Request
-        </Link>
+        {canCreateRequest && (
+          <Link
+            to="/private/requests/new"
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+          >
+            New Request
+          </Link>
+        )}
       </div>
 
       {/* Search form */}

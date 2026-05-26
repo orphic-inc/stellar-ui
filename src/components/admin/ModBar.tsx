@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { isStaffUser } from '../../utils/permissions';
+import { canSeeModBar } from '../../utils/permissions';
 import { useGetReportCountsQuery } from '../../store/services/reportsApi';
 import {
   useDismissInstallChecklistItemMutation,
@@ -32,7 +32,7 @@ const ModBar = () => {
   const { data: installStatus } = useGetInstallStatusQuery();
   const [dismissChecklistItem] = useDismissInstallChecklistItemMutation();
 
-  if (!isStaffUser(user)) return null;
+  if (!canSeeModBar(user)) return null;
 
   const openReports = reportCounts?.open ?? 0;
   const setupChecklist = installStatus?.setupChecklist ?? [];

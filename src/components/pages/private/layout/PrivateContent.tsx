@@ -149,7 +149,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tools/staff-groups"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['staff_groups_manage']}>
           <StaffGroupsPage />
         </StaffGate>
       }
@@ -165,7 +165,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tools/user-ranks/new"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['rank_permissions_manage']}>
           <UserRankFormPage />
         </StaffGate>
       }
@@ -173,7 +173,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tools/user-ranks/:id/edit"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['rank_permissions_manage']}>
           <UserRankFormPage />
         </StaffGate>
       }
@@ -181,7 +181,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tools/user-ranks"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['rank_permissions_manage']}>
           <UserRankManager />
         </StaffGate>
       }
@@ -229,7 +229,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tools/ratio-policy"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['ratio_policy_manage']}>
           <RatioPolicyPanel />
         </StaffGate>
       }
@@ -239,14 +239,32 @@ const PrivateContent = () => (
       element={
         <StaffGate
           permissions={[
-            'staff',
-            'admin',
+            'rank_permissions_manage',
+            'staff_groups_manage',
             'forums_manage',
             'forums_moderate',
             'communities_manage',
+            'contributions_manage',
+            'dnc_manage',
+            'collages_moderate',
             'news_manage',
             'rules_manage',
-            'users_edit'
+            'reports_manage',
+            'staff_inbox_manage',
+            'users_edit',
+            'users_warn',
+            'recovery_manage',
+            'invites_manage',
+            'ratio_policy_manage',
+            'site_history_manage',
+            'ip_bans_manage',
+            'email_blacklist_manage',
+            'donor_ranks_manage',
+            'donation_log_view',
+            'login_watch_view',
+            'duplicate_ips_view',
+            'registration_log_view',
+            'tags_manage'
           ]}
         >
           <Toolbox />
@@ -256,7 +274,7 @@ const PrivateContent = () => (
     <Route
       path="staff/site-history"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['site_history_manage']}>
           <SiteHistoryPage />
         </StaffGate>
       }
@@ -264,7 +282,7 @@ const PrivateContent = () => (
     <Route
       path="staff/mass-pm"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['messages_mass_pm']}>
           <MassPmPage />
         </StaffGate>
       }
@@ -272,7 +290,7 @@ const PrivateContent = () => (
     <Route
       path="staff/donor-ranks"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['donor_ranks_manage']}>
           <DonorRanksPage />
         </StaffGate>
       }
@@ -280,7 +298,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tools/recovery-queue"
       element={
-        <StaffGate permissions={['users_edit']}>
+        <StaffGate permissions={['recovery_manage']}>
           <RecoveryQueuePage />
         </StaffGate>
       }
@@ -288,7 +306,7 @@ const PrivateContent = () => (
     <Route
       path="staff/ip-bans"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['ip_bans_manage']}>
           <IpBansPage />
         </StaffGate>
       }
@@ -296,7 +314,7 @@ const PrivateContent = () => (
     <Route
       path="staff/email-blacklist"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['email_blacklist_manage']}>
           <EmailBlacklistPage />
         </StaffGate>
       }
@@ -304,7 +322,7 @@ const PrivateContent = () => (
     <Route
       path="staff/donation-log"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['donation_log_view']}>
           <DonationLogPage />
         </StaffGate>
       }
@@ -312,7 +330,7 @@ const PrivateContent = () => (
     <Route
       path="staff/duplicate-ips"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['duplicate_ips_view']}>
           <DuplicateIpsPage />
         </StaffGate>
       }
@@ -320,7 +338,7 @@ const PrivateContent = () => (
     <Route
       path="staff/registration-log"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['registration_log_view']}>
           <RegistrationLogPage />
         </StaffGate>
       }
@@ -328,7 +346,7 @@ const PrivateContent = () => (
     <Route
       path="staff/user-warnings"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['users_warn']}>
           <UserWarningsPage />
         </StaffGate>
       }
@@ -336,7 +354,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tag-aliases"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['tags_manage']}>
           <TagAliasesPage />
         </StaffGate>
       }
@@ -352,7 +370,7 @@ const PrivateContent = () => (
     <Route
       path="staff/login-watch"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['login_watch_view']}>
           <LoginWatchPage />
         </StaffGate>
       }
@@ -384,7 +402,7 @@ const PrivateContent = () => (
     <Route
       path="staff/invite-pool"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['invites_manage']}>
           <InvitePoolPage />
         </StaffGate>
       }
@@ -392,7 +410,7 @@ const PrivateContent = () => (
     <Route
       path="staff/invite-tree"
       element={
-        <StaffGate permissions={['admin']}>
+        <StaffGate permissions={['invites_manage']}>
           <InviteTreePage />
         </StaffGate>
       }
@@ -400,7 +418,7 @@ const PrivateContent = () => (
     <Route
       path="staff/dnc"
       element={
-        <StaffGate permissions={['communities_manage']}>
+        <StaffGate permissions={['dnc_manage']}>
           <DncPage />
         </StaffGate>
       }
@@ -476,11 +494,25 @@ const PrivateContent = () => (
     <Route path="contribute/list" element={wrap(ContributionsPage)} />
     <Route path="contribute" element={wrap(ContributeForm)} />
 
-    <Route path="requests/new" element={wrap(CreateRequestForm)} />
+    <Route
+      path="requests/new"
+      element={
+        <StaffGate permissions={['requests_create']}>
+          <CreateRequestForm />
+        </StaffGate>
+      }
+    />
     <Route path="requests/:id" element={wrap(RequestDetailPage)} />
     <Route path="requests" element={wrap(RequestsPage)} />
 
-    <Route path="collages/new" element={wrap(CollageCreate)} />
+    <Route
+      path="collages/new"
+      element={
+        <StaffGate permissions={['collages_create']}>
+          <CollageCreate />
+        </StaffGate>
+      }
+    />
     <Route path="collages/:id/edit" element={wrap(CollageEdit)} />
     <Route path="collages/:id" element={wrap(CollageDetail)} />
     <Route path="collages" element={wrap(CollageBrowse)} />
@@ -497,7 +529,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tickets/:id"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['staff_inbox_manage']}>
           <TicketView />
         </StaffGate>
       }
@@ -505,7 +537,7 @@ const PrivateContent = () => (
     <Route
       path="staff/tickets"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['staff_inbox_manage']}>
           <TicketQueuePage />
         </StaffGate>
       }
@@ -513,7 +545,7 @@ const PrivateContent = () => (
     <Route
       path="staff/inbox/responses"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['staff_inbox_manage']}>
           <CannedResponsesPage />
         </StaffGate>
       }
@@ -522,7 +554,7 @@ const PrivateContent = () => (
     <Route
       path="staff/reports"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['reports_manage']}>
           <ReportsQueuePage />
         </StaffGate>
       }
@@ -530,7 +562,7 @@ const PrivateContent = () => (
     <Route
       path="staff/reports/:id"
       element={
-        <StaffGate permissions={['staff', 'admin']}>
+        <StaffGate permissions={['reports_manage']}>
           <ReportDetailPage />
         </StaffGate>
       }

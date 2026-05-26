@@ -19,6 +19,18 @@ jest.mock('../../store/services/userApi', () => ({
   useGetStaffGroupsQuery: () => ({ data: [] })
 }));
 
+jest.mock('../../store/services/forumApi', () => ({
+  useGetForumCategoriesQuery: () => ({
+    data: [
+      {
+        id: 1,
+        name: 'Music',
+        forums: [{ id: 7, name: 'Jazz', minClassRead: 200 }]
+      }
+    ]
+  })
+}));
+
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
   useDispatch: () => mockDispatch
@@ -56,12 +68,13 @@ describe('UserRankFormPage — create mode', () => {
     renderWithProviders(<UserRankFormPage />);
     expect(screen.getByLabelText(/^name$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^level$/i)).toBeInTheDocument();
+    expect(screen.getByText(/secondary class/i)).toBeInTheDocument();
   });
 
   it('shows permission checkboxes', () => {
     renderWithProviders(<UserRankFormPage />);
-    expect(screen.getByText(/forums read/i)).toBeInTheDocument();
-    expect(screen.getByText(/admin/i)).toBeInTheDocument();
+    expect(screen.getByText(/read forums/i)).toBeInTheDocument();
+    expect(screen.getByText(/administrator/i)).toBeInTheDocument();
   });
 
   it('calls createUserRank with form data and navigates on success', async () => {
@@ -70,10 +83,18 @@ describe('UserRankFormPage — create mode', () => {
     await user.type(screen.getByLabelText(/^name$/i), 'Veteran');
     await user.clear(screen.getByLabelText(/^level$/i));
     await user.type(screen.getByLabelText(/^level$/i), '300');
+    await user.click(
+      screen.getByRole('checkbox', { name: /secondary class/i })
+    );
+    await user.click(screen.getByRole('checkbox', { name: /jazz/i }));
     await user.click(screen.getByRole('button', { name: /^create$/i }));
     await waitFor(() => {
       expect(mockCreateUserRank).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'Veteran' })
+        expect.objectContaining({
+          name: 'Veteran',
+          secondary: true,
+          permittedForumIds: [7]
+        })
       );
       expect(mockNavigate).toHaveBeenCalledWith(
         '/private/staff/tools/user-ranks'
@@ -108,7 +129,9 @@ describe('UserRankFormPage — edit mode', () => {
         id: 3,
         level: 500,
         name: 'Staff',
-        permissions: { staff: true, forums_moderate: true }
+        permissions: { staff: true, forums_moderate: true },
+        secondary: true,
+        permittedForumIds: [7]
       },
       isLoading: false
     });
@@ -130,6 +153,13 @@ describe('UserRankFormPage — edit mode', () => {
         'Staff'
       );
     });
+    expect(
+      (
+        screen.getByRole('checkbox', {
+          name: /secondary class/i
+        }) as HTMLInputElement
+      ).checked
+    ).toBe(true);
   });
 
   it('shows spinner when isLoading is true in edit mode', () => {

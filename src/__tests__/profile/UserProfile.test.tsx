@@ -66,6 +66,10 @@ let mockSetUserRankLoading = false;
 let mockGrantDonorLoading = false;
 
 let mockUserRanks: Array<{ id: number; name: string }> = [];
+let mockUserRankAssignment = {
+  userRankId: 10,
+  secondaryRankIds: [] as number[]
+};
 let mockDonorRanks: Array<{ id: number; name: string }> = [];
 let mockNotes: Array<{
   id: number;
@@ -104,6 +108,7 @@ jest.mock('../../store/services/userApi', () => ({
   useDeleteUserNoteMutation: () => [mockDeleteUserNote],
   useDisableUserMutation: () => [mockDisableUser, { isLoading: false }],
   useEnableUserMutation: () => [mockEnableUser, { isLoading: false }],
+  useGetUserRankAssignmentQuery: () => ({ data: mockUserRankAssignment }),
   useSetUserRankMutation: () => [
     mockSetUserRank,
     { isLoading: mockSetUserRankLoading }
@@ -225,6 +230,7 @@ describe('UserProfile', () => {
     mockCurrentUser = { id: 99, username: 'bob' };
     mockHasAnyPermission = false;
     mockUserRanks = [];
+    mockUserRankAssignment = { userRankId: 10, secondaryRankIds: [] };
     mockDonorRanks = [];
     mockNotes = [];
     mockWarnings = [];
@@ -515,7 +521,11 @@ describe('UserProfile', () => {
   describe('StaffActionsPanel interactions', () => {
     beforeEach(() => {
       mockHasAnyPermission = true;
-      mockUserRanks = [{ id: 10, name: 'Senior' }];
+      mockUserRanks = [
+        { id: 10, name: 'Senior', level: 100, secondary: false } as never,
+        { id: 11, name: 'Forum Staff', level: 500, secondary: true } as never
+      ];
+      mockUserRankAssignment = { userRankId: 10, secondaryRankIds: [] };
       mockDonorRanks = [{ id: 20, name: 'Gold' }];
     });
 
@@ -588,7 +598,7 @@ describe('UserProfile', () => {
       mockSetUserRank.mockReturnValue({ unwrap: () => Promise.reject({}) });
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.selectOptions(screen.getByDisplayValue('Select rank…'), '10');
+      await user.selectOptions(screen.getAllByRole('combobox')[0], '10');
       await user.click(screen.getByRole('button', { name: /^save$/i }));
       await waitFor(() => {
         expect(mockSetUserRank).toHaveBeenCalled();
@@ -683,12 +693,27 @@ describe('UserProfile', () => {
     it('selects a rank and clicks Save', async () => {
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      await user.selectOptions(screen.getByDisplayValue('Select rank…'), '10');
+      await user.selectOptions(screen.getAllByRole('combobox')[0], '10');
       await user.click(screen.getByRole('button', { name: /^save$/i }));
       await waitFor(() => {
         expect(mockSetUserRank).toHaveBeenCalledWith({
           id: 42,
-          userRankId: 10
+          userRankId: 10,
+          secondaryRankIds: []
+        });
+      });
+    });
+
+    it('saves selected secondary classes', async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<UserProfile />);
+      await user.click(screen.getByRole('checkbox', { name: /forum staff/i }));
+      await user.click(screen.getByRole('button', { name: /^save$/i }));
+      await waitFor(() => {
+        expect(mockSetUserRank).toHaveBeenCalledWith({
+          id: 42,
+          userRankId: 10,
+          secondaryRankIds: [11]
         });
       });
     });
@@ -696,7 +721,7 @@ describe('UserProfile', () => {
     it('selecting placeholder rank resets selectedRankId to empty string', async () => {
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
-      const rankSelect = screen.getByDisplayValue('Select rank…');
+      const rankSelect = screen.getAllByRole('combobox')[0];
       await user.selectOptions(rankSelect, '10');
       await user.selectOptions(rankSelect, '');
       expect((rankSelect as HTMLSelectElement).value).toBe('');

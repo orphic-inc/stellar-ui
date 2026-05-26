@@ -46,12 +46,12 @@ const sections: SectionProps[] = [
       {
         label: 'User ranks',
         to: '/private/staff/tools/user-ranks',
-        permissions: ['admin']
+        permissions: ['rank_permissions_manage']
       },
       {
         label: 'Staff groups',
         to: '/private/staff/tools/staff-groups',
-        permissions: ['admin']
+        permissions: ['staff_groups_manage']
       },
       {
         label: 'Site settings',
@@ -61,7 +61,7 @@ const sections: SectionProps[] = [
       {
         label: 'Login Watch',
         to: '/private/staff/login-watch',
-        permissions: ['admin']
+        permissions: ['login_watch_view']
       }
     ]
   },
@@ -76,22 +76,22 @@ const sections: SectionProps[] = [
       {
         label: 'Recovery queue',
         to: '/private/staff/tools/recovery-queue',
-        permissions: ['users_edit', 'admin']
+        permissions: ['recovery_manage']
       },
       {
         label: 'Registration log',
         to: '/private/staff/registration-log',
-        permissions: ['admin']
+        permissions: ['registration_log_view']
       },
       {
         label: 'Invite pool',
         to: '/private/staff/invite-pool',
-        permissions: ['admin']
+        permissions: ['invites_manage']
       },
       {
         label: 'Invite tree',
         to: '/private/staff/invite-tree',
-        permissions: ['admin']
+        permissions: ['invites_manage']
       },
       {
         label: 'User flow',
@@ -141,7 +141,7 @@ const sections: SectionProps[] = [
       {
         label: 'Site History',
         to: '/private/staff/site-history',
-        permissions: ['staff', 'admin']
+        permissions: ['site_history_manage']
       }
     ]
   },
@@ -166,7 +166,7 @@ const sections: SectionProps[] = [
       {
         label: 'Tag aliases',
         to: '/private/staff/tag-aliases',
-        permissions: ['staff', 'admin']
+        permissions: ['tags_manage']
       }
     ]
   },
@@ -176,27 +176,27 @@ const sections: SectionProps[] = [
       {
         label: 'Ticket queue',
         to: '/private/staff/tickets',
-        permissions: ['staff', 'admin']
+        permissions: ['staff_inbox_manage']
       },
       {
         label: 'Canned responses',
         to: '/private/staff/inbox/responses',
-        permissions: ['staff', 'admin']
+        permissions: ['staff_inbox_manage']
       },
       {
         label: 'Reports queue',
         to: '/private/staff/reports',
-        permissions: ['staff', 'admin']
+        permissions: ['reports_manage']
       },
       {
         label: 'Duplicate IPs',
         to: '/private/staff/duplicate-ips',
-        permissions: ['admin']
+        permissions: ['duplicate_ips_view']
       },
       {
         label: 'Do Not Contribute list',
         to: '/private/staff/dnc',
-        permissions: ['communities_manage']
+        permissions: ['dnc_manage']
       },
       {
         label: 'Collage recovery',
@@ -211,12 +211,12 @@ const sections: SectionProps[] = [
       {
         label: 'Ratio policy override',
         to: '/private/staff/tools/ratio-policy',
-        permissions: ['staff', 'admin']
+        permissions: ['ratio_policy_manage']
       },
       {
         label: 'User warnings',
         to: '/private/staff/user-warnings',
-        permissions: ['staff', 'admin']
+        permissions: ['users_warn']
       }
     ]
   },
@@ -226,12 +226,12 @@ const sections: SectionProps[] = [
       {
         label: 'IP address bans',
         to: '/private/staff/ip-bans',
-        permissions: ['admin']
+        permissions: ['ip_bans_manage']
       },
       {
         label: 'Email blacklist',
         to: '/private/staff/email-blacklist',
-        permissions: ['admin']
+        permissions: ['email_blacklist_manage']
       }
     ]
   },
@@ -241,12 +241,12 @@ const sections: SectionProps[] = [
       {
         label: 'Donor ranks',
         to: '/private/staff/donor-ranks',
-        permissions: ['admin']
+        permissions: ['donor_ranks_manage']
       },
       {
         label: 'Donation log',
         to: '/private/staff/donation-log',
-        permissions: ['admin']
+        permissions: ['donation_log_view']
       }
     ]
   },

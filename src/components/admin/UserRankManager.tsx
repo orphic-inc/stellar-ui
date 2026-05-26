@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import {
   useGetUserRanksQuery,
-  useDeleteUserRankMutation
+  useDeleteUserRankMutation,
+  type UserRankRecord
 } from '../../store/services/userApi';
 import Spinner from '../layout/Spinner';
 
@@ -48,7 +49,14 @@ const UserRankManager = () => {
               <tr className="bg-gray-700/60 text-gray-300 text-xs uppercase tracking-wider">
                 <th className="text-left px-4 py-3 font-semibold">Name</th>
                 <th className="text-left px-4 py-3 font-semibold">Level</th>
+                <th className="text-left px-4 py-3 font-semibold">Type</th>
                 <th className="text-left px-4 py-3 font-semibold">Users</th>
+                <th className="text-left px-4 py-3 font-semibold">
+                  Permissions
+                </th>
+                <th className="text-left px-4 py-3 font-semibold">
+                  Forum Overrides
+                </th>
                 <th className="text-left px-4 py-3 font-semibold">
                   Collage Limit
                 </th>
@@ -59,55 +67,64 @@ const UserRankManager = () => {
               {!userRanks?.length ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={8}
                     className="px-4 py-6 text-center text-gray-500"
                   >
                     No user ranks defined yet.
                   </td>
                 </tr>
               ) : (
-                userRanks.map(
-                  (rank: {
-                    id: number;
-                    name: string;
-                    level: number;
-                    personalCollageLimit?: number;
-                    userCount?: number;
-                  }) => (
-                    <tr
-                      key={rank.id}
-                      className="hover:bg-gray-700/30 transition-colors"
-                    >
-                      <td className="px-4 py-3 text-gray-200 font-medium">
-                        {rank.name}
-                      </td>
-                      <td className="px-4 py-3 text-gray-400">{rank.level}</td>
-                      <td className="px-4 py-3 text-gray-400">
-                        {rank.userCount ?? 0}
-                      </td>
-                      <td className="px-4 py-3 text-gray-400">
-                        {rank.personalCollageLimit === 0
-                          ? '∞'
-                          : rank.personalCollageLimit ?? '∞'}
-                      </td>
-                      <td className="px-4 py-3 flex gap-2">
-                        <Link
-                          to={`/private/staff/tools/user-ranks/${rank.id}/edit`}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(rank.id)}
-                          className="text-red-400 hover:text-red-300 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                )
+                userRanks.map((rank: UserRankRecord) => (
+                  <tr
+                    key={rank.id}
+                    className="hover:bg-gray-700/30 transition-colors"
+                  >
+                    <td className="px-4 py-3 text-gray-200 font-medium">
+                      {rank.name}
+                    </td>
+                    <td className="px-4 py-3 text-gray-400">{rank.level}</td>
+                    <td className="px-4 py-3 text-gray-400">
+                      {rank.secondary ? 'Secondary' : 'Primary'}
+                    </td>
+                    <td className="px-4 py-3 text-gray-400">
+                      {rank.userCount ?? 0}
+                    </td>
+                    <td className="px-4 py-3 text-gray-400">
+                      {
+                        Object.values(
+                          (
+                            rank as {
+                              permissions?: Record<string, boolean> | null;
+                            }
+                          ).permissions ?? {}
+                        ).filter(Boolean).length
+                      }
+                    </td>
+                    <td className="px-4 py-3 text-gray-400">
+                      {rank.permittedForumIds?.length ?? 0}
+                    </td>
+                    <td className="px-4 py-3 text-gray-400">
+                      {rank.personalCollageLimit === 0
+                        ? '∞'
+                        : rank.personalCollageLimit ?? '∞'}
+                    </td>
+                    <td className="px-4 py-3 flex gap-2">
+                      <Link
+                        to={`/private/staff/tools/user-ranks/${rank.id}/edit`}
+                        className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(rank.id)}
+                        className="text-red-400 hover:text-red-300 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

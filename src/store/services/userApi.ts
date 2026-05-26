@@ -15,21 +15,43 @@ type CreateUserArgs = NonNullable<
 >['content']['application/json'];
 type CreateUserResponse =
   paths['/users']['post']['responses'][201]['content']['application/json'];
-type UserRanksResponse =
-  paths['/tools/user-ranks']['get']['responses'][200]['content']['application/json'];
-type UserRankResponse =
-  paths['/tools/user-ranks/{id}']['get']['responses'][200]['content']['application/json'];
 type CreateUserRankArgs = NonNullable<
   paths['/tools/user-ranks']['post']['requestBody']
 >['content']['application/json'];
-type CreateUserRankResponse =
-  paths['/tools/user-ranks']['post']['responses'][201]['content']['application/json'];
 type UpdateUserRankBody = NonNullable<
   paths['/tools/user-ranks/{id}']['put']['requestBody']
 >['content']['application/json'];
 type UpdateUserRankArgs = { id: number } & UpdateUserRankBody;
-type UpdateUserRankResponse =
-  paths['/tools/user-ranks/{id}']['put']['responses'][200]['content']['application/json'];
+type StaffGroupsResponse =
+  paths['/tools/staff-groups']['get']['responses'][200]['content']['application/json'];
+
+export interface UserRankRecord {
+  id: number;
+  name: string;
+  level: number;
+  permissions: Record<string, boolean> | null;
+  secondary?: boolean;
+  permittedForumIds?: number[];
+  color?: string | null;
+  badge?: string | null;
+  personalCollageLimit?: number | null;
+  displayStaff?: boolean;
+  staffGroupId?: number | null;
+  primaryUserCount?: number;
+  secondaryUserCount?: number;
+  userCount?: number;
+}
+
+export interface UserRankAssignment {
+  userRankId: number;
+  secondaryRankIds: number[];
+}
+
+type SetUserRankArgs = {
+  id: number;
+  userRankId: number;
+  secondaryRankIds?: number[];
+};
 
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -54,15 +76,21 @@ export const userApi = api.injectEndpoints({
     }),
 
     // UserRanks (UserRank)
-    getUserRanks: build.query<UserRanksResponse, void>({
+    getUserRanks: build.query<UserRankRecord[], void>({
       query: () => '/tools/user-ranks',
       providesTags: ['UserRank']
     }),
-    getUserRankById: build.query<UserRankResponse, number | string>({
+    getUserRankById: build.query<UserRankRecord, number | string>({
       query: (id) => `/tools/user-ranks/${id}`,
       providesTags: (_, __, id) => [{ type: 'UserRank', id: Number(id) }]
     }),
-    createUserRank: build.mutation<CreateUserRankResponse, CreateUserRankArgs>({
+    createUserRank: build.mutation<
+      UserRankRecord,
+      CreateUserRankArgs & {
+        secondary?: boolean;
+        permittedForumIds?: number[];
+      }
+    >({
       query: (data) => ({
         url: '/tools/user-ranks',
         method: 'POST',
@@ -70,7 +98,13 @@ export const userApi = api.injectEndpoints({
       }),
       invalidatesTags: ['UserRank']
     }),
-    updateUserRank: build.mutation<UpdateUserRankResponse, UpdateUserRankArgs>({
+    updateUserRank: build.mutation<
+      UserRankRecord,
+      UpdateUserRankArgs & {
+        secondary?: boolean;
+        permittedForumIds?: number[];
+      }
+    >({
       query: ({ id, ...data }) => ({
         url: `/tools/user-ranks/${id}`,
         method: 'PUT',
@@ -151,14 +185,15 @@ export const userApi = api.injectEndpoints({
         'Profile'
       ]
     }),
-    setUserRank: build.mutation<
-      { msg: string },
-      { id: number; userRankId: number }
-    >({
-      query: ({ id, userRankId }) => ({
+    getUserRankAssignment: build.query<UserRankAssignment, number>({
+      query: (id) => `/users/${id}/rank`,
+      providesTags: (_, __, id) => [{ type: 'User', id }]
+    }),
+    setUserRank: build.mutation<{ msg: string }, SetUserRankArgs>({
+      query: ({ id, userRankId, secondaryRankIds = [] }) => ({
         url: `/users/${id}/rank`,
         method: 'PUT',
-        body: { userRankId }
+        body: { userRankId, secondaryRankIds }
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
@@ -320,10 +355,7 @@ export const userApi = api.injectEndpoints({
     }),
 
     // Staff groups (admin-only CRUD, lives here alongside rank mutations)
-    getStaffGroups: build.query<
-      paths['/tools/staff-groups']['get']['responses'][200]['content']['application/json'],
-      void
-    >({
+    getStaffGroups: build.query<StaffGroupsResponse, void>({
       query: () => '/tools/staff-groups',
       providesTags: ['StaffGroup']
     }),
@@ -391,6 +423,7 @@ export const {
   useDeleteUserNoteMutation,
   useDisableUserMutation,
   useEnableUserMutation,
+  useGetUserRankAssignmentQuery,
   useSetUserRankMutation,
   useGetUserIpHistoryQuery,
   useGetUserEmailHistoryQuery,

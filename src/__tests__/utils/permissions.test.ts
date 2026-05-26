@@ -1,4 +1,5 @@
 import {
+  canSeeModBar,
   hasPermission,
   hasAnyPermission,
   isStaffUser
@@ -12,8 +13,10 @@ const makeUser = (permissions: Record<string, boolean>) =>
   }) as never;
 
 describe('permissions helpers', () => {
-  it('treats staff as satisfying admin checks', () => {
-    expect(hasPermission(makeUser({ staff: true }), 'admin')).toBe(true);
+  it('treats admin as satisfying other permission checks', () => {
+    expect(hasPermission(makeUser({ admin: true }), 'reports_manage')).toBe(
+      true
+    );
   });
 
   it('returns true when any permission matches', () => {
@@ -25,5 +28,11 @@ describe('permissions helpers', () => {
   it('recognizes non-staff elevated users for staff-only UI gates', () => {
     expect(isStaffUser(makeUser({ forums_moderate: true }))).toBe(true);
     expect(isStaffUser(makeUser({}))).toBe(false);
+  });
+
+  it('limits the modbar to explicit staff/admin users', () => {
+    expect(canSeeModBar(makeUser({ staff: true }))).toBe(true);
+    expect(canSeeModBar(makeUser({ admin: true }))).toBe(true);
+    expect(canSeeModBar(makeUser({ forums_moderate: true }))).toBe(false);
   });
 });

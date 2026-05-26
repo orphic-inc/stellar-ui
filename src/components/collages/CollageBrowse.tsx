@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { useListCollagesQuery } from '../../store/services/collageApi';
 import type { CollageOrderBy } from '../../types';
 import Spinner from '../layout/Spinner';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import { hasPermission } from '../../utils/permissions';
 
 const CATEGORIES = [
   { id: undefined, label: 'All' },
@@ -23,6 +26,7 @@ const ORDER_OPTIONS: { value: CollageOrderBy; label: string }[] = [
 ];
 
 const CollageBrowse = () => {
+  const currentUser = useSelector(selectCurrentUser);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -49,17 +53,20 @@ const CollageBrowse = () => {
 
   const collages = data?.data ?? [];
   const meta = data?.meta;
+  const canCreateCollage = hasPermission(currentUser, 'collages_create');
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold">Collages</h2>
-        <Link
-          to="/private/collages/new"
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
-        >
-          New Collage
-        </Link>
+        {canCreateCollage && (
+          <Link
+            to="/private/collages/new"
+            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+          >
+            New Collage
+          </Link>
+        )}
       </div>
 
       <form onSubmit={handleSearch} className="flex gap-2 mb-4">

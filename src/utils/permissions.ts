@@ -1,28 +1,8 @@
 import type { AuthUser } from '../types';
+import { type Permission, VALID_PERMISSIONS } from './permissionCatalog';
 
-export const VALID_PERMISSIONS = [
-  'forums_read',
-  'forums_post',
-  'forums_moderate',
-  'forums_manage',
-  'communities_manage',
-  'collages_manage',
-  'collages_moderate',
-  'news_manage',
-  'invites_manage',
-  'users_edit',
-  'users_warn',
-  'users_disable',
-  'wiki_edit',
-  'wiki_manage',
-  'rules_manage',
-  'advanced_search',
-  'users_search',
-  'staff',
-  'admin'
-] as const;
-
-export type Permission = (typeof VALID_PERMISSIONS)[number];
+export { VALID_PERMISSIONS };
+export type { Permission };
 
 const getPermissions = (
   user: AuthUser | null | undefined
@@ -33,7 +13,7 @@ export const hasPermission = (
   permission: Permission
 ): boolean => {
   const permissions = getPermissions(user);
-  if (permission === 'admin') return !!(permissions.admin || permissions.staff);
+  if (permissions.admin) return true;
   return !!permissions[permission];
 };
 
@@ -42,13 +22,19 @@ export const hasAnyPermission = (
   permissions: Permission[]
 ): boolean => permissions.some((permission) => hasPermission(user, permission));
 
+export const canSeeModBar = (user: AuthUser | null | undefined): boolean =>
+  hasAnyPermission(user, ['staff', 'admin']);
+
 export const isStaffUser = (user: AuthUser | null | undefined): boolean =>
   hasAnyPermission(user, [
     'staff',
-    'admin',
     'forums_manage',
     'forums_moderate',
     'communities_manage',
+    'contributions_manage',
+    'reports_manage',
+    'staff_inbox_manage',
     'news_manage',
-    'users_edit'
+    'users_edit',
+    'rank_permissions_manage'
   ]);

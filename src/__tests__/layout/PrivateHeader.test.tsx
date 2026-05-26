@@ -61,8 +61,20 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('../../utils/permissions', () => ({
-  isStaffUser: (user: { permissions?: { staff?: boolean } }) =>
-    !!user.permissions?.staff
+  isStaffUser: (user: {
+    permissions?: { staff?: boolean };
+    userRank?: { permissions?: { staff?: boolean } };
+  }) => !!(user.permissions?.staff ?? user.userRank?.permissions?.staff),
+  canSeeModBar: (user: {
+    permissions?: { staff?: boolean; admin?: boolean };
+    userRank?: { permissions?: { staff?: boolean; admin?: boolean } };
+  }) =>
+    !!(
+      user.permissions?.staff ??
+      user.permissions?.admin ??
+      user.userRank?.permissions?.staff ??
+      user.userRank?.permissions?.admin
+    )
 }));
 
 jest.mock('../../store/services/messagesApi', () => ({
@@ -79,7 +91,7 @@ const mockUser = {
   username: 'testuser',
   avatar: null,
   inviteCount: 2,
-  userRank: { level: 100, name: 'Member', color: '#fff' },
+  userRank: { level: 100, name: 'Member', color: '#fff', permissions: {} },
   contributed: '2000000000',
   consumed: '500000000',
   ratio: 4.0,
@@ -148,7 +160,10 @@ describe('PrivateHeader', () => {
   });
 
   it('shows Staff Queue link for staff users', () => {
-    const staffUser = { ...mockUser, permissions: { staff: true } };
+    const staffUser = {
+      ...mockUser,
+      userRank: { ...mockUser.userRank, permissions: { staff: true } }
+    };
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
     expect(
       screen.getByRole('link', { name: /staff queue/i })
@@ -156,7 +171,10 @@ describe('PrivateHeader', () => {
   });
 
   it('shows ModBar for staff users', () => {
-    const staffUser = { ...mockUser, permissions: { staff: true } };
+    const staffUser = {
+      ...mockUser,
+      userRank: { ...mockUser.userRank, permissions: { staff: true } }
+    };
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
     expect(screen.getByText('ModBar')).toBeInTheDocument();
   });
@@ -181,7 +199,10 @@ describe('PrivateHeader', () => {
   });
 
   it('shows staff inbox badge when there are pending tickets', () => {
-    const staffUser = { ...mockUser, permissions: { staff: true } };
+    const staffUser = {
+      ...mockUser,
+      userRank: { ...mockUser.userRank, permissions: { staff: true } }
+    };
     mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 7 } });
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
     expect(screen.getByText('7')).toBeInTheDocument();

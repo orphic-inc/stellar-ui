@@ -8,46 +8,27 @@ import {
   useUpdateUserRankMutation,
   useGetStaffGroupsQuery
 } from '../../store/services/userApi';
+import { useGetForumCategoriesQuery } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
-
-const PERM_GROUPS: { title: string; perms: string[] }[] = [
-  {
-    title: 'Forums',
-    perms: ['forums_read', 'forums_post', 'forums_moderate', 'forums_manage']
-  },
-  {
-    title: 'Communities',
-    perms: ['communities_manage']
-  },
-  {
-    title: 'Collages',
-    perms: ['collages_manage', 'collages_moderate']
-  },
-  {
-    title: 'Users',
-    perms: ['users_edit', 'users_warn', 'users_disable', 'invites_manage']
-  },
-  {
-    title: 'Search',
-    perms: ['advanced_search', 'users_search']
-  },
-  {
-    title: 'System',
-    perms: ['news_manage', 'rules_manage', 'staff', 'admin']
-  }
-];
+import { PERMISSION_GROUPS } from '../../utils/permissionCatalog';
 
 interface FormValues {
   level: number;
   name: string;
   permissions: Record<string, boolean>;
+  secondary: boolean;
+  permittedForumIds: number[];
   personalCollageLimit: number;
   displayStaff: boolean;
   staffGroupId: number | '';
 }
 
-const formatPerm = (perm: string) => perm.replace(/_/g, ' ');
+type ForumCategory = {
+  id: number;
+  name: string;
+  forums?: Array<{ id: number; name: string; minClassRead?: number | null }>;
+};
 
 const UserRankFormPage = () => {
   const { id } = useParams<{ id?: string }>();
@@ -58,22 +39,27 @@ const UserRankFormPage = () => {
     skip: !isEditing
   });
   const { data: staffGroups } = useGetStaffGroupsQuery();
+  const { data: forumCategories } = useGetForumCategoriesQuery({ all: true });
   const [createUserRank] = useCreateUserRankMutation();
   const [updateUserRank] = useUpdateUserRankMutation();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit, reset, watch } = useForm<FormValues>({
-    defaultValues: {
-      level: 0,
-      name: '',
-      permissions: {},
-      personalCollageLimit: 0,
-      displayStaff: false,
-      staffGroupId: ''
-    }
-  });
+  const { register, handleSubmit, reset, watch, setValue } =
+    useForm<FormValues>({
+      defaultValues: {
+        level: 0,
+        name: '',
+        permissions: {},
+        secondary: false,
+        permittedForumIds: [],
+        personalCollageLimit: 0,
+        displayStaff: false,
+        staffGroupId: ''
+      }
+    });
 
   const displayStaff = watch('displayStaff');
+  const selectedForumIds = watch('permittedForumIds');
 
   useEffect(() => {
     if (existing) {
@@ -81,12 +67,21 @@ const UserRankFormPage = () => {
         level: existing.level,
         name: existing.name,
         permissions: existing.permissions ?? {},
+        secondary: existing.secondary ?? false,
+        permittedForumIds: existing.permittedForumIds ?? [],
         personalCollageLimit: existing.personalCollageLimit ?? 0,
         displayStaff: existing.displayStaff ?? false,
         staffGroupId: existing.staffGroupId ?? ''
       });
     }
   }, [existing, reset]);
+
+  const togglePermittedForum = (forumId: number) => {
+    const next = selectedForumIds.includes(forumId)
+      ? selectedForumIds.filter((id) => id !== forumId)
+      : [...selectedForumIds, forumId].sort((a, b) => a - b);
+    setValue('permittedForumIds', next, { shouldDirty: true });
+  };
 
   const onSubmit = async (data: FormValues) => {
     const payload = {
@@ -113,7 +108,7 @@ const UserRankFormPage = () => {
   if (isEditing && isLoading) return <Spinner />;
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="mx-auto max-w-6xl px-4 py-6 space-y-6">
       <div className="flex items-center gap-4">
         <div>
           <div className="flex gap-3 text-sm mb-2">
@@ -146,7 +141,7 @@ const UserRankFormPage = () => {
             </h3>
           </div>
           <div className="p-4 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               <div>
                 <label
                   htmlFor="perm-name"
@@ -194,6 +189,81 @@ const UserRankFormPage = () => {
                 />
                 <p className="text-xs text-gray-500 mt-1">0 = unlimited</p>
               </div>
+              <div className="rounded border border-gray-700 bg-gray-900/50 px-3 py-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    {...register('secondary')}
+                    className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm text-gray-200">
+                      Secondary class
+                    </span>
+                    <span className="block text-xs text-gray-500">
+                      Assignable as an additional class without replacing the
+                      user&apos;s primary rank.
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+          <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
+              Permitted Forums
+            </h3>
+          </div>
+          <div className="p-4 space-y-4">
+            <p className="text-sm text-gray-400">
+              Grant access to specific forums even when the effective class
+              level would normally be too low.
+            </p>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {(forumCategories as ForumCategory[] | undefined)?.map(
+                (category) => (
+                  <div
+                    key={category.id}
+                    className="rounded border border-gray-700 bg-gray-900/40 p-3"
+                  >
+                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                      {category.name}
+                    </h4>
+                    <div className="space-y-2">
+                      {category.forums?.length ? (
+                        category.forums.map((forum) => (
+                          <label
+                            key={forum.id}
+                            className="flex items-start gap-3 cursor-pointer rounded border border-gray-800 px-3 py-2 hover:border-gray-700"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectedForumIds.includes(forum.id)}
+                              onChange={() => togglePermittedForum(forum.id)}
+                              className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+                            />
+                            <span className="min-w-0">
+                              <span className="block text-sm text-gray-200">
+                                {forum.name}
+                              </span>
+                              <span className="block text-xs text-gray-500">
+                                Read level {forum.minClassRead ?? 0}
+                              </span>
+                            </span>
+                          </label>
+                        ))
+                      ) : (
+                        <p className="text-xs text-gray-500">
+                          No forums in this category.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
             </div>
           </div>
         </div>
@@ -205,25 +275,30 @@ const UserRankFormPage = () => {
               Rank Permissions
             </h3>
           </div>
-          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {PERM_GROUPS.map(({ title, perms }) => (
+          <div className="p-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {PERMISSION_GROUPS.map(({ title, permissions }) => (
               <div key={title}>
                 <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2 pb-1 border-b border-gray-700">
                   {title}
                 </h4>
-                <div className="space-y-1.5">
-                  {perms.map((perm) => (
+                <div className="space-y-2">
+                  {permissions.map(({ key, label, description }) => (
                     <label
-                      key={perm}
-                      className="flex items-center gap-2 cursor-pointer group"
+                      key={key}
+                      className="flex items-start gap-3 cursor-pointer group rounded border border-gray-700/70 px-3 py-2 hover:border-gray-600"
                     >
                       <input
                         type="checkbox"
-                        {...register(`permissions.${perm}`)}
-                        className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+                        {...register(`permissions.${key}`)}
+                        className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
                       />
-                      <span className="text-xs text-gray-400 group-hover:text-gray-200 transition-colors capitalize">
-                        {formatPerm(perm)}
+                      <span className="min-w-0">
+                        <span className="block text-sm text-gray-200 group-hover:text-white transition-colors">
+                          {label}
+                        </span>
+                        <span className="block text-xs text-gray-500">
+                          {description}
+                        </span>
                       </span>
                     </label>
                   ))}
