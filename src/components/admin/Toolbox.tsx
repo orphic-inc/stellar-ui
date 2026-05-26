@@ -94,6 +94,11 @@ const sections: SectionProps[] = [
         permissions: ['news_manage']
       },
       {
+        label: 'Global notices',
+        to: '/private/staff/global-notices',
+        permissions: ['news_manage']
+      },
+      {
         label: 'Mass PM',
         to: '/private/staff/mass-pm',
         permissions: ['staff', 'admin']
@@ -122,6 +127,11 @@ const sections: SectionProps[] = [
         label: 'Forum manager',
         to: '/private/staff/tools/forums',
         permissions: ['forums_manage']
+      },
+      {
+        label: 'Tag aliases',
+        to: '/private/staff/tag-aliases',
+        permissions: ['staff', 'admin']
       }
     ]
   },
@@ -161,6 +171,11 @@ const sections: SectionProps[] = [
       {
         label: 'Registration log',
         to: '/private/staff/registration-log',
+        permissions: ['staff', 'admin']
+      },
+      {
+        label: 'User warnings',
+        to: '/private/staff/user-warnings',
         permissions: ['staff', 'admin']
       }
     ]

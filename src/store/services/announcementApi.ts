@@ -13,6 +13,13 @@ type CreateBlogPostArgs = NonNullable<
 >['content']['application/json'];
 type CreateBlogPostResponse =
   paths['/announcements/blog']['post']['responses'][201]['content']['application/json'];
+type GlobalNoticesResponse =
+  paths['/announcements/global-notices']['get']['responses'][200]['content']['application/json'];
+type CreateGlobalNoticeArgs = NonNullable<
+  paths['/announcements/global-notice']['post']['requestBody']
+>['content']['application/json'];
+type CreateGlobalNoticeResponse =
+  paths['/announcements/global-notice']['post']['responses'][201]['content']['application/json'];
 
 export const announcementApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -42,6 +49,28 @@ export const announcementApi = api.injectEndpoints({
     deleteBlogPost: build.mutation<void, number>({
       query: (id) => ({ url: `/announcements/blog/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Announcement']
+    }),
+    getGlobalNotices: build.query<GlobalNoticesResponse, void>({
+      query: () => '/announcements/global-notices',
+      providesTags: ['GlobalNotice']
+    }),
+    createGlobalNotice: build.mutation<
+      CreateGlobalNoticeResponse,
+      CreateGlobalNoticeArgs
+    >({
+      query: (data) => ({
+        url: '/announcements/global-notice',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['GlobalNotice']
+    }),
+    deleteGlobalNotice: build.mutation<void, number>({
+      query: (id) => ({
+        url: `/announcements/global-notice/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['GlobalNotice']
     })
   })
 });
@@ -51,5 +80,8 @@ export const {
   useCreateAnnouncementMutation,
   useDeleteAnnouncementMutation,
   useCreateBlogPostMutation,
-  useDeleteBlogPostMutation
+  useDeleteBlogPostMutation,
+  useGetGlobalNoticesQuery,
+  useCreateGlobalNoticeMutation,
+  useDeleteGlobalNoticeMutation
 } = announcementApi;

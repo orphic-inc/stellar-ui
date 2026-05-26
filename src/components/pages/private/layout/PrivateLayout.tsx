@@ -9,6 +9,7 @@ import {
 import PrivateHeader from './PrivateHeader';
 import PrivateFooter from './PrivateFooter';
 import NotificationCorner from '../../../layout/NotificationCorner';
+import GlobalNoticeBanner from '../../../layout/GlobalNoticeBanner';
 import Spinner from '../../../layout/Spinner';
 
 interface Props {
@@ -34,6 +35,7 @@ const PrivateLayout = ({ children }: Props) => {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
       <PrivateHeader user={user} />
+      <GlobalNoticeBanner />
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
         {children}
       </main>

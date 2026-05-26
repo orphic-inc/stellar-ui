@@ -269,6 +269,17 @@ export const userApi = api.injectEndpoints({
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
+    getAllWarnings: build.query<
+      paths['/users/warnings']['get']['responses'][200]['content']['application/json'],
+      { page?: number; userId?: number }
+    >({
+      query: ({ page = 1, userId } = {}) => {
+        const params = new URLSearchParams({ page: String(page) });
+        if (userId) params.set('userId', String(userId));
+        return `/users/warnings?${params}`;
+      },
+      providesTags: ['Warning']
+    }),
     getSnatchListByUserId: build.query<
       Array<{
         id: number;
@@ -399,5 +410,6 @@ export const {
   useCreateStaffGroupMutation,
   useUpdateStaffGroupMutation,
   useDeleteStaffGroupMutation,
-  useSetStaffBioMutation
+  useSetStaffBioMutation,
+  useGetAllWarningsQuery
 } = userApi;

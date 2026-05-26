@@ -63,7 +63,10 @@ export const api = createApi({
     'DonorReward',
     'StaffGroup',
     'RulesPage',
-    'Friend'
+    'Friend',
+    'GlobalNotice',
+    'Warning',
+    'TagAlias'
   ] as const,
   endpoints: () => ({})
 });

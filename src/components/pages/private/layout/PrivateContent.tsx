@@ -65,6 +65,9 @@ import EmailBlacklistPage from '../../../staff/EmailBlacklistPage';
 import DonationLogPage from '../../../staff/DonationLogPage';
 import DuplicateIpsPage from '../../../staff/DuplicateIpsPage';
 import RegistrationLogPage from '../../../staff/RegistrationLogPage';
+import UserWarningsPage from '../../../staff/UserWarningsPage';
+import TagAliasesPage from '../../../staff/TagAliasesPage';
+import GlobalNoticesPage from '../../../staff/GlobalNoticesPage';
 import SnatchList from '../snatch/SnatchList';
 import BookmarksPage from '../bookmarks/BookmarksPage';
 import FriendsPage from '../friends/FriendsPage';
@@ -306,6 +309,30 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['staff', 'admin']}>
           <RegistrationLogPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/user-warnings"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <UserWarningsPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/tag-aliases"
+      element={
+        <StaffGate permissions={['staff', 'admin']}>
+          <TagAliasesPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/global-notices"
+      element={
+        <StaffGate permissions={['news_manage']}>
+          <GlobalNoticesPage />
         </StaffGate>
       }
     />

@@ -25,7 +25,6 @@ const NewsManager = () => {
   const [createBlogPost, { isLoading: creatingBlog }] =
     useCreateBlogPostMutation();
   const [deleteBlogPost] = useDeleteBlogPostMutation();
-
   const [newsTitle, setNewsTitle] = useState('');
   const [newsBody, setNewsBody] = useState('');
   const [blogTitle, setBlogTitle] = useState('');
