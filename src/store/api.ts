@@ -66,7 +66,20 @@ export const api = createApi({
     'Friend',
     'GlobalNotice',
     'Warning',
-    'TagAlias'
+    'TagAlias',
+    'Session',
+    'Invite',
+    'InviteTree',
+    'RatioWatch',
+    'VanityHouse',
+    'DeletedCollage',
+    'AlbumOfMonth',
+    'Dnc',
+    'EconomyStats',
+    'ReleaseStats',
+    'ClientStats',
+    'UserFlow',
+    'SiteInfo'
   ] as const,
   endpoints: () => ({})
 });

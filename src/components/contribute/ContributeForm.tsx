@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   useGetCommunitiesQuery,
-  useCreateContributionMutation
+  useCreateContributionMutation,
+  useGetDncListQuery
 } from '../../store/services/communityApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
@@ -86,6 +87,11 @@ const ContributeForm = () => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([
     { artist: '', importance: 'Main artist' }
   ]);
+
+  const { data: dncList } = useGetDncListQuery(
+    community ? parseInt(community, 10) : 0,
+    { skip: !community }
+  );
 
   useEffect(() => {
     if (type === 'Music') {
@@ -187,6 +193,32 @@ const ContributeForm = () => {
             </Link>
           </p>
         </div>
+
+        {dncList && dncList.length > 0 && (
+          <div className="rounded-lg border border-yellow-600/50 bg-yellow-900/20 p-4 space-y-2">
+            <h3 className="text-sm font-semibold text-yellow-400 uppercase tracking-wider">
+              Do Not Contribute List
+            </h3>
+            <p className="text-xs text-yellow-300/80">
+              The following artists, labels, and releases must not be
+              contributed to this community:
+            </p>
+            <ul className="space-y-1">
+              {dncList.map((entry) => (
+                <li key={entry.id} className="flex flex-wrap gap-x-2 text-sm">
+                  <span className="text-yellow-200 font-medium">
+                    {entry.name}
+                  </span>
+                  {entry.comment && (
+                    <span className="text-yellow-300/60 text-xs self-center">
+                      — {entry.comment}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div className={fieldWrap}>

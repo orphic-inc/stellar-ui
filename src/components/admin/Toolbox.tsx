@@ -57,6 +57,11 @@ const sections: SectionProps[] = [
         label: 'Site settings',
         to: '/private/staff/tools/settings',
         permissions: ['admin']
+      },
+      {
+        label: 'Login Watch',
+        to: '/private/staff/login-watch',
+        permissions: ['admin']
       }
     ]
   },
@@ -72,6 +77,26 @@ const sections: SectionProps[] = [
         label: 'Recovery queue',
         to: '/private/staff/tools/recovery-queue',
         permissions: ['users_edit', 'admin']
+      },
+      {
+        label: 'Registration log',
+        to: '/private/staff/registration-log',
+        permissions: ['admin']
+      },
+      {
+        label: 'Invite pool',
+        to: '/private/staff/invite-pool',
+        permissions: ['admin']
+      },
+      {
+        label: 'Invite tree',
+        to: '/private/staff/invite-tree',
+        permissions: ['admin']
+      },
+      {
+        label: 'User flow',
+        to: '/private/staff/user-flow',
+        permissions: ['admin']
       }
     ]
   },
@@ -96,6 +121,16 @@ const sections: SectionProps[] = [
       {
         label: 'Global notices',
         to: '/private/staff/global-notices',
+        permissions: ['news_manage']
+      },
+      {
+        label: 'Vanity House',
+        to: '/private/staff/vanity-house',
+        permissions: ['news_manage']
+      },
+      {
+        label: 'Album of the Month',
+        to: '/private/staff/album-of-month',
         permissions: ['news_manage']
       },
       {
@@ -152,6 +187,21 @@ const sections: SectionProps[] = [
         label: 'Reports queue',
         to: '/private/staff/reports',
         permissions: ['staff', 'admin']
+      },
+      {
+        label: 'Duplicate IPs',
+        to: '/private/staff/duplicate-ips',
+        permissions: ['admin']
+      },
+      {
+        label: 'Do Not Contribute list',
+        to: '/private/staff/dnc',
+        permissions: ['communities_manage']
+      },
+      {
+        label: 'Collage recovery',
+        to: '/private/staff/collage-recovery',
+        permissions: ['collages_moderate']
       }
     ]
   },
@@ -161,16 +211,6 @@ const sections: SectionProps[] = [
       {
         label: 'Ratio policy override',
         to: '/private/staff/tools/ratio-policy',
-        permissions: ['staff', 'admin']
-      },
-      {
-        label: 'Duplicate IPs',
-        to: '/private/staff/duplicate-ips',
-        permissions: ['staff', 'admin']
-      },
-      {
-        label: 'Registration log',
-        to: '/private/staff/registration-log',
         permissions: ['staff', 'admin']
       },
       {
@@ -206,6 +246,41 @@ const sections: SectionProps[] = [
       {
         label: 'Donation log',
         to: '/private/staff/donation-log',
+        permissions: ['admin']
+      }
+    ]
+  },
+  {
+    title: 'Site Information',
+    links: [
+      {
+        label: 'Economic stats',
+        to: '/private/staff/economic-stats',
+        permissions: ['admin']
+      },
+      {
+        label: 'Release stats',
+        to: '/private/staff/release-stats',
+        permissions: ['admin']
+      },
+      {
+        label: 'Ratio watch',
+        to: '/private/staff/ratio-watch',
+        permissions: ['admin']
+      },
+      {
+        label: 'OS & Browser usage',
+        to: '/private/staff/client-stats',
+        permissions: ['admin']
+      }
+    ]
+  },
+  {
+    title: 'Development',
+    links: [
+      {
+        label: 'Site info',
+        to: '/private/staff/site-info',
         permissions: ['admin']
       }
     ]

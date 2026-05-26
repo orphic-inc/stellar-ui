@@ -1,5 +1,6 @@
 import { api } from '../api';
 import type { components, paths } from '../../types/api';
+import type { DncEntry } from './adminApi';
 
 export interface VoteAggregate {
   releaseId: number;
@@ -312,6 +313,12 @@ export const communityApi = api.injectEndpoints({
       invalidatesTags: (_, __, { releaseId }) => [
         { type: 'Release', id: releaseId }
       ]
+    }),
+
+    // DNC (Do Not Contribute) — readable by all authenticated users
+    getDncList: build.query<DncEntry[], number>({
+      query: (communityId) => `/communities/${communityId}/dnc`,
+      providesTags: ['Dnc']
     })
   })
 });
@@ -339,5 +346,6 @@ export const {
   useVoteOnReleaseTagMutation,
   useRemoveTagFromReleaseMutation,
   useGetReleaseHistoryQuery,
-  useRevertReleaseHistoryMutation
+  useRevertReleaseHistoryMutation,
+  useGetDncListQuery
 } = communityApi;

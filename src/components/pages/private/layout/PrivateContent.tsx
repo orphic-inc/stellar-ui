@@ -68,6 +68,19 @@ import RegistrationLogPage from '../../../staff/RegistrationLogPage';
 import UserWarningsPage from '../../../staff/UserWarningsPage';
 import TagAliasesPage from '../../../staff/TagAliasesPage';
 import GlobalNoticesPage from '../../../staff/GlobalNoticesPage';
+import LoginWatchPage from '../../../staff/LoginWatchPage';
+import VanityHousePage from '../../../staff/VanityHousePage';
+import AlbumOfMonthPage from '../../../staff/AlbumOfMonthPage';
+import UserFlowPage from '../../../staff/UserFlowPage';
+import InvitePoolPage from '../../../staff/InvitePoolPage';
+import InviteTreePage from '../../../staff/InviteTreePage';
+import DncPage from '../../../staff/DncPage';
+import CollageRecoveryPage from '../../../staff/CollageRecoveryPage';
+import EconomicStatsPage from '../../../staff/EconomicStatsPage';
+import ReleaseStatsPage from '../../../staff/ReleaseStatsPage';
+import RatioWatchPage from '../../../staff/RatioWatchPage';
+import ClientStatsPage from '../../../staff/ClientStatsPage';
+import SiteInfoPage from '../../../staff/SiteInfoPage';
 import SnatchList from '../snatch/SnatchList';
 import BookmarksPage from '../bookmarks/BookmarksPage';
 import FriendsPage from '../friends/FriendsPage';
@@ -333,6 +346,110 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['news_manage']}>
           <GlobalNoticesPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/login-watch"
+      element={
+        <StaffGate permissions={['admin']}>
+          <LoginWatchPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/vanity-house"
+      element={
+        <StaffGate permissions={['news_manage']}>
+          <VanityHousePage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/album-of-month"
+      element={
+        <StaffGate permissions={['news_manage']}>
+          <AlbumOfMonthPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/user-flow"
+      element={
+        <StaffGate permissions={['admin']}>
+          <UserFlowPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/invite-pool"
+      element={
+        <StaffGate permissions={['admin']}>
+          <InvitePoolPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/invite-tree"
+      element={
+        <StaffGate permissions={['admin']}>
+          <InviteTreePage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/dnc"
+      element={
+        <StaffGate permissions={['communities_manage']}>
+          <DncPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/collage-recovery"
+      element={
+        <StaffGate permissions={['collages_moderate']}>
+          <CollageRecoveryPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/economic-stats"
+      element={
+        <StaffGate permissions={['admin']}>
+          <EconomicStatsPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/release-stats"
+      element={
+        <StaffGate permissions={['admin']}>
+          <ReleaseStatsPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/ratio-watch"
+      element={
+        <StaffGate permissions={['admin']}>
+          <RatioWatchPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/client-stats"
+      element={
+        <StaffGate permissions={['admin']}>
+          <ClientStatsPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/site-info"
+      element={
+        <StaffGate permissions={['admin']}>
+          <SiteInfoPage />
         </StaffGate>
       }
     />
