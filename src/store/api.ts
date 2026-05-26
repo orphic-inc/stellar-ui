@@ -61,7 +61,8 @@ export const api = createApi({
     'EmailBlacklist',
     'Donation',
     'StaffGroup',
-    'RulesPage'
+    'RulesPage',
+    'Friend'
   ] as const,
   endpoints: () => ({})
 });

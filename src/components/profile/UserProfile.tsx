@@ -28,6 +28,11 @@ import {
   useTriggerUserRecoveryMutation,
   useSetStaffBioMutation
 } from '../../store/services/userApi';
+import {
+  useGetFriendStatusQuery,
+  useAddFriendMutation,
+  useRemoveFriendMutation
+} from '../../store/services/friendApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { hasAnyPermission } from '../../utils/permissions';
@@ -854,6 +859,12 @@ const UserProfile = () => {
   const { data: myRatioStats } = useGetMyRatioStatsQuery(undefined, {
     skip: !isOwnProfile
   });
+  const dispatch = useDispatch();
+  const { data: friendStatus } = useGetFriendStatusQuery(Number(id), {
+    skip: isOwnProfile || !currentUser
+  });
+  const [addFriend] = useAddFriendMutation();
+  const [removeFriend] = useRemoveFriendMutation();
 
   if (isLoading) return <Spinner />;
   if (error) {
@@ -941,6 +952,55 @@ const UserProfile = () => {
               >
                 Send Message
               </Link>
+              {friendStatus?.isFriend ? (
+                <button
+                  onClick={async () => {
+                    try {
+                      await removeFriend(profile.id).unwrap();
+                      dispatch(
+                        addAlert(
+                          `${profile.username} removed from friends.`,
+                          'success'
+                        )
+                      );
+                    } catch (err) {
+                      dispatch(
+                        addAlert(
+                          getApiErrorMessage(err) ?? 'Failed to remove friend.',
+                          'danger'
+                        )
+                      );
+                    }
+                  }}
+                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  Remove Friend
+                </button>
+              ) : (
+                <button
+                  onClick={async () => {
+                    try {
+                      await addFriend(profile.id).unwrap();
+                      dispatch(
+                        addAlert(
+                          `${profile.username} added to friends.`,
+                          'success'
+                        )
+                      );
+                    } catch (err) {
+                      dispatch(
+                        addAlert(
+                          getApiErrorMessage(err) ?? 'Failed to add friend.',
+                          'danger'
+                        )
+                      );
+                    }
+                  }}
+                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  Add to Friends
+                </button>
+              )}
               <Link
                 to={`/private/reports/new?targetType=User&targetId=${profile.id}`}
                 className="text-gray-500 hover:text-gray-300 transition-colors"

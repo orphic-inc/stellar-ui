@@ -67,6 +67,7 @@ import DuplicateIpsPage from '../../../staff/DuplicateIpsPage';
 import RegistrationLogPage from '../../../staff/RegistrationLogPage';
 import SnatchList from '../snatch/SnatchList';
 import BookmarksPage from '../bookmarks/BookmarksPage';
+import FriendsPage from '../friends/FriendsPage';
 import WikiListPage from '../../../wiki/WikiListPage';
 import WikiViewPage from '../../../wiki/WikiViewPage';
 import WikiEditPage from '../../../wiki/WikiEditPage';
@@ -124,6 +125,7 @@ const PrivateContent = () => (
     <Route path="invite" element={<InviteForm />} />
     <Route path="ratio" element={wrap(RatioRulesPage)} />
     <Route path="bookmarks" element={wrap(BookmarksPage)} />
+    <Route path="friends" element={wrap(FriendsPage)} />
 
     <Route path="staff" element={wrap(StaffPage)} />
     <Route

@@ -199,6 +199,12 @@ jest.mock('../../store/services/profileApi', () => ({
   useGetMyRatioStatsQuery: () => ({ data: mockMyRatioStats, isLoading: false })
 }));
 
+jest.mock('../../store/services/friendApi', () => ({
+  useGetFriendStatusQuery: () => ({ data: { isFriend: false } }),
+  useAddFriendMutation: () => [jest.fn(), { isLoading: false }],
+  useRemoveFriendMutation: () => [jest.fn(), { isLoading: false }]
+}));
+
 describe('UserProfile', () => {
   beforeEach(() => {
     jest.clearAllMocks();

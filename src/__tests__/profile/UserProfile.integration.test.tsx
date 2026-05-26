@@ -182,6 +182,8 @@ const setupFetch = (opts: FetchOpts = {}) => {
       return Promise.resolve(makeResponse({ body: [] }));
     if (pathname === '/api/users/me/snatch-list')
       return Promise.resolve(makeResponse({ body: [] }));
+    if (pathname === `/api/friends/status/42`)
+      return Promise.resolve(makeResponse({ body: { isFriend: false } }));
 
     return Promise.resolve(
       makeResponse({

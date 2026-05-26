@@ -125,6 +125,12 @@ const PrivateHeader = ({ user }: Props) => {
             >
               Bookmarks
             </Link>
+            <Link
+              to="/private/friends"
+              className="hover:text-gray-200 transition-colors"
+            >
+              Friends
+            </Link>
           </div>
         </div>
       </div>
