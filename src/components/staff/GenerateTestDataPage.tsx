@@ -254,9 +254,6 @@ const RunRow = ({ run, onCleanup }: RunRowProps) => {
   return (
     <>
       <tr className="hover:bg-gray-700/20 transition-colors">
-        <td className="px-4 py-2.5 text-gray-200 text-sm">
-          {run.label ?? <span className="text-gray-600 italic">—</span>}
-        </td>
         <td className="px-4 py-2.5">
           <span className="text-xs font-mono text-gray-400">{run.mode}</span>
         </td>
@@ -288,19 +285,17 @@ const RunRow = ({ run, onCleanup }: RunRowProps) => {
           </span>
         </td>
         <td className="px-4 py-2.5 text-right space-x-3">
-          {(run.warnings?.length ?? 0) > 0 && (
-            <button
-              type="button"
-              onClick={() => setExpanded((v) => !v)}
-              className="text-xs text-gray-400 hover:text-white transition-colors"
-            >
-              {expanded ? 'Hide' : 'Expand'}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="text-xs text-gray-400 hover:text-white transition-colors"
+          >
+            {expanded ? 'Hide' : 'Detail'}
+          </button>
           {run.cleanupStatus === 'active' && (
             <button
               type="button"
-              onClick={() => onCleanup(run.id, run.label ?? run.id.slice(0, 8))}
+              onClick={() => onCleanup(run.id, run.id.slice(0, 8))}
               className="text-xs text-red-400 hover:text-red-300 transition-colors"
             >
               Clean up
@@ -308,18 +303,53 @@ const RunRow = ({ run, onCleanup }: RunRowProps) => {
           )}
         </td>
       </tr>
-      {expanded && (run.warnings?.length ?? 0) > 0 && (
+      {expanded && (
         <tr>
-          <td colSpan={8} className="px-4 pb-3">
-            <div className="bg-gray-900 rounded border border-gray-700 p-3 space-y-1">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                Warnings
-              </p>
-              {run.warnings!.map((w, i) => (
-                <p key={i} className="text-xs text-amber-300 font-mono">
-                  {w}
-                </p>
-              ))}
+          <td colSpan={7} className="px-4 pb-3">
+            <div className="bg-gray-900 rounded border border-gray-700 p-3 space-y-3">
+              {/* Summary entity counts */}
+              {Object.keys(run.summary).length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Generated entities
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-1">
+                    {Object.entries(run.summary)
+                      .filter(([, v]) => v > 0)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([k, v]) => (
+                        <div key={k} className="flex justify-between text-xs">
+                          <span className="text-gray-400">{k}</span>
+                          <span className="text-gray-300 font-mono ml-2">
+                            {v.toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+              {/* Warnings */}
+              {(run.warnings?.length ?? 0) > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                    Warnings
+                  </p>
+                  <div className="space-y-1">
+                    {run.warnings!.map((w, i) => (
+                      <p key={i} className="text-xs text-amber-300 font-mono">
+                        {w}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Empty state */}
+              {Object.keys(run.summary).length === 0 &&
+                (run.warnings?.length ?? 0) === 0 && (
+                  <p className="text-xs text-gray-500 italic">
+                    No details available.
+                  </p>
+                )}
             </div>
           </td>
         </tr>
@@ -995,9 +1025,6 @@ const GenerateTestDataPage = () => {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
-                      <th className="text-left px-4 py-2 font-semibold">
-                        Label
-                      </th>
                       <th className="text-left px-4 py-2 font-semibold">
                         Mode
                       </th>
