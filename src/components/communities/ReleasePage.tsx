@@ -3,23 +3,6 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import CommentsSection from '../layout/CommentsSection';
-import {
-  useGetReleaseByIdQuery,
-  useGetCommunityByIdQuery,
-  useGetReleaseHistoryQuery,
-  useVoteOnReleaseMutation,
-  useRemoveVoteOnReleaseMutation,
-  useAddTagToReleaseMutation,
-  useVoteOnReleaseTagMutation,
-  useRemoveTagFromReleaseMutation,
-  useRevertReleaseHistoryMutation,
-  useUpdateReleaseMutation
-} from '../../store/services/communityApi';
-import type {
-  MyVote,
-  ReleaseTag,
-  VoteAggregate
-} from '../../store/services/communityApi';
 import { useToggleReleaseBookmarkMutation } from '../../store/services/bookmarkApi';
 import {
   useGetCommentSubscriptionQuery,
@@ -33,12 +16,7 @@ import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
 import { formatBytes } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
-
-type ReleaseWithVote = {
-  myVote?: MyVote;
-  voteAggregate?: VoteAggregate | null;
-  releaseTags?: ReleaseTag[];
-};
+import { useReleaseWorkbench } from './useReleaseWorkbench';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -71,42 +49,49 @@ const ReleasePage = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
   const [reportingId, setReportingId] = useState<number | null>(null);
-  const [pendingTag, setPendingTag] = useState('');
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [revertingId, setRevertingId] = useState<number | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
-    title: '',
-    description: '',
-    year: 0,
-    image: '',
-    isEdition: false,
-    editSummary: ''
-  });
-  const [editError, setEditError] = useState<string | null>(null);
-
   const {
-    data: release,
+    release,
+    community,
     isLoading,
-    error
-  } = useGetReleaseByIdQuery({ communityId: cId, releaseId: rId });
-  const { data: community } = useGetCommunityByIdQuery(cId);
-  const { data: historyData, isLoading: historyLoading } =
-    useGetReleaseHistoryQuery(
-      { communityId: cId, releaseId: rId },
-      { skip: !historyOpen }
-    );
+    error,
+    tags,
+    myVote,
+    agg,
+    historyEntries,
+    historyOpen,
+    setHistoryOpen,
+    historyLoading,
+    pendingTag,
+    setPendingTag,
+    revertingId,
+    setRevertingId,
+    editOpen,
+    setEditOpen,
+    editForm,
+    setEditForm,
+    editError,
+    canManageTags,
+    canEdit,
+    voting,
+    unvoting,
+    addingTag,
+    votingTag,
+    removingTag,
+    saving,
+    handleVote,
+    handleAddTag,
+    handleRemoveTag,
+    handleVoteTag,
+    handleEditOpen,
+    handleEditSave,
+    handleRevertHistory
+  } = useReleaseWorkbench({
+    communityId: cId,
+    releaseId: rId,
+    user
+  });
   const [toggleBookmark, { isLoading: bookmarking }] =
     useToggleReleaseBookmarkMutation();
-  const [voteOn, { isLoading: voting }] = useVoteOnReleaseMutation();
-  const [removeVote, { isLoading: unvoting }] =
-    useRemoveVoteOnReleaseMutation();
-  const [addTag, { isLoading: addingTag }] = useAddTagToReleaseMutation();
-  const [voteTag, { isLoading: votingTag }] = useVoteOnReleaseTagMutation();
-  const [removeTag, { isLoading: removingTag }] =
-    useRemoveTagFromReleaseMutation();
-  const [revertHistory] = useRevertReleaseHistoryMutation();
-  const [updateRelease, { isLoading: saving }] = useUpdateReleaseMutation();
   const { data: commentSubData } = useGetCommentSubscriptionQuery(
     { page: 'release', pageId: rId },
     { skip: !user }
@@ -149,113 +134,9 @@ const ReleasePage = () => {
     }
   };
 
-  const handleVote = async (positive: boolean) => {
-    const r = release as ReleaseWithVote | undefined;
-    const alreadyThis =
-      (positive && r?.myVote === 'up') || (!positive && r?.myVote === 'down');
-    try {
-      if (alreadyThis) {
-        await removeVote({ communityId: cId, releaseId: rId }).unwrap();
-      } else {
-        await voteOn({
-          communityId: cId,
-          releaseId: rId,
-          positive
-        }).unwrap();
-      }
-    } catch {
-      dispatch(addAlert('Failed to record vote.', 'danger'));
-    }
-  };
-
-  const handleAddTag = async () => {
-    const name = pendingTag.trim().toLowerCase();
-    if (!name) return;
-    try {
-      await addTag({ communityId: cId, releaseId: rId, name }).unwrap();
-      setPendingTag('');
-    } catch (e: unknown) {
-      const msg =
-        (e as { data?: { msg?: string } })?.data?.msg ?? 'Failed to add tag.';
-      dispatch(addAlert(msg, 'danger'));
-    }
-  };
-
-  const handleRemoveTag = async (tagId: number) => {
-    try {
-      await removeTag({ communityId: cId, releaseId: rId, tagId }).unwrap();
-    } catch {
-      dispatch(addAlert('Failed to remove tag.', 'danger'));
-    }
-  };
-
-  const handleVoteTag = async (tagId: number, direction: 'up' | 'down') => {
-    try {
-      await voteTag({
-        communityId: cId,
-        releaseId: rId,
-        tagId,
-        direction
-      }).unwrap();
-    } catch {
-      dispatch(addAlert('Failed to record tag vote.', 'danger'));
-    }
-  };
-
   if (isLoading) return <Spinner />;
   if (error || !release)
     return <div className="p-4 text-red-400">Release not found.</div>;
-
-  const r = release as typeof release & ReleaseWithVote;
-  const tags = r.releaseTags ?? [];
-  const myVote = r.myVote ?? null;
-  const agg = r.voteAggregate ?? null;
-  const historyEntries = historyData?.data ?? [];
-  const canManageTags = Boolean(
-    user?.userRank?.permissions?.communities_manage ||
-      user?.userRank?.permissions?.staff ||
-      user?.userRank?.permissions?.admin
-  );
-  const isContributor = Boolean(
-    (release as { isContributor?: boolean }).isContributor
-  );
-  const canEdit = canManageTags || isContributor;
-
-  const handleEditOpen = () => {
-    setEditForm({
-      title: release.title ?? '',
-      description: release.description ?? '',
-      year: release.year ?? new Date().getFullYear(),
-      image: release.image ?? '',
-      isEdition: Boolean((release as { isEdition?: boolean }).isEdition),
-      editSummary: ''
-    });
-    setEditError(null);
-    setEditOpen(true);
-  };
-
-  const handleEditSave = async () => {
-    setEditError(null);
-    try {
-      await updateRelease({
-        communityId: cId,
-        releaseId: rId,
-        title: editForm.title.trim() || undefined,
-        description: editForm.description.trim() || undefined,
-        year: editForm.year || undefined,
-        image: editForm.image.trim() || undefined,
-        isEdition: editForm.isEdition,
-        editSummary: editForm.editSummary.trim() || undefined
-      }).unwrap();
-      dispatch(addAlert('Release updated.', 'success'));
-      setEditOpen(false);
-    } catch (e: unknown) {
-      const msg =
-        (e as { data?: { msg?: string } })?.data?.msg ??
-        'Failed to save changes.';
-      setEditError(msg);
-    }
-  };
 
   return (
     <div>
@@ -496,29 +377,9 @@ const ReleasePage = () => {
                                     <button
                                       type="button"
                                       className="text-xs text-red-400 hover:text-red-300"
-                                      onClick={async () => {
-                                        try {
-                                          await revertHistory({
-                                            communityId: cId,
-                                            releaseId: rId,
-                                            historyId: entry.id
-                                          }).unwrap();
-                                          dispatch(
-                                            addAlert(
-                                              'Release reverted successfully',
-                                              'success'
-                                            )
-                                          );
-                                        } catch {
-                                          dispatch(
-                                            addAlert(
-                                              'Failed to revert release',
-                                              'danger'
-                                            )
-                                          );
-                                        }
-                                        setRevertingId(null);
-                                      }}
+                                      onClick={() =>
+                                        void handleRevertHistory(entry.id)
+                                      }
                                     >
                                       Yes
                                     </button>
