@@ -661,6 +661,7 @@ const GenerateTestDataPage = () => {
                 ).map((opt) => (
                   <label
                     key={opt.value}
+                    aria-label={opt.title}
                     className={`flex-1 flex gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                       mode === opt.value
                         ? 'border-indigo-500 bg-indigo-900/20'
