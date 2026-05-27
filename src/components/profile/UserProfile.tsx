@@ -575,6 +575,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                     {secondaryRanks.map((rank) => (
                       <label
                         key={rank.id}
+                        aria-label={rank.name}
                         className="flex items-start gap-3 rounded border border-gray-800 px-3 py-2 cursor-pointer hover:border-gray-700"
                       >
                         <input

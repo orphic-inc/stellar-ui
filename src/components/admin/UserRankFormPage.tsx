@@ -237,6 +237,7 @@ const UserRankFormPage = () => {
                         category.forums.map((forum) => (
                           <label
                             key={forum.id}
+                            aria-label={forum.name}
                             className="flex items-start gap-3 cursor-pointer rounded border border-gray-800 px-3 py-2 hover:border-gray-700"
                           >
                             <input
