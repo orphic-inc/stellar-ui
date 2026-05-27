@@ -79,7 +79,8 @@ export const api = createApi({
     'ReleaseStats',
     'ClientStats',
     'UserFlow',
-    'SiteInfo'
+    'SiteInfo',
+    'DevSeedRun'
   ] as const,
   endpoints: () => ({})
 });

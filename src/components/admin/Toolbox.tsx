@@ -282,6 +282,11 @@ const sections: SectionProps[] = [
         label: 'Site info',
         to: '/private/staff/site-info',
         permissions: ['admin']
+      },
+      {
+        label: 'Generate test data',
+        to: '/private/staff/generate-test-data',
+        permissions: ['admin']
       }
     ]
   }

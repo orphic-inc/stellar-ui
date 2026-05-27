@@ -790,7 +790,17 @@ const ReleasePage = () => {
                 <li className="flex justify-between px-3 py-1.5">
                   <span className="text-gray-500">Edition</span>
                   <span className="text-gray-300">
-                    {(release as { edition?: string }).edition ?? 'Yes'}
+                    {(() => {
+                      const ed = (release as { edition?: unknown }).edition;
+                      if (ed && typeof ed === 'object') {
+                        const { title, year } = ed as {
+                          title?: string;
+                          year?: number;
+                        };
+                        return [title, year].filter(Boolean).join(' ');
+                      }
+                      return typeof ed === 'string' ? ed : 'Yes';
+                    })()}
                   </span>
                 </li>
               )}

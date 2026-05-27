@@ -81,6 +81,7 @@ import ReleaseStatsPage from '../../../staff/ReleaseStatsPage';
 import RatioWatchPage from '../../../staff/RatioWatchPage';
 import ClientStatsPage from '../../../staff/ClientStatsPage';
 import SiteInfoPage from '../../../staff/SiteInfoPage';
+import GenerateTestDataPage from '../../../staff/GenerateTestDataPage';
 import SnatchList from '../snatch/SnatchList';
 import BookmarksPage from '../bookmarks/BookmarksPage';
 import FriendsPage from '../friends/FriendsPage';
@@ -468,6 +469,14 @@ const PrivateContent = () => (
       element={
         <StaffGate permissions={['admin']}>
           <SiteInfoPage />
+        </StaffGate>
+      }
+    />
+    <Route
+      path="staff/generate-test-data"
+      element={
+        <StaffGate permissions={['admin']}>
+          <GenerateTestDataPage />
         </StaffGate>
       }
     />
