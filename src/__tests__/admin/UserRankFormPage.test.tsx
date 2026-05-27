@@ -11,12 +11,38 @@ const mockNavigate = jest.fn();
 const mockDispatch = jest.fn();
 const mockUseParams = jest.fn();
 
+const mockPermissionCatalog = [
+  {
+    key: 'forums',
+    title: 'Forums',
+    permissions: [
+      {
+        key: 'forums_read',
+        label: 'Read forums',
+        description: 'Access forums.'
+      }
+    ]
+  },
+  {
+    key: 'administration',
+    title: 'Administration',
+    permissions: [
+      {
+        key: 'admin',
+        label: 'Administrator',
+        description: 'Global administrative override.'
+      }
+    ]
+  }
+];
+
 jest.mock('../../store/services/userApi', () => ({
   useGetUserRankByIdQuery: (...args: unknown[]) =>
     mockGetUserRankByIdQuery(...args),
   useCreateUserRankMutation: () => [mockCreateUserRank],
   useUpdateUserRankMutation: () => [mockUpdateUserRank],
-  useGetStaffGroupsQuery: () => ({ data: [] })
+  useGetStaffGroupsQuery: () => ({ data: [] }),
+  useGetPermissionCatalogQuery: () => ({ data: mockPermissionCatalog })
 }));
 
 jest.mock('../../store/services/forumApi', () => ({
