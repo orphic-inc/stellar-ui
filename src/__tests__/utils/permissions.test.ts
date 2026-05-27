@@ -25,12 +25,14 @@ describe('permissions helpers', () => {
     ).toBe(true);
   });
 
-  it('recognizes non-staff elevated users for staff-only UI gates', () => {
-    expect(isStaffUser(makeUser({ forums_moderate: true }))).toBe(true);
+  it('gates staff UI on the staff permission', () => {
+    expect(isStaffUser(makeUser({ staff: true }))).toBe(true);
+    expect(isStaffUser(makeUser({ admin: true }))).toBe(true);
+    expect(isStaffUser(makeUser({ forums_moderate: true }))).toBe(false);
     expect(isStaffUser(makeUser({}))).toBe(false);
   });
 
-  it('limits the modbar to explicit staff/admin users', () => {
+  it('gates the modbar on the staff permission', () => {
     expect(canSeeModBar(makeUser({ staff: true }))).toBe(true);
     expect(canSeeModBar(makeUser({ admin: true }))).toBe(true);
     expect(canSeeModBar(makeUser({ forums_moderate: true }))).toBe(false);
