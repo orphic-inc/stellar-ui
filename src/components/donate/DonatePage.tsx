@@ -34,7 +34,7 @@ const DonatePage = () => {
   const { data: ranks, isLoading } = useGetDonorRanksQuery();
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold text-white">Donate</h1>
 
       <Section title="Why donate?">

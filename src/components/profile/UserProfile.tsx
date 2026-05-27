@@ -940,9 +940,7 @@ const UserProfile = () => {
       message = 'User not found.';
     }
 
-    return (
-      <div className="max-w-5xl mx-auto px-4 py-6 text-red-400">{message}</div>
-    );
+    return <div className="text-red-400">{message}</div>;
   }
   if (!profile) return <Spinner />;
 
@@ -974,7 +972,7 @@ const UserProfile = () => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       {/* Page header */}
       <div className="mb-6 flex items-center gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-white">{profile.username}</h1>
@@ -999,7 +997,7 @@ const UserProfile = () => {
           )}
           {(isOwnProfile || isStaff) && (
             <Link
-              to={`/private/users/${profile.id}/stats`}
+              to={`/private/user/${profile.id}/stats`}
               className="text-indigo-400 hover:text-indigo-300 transition-colors"
             >
               Stats

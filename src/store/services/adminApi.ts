@@ -1,30 +1,14 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
-export interface IpBan {
-  id: number;
-  fromIp: string;
-  toIp: string;
-}
+export type IpBan =
+  paths['/ip-bans']['get']['responses'][200]['content']['application/json'][number];
 
-export interface EmailBlacklistEntry {
-  id: number;
-  userId: number;
-  email: string;
-  comment: string;
-  addedAt: string;
-}
+export type EmailBlacklistEntry =
+  paths['/email-blacklist']['get']['responses'][200]['content']['application/json'][number];
 
-export interface Donation {
-  id: number;
-  userId: number;
-  user: { id: number; username: string } | null;
-  amount: number;
-  email: string;
-  donatedAt: string;
-  currency: string;
-  source: string;
-  reason: string;
-}
+export type Donation =
+  paths['/donations']['get']['responses'][200]['content']['application/json']['data'][number];
 
 export interface DuplicateIpUser {
   id: number;

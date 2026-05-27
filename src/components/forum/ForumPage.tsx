@@ -25,7 +25,7 @@ const ForumPage = () => {
     return <div className="p-4 text-red-400">Forum not found.</div>;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/private/forums" className="hover:text-gray-300">
           Forums

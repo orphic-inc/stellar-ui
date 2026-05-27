@@ -107,7 +107,7 @@ const CommunityPage = () => {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/private/communities" className="hover:text-gray-300">
           Communities

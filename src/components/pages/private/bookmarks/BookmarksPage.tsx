@@ -146,7 +146,7 @@ const BookmarksPage = () => {
     }`;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
+    <div>
       <h2 className="text-xl font-semibold text-white mb-6">Bookmarks</h2>
 
       <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">

@@ -1,13 +1,10 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
-export interface SiteHistoryEntry {
-  id: number;
-  title: string;
-  body: string;
-  createdAt: string;
-  updatedAt: string;
-  author?: { id: number; username: string } | null;
-}
+export type SiteHistoryEntry =
+  paths['/site-history']['get']['responses'][200]['content']['application/json'][number];
+type SiteHistoryMutationResult =
+  paths['/site-history']['post']['responses'][201]['content']['application/json'];
 
 export const siteHistoryApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -16,14 +13,14 @@ export const siteHistoryApi = api.injectEndpoints({
       providesTags: ['SiteHistory']
     }),
     createSiteHistory: build.mutation<
-      SiteHistoryEntry,
+      SiteHistoryMutationResult,
       { title: string; body: string }
     >({
       query: (body) => ({ url: '/site-history', method: 'POST', body }),
       invalidatesTags: ['SiteHistory']
     }),
     updateSiteHistory: build.mutation<
-      SiteHistoryEntry,
+      SiteHistoryMutationResult,
       { id: number; title?: string; body?: string }
     >({
       query: ({ id, ...body }) => ({

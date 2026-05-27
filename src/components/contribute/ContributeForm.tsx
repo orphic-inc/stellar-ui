@@ -159,7 +159,7 @@ const ContributeForm = () => {
   if (loadingCommunities) return <Spinner />;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <div>
       <h2 className="text-xl font-semibold text-gray-100 mb-6">
         Upload a release
       </h2>

@@ -41,13 +41,13 @@ describe('NewTopicForm', () => {
 
     await user.type(textboxes[0], 'Favorite pressings');
     await user.type(textboxes[1], 'Share your picks');
-    await user.click(screen.getByRole('button', { name: /^show$/i }));
+    await user.click(screen.getByRole('button', { name: /add a poll/i }));
     const pollInputs = screen.getAllByRole('textbox');
     await user.type(pollInputs[2], 'Best format?');
     await user.type(pollInputs[3], 'CD');
-    await user.click(screen.getByRole('button', { name: '+' }));
+    await user.click(screen.getByRole('button', { name: /add answer/i }));
     await user.type(screen.getAllByRole('textbox')[4], 'Vinyl');
-    await user.click(screen.getByDisplayValue(/create thread/i));
+    await user.click(screen.getByRole('button', { name: /create thread/i }));
 
     await waitFor(() => {
       expect(mockCreateTopic).toHaveBeenCalledWith({
@@ -64,10 +64,10 @@ describe('NewTopicForm', () => {
   it('removes an answer when "−" is clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(<NewTopicForm />);
-    await user.click(screen.getByRole('button', { name: /^show$/i }));
-    await user.click(screen.getByRole('button', { name: '+' }));
+    await user.click(screen.getByRole('button', { name: /add a poll/i }));
+    await user.click(screen.getByRole('button', { name: /add answer/i }));
     expect(screen.getAllByRole('textbox').length).toBe(5);
-    await user.click(screen.getByRole('button', { name: '−' }));
+    await user.click(screen.getByRole('button', { name: /remove answer/i }));
     expect(screen.getAllByRole('textbox').length).toBe(4);
   });
 
@@ -80,7 +80,7 @@ describe('NewTopicForm', () => {
     const textboxes = screen.getAllByRole('textbox');
     await user.type(textboxes[0], 'Title');
     await user.type(textboxes[1], 'Body');
-    await user.click(screen.getByDisplayValue(/create thread/i));
+    await user.click(screen.getByRole('button', { name: /create thread/i }));
     await waitFor(() => {
       expect(mockCreateTopic).toHaveBeenCalledWith(
         expect.objectContaining({ forumId: 0 })
@@ -98,7 +98,7 @@ describe('NewTopicForm', () => {
     const textboxes = screen.getAllByRole('textbox');
     await user.type(textboxes[0], 'Title');
     await user.type(textboxes[1], 'Body text');
-    await user.click(screen.getByDisplayValue(/create thread/i));
+    await user.click(screen.getByRole('button', { name: /create thread/i }));
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
       expect(
@@ -121,7 +121,7 @@ describe('NewTopicForm', () => {
 
     await user.type(textboxes[0], 'Blocked');
     await user.type(textboxes[1], 'Cannot post');
-    await user.click(screen.getByDisplayValue(/create thread/i));
+    await user.click(screen.getByRole('button', { name: /create thread/i }));
 
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());

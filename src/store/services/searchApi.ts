@@ -1,203 +1,60 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
 // ── Shared types ──────────────────────────────────────────────────────────────
 
-export interface PaginatedMeta {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-interface ArtistRef {
-  id: number;
-  name: string;
-}
-interface UserRef {
-  id: number;
-  username: string;
-}
-interface TagRef {
-  id: number;
-  name: string;
-}
+export type PaginatedMeta =
+  paths['/search/releases']['get']['responses'][200]['content']['application/json']['meta'];
 
 // ── Release search ────────────────────────────────────────────────────────────
 
-export interface SearchReleasesParams {
-  q?: string;
-  tags?: string;
-  tagMode?: 'any' | 'all';
-  orderBy?: 'createdAt' | 'year' | 'consumers' | 'contributors' | 'random';
-  order?: 'asc' | 'desc';
-  communityId?: number | number[];
-  artist?: string;
-  title?: string;
-  recordLabel?: string;
-  catalogueNumber?: string;
-  year?: number;
-  yearTo?: number;
-  description?: string;
-  type?: string;
-  releaseType?: string;
-  format?: string;
-  bitrate?: string;
-  media?: string;
-  hasLog?: boolean;
-  hasCue?: boolean;
-  isScene?: boolean;
-  vanityHouse?: boolean;
-  page?: number;
-  limit?: number;
-}
-
-export interface ReleaseSearchResult {
-  id: number;
-  title: string;
-  year: number;
-  type: string;
-  releaseType: string;
-  communityId: number | null;
-  catalogueNumber: string | null;
-  recordLabel: string | null;
-  description: string;
-  createdAt: string;
-  artist: ArtistRef & { vanityHouse: boolean };
-  tags: TagRef[];
-  _count: { consumers: number; contributors: number };
-}
+export type SearchReleasesParams = NonNullable<
+  paths['/search/releases']['get']['parameters']['query']
+>;
+export type ReleaseSearchResult =
+  paths['/search/releases']['get']['responses'][200]['content']['application/json']['data'][number];
 
 // ── Artist search ─────────────────────────────────────────────────────────────
 
-export interface SearchArtistsParams {
-  q?: string;
-  tags?: string;
-  tagMode?: 'any' | 'all';
-  vanityHouse?: boolean;
-  orderBy?: 'name' | 'random';
-  order?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-}
-
-export interface ArtistSearchResult {
-  id: number;
-  name: string;
-  vanityHouse: boolean;
-  tags: Array<{ tag: TagRef }>;
-  _count: { releases: number };
-}
+export type SearchArtistsParams = NonNullable<
+  paths['/search/artists']['get']['parameters']['query']
+>;
+export type ArtistSearchResult =
+  paths['/search/artists']['get']['responses'][200]['content']['application/json']['data'][number];
 
 // ── Request search ────────────────────────────────────────────────────────────
 
-export interface SearchRequestsParams {
-  q?: string;
-  artist?: string;
-  type?: string;
-  year?: number;
-  status?: string;
-  communityId?: number;
-  orderBy?: 'createdAt' | 'voteCount' | 'random';
-  order?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-}
-
-export interface RequestSearchResult {
-  id: number;
-  title: string;
-  description: string;
-  type: string;
-  year: number | null;
-  status: string;
-  voteCount: number;
-  communityId: number;
-  createdAt: string;
-  user: UserRef;
-  community?: { id: number; name: string };
-  artists: Array<{ artist: ArtistRef }>;
-  totalBounty: string;
-  _count: { bounties: number };
-}
+export type SearchRequestsParams = NonNullable<
+  paths['/search/requests']['get']['parameters']['query']
+>;
+export type RequestSearchResult =
+  paths['/search/requests']['get']['responses'][200]['content']['application/json']['data'][number];
 
 // ── Log search ────────────────────────────────────────────────────────────────
 
-export interface SearchLogParams {
-  q?: string;
-  type?: 'topic' | 'post' | 'all';
-  authorId?: number;
-  orderBy?: 'createdAt';
-  order?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-}
-
-export interface TopicSearchResult {
-  id: number;
-  title: string;
-  createdAt: string;
-  isLocked: boolean;
-  isSticky: boolean;
-  numPosts: number;
-  forumId: number;
-  author: UserRef;
-}
-
-export interface PostSearchResult {
-  id: number;
-  body: string;
-  createdAt: string;
-  forumTopicId: number;
-  author: UserRef;
-}
-
+export type SearchLogParams = NonNullable<
+  paths['/search/log']['get']['parameters']['query']
+>;
 export type LogSearchResponse =
-  | { data: TopicSearchResult[]; meta: PaginatedMeta }
-  | { data: PostSearchResult[]; meta: PaginatedMeta }
-  | {
-      topics: { data: TopicSearchResult[]; meta: PaginatedMeta };
-      posts: { data: PostSearchResult[]; meta: PaginatedMeta };
-    };
+  paths['/search/log']['get']['responses'][200]['content']['application/json'];
+type LogSplitResponse = Extract<LogSearchResponse, { topics: unknown }>;
+export type TopicSearchResult = LogSplitResponse['topics']['data'][number];
+export type PostSearchResult = LogSplitResponse['posts']['data'][number];
 
 // ── User search ───────────────────────────────────────────────────────────────
 
-export interface SearchUsersParams {
-  q?: string;
-  orderBy?: 'username' | 'createdAt' | 'lastLogin';
-  order?: 'asc' | 'desc';
-  disabled?: boolean;
-  page?: number;
-  limit?: number;
-}
-
-export interface UserSearchResult {
-  id: number;
-  username: string;
-  createdAt: string;
-  userRank: { name: string; color: string | null };
-  // staff-only fields (may be absent for regular users)
-  email?: string;
-  lastLogin?: string | null;
-  disabled?: boolean;
-  ratio?: number | null;
-  contributed?: string;
-  consumed?: string;
-}
+export type SearchUsersParams = NonNullable<
+  paths['/search/users']['get']['parameters']['query']
+>;
+export type UserSearchResult =
+  paths['/search/users']['get']['responses'][200]['content']['application/json']['data'][number];
 
 // ── Random ────────────────────────────────────────────────────────────────────
 
-export interface RandomRelease {
-  id: number;
-  communityId: number | null;
-  title: string;
-  year: number;
-  artist: ArtistRef;
-}
-
-export interface RandomArtist {
-  id: number;
-  name: string;
-}
+export type RandomRelease =
+  paths['/random/release']['get']['responses'][200]['content']['application/json'];
+export type RandomArtist =
+  paths['/random/artist']['get']['responses'][200]['content']['application/json'];
 
 // ── API endpoints ─────────────────────────────────────────────────────────────
 

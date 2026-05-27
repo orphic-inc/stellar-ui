@@ -72,7 +72,7 @@ const UserStatsHistoryPage = () => {
   const is403 = error && 'status' in error && error.status === 403;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+    <div className="space-y-6">
       <h2 className="text-xl font-semibold text-white">Stats History</h2>
 
       {/* Period tabs */}

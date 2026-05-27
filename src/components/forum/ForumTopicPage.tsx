@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   useGetTopicByIdQuery,
@@ -9,6 +9,7 @@ import {
   useGetPollByTopicQuery,
   useVotePollMutation,
   useUpdateTopicMutation,
+  useTrashTopicMutation,
   useCatchupForumMutation
 } from '../../store/services/forumApi';
 import {
@@ -47,6 +48,8 @@ const ForumTopicPage = () => {
   const [votePoll, { isLoading: voting }] = useVotePollMutation();
   const [subscribe, { isLoading: subscribing }] = useSubscribeMutation();
   const [updateTopic, { isLoading: updatingTopic }] = useUpdateTopicMutation();
+  const [trashTopic, { isLoading: trashing }] = useTrashTopicMutation();
+  const navigate = useNavigate();
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [quoteText, setQuoteText] = useState('');
@@ -100,8 +103,18 @@ const ForumTopicPage = () => {
     });
   };
 
+  const handleTrash = async () => {
+    if (!window.confirm('Move this thread to the Trash board?')) return;
+    try {
+      await trashTopic({ forumId: fId, topicId: tId }).unwrap();
+      navigate(`/private/forums/${fId}`);
+    } catch {
+      return;
+    }
+  };
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/private/forums" className="hover:text-gray-300">
           Forums
@@ -159,6 +172,14 @@ const ForumTopicPage = () => {
                   className="text-xs text-gray-400 hover:text-blue-400 disabled:opacity-50"
                 >
                   {topic.isSticky ? 'Unsticky' : 'Sticky'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleTrash}
+                  disabled={trashing}
+                  className="text-xs text-gray-400 hover:text-red-400 disabled:opacity-50"
+                >
+                  Trash
                 </button>
               </>
             )}

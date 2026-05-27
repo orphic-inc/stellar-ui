@@ -620,7 +620,7 @@ const PrivateContent = () => (
     </Route>
 
     <Route path="stats/history" element={wrap(SiteStatsHistoryPage)} />
-    <Route path="users/:id/stats" element={wrap(UserStatsHistoryPage)} />
+    <Route path="user/:id/stats" element={wrap(UserStatsHistoryPage)} />
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />

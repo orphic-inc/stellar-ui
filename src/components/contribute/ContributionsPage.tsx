@@ -15,7 +15,7 @@ const ContributionsPage = () => {
   const contributions = data?.data ?? [];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-gray-100">
           My Contributions

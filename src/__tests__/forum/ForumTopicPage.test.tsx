@@ -19,6 +19,7 @@ const mockMarkRead = jest.fn();
 const mockVotePoll = jest.fn();
 const mockSubscribe = jest.fn();
 const mockUpdateTopic = jest.fn();
+const mockTrashTopic = jest.fn();
 const mockCatchupForum = jest.fn();
 
 jest.mock('../../store/services/forumApi', () => ({
@@ -33,6 +34,7 @@ jest.mock('../../store/services/forumApi', () => ({
   useMarkTopicReadMutation: () => [mockMarkRead],
   useVotePollMutation: () => [mockVotePoll, { isLoading: false }],
   useUpdateTopicMutation: () => [mockUpdateTopic, { isLoading: false }],
+  useTrashTopicMutation: () => [mockTrashTopic, { isLoading: false }],
   useCatchupForumMutation: () => [mockCatchupForum]
 }));
 

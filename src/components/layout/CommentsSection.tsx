@@ -10,6 +10,7 @@ import {
 } from '../../store/services/commentApi';
 import { useSubscribeCommentsMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
+import { parseBBCode } from '../../utils/bbcode';
 import Time from './Time';
 
 const SUBSCRIBABLE_PAGES: CommentPage[] = [
@@ -95,9 +96,21 @@ const CommentsSection = ({
                 </span>
               </div>
               <div
-                className="text-gray-300 leading-relaxed break-words"
+                className="text-gray-300 leading-relaxed break-words bbcode-content"
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(c.body)
+                  __html: DOMPurify.sanitize(parseBBCode(c.body), {
+                    ADD_TAGS: [
+                      'blockquote',
+                      'cite',
+                      'u',
+                      's',
+                      'pre',
+                      'code',
+                      'ul',
+                      'li'
+                    ],
+                    ADD_ATTR: ['style', 'class', 'rel', 'target']
+                  })
                 }}
               />
               <div className="flex gap-2 mt-1">

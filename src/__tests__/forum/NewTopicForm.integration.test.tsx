@@ -73,16 +73,16 @@ describe('NewTopicForm RTK Query integration', () => {
     const textboxes = await screen.findAllByRole('textbox');
     await user.type(textboxes[0], 'Favorite pressings');
     await user.type(textboxes[1], 'Share your picks');
-    await user.click(screen.getByRole('button', { name: /^show$/i }));
+    await user.click(screen.getByRole('button', { name: /add a poll/i }));
 
     const pollInputs = screen.getAllByRole('textbox');
     await user.type(pollInputs[2], 'Best format?');
     await user.type(pollInputs[3], 'CD');
-    await user.click(screen.getByRole('button', { name: '+' }));
+    await user.click(screen.getByRole('button', { name: /add answer/i }));
     await user.type(screen.getAllByRole('textbox')[4], '   ');
-    await user.click(screen.getByRole('button', { name: '+' }));
+    await user.click(screen.getByRole('button', { name: /add answer/i }));
     await user.type(screen.getAllByRole('textbox')[5], 'Vinyl');
-    await user.click(screen.getByDisplayValue(/create thread/i));
+    await user.click(screen.getByRole('button', { name: /create thread/i }));
 
     await waitFor(async () => {
       const request = (global.fetch as jest.Mock).mock.calls.find(
@@ -136,7 +136,7 @@ describe('NewTopicForm RTK Query integration', () => {
     const textboxes = await screen.findAllByRole('textbox');
     await user.type(textboxes[0], 'Blocked');
     await user.type(textboxes[1], 'Cannot post');
-    await user.click(screen.getByDisplayValue(/create thread/i));
+    await user.click(screen.getByRole('button', { name: /create thread/i }));
 
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());

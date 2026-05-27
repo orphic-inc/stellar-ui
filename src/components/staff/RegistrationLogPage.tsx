@@ -36,7 +36,7 @@ const RegistrationLogPage = () => {
               >
                 <div className="flex items-center gap-2">
                   <Link
-                    to={`/private/users/${user.id}`}
+                    to={`/private/user/${user.id}`}
                     className="text-indigo-400 hover:text-indigo-300 font-medium"
                   >
                     {user.username}

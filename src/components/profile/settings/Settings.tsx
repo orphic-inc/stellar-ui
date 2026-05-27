@@ -28,18 +28,18 @@ type MyProfileResponse =
 type Tab = 'appearance' | 'privacy' | 'security' | 'donor';
 
 const PARANOIA_LABELS: Record<number, string> = {
-  0: 'No restrictions — profile fully visible',
-  1: 'Hide email and last login time',
-  2: 'Also hide upload/download stats',
-  3: 'Hide most activity'
+  0: 'No restrictions — your profile is fully visible',
+  1: 'Hide your email address and last-seen time',
+  2: 'Also hide your contributed/consumed (upload/download) stats',
+  3: 'Also hide your ratio and buffer — nearly all activity stats are hidden'
 };
 
 const NOTIFICATION_OPTIONS = [
-  { value: 'disabled', label: 'Disabled' },
-  { value: 'popup', label: 'Popup' },
-  { value: 'traditional', label: 'Traditional' },
-  { value: 'push', label: 'Push' },
-  { value: 'combined', label: 'Combined' }
+  { value: 'Disabled', label: 'Disabled — no notifications' },
+  { value: 'Traditional', label: 'Traditional — on-site notifications list' },
+  { value: 'Popup', label: 'Popup — transient toast popups' },
+  { value: 'Push', label: 'Push — browser push notifications' },
+  { value: 'Combined', label: 'Combined — all of the above' }
 ];
 
 const toProfileForm = (profile: MyProfileResponse): ProfileForm => ({
@@ -51,12 +51,7 @@ const toProfileForm = (profile: MyProfileResponse): ProfileForm => ({
   externalStylesheet: profile.userSettings.externalStylesheet ?? '',
   styledTooltips: profile.userSettings.styledTooltips,
   paranoia: profile.userSettings.paranoia,
-  notificationMethod: profile.userSettings.notificationMethod,
-  showEmail: profile.userSettings.showEmail,
-  showLastSeen: profile.userSettings.showLastSeen,
-  showContributedStats: profile.userSettings.showContributedStats,
-  showConsumedStats: profile.userSettings.showConsumedStats,
-  showRatioStats: profile.userSettings.showRatioStats
+  notificationMethod: profile.userSettings.notificationMethod
 });
 
 const Settings = () => {
@@ -169,7 +164,7 @@ const Settings = () => {
     }`;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
+    <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-white">Settings</h2>
         <Link
@@ -387,57 +382,9 @@ const Settings = () => {
                 ))}
               </select>
               <p className="text-xs text-gray-600 mt-1">
-                Controls how account notifications are delivered.
+                Controls how account notifications are delivered. Defaults to
+                Traditional (on-site notifications list).
               </p>
-            </div>
-
-            <div className="space-y-3">
-              <p className="block text-sm text-gray-300">Visible to others</p>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('showEmail')}
-                  className="accent-indigo-500"
-                />
-                <span className="text-sm text-gray-300">Email address</span>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('showLastSeen')}
-                  className="accent-indigo-500"
-                />
-                <span className="text-sm text-gray-300">Last seen time</span>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('showContributedStats')}
-                  className="accent-indigo-500"
-                />
-                <span className="text-sm text-gray-300">Contributed stats</span>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('showConsumedStats')}
-                  className="accent-indigo-500"
-                />
-                <span className="text-sm text-gray-300">Consumed stats</span>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('showRatioStats')}
-                  className="accent-indigo-500"
-                />
-                <span className="text-sm text-gray-300">Ratio and buffer</span>
-              </label>
             </div>
           </div>
 

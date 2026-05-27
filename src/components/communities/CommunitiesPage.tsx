@@ -17,7 +17,7 @@ const CommunitiesPage = () => {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       <h2 className="text-xl font-semibold text-gray-100 mb-4">Communities</h2>
       <CommunitiesTable communities={communities} />
 

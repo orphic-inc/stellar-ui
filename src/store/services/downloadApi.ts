@@ -1,10 +1,15 @@
 import { api } from '../api';
-import type { DownloadGrant } from '../../types';
+import type { paths } from '../../types/api';
+
+type GrantResult =
+  paths['/contributions/{id}/access']['post']['responses'][200]['content']['application/json'];
+type ReverseGrantResult =
+  paths['/downloads/{grantId}/reverse']['post']['responses'][200]['content']['application/json'];
 
 export const downloadApi = api.injectEndpoints({
   endpoints: (builder) => ({
     grantAccess: builder.mutation<
-      DownloadGrant,
+      GrantResult,
       { contributionId: number; idempotencyKey?: string }
     >({
       query: ({ contributionId, idempotencyKey }) => ({
@@ -16,7 +21,7 @@ export const downloadApi = api.injectEndpoints({
     }),
 
     reverseGrant: builder.mutation<
-      { grantId: number; status: string },
+      ReverseGrantResult,
       { grantId: number; reason?: string }
     >({
       query: ({ grantId, reason }) => ({

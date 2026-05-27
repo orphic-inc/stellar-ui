@@ -60,106 +60,127 @@ const NewTopicForm = () => {
   };
 
   return (
-    <div className="thin">
-      <div className="linkbox">
-        <Link to="/private/forums">Forums</Link>
+    <div className="space-y-6">
+      <nav className="text-sm text-gray-500">
+        <Link to="/private/forums" className="hover:text-gray-300">
+          Forums
+        </Link>
         {' › '}
-        <Link to={`/private/forums/${forumId}`}>{forum?.name ?? 'Forum'}</Link>
+        <Link to={`/private/forums/${forumId}`} className="hover:text-gray-300">
+          {forum?.name ?? 'Forum'}
+        </Link>
         {' › '}
-        <span>New Topic</span>
-      </div>
+        <span className="text-gray-300">New Topic</span>
+      </nav>
 
-      <div className="box pad">
-        <form className="create_form" onSubmit={handleSubmit}>
-          <table className="layout">
-            <tbody>
-              <tr>
-                <td className="label">Title:</td>
-                <td>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-gray-800 rounded-lg border border-gray-700 p-5 space-y-4"
+      >
+        <div>
+          <label
+            htmlFor="new-topic-title"
+            className="block text-sm text-gray-300 mb-1"
+          >
+            Title
+          </label>
+          <input
+            id="new-topic-title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="new-topic-body"
+            className="block text-sm text-gray-300 mb-1"
+          >
+            Body
+          </label>
+          <textarea
+            id="new-topic-body"
+            rows={10}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            required
+            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div className="border-t border-gray-700 pt-4">
+          <button
+            type="button"
+            onClick={() => setShowPoll(!showPoll)}
+            className="text-sm font-medium text-indigo-400 hover:text-indigo-300"
+          >
+            {showPoll ? 'Remove poll' : 'Add a poll'}
+          </button>
+        </div>
+
+        {showPoll && (
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="new-topic-poll-question"
+                className="block text-sm text-gray-300 mb-1"
+              >
+                Poll question
+              </label>
+              <input
+                id="new-topic-poll-question"
+                type="text"
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <div>
+              <p className="block text-sm text-gray-300 mb-1">Poll answers</p>
+              <div className="space-y-2">
+                {answers.map((answer, index) => (
                   <input
+                    key={index}
                     type="text"
-                    style={{ width: '98%' }}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
+                    value={answer}
+                    onChange={(e) => handleAnswerChange(e, index)}
+                    className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                </td>
-              </tr>
-              <tr>
-                <td className="label">Body:</td>
-                <td>
-                  <textarea
-                    style={{ width: '98%' }}
-                    rows={10}
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
-                    required
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={2} className="center">
-                  <strong>Poll Settings</strong>{' '}
-                  <button
-                    type="button"
-                    onClick={() => setShowPoll(!showPoll)}
-                    className="brackets btn-link"
-                  >
-                    {showPoll ? 'Hide' : 'Show'}
-                  </button>
-                </td>
-              </tr>
-              {showPoll && (
-                <>
-                  <tr>
-                    <td className="label">Poll Question:</td>
-                    <td>
-                      <input
-                        type="text"
-                        style={{ width: '98%' }}
-                        value={question}
-                        onChange={(e) => setQuestion(e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="label">Poll Answers:</td>
-                    <td>
-                      {answers.map((answer, index) => (
-                        <div key={index}>
-                          <input
-                            type="text"
-                            style={{ width: '90%' }}
-                            value={answer}
-                            onChange={(e) => handleAnswerChange(e, index)}
-                          />
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={handleAddAnswer}
-                        className="brackets btn-link"
-                      >
-                        +
-                      </button>{' '}
-                      <button
-                        type="button"
-                        onClick={handleRemoveAnswer}
-                        className="brackets btn-link"
-                      >
-                        −
-                      </button>
-                    </td>
-                  </tr>
-                </>
-              )}
-            </tbody>
-          </table>
-          <div className="center">
-            <input type="submit" value="Create thread" disabled={isLoading} />
+                ))}
+              </div>
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleAddAnswer}
+                  className="px-3 py-1 text-xs rounded border border-gray-600 text-gray-300 hover:bg-gray-700 transition-colors"
+                >
+                  Add answer
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRemoveAnswer}
+                  disabled={answers.length <= 1}
+                  className="px-3 py-1 text-xs rounded border border-gray-600 text-gray-300 hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                >
+                  Remove answer
+                </button>
+              </div>
+            </div>
           </div>
-        </form>
-      </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+        >
+          {isLoading ? 'Creating…' : 'Create thread'}
+        </button>
+      </form>
     </div>
   );
 };

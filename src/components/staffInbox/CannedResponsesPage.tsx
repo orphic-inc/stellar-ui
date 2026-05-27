@@ -8,14 +8,10 @@ import {
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
+import type { paths } from '../../types/api';
 
-type CannedResponse = {
-  id: number;
-  name: string;
-  body: string;
-  createdAt: string;
-  updatedAt: string;
-};
+type CannedResponse =
+  paths['/staff-inbox/responses']['get']['responses'][200]['content']['application/json'][number];
 
 const CannedResponsesPage = () => {
   const dispatch = useAppDispatch();

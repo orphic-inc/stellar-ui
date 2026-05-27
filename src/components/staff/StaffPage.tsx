@@ -17,13 +17,11 @@ const StaffPage = () => {
 
   if (isError)
     return (
-      <div className="max-w-3xl mx-auto px-4 py-6 text-sm text-red-400">
-        Failed to load staff list.
-      </div>
+      <div className="text-sm text-red-400">Failed to load staff list.</div>
     );
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 space-y-8">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">Staff</h2>
         <Link

@@ -68,7 +68,7 @@ const ArtistPage = () => {
   const seenYears = new Set<number | null | undefined>();
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/private/communities" className="hover:text-gray-300">

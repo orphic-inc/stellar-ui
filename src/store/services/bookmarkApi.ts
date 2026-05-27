@@ -1,32 +1,17 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
-export interface BookmarkToggleResponse {
-  bookmarked: boolean;
-}
+export type BookmarkToggleResponse =
+  paths['/bookmarks/artists/{artistId}']['post']['responses'][200]['content']['application/json'];
 
-export interface ArtistBookmark {
-  artistId: number;
-  artist: { id: number; name: string };
-  createdAt: string;
-}
-
-export interface ReleaseBookmark {
-  releaseId: number;
-  release: { id: number; title: string; communityId: number | null };
-  createdAt: string;
-}
-
-export interface CommunityBookmark {
-  communityId: number;
-  community: { id: number; name: string };
-  createdAt: string;
-}
-
-export interface RequestBookmark {
-  requestId: number;
-  request: { id: number; title: string };
-  createdAt: string;
-}
+export type ArtistBookmark =
+  paths['/bookmarks/artists']['get']['responses'][200]['content']['application/json'][number];
+export type ReleaseBookmark =
+  paths['/bookmarks/releases']['get']['responses'][200]['content']['application/json'][number];
+export type CommunityBookmark =
+  paths['/bookmarks/communities']['get']['responses'][200]['content']['application/json'][number];
+export type RequestBookmark =
+  paths['/bookmarks/requests']['get']['responses'][200]['content']['application/json'][number];
 
 export const bookmarkApi = api.injectEndpoints({
   endpoints: (build) => ({

@@ -56,6 +56,8 @@ type UpdateTopicArgs = TopicArgs &
   >['content']['application/json'];
 type UpdateTopicResponse =
   paths['/forums/{forumId}/topics/{topicId}']['put']['responses'][200]['content']['application/json'];
+type TrashTopicResponse =
+  paths['/forums/{forumId}/topics/{topicId}/trash']['post']['responses'][200]['content']['application/json'];
 
 type PostsByTopicResponse =
   paths['/forums/{forumId}/topics/{topicId}/posts']['get']['responses'][200]['content']['application/json'];
@@ -200,6 +202,16 @@ export const forumApi = api.injectEndpoints({
         'ForumTopic'
       ]
     }),
+    trashTopic: build.mutation<TrashTopicResponse, TopicArgs>({
+      query: ({ forumId, topicId }) => ({
+        url: `/forums/${forumId}/topics/${topicId}/trash`,
+        method: 'POST'
+      }),
+      invalidatesTags: (_, __, { forumId }) => [
+        { type: 'Forum', id: forumId },
+        'ForumTopic'
+      ]
+    }),
 
     getPostsByTopic: build.query<PostsByTopicResponse, TopicArgs>({
       query: ({ forumId, topicId }) =>
@@ -296,6 +308,7 @@ export const {
   useCreateTopicMutation,
   useUpdateTopicMutation,
   useDeleteTopicMutation,
+  useTrashTopicMutation,
   useGetPostsByTopicQuery,
   useLazyGetPostEditHistoryQuery,
   useCreatePostMutation,
