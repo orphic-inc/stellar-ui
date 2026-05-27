@@ -4067,6 +4067,49 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/tools/user-ranks/permissions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Permission catalog */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              key: string;
+              title: string;
+              permissions: {
+                key: components['schemas']['PermissionKey'];
+                label: string;
+                description: string;
+              }[];
+            }[];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/tools/user-ranks/{id}': {
     parameters: {
       query?: never;
@@ -11559,6 +11602,60 @@ export interface components {
       } | null;
       contributions?: components['schemas']['ReleaseContribution'][];
       isContributor?: boolean;
+    };
+    /** @enum {string} */
+    PermissionKey:
+      | 'advanced_search'
+      | 'users_search'
+      | 'forums_read'
+      | 'forums_post'
+      | 'forums_moderate'
+      | 'forums_manage'
+      | 'communities_manage'
+      | 'contributions_manage'
+      | 'dnc_manage'
+      | 'collages_create'
+      | 'collages_manage'
+      | 'collages_moderate'
+      | 'requests_create'
+      | 'requests_moderate'
+      | 'wiki_edit'
+      | 'wiki_manage'
+      | 'news_manage'
+      | 'rules_manage'
+      | 'tags_manage'
+      | 'reports_manage'
+      | 'staff_inbox_manage'
+      | 'users_edit'
+      | 'users_warn'
+      | 'users_disable'
+      | 'users_view_ips'
+      | 'users_view_email'
+      | 'recovery_manage'
+      | 'invites_manage'
+      | 'ratio_policy_manage'
+      | 'site_history_manage'
+      | 'ip_bans_manage'
+      | 'email_blacklist_manage'
+      | 'donor_ranks_manage'
+      | 'donation_log_view'
+      | 'messages_mass_pm'
+      | 'login_watch_view'
+      | 'duplicate_ips_view'
+      | 'registration_log_view'
+      | 'staff'
+      | 'rank_permissions_manage'
+      | 'staff_groups_manage'
+      | 'admin';
+    PermissionEntry: {
+      key: components['schemas']['PermissionKey'];
+      label: string;
+      description: string;
+    };
+    PermissionGroup: {
+      key: string;
+      title: string;
+      permissions: components['schemas']['PermissionEntry'][];
     };
     UserRank: {
       id: number;

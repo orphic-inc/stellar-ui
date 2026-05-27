@@ -24,6 +24,8 @@ type UpdateUserRankBody = NonNullable<
 type UpdateUserRankArgs = { id: number } & UpdateUserRankBody;
 type StaffGroupsResponse =
   paths['/tools/staff-groups']['get']['responses'][200]['content']['application/json'];
+type PermissionCatalogResponse =
+  paths['/tools/user-ranks/permissions']['get']['responses'][200]['content']['application/json'];
 
 export interface UserRankRecord {
   id: number;
@@ -79,6 +81,9 @@ export const userApi = api.injectEndpoints({
     getUserRanks: build.query<UserRankRecord[], void>({
       query: () => '/tools/user-ranks',
       providesTags: ['UserRank']
+    }),
+    getPermissionCatalog: build.query<PermissionCatalogResponse, void>({
+      query: () => '/tools/user-ranks/permissions'
     }),
     getUserRankById: build.query<UserRankRecord, number | string>({
       query: (id) => `/tools/user-ranks/${id}`,
@@ -408,6 +413,7 @@ export const userApi = api.injectEndpoints({
 
 export const {
   useGetUserByIdQuery,
+  useGetPermissionCatalogQuery,
   useGetUserSettingsQuery,
   useUpdateUserSettingsMutation,
   useCreateUserMutation,
