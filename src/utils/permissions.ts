@@ -1,8 +1,7 @@
 import type { AuthUser } from '../types';
-import { type Permission, VALID_PERMISSIONS } from './permissionCatalog';
+import type { components } from '../types/api';
 
-export { VALID_PERMISSIONS };
-export type { Permission };
+export type Permission = components['schemas']['PermissionKey'];
 
 const getPermissions = (
   user: AuthUser | null | undefined

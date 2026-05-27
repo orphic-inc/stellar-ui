@@ -6,12 +6,12 @@ import {
   useGetUserRankByIdQuery,
   useCreateUserRankMutation,
   useUpdateUserRankMutation,
-  useGetStaffGroupsQuery
+  useGetStaffGroupsQuery,
+  useGetPermissionCatalogQuery
 } from '../../store/services/userApi';
 import { useGetForumCategoriesQuery } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
-import { PERMISSION_GROUPS } from '../../utils/permissionCatalog';
 
 interface FormValues {
   level: number;
@@ -39,6 +39,7 @@ const UserRankFormPage = () => {
     skip: !isEditing
   });
   const { data: staffGroups } = useGetStaffGroupsQuery();
+  const { data: permissionCatalog } = useGetPermissionCatalogQuery();
   const { data: forumCategories } = useGetForumCategoriesQuery({ all: true });
   const [createUserRank] = useCreateUserRankMutation();
   const [updateUserRank] = useUpdateUserRankMutation();
@@ -277,7 +278,7 @@ const UserRankFormPage = () => {
             </h3>
           </div>
           <div className="p-4 grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {PERMISSION_GROUPS.map(({ title, permissions }) => (
+            {(permissionCatalog ?? []).map(({ title, permissions }) => (
               <div key={title}>
                 <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2 pb-1 border-b border-gray-700">
                   {title}
