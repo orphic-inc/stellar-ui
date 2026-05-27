@@ -23,18 +23,7 @@ export const hasAnyPermission = (
 ): boolean => permissions.some((permission) => hasPermission(user, permission));
 
 export const canSeeModBar = (user: AuthUser | null | undefined): boolean =>
-  hasAnyPermission(user, ['staff', 'admin']);
+  hasPermission(user, 'staff');
 
 export const isStaffUser = (user: AuthUser | null | undefined): boolean =>
-  hasAnyPermission(user, [
-    'staff',
-    'forums_manage',
-    'forums_moderate',
-    'communities_manage',
-    'contributions_manage',
-    'reports_manage',
-    'staff_inbox_manage',
-    'news_manage',
-    'users_edit',
-    'rank_permissions_manage'
-  ]);
+  hasPermission(user, 'staff');
