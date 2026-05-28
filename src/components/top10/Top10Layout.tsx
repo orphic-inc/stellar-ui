@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useGetMeQuery } from '../../store/services/authApi';
-import { hasAnyPermission } from '../../utils/permissions';
+import { canSeeTop10History } from '../staff/staffAffordances';
 
 const tabCls = (active: boolean) =>
   `px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
@@ -19,7 +19,7 @@ const TABS = [
 const Top10Layout = () => {
   const { pathname } = useLocation();
   const { data: user } = useGetMeQuery();
-  const isStaff = hasAnyPermission(user, ['staff', 'admin']);
+  const canViewHistory = canSeeTop10History(user);
 
   if (pathname === '/private/top10' || pathname === '/private/top10/') {
     return <Navigate to="releases" replace />;
@@ -39,7 +39,7 @@ const Top10Layout = () => {
             {label}
           </NavLink>
         ))}
-        {isStaff && (
+        {canViewHistory && (
           <NavLink to="history" className={({ isActive }) => tabCls(isActive)}>
             History
           </NavLink>

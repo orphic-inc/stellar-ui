@@ -12,11 +12,11 @@ import {
   useGetRequestBountyHistoryQuery
 } from '../../store/services/requestApi';
 import { useToggleRequestBookmarkMutation } from '../../store/services/bookmarkApi';
-import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import CommentsSection from '../layout/CommentsSection';
 import { addAlert } from '../../store/slices/alertSlice';
 import { useAppDispatch } from '../../store/hooks';
+import { canUseRequestModeration } from '../staff/staffAffordances';
 
 const RequestDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,7 +49,7 @@ const RequestDetailPage = () => {
   const [fillContribId, setFillContribId] = useState('');
   const [unfillReason, setUnfillReason] = useState('');
 
-  const isStaff = hasAnyPermission(user, ['staff', 'admin']);
+  const canModerateRequest = canUseRequestModeration(user);
   const isOwner = user?.id === req?.userId;
 
   const handleVote = async () => {
@@ -136,9 +136,9 @@ const RequestDetailPage = () => {
     return <div className="p-4 text-red-400">Request not found.</div>;
 
   const totalBountyDisplay = formatBytes(req.totalBounty);
-  const canDelete = (isOwner && req.status === 'open') || isStaff;
+  const canDelete = (isOwner && req.status === 'open') || canModerateRequest;
   const canFill = req.status === 'open' && !!user;
-  const canUnfill = req.status === 'filled' && isStaff;
+  const canUnfill = req.status === 'filled' && canModerateRequest;
 
   return (
     <div className="thin space-y-6">

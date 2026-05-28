@@ -9,10 +9,10 @@ import {
   useAddReportNoteMutation
 } from '../../store/services/reportsApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { hasAnyPermission } from '../../utils/permissions';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
+import { canUseReportActions } from '../staff/staffAffordances';
 
 const RESOLUTION_ACTIONS = [
   { value: 'Dismissed', label: 'Dismissed — no action taken' },
@@ -45,7 +45,7 @@ const ReportDetailPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const currentUser = useSelector(selectCurrentUser);
-  const isStaff = hasAnyPermission(currentUser, ['staff', 'admin']);
+  const canModerateReport = canUseReportActions(currentUser);
 
   const { data: report, isLoading, error } = useGetReportQuery(reportId);
   const [claimReport, { isLoading: claiming }] = useClaimReportMutation();
@@ -101,10 +101,15 @@ const ReportDetailPage = () => {
   };
 
   useEffect(() => {
-    if (error && 'status' in error && error.status === 403 && !isStaff) {
+    if (
+      error &&
+      'status' in error &&
+      error.status === 403 &&
+      !canModerateReport
+    ) {
       navigate('/private/reports/mine', { replace: true });
     }
-  }, [error, isStaff, navigate]);
+  }, [error, canModerateReport, navigate]);
 
   if (isLoading) return <Spinner />;
   if (error || !report)
@@ -118,7 +123,7 @@ const ReportDetailPage = () => {
   return (
     <div className="thin">
       <div className="mb-4">
-        {isStaff ? (
+        {canModerateReport ? (
           <Link
             to="/private/staff/reports"
             className="text-blue-400 text-sm hover:underline"
@@ -177,7 +182,7 @@ const ReportDetailPage = () => {
           </div>
         </div>
 
-        {isStaff && !isResolved && (
+        {canModerateReport && !isResolved && (
           <div className="flex gap-2 text-sm shrink-0">
             {!report.claimedById && (
               <button
@@ -242,7 +247,7 @@ const ReportDetailPage = () => {
         )}
       </div>
 
-      {isStaff && showResolveForm && !isResolved && (
+      {canModerateReport && showResolveForm && !isResolved && (
         <form
           onSubmit={handleResolve}
           className="mb-6 p-4 bg-gray-800 border border-gray-700 rounded space-y-3"
@@ -306,7 +311,7 @@ const ReportDetailPage = () => {
         </form>
       )}
 
-      {isStaff && report.notes.length > 0 && (
+      {canModerateReport && report.notes.length > 0 && (
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-gray-300 mb-3">
             Moderator Notes
@@ -330,7 +335,7 @@ const ReportDetailPage = () => {
         </div>
       )}
 
-      {isStaff && (
+      {canModerateReport && (
         <form onSubmit={handleAddNote} className="flex flex-col gap-3">
           <div>
             <label

@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import ErrorBoundary from '../../../layout/ErrorBoundary';
 import FallbackComponent from '../../../layout/FallbackComponent';
@@ -37,62 +37,13 @@ import ComposeForm from '../../../messages/ComposeForm';
 import ConversationView from '../../../messages/ConversationView';
 import MyTicketsPage from '../../../staffInbox/MyTicketsPage';
 import NewTicketForm from '../../../staffInbox/NewTicketForm';
-import CannedResponsesPage from '../../../staffInbox/CannedResponsesPage';
 import TicketView from '../../../staffInbox/TicketView';
-import ReportsQueuePage from '../../../reports/ReportsQueuePage';
+import ReportForm from '../../../reports/ReportForm';
 import ReportDetailPage from '../../../reports/ReportDetailPage';
 import MyReportsPage from '../../../reports/MyReportsPage';
-import ReportForm from '../../../reports/ReportForm';
 import Toolbox from '../../../admin/Toolbox';
-import NewUserForm from '../../../admin/NewUserForm';
-import UserRankManager from '../../../admin/UserRankManager';
-import UserRankFormPage from '../../../admin/UserRankFormPage';
-import ForumCategoryControlPanel from '../../../admin/ForumCategoryControlPanel';
-import ForumControlPanel from '../../../admin/ForumControlPanel';
-import CommunityManager from '../../../admin/CommunityManager';
-import NewsManager from '../../../admin/NewsManager';
-import SiteSettingsPage from '../../../admin/SiteSettingsPage';
-import RatioPolicyPanel from '../../../admin/RatioPolicyPanel';
-import TicketQueuePage from '../../../staffInbox/TicketQueuePage';
-import StaffPage from '../../../staff/StaffPage';
-import StaffGroupsPage from '../../../staff/StaffGroupsPage';
-import SiteHistoryPage from '../../../staff/SiteHistoryPage';
-import MassPmPage from '../../../staff/MassPmPage';
-import DonorRanksPage from '../../../staff/DonorRanksPage';
-import RecoveryQueuePage from '../../../staff/RecoveryQueuePage';
-import IpBansPage from '../../../staff/IpBansPage';
-import EmailBlacklistPage from '../../../staff/EmailBlacklistPage';
-import DonationLogPage from '../../../staff/DonationLogPage';
-import DuplicateIpsPage from '../../../staff/DuplicateIpsPage';
-import RegistrationLogPage from '../../../staff/RegistrationLogPage';
-import UserWarningsPage from '../../../staff/UserWarningsPage';
-import TagAliasesPage from '../../../staff/TagAliasesPage';
-import GlobalNoticesPage from '../../../staff/GlobalNoticesPage';
-import LoginWatchPage from '../../../staff/LoginWatchPage';
-import VanityHousePage from '../../../staff/VanityHousePage';
-import AlbumOfMonthPage from '../../../staff/AlbumOfMonthPage';
-import UserFlowPage from '../../../staff/UserFlowPage';
-import InvitePoolPage from '../../../staff/InvitePoolPage';
-import InviteTreePage from '../../../staff/InviteTreePage';
-import DncPage from '../../../staff/DncPage';
-import CollageRecoveryPage from '../../../staff/CollageRecoveryPage';
-import EconomicStatsPage from '../../../staff/EconomicStatsPage';
-import ReleaseStatsPage from '../../../staff/ReleaseStatsPage';
-import RatioWatchPage from '../../../staff/RatioWatchPage';
-import ClientStatsPage from '../../../staff/ClientStatsPage';
-import SiteInfoPage from '../../../staff/SiteInfoPage';
-import GenerateTestDataPage from '../../../staff/GenerateTestDataPage';
-import SnatchList from '../snatch/SnatchList';
-import BookmarksPage from '../bookmarks/BookmarksPage';
-import FriendsPage from '../friends/FriendsPage';
-import DonatePage from '../../../donate/DonatePage';
-import WikiListPage from '../../../wiki/WikiListPage';
-import WikiViewPage from '../../../wiki/WikiViewPage';
-import WikiEditPage from '../../../wiki/WikiEditPage';
-import WikiHistoryPage from '../../../wiki/WikiHistoryPage';
 import RulesPage from '../../../rules/RulesPage';
 import RulesSubPage from '../../../rules/RulesSubPage';
-import RulesManager from '../../../admin/RulesManager';
 import ReleaseBrowsePage from '../../../releases/ReleaseBrowsePage';
 import ArtistBrowsePage from '../../../artists/ArtistBrowsePage';
 import LogBrowsePage from '../../../log/LogBrowsePage';
@@ -106,32 +57,43 @@ import TopHistoryPage from '../../../top10/TopHistoryPage';
 import SiteStatsHistoryPage from '../stats/SiteStatsHistoryPage';
 import UserStatsHistoryPage from '../stats/UserStatsHistoryPage';
 import DraftsPage from '../../../messages/DraftsPage';
+import SnatchList from '../snatch/SnatchList';
+import BookmarksPage from '../bookmarks/BookmarksPage';
+import FriendsPage from '../friends/FriendsPage';
+import DonatePage from '../../../donate/DonatePage';
+import WikiListPage from '../../../wiki/WikiListPage';
+import WikiViewPage from '../../../wiki/WikiViewPage';
+import WikiEditPage from '../../../wiki/WikiEditPage';
+import WikiHistoryPage from '../../../wiki/WikiHistoryPage';
 import { useGetMeQuery } from '../../../../store/services/authApi';
-import {
-  hasAnyPermission,
-  type Permission
-} from '../../../../utils/permissions';
+import StaffGate from '../../../staff/StaffGate';
+import { canSeeTop10History } from '../../../staff/staffAffordances';
+import { canAccessToolbox, staffTools } from '../../../staff/staffToolRegistry';
 
-const wrap = (Component: React.ComponentType) => (
+const wrap = (Component: ComponentType) => (
   <ErrorBoundary FallbackComponent={FallbackComponent}>
     <Component />
   </ErrorBoundary>
 );
 
-const StaffGate = ({
-  permissions,
-  children
-}: {
-  permissions: Permission[];
-  children: ReactElement;
-}) => {
+const StaffToolboxGate = ({ children }: { children: ReactNode }) => {
   const { data: user } = useGetMeQuery();
 
-  if (!user || !hasAnyPermission(user, permissions)) {
+  if (!user || !canAccessToolbox(user)) {
     return <Navigate to="/private" replace />;
   }
 
-  return children;
+  return <>{children}</>;
+};
+
+const StaffTop10HistoryGate = ({ children }: { children: ReactNode }) => {
+  const { data: user } = useGetMeQuery();
+
+  if (!user || !canSeeTop10History(user)) {
+    return <Navigate to="/private/top10/releases" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const PrivateContent = () => (
@@ -146,338 +108,12 @@ const PrivateContent = () => (
     <Route path="bookmarks" element={wrap(BookmarksPage)} />
     <Route path="friends" element={wrap(FriendsPage)} />
 
-    <Route path="staff" element={wrap(StaffPage)} />
-    <Route
-      path="staff/tools/staff-groups"
-      element={
-        <StaffGate permissions={['staff_groups_manage']}>
-          <StaffGroupsPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/user/new"
-      element={
-        <StaffGate permissions={['users_edit']}>
-          <NewUserForm />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/user-ranks/new"
-      element={
-        <StaffGate permissions={['rank_permissions_manage']}>
-          <UserRankFormPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/user-ranks/:id/edit"
-      element={
-        <StaffGate permissions={['rank_permissions_manage']}>
-          <UserRankFormPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/user-ranks"
-      element={
-        <StaffGate permissions={['rank_permissions_manage']}>
-          <UserRankManager />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/categories"
-      element={
-        <StaffGate permissions={['forums_manage']}>
-          <ForumCategoryControlPanel />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/forums"
-      element={
-        <StaffGate permissions={['forums_manage']}>
-          <ForumControlPanel />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/communities"
-      element={
-        <StaffGate permissions={['communities_manage']}>
-          <CommunityManager />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/news"
-      element={
-        <StaffGate permissions={['news_manage']}>
-          <NewsManager />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/settings"
-      element={
-        <StaffGate permissions={['admin']}>
-          <SiteSettingsPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/ratio-policy"
-      element={
-        <StaffGate permissions={['ratio_policy_manage']}>
-          <RatioPolicyPanel />
-        </StaffGate>
-      }
-    />
     <Route
       path="staff/tools"
       element={
-        <StaffGate
-          permissions={[
-            'rank_permissions_manage',
-            'staff_groups_manage',
-            'forums_manage',
-            'forums_moderate',
-            'communities_manage',
-            'contributions_manage',
-            'dnc_manage',
-            'collages_moderate',
-            'news_manage',
-            'rules_manage',
-            'reports_manage',
-            'staff_inbox_manage',
-            'users_edit',
-            'users_warn',
-            'recovery_manage',
-            'invites_manage',
-            'ratio_policy_manage',
-            'site_history_manage',
-            'ip_bans_manage',
-            'email_blacklist_manage',
-            'donor_ranks_manage',
-            'donation_log_view',
-            'login_watch_view',
-            'duplicate_ips_view',
-            'registration_log_view',
-            'tags_manage'
-          ]}
-        >
+        <StaffToolboxGate>
           <Toolbox />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/site-history"
-      element={
-        <StaffGate permissions={['site_history_manage']}>
-          <SiteHistoryPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/mass-pm"
-      element={
-        <StaffGate permissions={['messages_mass_pm']}>
-          <MassPmPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/donor-ranks"
-      element={
-        <StaffGate permissions={['donor_ranks_manage']}>
-          <DonorRanksPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tools/recovery-queue"
-      element={
-        <StaffGate permissions={['recovery_manage']}>
-          <RecoveryQueuePage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/ip-bans"
-      element={
-        <StaffGate permissions={['ip_bans_manage']}>
-          <IpBansPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/email-blacklist"
-      element={
-        <StaffGate permissions={['email_blacklist_manage']}>
-          <EmailBlacklistPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/donation-log"
-      element={
-        <StaffGate permissions={['donation_log_view']}>
-          <DonationLogPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/duplicate-ips"
-      element={
-        <StaffGate permissions={['duplicate_ips_view']}>
-          <DuplicateIpsPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/registration-log"
-      element={
-        <StaffGate permissions={['registration_log_view']}>
-          <RegistrationLogPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/user-warnings"
-      element={
-        <StaffGate permissions={['users_warn']}>
-          <UserWarningsPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tag-aliases"
-      element={
-        <StaffGate permissions={['tags_manage']}>
-          <TagAliasesPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/global-notices"
-      element={
-        <StaffGate permissions={['news_manage']}>
-          <GlobalNoticesPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/login-watch"
-      element={
-        <StaffGate permissions={['login_watch_view']}>
-          <LoginWatchPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/vanity-house"
-      element={
-        <StaffGate permissions={['news_manage']}>
-          <VanityHousePage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/album-of-month"
-      element={
-        <StaffGate permissions={['news_manage']}>
-          <AlbumOfMonthPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/user-flow"
-      element={
-        <StaffGate permissions={['admin']}>
-          <UserFlowPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/invite-pool"
-      element={
-        <StaffGate permissions={['invites_manage']}>
-          <InvitePoolPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/invite-tree"
-      element={
-        <StaffGate permissions={['invites_manage']}>
-          <InviteTreePage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/dnc"
-      element={
-        <StaffGate permissions={['dnc_manage']}>
-          <DncPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/collage-recovery"
-      element={
-        <StaffGate permissions={['collages_moderate']}>
-          <CollageRecoveryPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/economic-stats"
-      element={
-        <StaffGate permissions={['admin']}>
-          <EconomicStatsPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/release-stats"
-      element={
-        <StaffGate permissions={['admin']}>
-          <ReleaseStatsPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/ratio-watch"
-      element={
-        <StaffGate permissions={['admin']}>
-          <RatioWatchPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/client-stats"
-      element={
-        <StaffGate permissions={['admin']}>
-          <ClientStatsPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/site-info"
-      element={
-        <StaffGate permissions={['admin']}>
-          <SiteInfoPage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/generate-test-data"
-      element={
-        <StaffGate permissions={['admin']}>
-          <GenerateTestDataPage />
-        </StaffGate>
+        </StaffToolboxGate>
       }
     />
 
@@ -535,60 +171,9 @@ const PrivateContent = () => (
     <Route path="messages/:id" element={wrap(ConversationView)} />
     <Route path="messages" element={wrap(InboxPage)} />
 
-    <Route
-      path="staff/tickets/:id"
-      element={
-        <StaffGate permissions={['staff_inbox_manage']}>
-          <TicketView />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/tickets"
-      element={
-        <StaffGate permissions={['staff_inbox_manage']}>
-          <TicketQueuePage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/inbox/responses"
-      element={
-        <StaffGate permissions={['staff_inbox_manage']}>
-          <CannedResponsesPage />
-        </StaffGate>
-      }
-    />
-
-    <Route
-      path="staff/reports"
-      element={
-        <StaffGate permissions={['reports_manage']}>
-          <ReportsQueuePage />
-        </StaffGate>
-      }
-    />
-    <Route
-      path="staff/reports/:id"
-      element={
-        <StaffGate permissions={['reports_manage']}>
-          <ReportDetailPage />
-        </StaffGate>
-      }
-    />
-
     <Route path="reports/new" element={wrap(ReportForm)} />
     <Route path="reports/mine" element={wrap(MyReportsPage)} />
     <Route path="reports/:id" element={wrap(ReportDetailPage)} />
-
-    <Route
-      path="staff/tools/rules"
-      element={
-        <StaffGate permissions={['rules_manage']}>
-          <RulesManager />
-        </StaffGate>
-      }
-    />
 
     <Route path="rules/:slug" element={wrap(RulesSubPage)} />
     <Route path="rules" element={wrap(RulesPage)} />
@@ -612,15 +197,27 @@ const PrivateContent = () => (
       <Route
         path="history"
         element={
-          <StaffGate permissions={['staff', 'admin']}>
+          <StaffTop10HistoryGate>
             <TopHistoryPage />
-          </StaffGate>
+          </StaffTop10HistoryGate>
         }
       />
     </Route>
 
     <Route path="stats/history" element={wrap(SiteStatsHistoryPage)} />
     <Route path="user/:id/stats" element={wrap(UserStatsHistoryPage)} />
+
+    {staffTools
+      .filter((tool) => tool.path !== 'staff/tools')
+      .map((tool) => (
+        <Route
+          key={tool.id}
+          path={tool.path}
+          element={
+            <StaffGate permissions={tool.permissions}>{tool.element}</StaffGate>
+          }
+        />
+      ))}
 
     <Route path="" element={<PrivateHomepage />} />
     <Route path="*" element={<NotFound />} />

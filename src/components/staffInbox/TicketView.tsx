@@ -10,10 +10,10 @@ import {
   useGetCannedResponsesQuery
 } from '../../store/services/staffInboxApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { hasAnyPermission } from '../../utils/permissions';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
+import { canUseTicketStaffActions } from '../staff/staffAffordances';
 
 const STATUS_BADGE: Record<string, string> = {
   Unanswered: 'bg-yellow-800 text-yellow-200',
@@ -26,11 +26,11 @@ const TicketView = () => {
   const ticketId = Number(id);
   const dispatch = useAppDispatch();
   const currentUser = useSelector(selectCurrentUser);
-  const isStaff = hasAnyPermission(currentUser, ['staff', 'admin']);
+  const canManageTicket = canUseTicketStaffActions(currentUser);
 
   const { data: ticket, isLoading, error } = useGetTicketQuery(ticketId);
   const { data: cannedResponses } = useGetCannedResponsesQuery(undefined, {
-    skip: !isStaff
+    skip: !canManageTicket
   });
   const [replyToTicket, { isLoading: replying }] = useReplyToTicketMutation();
   const [resolveTicket, { isLoading: resolving }] = useResolveTicketMutation();
@@ -102,10 +102,10 @@ const TicketView = () => {
 
   const isResolved = ticket.status === 'Resolved';
   const isOwner = ticket.user?.id === currentUser?.id;
-  const backLink = isStaff
+  const backLink = canManageTicket
     ? '/private/staff/tickets'
     : '/private/messages/tickets';
-  const backLabel = isStaff ? '← Ticket Queue' : '← My Tickets';
+  const backLabel = canManageTicket ? '← Ticket Queue' : '← My Tickets';
 
   return (
     <div className="thin">
@@ -124,7 +124,7 @@ const TicketView = () => {
               {ticket.status}
             </span>
           </div>
-          {isStaff && (
+          {canManageTicket && (
             <p className="text-sm text-gray-400 mt-0.5">
               From:{' '}
               <Link
@@ -146,7 +146,7 @@ const TicketView = () => {
         </div>
 
         <div className="flex gap-2 text-sm shrink-0">
-          {!isResolved && (isStaff || isOwner) && (
+          {!isResolved && (canManageTicket || isOwner) && (
             <button
               onClick={handleResolve}
               disabled={resolving}
@@ -155,7 +155,7 @@ const TicketView = () => {
               Resolve
             </button>
           )}
-          {isResolved && isStaff && (
+          {isResolved && canManageTicket && (
             <button
               onClick={handleUnresolve}
               className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded"
@@ -166,7 +166,7 @@ const TicketView = () => {
         </div>
       </div>
 
-      {isStaff && (
+      {canManageTicket && (
         <form
           onSubmit={handleAssign}
           className="flex gap-2 mb-6 p-3 bg-gray-800 rounded text-sm"
@@ -236,7 +236,7 @@ const TicketView = () => {
 
       {!isResolved && (
         <form onSubmit={handleReply} className="flex flex-col gap-3">
-          {isStaff && cannedResponses && cannedResponses.length > 0 && (
+          {canManageTicket && cannedResponses && cannedResponses.length > 0 && (
             <div>
               <label
                 htmlFor="canned-select"

@@ -4,7 +4,10 @@ import Alert from '../../../layout/Alert';
 import ModBar from '../../../admin/ModBar';
 import QuickSearch from '../../../layout/QuickSearch';
 import type { AuthUser } from '../../../../types';
-import { canSeeModBar, isStaffUser } from '../../../../utils/permissions';
+import {
+  canAccessStaffQueue,
+  canSeeModBar
+} from '../../../staff/staffAffordances';
 import { formatBytes } from '../../../../utils';
 import { useGetUnreadCountQuery } from '../../../../store/services/messagesApi';
 import {
@@ -29,8 +32,8 @@ const navLinks = [
 ];
 
 const PrivateHeader = ({ user }: Props) => {
-  const isStaff = isStaffUser(user);
   const showModBar = canSeeModBar(user);
+  const showStaffQueue = canAccessStaffQueue(user);
   const { data: inboxData } = useGetUnreadCountQuery();
   const { data: ticketData } = useGetQueueCountQuery();
   const { data: myTicketData } = useGetMyTicketCountQuery();
@@ -101,7 +104,7 @@ const PrivateHeader = ({ user }: Props) => {
                 </span>
               )}
             </Link>
-            {isStaff && (
+            {showStaffQueue && (
               <Link
                 to="/private/staff/tickets"
                 className="hover:text-gray-200 transition-colors"

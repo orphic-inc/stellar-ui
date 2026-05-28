@@ -60,11 +60,7 @@ jest.mock('react-router-dom', () => ({
   }
 }));
 
-jest.mock('../../utils/permissions', () => ({
-  isStaffUser: (user: {
-    permissions?: { staff?: boolean };
-    userRank?: { permissions?: { staff?: boolean } };
-  }) => !!(user.permissions?.staff ?? user.userRank?.permissions?.staff),
+jest.mock('../../components/staff/staffAffordances', () => ({
   canSeeModBar: (user: {
     permissions?: { staff?: boolean; admin?: boolean };
     userRank?: { permissions?: { staff?: boolean; admin?: boolean } };
@@ -74,6 +70,14 @@ jest.mock('../../utils/permissions', () => ({
       user.permissions?.admin ??
       user.userRank?.permissions?.staff ??
       user.userRank?.permissions?.admin
+    ),
+  canAccessStaffQueue: (user: {
+    permissions?: { staff_inbox_manage?: boolean };
+    userRank?: { permissions?: { staff_inbox_manage?: boolean } };
+  }) =>
+    !!(
+      user.permissions?.staff_inbox_manage ??
+      user.userRank?.permissions?.staff_inbox_manage
     )
 }));
 
@@ -162,7 +166,10 @@ describe('PrivateHeader', () => {
   it('shows Staff Queue link for staff users', () => {
     const staffUser = {
       ...mockUser,
-      userRank: { ...mockUser.userRank, permissions: { staff: true } }
+      userRank: {
+        ...mockUser.userRank,
+        permissions: { staff: true, staff_inbox_manage: true }
+      }
     };
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
     expect(
@@ -201,7 +208,10 @@ describe('PrivateHeader', () => {
   it('shows staff inbox badge when there are pending tickets', () => {
     const staffUser = {
       ...mockUser,
-      userRank: { ...mockUser.userRank, permissions: { staff: true } }
+      userRank: {
+        ...mockUser.userRank,
+        permissions: { staff: true, staff_inbox_manage: true }
+      }
     };
     mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 7 } });
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
