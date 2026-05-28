@@ -21,18 +21,21 @@ type PollState = {
   votes: Array<{ userId: number; vote: number }>;
 };
 
+// Builds a fetch mock that serves the single session endpoint and handles all
+// topic-session mutations. canModerate controls the server-computed affordances.
 const makeForumFetch = ({
   topic,
   poll,
   subscriptions,
-  markReadStatus = 200
+  markReadStatus = 200,
+  canModerate = false
 }: {
   topic?: TopicState;
   poll?: PollState;
   subscriptions?: Array<{ topicId: number }>;
   markReadStatus?: number;
+  canModerate?: boolean;
 }) => {
-  const forum = { id: 9, name: 'Jazz Forum' };
   const posts = {
     data: [
       {
@@ -45,52 +48,70 @@ const makeForumFetch = ({
         body: 'Second post',
         author: { id: 8, username: 'bob' }
       }
-    ]
+    ],
+    meta: { total: 2, page: 1, limit: 25, totalPages: 1 }
   };
-  const topicState = topic ?? {
+  const topicState: TopicState = topic ?? {
     id: 44,
     title: 'Blue Note thread',
     isLocked: false,
     isSticky: false
   };
-  const pollState = poll ?? {
+  const pollState: PollState = poll ?? {
     id: 6,
     question: 'Best format?',
     answers: JSON.stringify(['CD', 'Vinyl']),
     closed: false,
     votes: []
   };
-  const subscriptionState = subscriptions ?? [{ topicId: 44 }];
+  const subscriptionState: Array<{ topicId: number }> = subscriptions ?? [
+    { topicId: 44 }
+  ];
+
+  const buildSession = () => ({
+    forum: {
+      id: 9,
+      name: 'Jazz Forum',
+      forumCategoryId: 1,
+      forumCategory: null
+    },
+    topic: {
+      ...topicState,
+      authorId: 5,
+      author: { id: 5, username: 'author', avatar: null },
+      notes: []
+    },
+    posts,
+    poll: pollState,
+    subscription: {
+      isSubscribed: subscriptionState.some((s) => s.topicId === topicState.id)
+    },
+    affordances: {
+      canReply: !topicState.isLocked || canModerate,
+      canModerate,
+      canVoteInPoll: !pollState.closed,
+      canSubscribe: true,
+      canCatchUp: true
+    },
+    readState: { lastVisiblePostId: 102 }
+  });
 
   return jest.fn(async (request: Request) => {
     const url = new URL(request.url, 'http://localhost');
 
-    if (url.pathname === '/api/forums/9') {
-      return makeResponse({ body: forum });
+    if (url.pathname === '/api/forums/9/topics/44/session') {
+      return makeResponse({ body: buildSession() });
     }
 
-    if (url.pathname === '/api/forums/9/topics/44') {
-      if (request.method === 'PUT') {
-        const body = JSON.parse(
-          (await request.text()) || '{}'
-        ) as Partial<TopicState>;
-        Object.assign(topicState, body);
-        return makeResponse({ body: topicState });
-      }
-
+    if (
+      url.pathname === '/api/forums/9/topics/44' &&
+      request.method === 'PUT'
+    ) {
+      const body = JSON.parse(
+        (await request.text()) || '{}'
+      ) as Partial<TopicState>;
+      Object.assign(topicState, body);
       return makeResponse({ body: topicState });
-    }
-
-    if (url.pathname === '/api/forums/9/topics/44/posts') {
-      return makeResponse({ body: posts });
-    }
-
-    if (url.pathname === '/api/forums/polls/44') {
-      return makeResponse({ body: pollState });
-    }
-
-    if (url.pathname === '/api/subscriptions') {
-      return makeResponse({ body: subscriptionState });
     }
 
     if (url.pathname === '/api/subscriptions/subscribe') {
@@ -98,7 +119,6 @@ const makeForumFetch = ({
         topicId: number;
         action: 'subscribe' | 'unsubscribe';
       };
-
       if (body.action === 'unsubscribe') {
         const index = subscriptionState.findIndex(
           (s) => s.topicId === body.topicId
@@ -107,7 +127,6 @@ const makeForumFetch = ({
       } else if (!subscriptionState.some((s) => s.topicId === body.topicId)) {
         subscriptionState.push({ topicId: body.topicId });
       }
-
       return makeResponse({ status: 204 });
     }
 
@@ -189,7 +208,9 @@ describe('ForumTopicPage RTK Query integration', () => {
         userRank: { permissions: { forums_moderate: true } }
       } as never)
     );
-    (global.fetch as jest.Mock).mockImplementation(makeForumFetch({}));
+    (global.fetch as jest.Mock).mockImplementation(
+      makeForumFetch({ canModerate: true })
+    );
 
     renderWithProviders(<ForumTopicPage />, { store });
 
@@ -297,7 +318,8 @@ describe('ForumTopicPage RTK Query integration', () => {
           closed: false,
           votes: []
         },
-        subscriptions: []
+        subscriptions: [],
+        canModerate: false
       })
     );
 

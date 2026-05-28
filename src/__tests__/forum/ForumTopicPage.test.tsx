@@ -10,11 +10,7 @@ type MockForumPostProps = {
   onQuote?: (text: string) => void;
 };
 
-const mockUseGetForumByIdQuery = jest.fn();
-const mockUseGetTopicByIdQuery = jest.fn();
-const mockUseGetPostsByTopicQuery = jest.fn();
-const mockUseGetPollByTopicQuery = jest.fn();
-const mockUseGetSubscriptionsQuery = jest.fn();
+const mockUseGetTopicSessionQuery = jest.fn();
 const mockMarkRead = jest.fn();
 const mockVotePoll = jest.fn();
 const mockSubscribe = jest.fn();
@@ -23,14 +19,8 @@ const mockTrashTopic = jest.fn();
 const mockCatchupForum = jest.fn();
 
 jest.mock('../../store/services/forumApi', () => ({
-  useGetForumByIdQuery: (...args: unknown[]) =>
-    mockUseGetForumByIdQuery(...args),
-  useGetTopicByIdQuery: (...args: unknown[]) =>
-    mockUseGetTopicByIdQuery(...args),
-  useGetPostsByTopicQuery: (...args: unknown[]) =>
-    mockUseGetPostsByTopicQuery(...args),
-  useGetPollByTopicQuery: (...args: unknown[]) =>
-    mockUseGetPollByTopicQuery(...args),
+  useGetTopicSessionQuery: (...args: unknown[]) =>
+    mockUseGetTopicSessionQuery(...args),
   useMarkTopicReadMutation: () => [mockMarkRead],
   useVotePollMutation: () => [mockVotePoll, { isLoading: false }],
   useUpdateTopicMutation: () => [mockUpdateTopic, { isLoading: false }],
@@ -39,7 +29,6 @@ jest.mock('../../store/services/forumApi', () => ({
 }));
 
 jest.mock('../../store/services/subscriptionApi', () => ({
-  useGetSubscriptionsQuery: () => mockUseGetSubscriptionsQuery(),
   useSubscribeMutation: () => [mockSubscribe, { isLoading: false }]
 }));
 
@@ -73,49 +62,55 @@ jest.mock('react-router-dom', () => ({
   useParams: () => ({ forumId: '9', forumTopicId: '44' })
 }));
 
+// Default session covers the common happy-path shape. Individual tests override
+// only what they need.
+const defaultSession = {
+  forum: {
+    id: 9,
+    name: 'Jazz Forum',
+    forumCategoryId: 1,
+    forumCategory: null
+  },
+  topic: {
+    id: 44,
+    title: 'Blue Note thread',
+    isLocked: false,
+    isSticky: false,
+    authorId: 5,
+    author: { id: 5, username: 'alice', avatar: null },
+    notes: []
+  },
+  posts: {
+    data: [
+      { id: 101, body: 'First post', author: { id: 7, username: 'alice' } },
+      { id: 102, body: 'Second post', author: { id: 8, username: 'bob' } }
+    ],
+    meta: { total: 2, page: 1, limit: 25, totalPages: 1 }
+  },
+  poll: {
+    id: 6,
+    question: 'Best format?',
+    answers: JSON.stringify(['CD', 'Vinyl']),
+    closed: false,
+    votes: [] as Array<{ userId: number; vote: number }>
+  },
+  subscription: { isSubscribed: true },
+  affordances: {
+    canReply: true,
+    canModerate: true,
+    canVoteInPoll: true,
+    canSubscribe: true,
+    canCatchUp: true
+  },
+  readState: { lastVisiblePostId: 102 }
+};
+
 describe('ForumTopicPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseGetForumByIdQuery.mockReturnValue({
-      data: { id: 9, name: 'Jazz Forum' }
-    });
-    mockUseGetTopicByIdQuery.mockReturnValue({
-      data: {
-        id: 44,
-        title: 'Blue Note thread',
-        isLocked: false,
-        isSticky: false
-      },
+    mockUseGetTopicSessionQuery.mockReturnValue({
+      data: defaultSession,
       isLoading: false
-    });
-    mockUseGetPostsByTopicQuery.mockReturnValue({
-      data: {
-        data: [
-          {
-            id: 101,
-            body: 'First post',
-            author: { id: 7, username: 'alice' }
-          },
-          {
-            id: 102,
-            body: 'Second post',
-            author: { id: 8, username: 'bob' }
-          }
-        ]
-      },
-      isLoading: false
-    });
-    mockUseGetPollByTopicQuery.mockReturnValue({
-      data: {
-        id: 6,
-        question: 'Best format?',
-        answers: JSON.stringify(['CD', 'Vinyl']),
-        closed: false,
-        votes: []
-      }
-    });
-    mockUseGetSubscriptionsQuery.mockReturnValue({
-      data: [{ topicId: 44 }]
     });
   });
 
@@ -180,17 +175,21 @@ describe('ForumTopicPage', () => {
         userRank: { permissions: { forums_moderate: true } }
       } as never)
     );
-    mockUseGetPollByTopicQuery.mockReturnValue({
+    mockUseGetTopicSessionQuery.mockReturnValue({
       data: {
-        id: 6,
-        question: 'Best format?',
-        answers: JSON.stringify(['CD', 'Vinyl']),
-        closed: true,
-        votes: [
-          { userId: 9, vote: 0 },
-          { userId: 10, vote: 1 }
-        ]
-      }
+        ...defaultSession,
+        poll: {
+          id: 6,
+          question: 'Best format?',
+          answers: JSON.stringify(['CD', 'Vinyl']),
+          closed: true,
+          votes: [
+            { userId: 9, vote: 0 },
+            { userId: 10, vote: 1 }
+          ]
+        }
+      },
+      isLoading: false
     });
 
     renderWithProviders(<ForumTopicPage />, { store });
@@ -202,10 +201,10 @@ describe('ForumTopicPage', () => {
     // Quote a post then clear it via onQuoteConsumed
     await user.click(screen.getByRole('button', { name: /quote post 101/i }));
     await user.click(screen.getByRole('button', { name: /clear quote/i }));
-    // No assertion needed — just exercising the callback path
+    // No assertion needed — exercising the callback path
   });
 
-  it('shows subscribe (not unsubscribe) when not subscribed, topic not found when data missing, and singular vote count', async () => {
+  it('shows subscribe (not unsubscribe) when not subscribed, and singular vote count', async () => {
     const user = userEvent.setup();
     const store = createTestStore();
     store.dispatch(
@@ -215,17 +214,27 @@ describe('ForumTopicPage', () => {
         userRank: { permissions: {} }
       } as never)
     );
-    // Not subscribed
-    mockUseGetSubscriptionsQuery.mockReturnValue({ data: [] });
-    // Poll: open with 1 vote by another user → shows voting form with '1 vote'
-    mockUseGetPollByTopicQuery.mockReturnValue({
+    // Poll open, 1 vote by another user → shows voting form with '1 vote'
+    mockUseGetTopicSessionQuery.mockReturnValue({
       data: {
-        id: 6,
-        question: 'Format?',
-        answers: JSON.stringify(['CD', 'Vinyl']),
-        closed: false,
-        votes: [{ userId: 99, vote: 0 }]
-      }
+        ...defaultSession,
+        poll: {
+          id: 6,
+          question: 'Format?',
+          answers: JSON.stringify(['CD', 'Vinyl']),
+          closed: false,
+          votes: [{ userId: 99, vote: 0 }]
+        },
+        subscription: { isSubscribed: false },
+        affordances: {
+          canReply: true,
+          canModerate: false,
+          canVoteInPoll: true,
+          canSubscribe: true,
+          canCatchUp: true
+        }
+      },
+      isLoading: false
     });
 
     renderWithProviders(<ForumTopicPage />, { store });
@@ -251,19 +260,18 @@ describe('ForumTopicPage', () => {
         userRank: { permissions: {} }
       } as never)
     );
-    mockUseGetPollByTopicQuery.mockReturnValue({ data: undefined });
+    mockUseGetTopicSessionQuery.mockReturnValue({
+      data: { ...defaultSession, poll: null },
+      isLoading: false
+    });
 
     renderWithProviders(<ForumTopicPage />, { store });
 
     expect(screen.queryByText('Best format?')).not.toBeInTheDocument();
   });
 
-  it('shows topic not found when topic data is absent', () => {
-    mockUseGetTopicByIdQuery.mockReturnValue({
-      data: undefined,
-      isLoading: false
-    });
-    mockUseGetPostsByTopicQuery.mockReturnValue({
+  it('shows topic not found when session data is absent', () => {
+    mockUseGetTopicSessionQuery.mockReturnValue({
       data: undefined,
       isLoading: false
     });
@@ -280,14 +288,18 @@ describe('ForumTopicPage', () => {
         userRank: { permissions: {} }
       } as never)
     );
-    mockUseGetPollByTopicQuery.mockReturnValue({
+    mockUseGetTopicSessionQuery.mockReturnValue({
       data: {
-        id: 6,
-        question: 'Format?',
-        answers: JSON.stringify(['CD', 'Vinyl']),
-        closed: true,
-        votes: []
-      }
+        ...defaultSession,
+        poll: {
+          id: 6,
+          question: 'Format?',
+          answers: JSON.stringify(['CD', 'Vinyl']),
+          closed: true,
+          votes: []
+        }
+      },
+      isLoading: false
     });
 
     renderWithProviders(<ForumTopicPage />, { store });
@@ -305,18 +317,24 @@ describe('ForumTopicPage', () => {
         userRank: { permissions: {} }
       } as never)
     );
-    mockUseGetTopicByIdQuery.mockReturnValue({
-      data: { id: 44, title: 'Locked topic', isLocked: true, isSticky: false },
-      isLoading: false
-    });
-    mockUseGetPollByTopicQuery.mockReturnValue({
+    mockUseGetTopicSessionQuery.mockReturnValue({
       data: {
-        id: 6,
-        question: 'Broken poll',
-        answers: '{bad json',
-        closed: false,
-        votes: []
-      }
+        ...defaultSession,
+        topic: { ...defaultSession.topic, isLocked: true },
+        poll: {
+          id: 6,
+          question: 'Broken poll',
+          answers: '{bad json',
+          closed: false,
+          votes: []
+        },
+        affordances: {
+          ...defaultSession.affordances,
+          canReply: false,
+          canModerate: false
+        }
+      },
+      isLoading: false
     });
 
     renderWithProviders(<ForumTopicPage />, { store });
