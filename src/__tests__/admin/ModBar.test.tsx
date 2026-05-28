@@ -43,6 +43,17 @@ const staffUser = {
   }
 };
 
+const staffToolUser = {
+  ...staffUser,
+  userRank: {
+    ...staffUser.userRank,
+    permissions: {
+      ...staffUser.userRank.permissions,
+      reports_manage: true
+    }
+  }
+};
+
 const regularUser = {
   id: 2,
   username: 'regularuser',
@@ -65,10 +76,19 @@ describe('ModBar', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders Toolbox and Reports links for staff', () => {
-    mockUseAppSelector.mockReturnValue(staffUser);
+  it('renders Toolbox and Reports links for staff with tool access', () => {
+    mockUseAppSelector.mockReturnValue(staffToolUser);
     renderWithProviders(<ModBar />);
     expect(screen.getByRole('link', { name: /toolbox/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /reports/i })).toBeInTheDocument();
+  });
+
+  it('renders Reports but not Toolbox for staff without tool access', () => {
+    mockUseAppSelector.mockReturnValue(staffUser);
+    renderWithProviders(<ModBar />);
+    expect(
+      screen.queryByRole('link', { name: /toolbox/i })
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /reports/i })).toBeInTheDocument();
   });
 
