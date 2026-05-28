@@ -395,7 +395,7 @@ const RequestDetailPage = () => {
         )}
       </div>
 
-      <CommentsSection page="requests" pageId={requestId} />
+      <CommentsSection context="requests" pageId={requestId} />
     </div>
   );
 };

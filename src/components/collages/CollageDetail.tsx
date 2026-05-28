@@ -406,7 +406,7 @@ const CollageDetail = () => {
           )}
 
           {/* Comments */}
-          <CommentsSection page="collages" pageId={collageId} />
+          <CommentsSection context="collages" pageId={collageId} />
         </div>
       </div>
     </div>

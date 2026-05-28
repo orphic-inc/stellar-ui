@@ -92,31 +92,31 @@ describe('CommentsSection', () => {
   it('shows loading state', () => {
     mockIsLoading = true;
     mockCommentsData = undefined;
-    renderWithProviders(<CommentsSection page="release" pageId={1} />);
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
   it('shows empty state when no comments', () => {
     mockCommentsData = [];
-    renderWithProviders(<CommentsSection page="release" pageId={1} />);
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(screen.getByText(/no comments yet/i)).toBeInTheDocument();
   });
 
   it('renders comment authors and bodies', () => {
-    renderWithProviders(<CommentsSection page="release" pageId={1} />);
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(screen.getByText('alice')).toBeInTheDocument();
     expect(screen.getByText('bob')).toBeInTheDocument();
   });
 
   it('shows delete button for own comment (bob)', () => {
-    renderWithProviders(<CommentsSection page="release" pageId={1} />);
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(
       screen.getByRole('button', { name: /delete comment/i })
     ).toBeInTheDocument();
   });
 
   it("shows report link for other users' comments (alice)", () => {
-    renderWithProviders(<CommentsSection page="release" pageId={1} />);
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(
       screen.getByRole('link', { name: /report comment/i })
     ).toBeInTheDocument();
@@ -124,14 +124,14 @@ describe('CommentsSection', () => {
 
   it('calls deleteComment when delete button is clicked', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="release" pageId={1} />);
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
     await user.click(screen.getByRole('button', { name: /delete comment/i }));
     expect(mockDeleteComment).toHaveBeenCalledWith(2);
   });
 
   it('calls createComment with releaseId on submit', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="release" pageId={5} />);
+    renderWithProviders(<CommentsSection context="release" pageId={5} />);
     await user.type(
       screen.getByPlaceholderText(/add a comment/i),
       'Nice release'
@@ -148,7 +148,7 @@ describe('CommentsSection', () => {
 
   it('calls createComment with communityId on submit for communities page', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="communities" pageId={7} />);
+    renderWithProviders(<CommentsSection context="communities" pageId={7} />);
     await user.type(
       screen.getByPlaceholderText(/add a comment/i),
       'Great community'
@@ -165,7 +165,7 @@ describe('CommentsSection', () => {
 
   it('calls createComment with artistId on submit for artist page', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    renderWithProviders(<CommentsSection context="artist" pageId={3} />);
     await user.type(screen.getByPlaceholderText(/add a comment/i), 'Fan');
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
@@ -179,7 +179,7 @@ describe('CommentsSection', () => {
 
   it('calls createComment with collageId on submit for collages page', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="collages" pageId={9} />);
+    renderWithProviders(<CommentsSection context="collages" pageId={9} />);
     await user.type(screen.getByPlaceholderText(/add a comment/i), 'Nice');
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
@@ -193,7 +193,7 @@ describe('CommentsSection', () => {
 
   it('calls createComment with contributionId on submit for contributions page', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="contributions" pageId={11} />);
+    renderWithProviders(<CommentsSection context="contributions" pageId={11} />);
     await user.type(screen.getByPlaceholderText(/add a comment/i), 'Thanks');
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
@@ -207,7 +207,7 @@ describe('CommentsSection', () => {
 
   it('calls createComment with requestId on submit for requests page', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="requests" pageId={13} />);
+    renderWithProviders(<CommentsSection context="requests" pageId={13} />);
     await user.type(screen.getByPlaceholderText(/add a comment/i), 'Support');
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
@@ -221,7 +221,7 @@ describe('CommentsSection', () => {
 
   it('clears comment body after successful submission', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="release" pageId={5} />);
+    renderWithProviders(<CommentsSection context="release" pageId={5} />);
     const textarea = screen.getByPlaceholderText(/add a comment/i);
     await user.type(textarea, 'Hello world');
     await user.click(screen.getByRole('button', { name: /post comment/i }));
@@ -232,21 +232,21 @@ describe('CommentsSection', () => {
 
   it('hides form when user is not logged in', () => {
     mockCurrentUser = null;
-    renderWithProviders(<CommentsSection page="release" pageId={1} />);
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(
       screen.queryByPlaceholderText(/add a comment/i)
     ).not.toBeInTheDocument();
   });
 
   it('shows subscribe checkbox on subscribable pages (artist)', () => {
-    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    renderWithProviders(<CommentsSection context="artist" pageId={3} />);
     expect(
       screen.getByRole('checkbox', { name: /subscribe to comments/i })
     ).toBeInTheDocument();
   });
 
   it('shows subscribe checkbox on release page', () => {
-    renderWithProviders(<CommentsSection page="release" pageId={5} />);
+    renderWithProviders(<CommentsSection context="release" pageId={5} />);
     expect(
       screen.getByRole('checkbox', { name: /subscribe to comments/i })
     ).toBeInTheDocument();
@@ -254,7 +254,7 @@ describe('CommentsSection', () => {
 
   it('calls subscribeComments when checkbox is checked on submit', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    renderWithProviders(<CommentsSection context="artist" pageId={3} />);
     await user.click(
       screen.getByRole('checkbox', { name: /subscribe to comments/i })
     );
@@ -271,7 +271,7 @@ describe('CommentsSection', () => {
 
   it('does not call subscribeComments when checkbox is unchecked', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    renderWithProviders(<CommentsSection context="artist" pageId={3} />);
     await user.type(screen.getByPlaceholderText(/add a comment/i), 'Great');
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
@@ -282,7 +282,7 @@ describe('CommentsSection', () => {
 
   it('resets subscribe checkbox to unchecked after submit', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="communities" pageId={7} />);
+    renderWithProviders(<CommentsSection context="communities" pageId={7} />);
     const checkbox = screen.getByRole('checkbox', {
       name: /subscribe to comments/i
     });
@@ -300,7 +300,7 @@ describe('CommentsSection', () => {
       unwrap: () => Promise.reject(new Error('nope'))
     });
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection page="artist" pageId={3} />);
+    renderWithProviders(<CommentsSection context="artist" pageId={3} />);
     const checkbox = screen.getByRole('checkbox', {
       name: /subscribe to comments/i
     });

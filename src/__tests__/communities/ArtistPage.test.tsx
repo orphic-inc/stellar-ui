@@ -29,8 +29,8 @@ jest.mock('../../store/services/subscriptionApi', () => ({
 
 jest.mock('../../components/layout/CommentsSection', () => ({
   __esModule: true,
-  default: ({ page, pageId }: { page: string; pageId: number }) => (
-    <div data-testid="artist-comments">{`${page}:${pageId}`}</div>
+  default: ({ context, pageId }: { context: string; pageId: number }) => (
+    <div data-testid="artist-comments">{`${context}:${pageId}`}</div>
   )
 }));
 

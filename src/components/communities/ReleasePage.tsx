@@ -448,7 +448,7 @@ const ReleasePage = () => {
           </div>
 
           <CommentsSection
-            page="release"
+            context="release"
             pageId={rId}
             alreadySubscribed={isSubscribedToComments}
           />

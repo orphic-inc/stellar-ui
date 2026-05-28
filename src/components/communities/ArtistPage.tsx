@@ -256,7 +256,7 @@ const ArtistPage = () => {
           </table>
         )}
       </div>
-      <CommentsSection page="artist" pageId={artistId} />
+      <CommentsSection context="artist" pageId={artistId} />
     </div>
   );
 };

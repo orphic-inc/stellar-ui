@@ -3,7 +3,7 @@ import type { paths } from '../../types/api';
 
 export type CommentPage = NonNullable<
   paths['/comments']['get']['parameters']['query']
->['page'] extends infer T
+>['context'] extends infer T
   ? Exclude<T, undefined>
   : never;
 type CommentQueryParams = NonNullable<

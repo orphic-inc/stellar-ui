@@ -4585,7 +4585,9 @@ export interface paths {
     get: {
       parameters: {
         query?: {
-          page?:
+          page?: number;
+          limit?: number;
+          context?:
             | 'artist'
             | 'collages'
             | 'contributions'

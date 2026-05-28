@@ -154,7 +154,7 @@ describe('RequestDetailPage', () => {
       expect(mockDeleteRequest).toHaveBeenCalledWith(12);
       expect(mockNavigate).toHaveBeenCalledWith('/private/requests');
       expect(mockCommentsSection).toHaveBeenCalledWith({
-        page: 'requests',
+        context: 'requests',
         pageId: 12
       });
       expect(screen.getAllByText('100.00 MiB').length).toBeGreaterThan(0);
