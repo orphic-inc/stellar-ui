@@ -34,7 +34,10 @@ const CommentsSection = ({
   alreadySubscribed = false
 }: Props) => {
   const currentUser = useSelector(selectCurrentUser);
-  const { data: comments, isLoading } = useGetCommentsQuery({ context, pageId });
+  const { data: comments, isLoading } = useGetCommentsQuery({
+    context,
+    pageId
+  });
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
 
@@ -42,28 +45,53 @@ const CommentsSection = ({
   const [subscribe, setSubscribe] = useState(false);
   const [subscribeComments, { isLoading: subscribing }] =
     useSubscribeCommentsMutation();
-  const canSubscribe = SUBSCRIBABLE_PAGES.includes(context) && !alreadySubscribed;
+  const canSubscribe =
+    SUBSCRIBABLE_PAGES.includes(context) && !alreadySubscribed;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!body.trim()) return;
     try {
       if (context === 'communities') {
-        await createComment({ page: context, body, communityId: pageId }).unwrap();
+        await createComment({
+          page: context,
+          body,
+          communityId: pageId
+        }).unwrap();
       } else if (context === 'artist') {
         await createComment({ page: context, body, artistId: pageId }).unwrap();
       } else if (context === 'release') {
-        await createComment({ page: context, body, releaseId: pageId }).unwrap();
+        await createComment({
+          page: context,
+          body,
+          releaseId: pageId
+        }).unwrap();
       } else if (context === 'collages') {
-        await createComment({ page: context, body, collageId: pageId }).unwrap();
+        await createComment({
+          page: context,
+          body,
+          collageId: pageId
+        }).unwrap();
       } else if (context === 'contributions') {
-        await createComment({ page: context, body, contributionId: pageId }).unwrap();
+        await createComment({
+          page: context,
+          body,
+          contributionId: pageId
+        }).unwrap();
       } else {
-        await createComment({ page: context, body, requestId: pageId }).unwrap();
+        await createComment({
+          page: context,
+          body,
+          requestId: pageId
+        }).unwrap();
       }
 
       if (subscribe && canSubscribe) {
-        await subscribeComments({ page: context, pageId, action: 'subscribe' }).unwrap();
+        await subscribeComments({
+          page: context,
+          pageId,
+          action: 'subscribe'
+        }).unwrap();
       }
 
       setBody('');
