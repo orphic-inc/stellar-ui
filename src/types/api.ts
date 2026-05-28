@@ -2550,6 +2550,64 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/forums/{forumId}/topics/{topicId}/session': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: string;
+        };
+        header?: never;
+        path: {
+          forumId: string;
+          topicId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Topic session view model (forum + topic + posts + poll + subscription + affordances) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ForumTopicSession'];
+          };
+        };
+        /** @description Insufficient class */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Forum or topic not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/forums/{forumId}/topics/{topicId}': {
     parameters: {
       query?: never;
@@ -11456,6 +11514,36 @@ export interface components {
     PaginatedForumTopics: {
       data: components['schemas']['ForumTopic'][];
       meta: components['schemas']['PaginationMeta'];
+    };
+    ForumTopicSession: {
+      forum: {
+        id: number;
+        name: string;
+        forumCategoryId: number;
+        forumCategory?: {
+          id: number;
+          name: string;
+        } | null;
+      };
+      topic: components['schemas']['ForumTopic'];
+      posts: {
+        data: components['schemas']['ForumPost'][];
+        meta: components['schemas']['PaginationMeta'];
+      };
+      poll?: components['schemas']['ForumPoll'] & unknown;
+      subscription: {
+        isSubscribed: boolean;
+      };
+      affordances: {
+        canReply: boolean;
+        canModerate: boolean;
+        canVoteInPoll: boolean;
+        canSubscribe: boolean;
+        canCatchUp: boolean;
+      };
+      readState: {
+        lastVisiblePostId: number | null;
+      };
     };
     CommunityStaffMember: {
       id: number;

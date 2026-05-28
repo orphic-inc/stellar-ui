@@ -80,7 +80,8 @@ export const api = createApi({
     'ClientStats',
     'UserFlow',
     'SiteInfo',
-    'DevSeedRun'
+    'DevSeedRun',
+    'TopicSession'
   ] as const,
   endpoints: () => ({})
 });

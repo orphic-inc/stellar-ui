@@ -89,7 +89,11 @@ type MarkReadArgs = NonNullable<
 type MarkReadResponse =
   paths['/forums/last-read']['post']['responses'][200]['content']['application/json'];
 
-export type { CreateTopicArgs };
+type TopicSessionResponse =
+  paths['/forums/{forumId}/topics/{topicId}/session']['get']['responses'][200]['content']['application/json'];
+type TopicSessionArgs = { forumId: number; topicId: number; page?: number };
+
+export type { CreateTopicArgs, TopicSessionResponse };
 
 export const forumApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -171,6 +175,13 @@ export const forumApi = api.injectEndpoints({
         { type: 'ForumTopic', id: topicId }
       ]
     }),
+    getTopicSession: build.query<TopicSessionResponse, TopicSessionArgs>({
+      query: ({ forumId, topicId, page = 1 }) =>
+        `/forums/${forumId}/topics/${topicId}/session?page=${page}`,
+      providesTags: (_, __, { topicId }) => [
+        { type: 'TopicSession', id: topicId }
+      ]
+    }),
     createTopic: build.mutation<CreateTopicResponse, CreateTopicArgs>({
       query: ({ forumId, ...data }) => ({
         url: `/forums/${forumId}/topics`,
@@ -189,7 +200,8 @@ export const forumApi = api.injectEndpoints({
         body: data
       }),
       invalidatesTags: (_, __, { topicId }) => [
-        { type: 'ForumTopic', id: topicId }
+        { type: 'ForumTopic', id: topicId },
+        { type: 'TopicSession', id: topicId }
       ]
     }),
     deleteTopic: build.mutation<void, TopicArgs>({
@@ -197,9 +209,10 @@ export const forumApi = api.injectEndpoints({
         url: `/forums/${forumId}/topics/${topicId}`,
         method: 'DELETE'
       }),
-      invalidatesTags: (_, __, { forumId }) => [
+      invalidatesTags: (_, __, { forumId, topicId }) => [
         { type: 'Forum', id: forumId },
-        'ForumTopic'
+        'ForumTopic',
+        { type: 'TopicSession', id: topicId }
       ]
     }),
     trashTopic: build.mutation<TrashTopicResponse, TopicArgs>({
@@ -207,9 +220,10 @@ export const forumApi = api.injectEndpoints({
         url: `/forums/${forumId}/topics/${topicId}/trash`,
         method: 'POST'
       }),
-      invalidatesTags: (_, __, { forumId }) => [
+      invalidatesTags: (_, __, { forumId, topicId }) => [
         { type: 'Forum', id: forumId },
-        'ForumTopic'
+        'ForumTopic',
+        { type: 'TopicSession', id: topicId }
       ]
     }),
 
@@ -230,7 +244,8 @@ export const forumApi = api.injectEndpoints({
       }),
       invalidatesTags: (_, __, { topicId, forumId }) => [
         { type: 'ForumPost', id: topicId },
-        { type: 'Forum', id: forumId }
+        { type: 'Forum', id: forumId },
+        { type: 'TopicSession', id: topicId }
       ]
     }),
     updatePost: build.mutation<UpdatePostResponse, UpdatePostArgs>({
@@ -263,7 +278,8 @@ export const forumApi = api.injectEndpoints({
         body: data
       }),
       invalidatesTags: (_, __, { topicId }) => [
-        { type: 'ForumTopic', id: topicId }
+        { type: 'ForumTopic', id: topicId },
+        { type: 'TopicSession', id: topicId }
       ]
     }),
 
@@ -274,7 +290,8 @@ export const forumApi = api.injectEndpoints({
         body: data
       }),
       invalidatesTags: (_, __, { forumTopicId }) => [
-        { type: 'ForumTopic', id: forumTopicId }
+        { type: 'ForumTopic', id: forumTopicId },
+        { type: 'TopicSession', id: forumTopicId }
       ]
     }),
 
@@ -305,6 +322,7 @@ export const {
   useDeleteForumMutation,
   useGetTopicsByForumQuery,
   useGetTopicByIdQuery,
+  useGetTopicSessionQuery,
   useCreateTopicMutation,
   useUpdateTopicMutation,
   useDeleteTopicMutation,

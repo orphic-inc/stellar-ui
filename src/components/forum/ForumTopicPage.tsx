@@ -2,22 +2,15 @@ import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
-  useGetTopicByIdQuery,
-  useGetPostsByTopicQuery,
-  useGetForumByIdQuery,
+  useGetTopicSessionQuery,
   useMarkTopicReadMutation,
-  useGetPollByTopicQuery,
   useVotePollMutation,
   useUpdateTopicMutation,
   useTrashTopicMutation,
   useCatchupForumMutation
 } from '../../store/services/forumApi';
-import {
-  useGetSubscriptionsQuery,
-  useSubscribeMutation
-} from '../../store/services/subscriptionApi';
+import { useSubscribeMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import PostBox from '../layout/PostBox';
 import ForumTopicPost from './ForumTopicPost';
@@ -31,51 +24,38 @@ const ForumTopicPage = () => {
   }>();
   const fId = parseInt(forumId ?? '0');
   const tId = parseInt(forumTopicId ?? '0');
+  const navigate = useNavigate();
   const currentUser = useSelector(selectCurrentUser);
 
-  const { data: forum } = useGetForumByIdQuery(fId);
-  const { data: topic, isLoading: topicLoading } = useGetTopicByIdQuery({
+  const { data: session, isLoading } = useGetTopicSessionQuery({
     forumId: fId,
     topicId: tId
   });
-  const { data: posts, isLoading: postsLoading } = useGetPostsByTopicQuery({
-    forumId: fId,
-    topicId: tId
-  });
-  const { data: poll } = useGetPollByTopicQuery(tId);
-  const { data: subscriptions } = useGetSubscriptionsQuery();
+
   const [markRead] = useMarkTopicReadMutation();
   const [votePoll, { isLoading: voting }] = useVotePollMutation();
   const [subscribe, { isLoading: subscribing }] = useSubscribeMutation();
   const [updateTopic, { isLoading: updatingTopic }] = useUpdateTopicMutation();
   const [trashTopic, { isLoading: trashing }] = useTrashTopicMutation();
-  const navigate = useNavigate();
+  const [catchupForum] = useCatchupForumMutation();
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [quoteText, setQuoteText] = useState('');
 
-  const [catchupForum] = useCatchupForumMutation();
-
-  const isSubscribed = subscriptions?.some((s) => s.topicId === tId) ?? false;
-  const canModerate = hasAnyPermission(currentUser, [
-    'forums_moderate',
-    'forums_manage',
-    'staff',
-    'admin'
-  ]);
-
+  // Mark the last visible post as read whenever the posts list refreshes.
   useEffect(() => {
-    if (posts?.data?.length) {
-      markRead({
-        forumTopicId: tId,
-        forumPostId: posts.data[posts.data.length - 1].id
-      });
+    const lastPostId = session?.readState.lastVisiblePostId;
+    if (lastPostId != null) {
+      markRead({ forumTopicId: tId, forumPostId: lastPostId });
     }
-  }, [posts, tId, markRead]);
+  }, [session?.readState.lastVisiblePostId, tId, markRead]);
 
-  if (topicLoading || postsLoading) return <Spinner />;
-  if (!topic) return <div className="p-4 text-red-400">Topic not found.</div>;
+  if (isLoading) return <Spinner />;
+  if (!session) return <div className="p-4 text-red-400">Topic not found.</div>;
 
+  const { forum, topic, posts, poll, subscription, affordances } = session;
+
+  // Poll answer parsing
   let answers: string[] = [];
   let pollParseError = false;
   if (poll) {
@@ -88,7 +68,6 @@ const ForumTopicPage = () => {
 
   const myVote = poll?.votes.find((v) => v.userId === currentUser?.id);
   const totalVotes = poll?.votes.length ?? 0;
-
   const voteCounts = answers.map(
     (_, i) => poll?.votes.filter((v) => v.vote === i).length ?? 0
   );
@@ -113,6 +92,10 @@ const ForumTopicPage = () => {
     }
   };
 
+  // Show results when poll is closed or user has already voted (canVoteInPoll=false + poll exists)
+  const showPollResults =
+    !!poll && (!poll.closed ? !affordances.canVoteInPoll : true);
+
   return (
     <div>
       <nav className="text-sm text-gray-500 mb-4">
@@ -120,8 +103,8 @@ const ForumTopicPage = () => {
           Forums
         </Link>
         {' › '}
-        <Link to={`/private/forums/${forumId}`} className="hover:text-gray-300">
-          {forum?.name ?? 'Forum'}
+        <Link to={`/private/forums/${fId}`} className="hover:text-gray-300">
+          {forum.name}
         </Link>
         {' › '}
         <strong className="text-gray-200">{topic.title}</strong>
@@ -143,7 +126,7 @@ const ForumTopicPage = () => {
             )}
           </span>
           <div className="flex items-center gap-3">
-            {canModerate && (
+            {affordances.canModerate && (
               <>
                 <button
                   type="button"
@@ -188,13 +171,15 @@ const ForumTopicPage = () => {
               onClick={() =>
                 subscribe({
                   topicId: tId,
-                  action: isSubscribed ? 'unsubscribe' : 'subscribe'
+                  action: subscription.isSubscribed
+                    ? 'unsubscribe'
+                    : 'subscribe'
                 })
               }
               disabled={subscribing}
               className="text-xs text-gray-400 hover:text-gray-200"
             >
-              {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+              {subscription.isSubscribed ? 'Unsubscribe' : 'Subscribe'}
             </button>
             <button
               type="button"
@@ -216,7 +201,7 @@ const ForumTopicPage = () => {
       {poll && !pollParseError && answers.length > 0 && (
         <div className="rounded border border-gray-700 bg-gray-900 mb-4 p-4">
           <strong className="text-sm text-gray-200">{poll.question}</strong>
-          {myVote !== undefined || poll.closed ? (
+          {showPollResults ? (
             <table className="w-full text-sm mt-3">
               <tbody>
                 {answers.map((answer, i) => {
@@ -280,20 +265,20 @@ const ForumTopicPage = () => {
         </div>
       )}
 
-      {posts?.data?.map((post) => (
+      {posts.data.map((post) => (
         <ErrorBoundary key={post.id} FallbackComponent={FallbackComponent}>
           <ForumTopicPost
             post={post}
             forumId={fId}
             topicId={tId}
             currentUserId={currentUser?.id}
-            canModerate={canModerate}
+            canModerate={affordances.canModerate}
             onQuote={(text) => setQuoteText((prev) => prev + text)}
           />
         </ErrorBoundary>
       ))}
 
-      {(!topic.isLocked || canModerate) && (
+      {affordances.canReply && (
         <PostBox
           forumId={forumId!}
           topicId={forumTopicId!}

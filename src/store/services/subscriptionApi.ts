@@ -26,7 +26,14 @@ export const subscriptionApi = api.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['Subscription']
+      invalidatesTags: (_, __, args) => [
+        'Subscription',
+        // Invalidate the topic session so the page's subscription.isSubscribed
+        // field reflects the new state without a separate subscriptions fetch.
+        ...('topicId' in args && args.topicId != null
+          ? [{ type: 'TopicSession' as const, id: args.topicId }]
+          : [])
+      ]
     }),
     subscribeComments: build.mutation<void, SubscribeCommentsArgs>({
       query: (data) => ({
