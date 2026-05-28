@@ -193,7 +193,9 @@ describe('CommentsSection', () => {
 
   it('calls createComment with contributionId on submit for contributions page', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection context="contributions" pageId={11} />);
+    renderWithProviders(
+      <CommentsSection context="contributions" pageId={11} />
+    );
     await user.type(screen.getByPlaceholderText(/add a comment/i), 'Thanks');
     await user.click(screen.getByRole('button', { name: /post comment/i }));
     await waitFor(() => {
