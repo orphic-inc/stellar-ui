@@ -101,6 +101,7 @@ export interface FeaturedAlbumItem {
   groupId: number;
   threadId: number;
   title: string;
+  image: string;
   started: string;
   ended: string;
 }
@@ -333,6 +334,7 @@ export const adminApi = api.injectEndpoints({
         groupId: number;
         threadId: number;
         title: string;
+        image?: string;
         started: string;
         ended: string;
       }

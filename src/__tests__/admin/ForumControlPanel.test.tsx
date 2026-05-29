@@ -7,11 +7,15 @@ import ForumControlPanel from '../../components/admin/ForumControlPanel';
 const mockGetForumCategoriesQuery = jest.fn();
 const mockGetForumsQuery = jest.fn();
 const mockCreateForum = jest.fn();
+const mockUpdateForum = jest.fn();
+const mockDeleteForum = jest.fn();
 
 jest.mock('../../store/services/forumApi', () => ({
   useGetForumCategoriesQuery: () => mockGetForumCategoriesQuery(),
   useGetForumsQuery: () => mockGetForumsQuery(),
-  useCreateForumMutation: () => [mockCreateForum, { isLoading: false }]
+  useCreateForumMutation: () => [mockCreateForum, { isLoading: false }],
+  useUpdateForumMutation: () => [mockUpdateForum, { isLoading: false }],
+  useDeleteForumMutation: () => [mockDeleteForum]
 }));
 
 jest.mock('react-router-dom', () => ({

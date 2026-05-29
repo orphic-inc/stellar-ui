@@ -3,9 +3,136 @@ import { Link } from 'react-router-dom';
 import {
   useGetForumCategoriesQuery,
   useGetForumsQuery,
-  useCreateForumMutation
+  useCreateForumMutation,
+  useUpdateForumMutation,
+  useDeleteForumMutation
 } from '../../store/services/forumApi';
+import type { Forum } from '../../types';
 import Spinner from '../layout/Spinner';
+
+const inputCls =
+  'rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500';
+
+interface EditRowProps {
+  forum: Forum;
+  onDone: () => void;
+}
+
+const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
+  const [updateForum, { isLoading }] = useUpdateForumMutation();
+  const [name, setName] = useState(forum.name);
+  const [description, setDescription] = useState(forum.description ?? '');
+  const [sort, setSort] = useState(String(forum.sort ?? 0));
+  const [minRead, setMinRead] = useState(String(forum.minClassRead ?? 0));
+  const [minWrite, setMinWrite] = useState(String(forum.minClassWrite ?? 0));
+  const [minCreate, setMinCreate] = useState(String(forum.minClassCreate ?? 0));
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await updateForum({
+      id: forum.id,
+      name,
+      description,
+      sort: parseInt(sort) || 0,
+      minClassRead: parseInt(minRead) || 0,
+      minClassWrite: parseInt(minWrite) || 0,
+      minClassCreate: parseInt(minCreate) || 0
+    });
+    onDone();
+  };
+
+  return (
+    <tr className="bg-indigo-950/30 border-t border-indigo-800/40">
+      <td colSpan={6} className="px-4 py-3">
+        <form onSubmit={handleSave} className="space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-gray-400 mb-0.5">
+                Name *
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className={`${inputCls} w-full`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-0.5">Sort</label>
+              <input
+                type="number"
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className={`${inputCls} w-full`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-0.5">
+                Min read
+              </label>
+              <input
+                type="number"
+                value={minRead}
+                onChange={(e) => setMinRead(e.target.value)}
+                className={`${inputCls} w-full`}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-gray-400 mb-0.5">
+                Description
+              </label>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className={`${inputCls} w-full`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-0.5">
+                Min write
+              </label>
+              <input
+                type="number"
+                value={minWrite}
+                onChange={(e) => setMinWrite(e.target.value)}
+                className={`${inputCls} w-full`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-0.5">
+                Min create topics
+              </label>
+              <input
+                type="number"
+                value={minCreate}
+                onChange={(e) => setMinCreate(e.target.value)}
+                className={`${inputCls} w-full`}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded"
+            >
+              {isLoading ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              type="button"
+              onClick={onDone}
+              className="px-3 py-1 text-gray-400 hover:text-white text-xs"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </td>
+    </tr>
+  );
+};
 
 const ForumControlPanel = () => {
   const {
@@ -19,6 +146,9 @@ const ForumControlPanel = () => {
     error: forumsError
   } = useGetForumsQuery();
   const [createForum, { isLoading: isCreating }] = useCreateForumMutation();
+  const [deleteForum] = useDeleteForumMutation();
+
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const [categoryId, setCategoryId] = useState('');
   const [name, setName] = useState('');
@@ -27,6 +157,11 @@ const ForumControlPanel = () => {
   const [minClassRead, setMinClassRead] = useState('');
   const [minClassWrite, setMinClassWrite] = useState('');
   const [minClassCreate, setMinClassCreate] = useState('');
+
+  const handleDelete = async (id: number, forumName: string) => {
+    if (!confirm(`Delete forum "${forumName}"? This cannot be undone.`)) return;
+    await deleteForum(id);
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,13 +215,14 @@ const ForumControlPanel = () => {
                 <th className="text-right px-4 py-2 font-semibold">Sort</th>
                 <th className="text-right px-4 py-2 font-semibold">Topics</th>
                 <th className="text-right px-4 py-2 font-semibold">Posts</th>
+                <th className="px-4 py-2 font-semibold"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700/50">
               {!forums?.length ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="px-4 py-6 text-center text-gray-500"
                   >
                     No forums yet.
@@ -94,31 +230,58 @@ const ForumControlPanel = () => {
                 </tr>
               ) : (
                 forums.map((f) => (
-                  <tr
-                    key={f.id}
-                    className="hover:bg-gray-700/30 transition-colors"
-                  >
-                    <td className="px-4 py-2 text-gray-200 font-medium">
-                      <Link
-                        to={`/private/forums/${f.id}`}
-                        className="hover:text-indigo-300 transition-colors"
-                      >
-                        {f.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2 text-gray-400">
-                      {f.forumCategory?.name ?? '—'}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-right">
-                      {f.sort}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-right">
-                      {f.numTopics}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-right">
-                      {f.numPosts}
-                    </td>
-                  </tr>
+                  <>
+                    <tr
+                      key={f.id}
+                      className="hover:bg-gray-700/30 transition-colors"
+                    >
+                      <td className="px-4 py-2 text-gray-200 font-medium">
+                        <Link
+                          to={`/private/forums/${f.id}`}
+                          className="hover:text-indigo-300 transition-colors"
+                        >
+                          {f.name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-2 text-gray-400">
+                        {f.forumCategory?.name ?? '—'}
+                      </td>
+                      <td className="px-4 py-2 text-gray-400 text-right">
+                        {f.sort}
+                      </td>
+                      <td className="px-4 py-2 text-gray-400 text-right">
+                        {f.numTopics}
+                      </td>
+                      <td className="px-4 py-2 text-gray-400 text-right">
+                        {f.numPosts}
+                      </td>
+                      <td className="px-4 py-2 text-right whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingId(editingId === f.id ? null : f.id)
+                          }
+                          className="text-xs text-indigo-400 hover:text-indigo-300 mr-3"
+                        >
+                          {editingId === f.id ? 'Cancel' : 'Edit'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(f.id, f.name)}
+                          className="text-xs text-red-400 hover:text-red-300"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                    {editingId === f.id && (
+                      <ForumEditRow
+                        key={`edit-${f.id}`}
+                        forum={f}
+                        onDone={() => setEditingId(null)}
+                      />
+                    )}
+                  </>
                 ))
               )}
             </tbody>

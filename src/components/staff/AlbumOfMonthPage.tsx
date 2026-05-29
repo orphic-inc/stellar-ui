@@ -12,6 +12,7 @@ const AlbumOfMonthPage = () => {
   const [groupId, setGroupId] = useState('');
   const [threadId, setThreadId] = useState('');
   const [title, setTitle] = useState('');
+  const [image, setImage] = useState('');
   const [started, setStarted] = useState('');
   const [ended, setEnded] = useState('');
   const [formError, setFormError] = useState('');
@@ -39,12 +40,14 @@ const AlbumOfMonthPage = () => {
         groupId: gId,
         threadId: tId,
         title: title.trim(),
+        image: image.trim(),
         started: new Date(started).toISOString(),
         ended: new Date(ended).toISOString()
       }).unwrap();
       setGroupId('');
       setThreadId('');
       setTitle('');
+      setImage('');
       setStarted('');
       setEnded('');
     } catch {
@@ -90,6 +93,13 @@ const AlbumOfMonthPage = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
+            className="col-span-2 rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <input
+            type="url"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            placeholder="Cover image URL (optional — overrides release image)"
             className="col-span-2 rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <div className="flex flex-col gap-1">

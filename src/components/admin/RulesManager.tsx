@@ -70,6 +70,88 @@ const MainPageEditor = ({ page }: { page: RulesPage | null }) => {
   );
 };
 
+const SubPageEditForm = ({
+  page,
+  onDone
+}: {
+  page: RulesPage;
+  onDone: () => void;
+}) => {
+  const dispatch = useDispatch();
+  const [updatePage, { isLoading }] = useUpdateRulesPageMutation();
+  const [title, setTitle] = useState(page.title);
+  const [body, setBody] = useState(page.body);
+  const [sortOrder, setSortOrder] = useState(page.sortOrder ?? 0);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updatePage({ id: page.id, title, body, sortOrder }).unwrap();
+      dispatch(addAlert('Sub-page updated.', 'success'));
+      onDone();
+    } catch (err) {
+      dispatch(
+        addAlert(getApiErrorMessage(err) ?? 'Failed to update.', 'danger')
+      );
+    }
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="p-4 border-t border-gray-700 space-y-3 bg-indigo-950/20"
+    >
+      <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+        Edit: {page.title}
+      </h4>
+      <input
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+        required
+        className={`${inputClass} w-full`}
+      />
+      <textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        placeholder="Body"
+        rows={8}
+        required
+        className={`${inputClass} w-full font-mono`}
+      />
+      <div className="flex items-center gap-3">
+        <label className="text-sm text-gray-400 whitespace-nowrap">
+          Sort order
+        </label>
+        <input
+          type="number"
+          min={0}
+          value={sortOrder}
+          onChange={(e) => setSortOrder(Number(e.target.value))}
+          className={`${inputClass} w-24`}
+        />
+      </div>
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+        >
+          {isLoading ? 'Saving…' : 'Save Changes'}
+        </button>
+        <button
+          type="button"
+          onClick={onDone}
+          className="text-gray-400 hover:text-gray-200 px-4 py-2 rounded text-sm transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+};
+
 const SubPageForm = ({ onDone }: { onDone: () => void }) => {
   const dispatch = useDispatch();
   const [createPage, { isLoading }] = useCreateRulesPageMutation();
@@ -159,6 +241,7 @@ const RulesManager = () => {
   const dispatch = useDispatch();
   const [deletePage] = useDeleteRulesPageMutation();
   const [showNewForm, setShowNewForm] = useState(false);
+  const [editingPageId, setEditingPageId] = useState<number | null>(null);
 
   const handleDelete = async (id: number, title: string) => {
     if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
@@ -245,34 +328,57 @@ const RulesManager = () => {
                 </tr>
               ) : (
                 data.pages.map((page) => (
-                  <tr
-                    key={page.id}
-                    className="hover:bg-gray-700/30 transition-colors"
-                  >
-                    <td className="px-4 py-2 text-gray-200 font-medium">
-                      <Link
-                        to={`/private/rules/${page.slug}`}
-                        className="hover:text-indigo-400 transition-colors"
-                      >
-                        {page.title}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 font-mono text-xs">
-                      {page.slug}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400">
-                      {page.sortOrder}
-                    </td>
-                    <td className="px-4 py-2 text-center">
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(page.id, page.title)}
-                        className="text-red-400 hover:text-red-300 transition-colors text-sm"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
+                  <>
+                    <tr
+                      key={page.id}
+                      className="hover:bg-gray-700/30 transition-colors"
+                    >
+                      <td className="px-4 py-2 text-gray-200 font-medium">
+                        <Link
+                          to={`/private/rules/${page.slug}`}
+                          className="hover:text-indigo-400 transition-colors"
+                        >
+                          {page.title}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-2 text-gray-400 font-mono text-xs">
+                        {page.slug}
+                      </td>
+                      <td className="px-4 py-2 text-gray-400">
+                        {page.sortOrder}
+                      </td>
+                      <td className="px-4 py-2 text-right whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingPageId(
+                              editingPageId === page.id ? null : page.id
+                            )
+                          }
+                          className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm mr-3"
+                        >
+                          {editingPageId === page.id ? 'Cancel' : 'Edit'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(page.id, page.title)}
+                          className="text-red-400 hover:text-red-300 transition-colors text-sm"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                    {editingPageId === page.id && (
+                      <tr key={`edit-${page.id}`}>
+                        <td colSpan={4} className="p-0">
+                          <SubPageEditForm
+                            page={page}
+                            onDone={() => setEditingPageId(null)}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 ))
               )}
             </tbody>
