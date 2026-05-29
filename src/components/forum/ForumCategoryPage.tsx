@@ -10,7 +10,7 @@ const ForumCategoryPage = () => {
     return <div className="p-4 text-red-400">Failed to load forums.</div>;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
+    <div>
       <h2 className="text-xl font-semibold text-gray-100 mb-4">Forums</h2>
       {categories?.map((category) => (
         <div

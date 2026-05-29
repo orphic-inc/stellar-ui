@@ -368,6 +368,7 @@ const GenerateTestDataPage = () => {
   const {
     data: runs,
     isLoading: runsLoading,
+    isUninitialized: runsUninitialized,
     refetch: refetchRuns
   } = useListSeedRunsQuery();
 
@@ -492,20 +493,22 @@ const GenerateTestDataPage = () => {
       );
       // Explicitly refetch so the runs table updates without a page reload,
       // then scroll it into view once the data arrives
-      refetchRuns().then(() => {
-        setTimeout(() => {
-          runsRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }, 100);
-      });
+      if (!runsUninitialized) {
+        refetchRuns().then(() => {
+          setTimeout(() => {
+            runsRef.current?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }, 100);
+        });
+      }
     } catch (err) {
       dispatch(
         addAlert(getApiErrorMessage(err) ?? 'Generation failed.', 'danger')
       );
       // Still refetch — a partial run may have been recorded
-      refetchRuns();
+      if (!runsUninitialized) refetchRuns();
     }
   };
 

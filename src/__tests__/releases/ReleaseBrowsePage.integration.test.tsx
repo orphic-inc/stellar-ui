@@ -1,9 +1,15 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ReleaseBrowsePage from '../../components/releases/ReleaseBrowsePage';
 import { ensureRequestPolyfill, makeResponse } from '../fetchTestUtils';
 import { renderWithProviders } from '../testUtils';
+
+// Flush any pending RTK Query state updates (e.g. setCredentials) so they
+// don't fire after the test assertion and trigger an act() warning.
+afterEach(async () => {
+  await act(async () => {});
+});
 
 // Suppress random-link fetch calls — they're unrelated to this page's behavior
 jest.mock('../../components/search/RandomLinks', () => ({

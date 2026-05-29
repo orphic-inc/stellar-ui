@@ -54,7 +54,7 @@ const makeRelease = (id: number) => ({
   image: null,
   communityId: 1,
   artist: { id: 1, name: 'Miles Davis' },
-  tags: [{ name: 'jazz' }],
+  tags: [{ id: 1, name: 'jazz' }],
   contributions: [
     {
       id: 100,
