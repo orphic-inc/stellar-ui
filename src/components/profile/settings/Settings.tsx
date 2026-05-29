@@ -61,7 +61,8 @@ const Settings = () => {
 
   const { data: profile, isLoading } = useGetMyProfileQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
-  const { register, handleSubmit, reset, watch, setValue } = useForm<ProfileForm>();
+  const { register, handleSubmit, reset, watch, setValue } =
+    useForm<ProfileForm>();
 
   useEffect(() => {
     if (profile) reset(toProfileForm(profile));

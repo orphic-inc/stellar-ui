@@ -1,4 +1,9 @@
-import { formatDate, readableTime, formatBytes, ordinalSuffix } from '../../utils';
+import {
+  formatDate,
+  readableTime,
+  formatBytes,
+  ordinalSuffix
+} from '../../utils';
 
 describe('formatDate', () => {
   it('returns empty string for undefined input', () => {

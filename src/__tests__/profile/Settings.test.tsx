@@ -490,7 +490,10 @@ describe('Settings', () => {
   it('pre-selects the radio button matching the saved paranoia level', async () => {
     const profile = makeProfile();
     profile.userSettings.paranoia = 2;
-    mockUseGetMyProfileQuery.mockReturnValue({ data: profile, isLoading: false });
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: profile,
+      isLoading: false
+    });
 
     const user = userEvent.setup();
     renderWithProviders(<Settings />);

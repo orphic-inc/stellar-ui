@@ -182,79 +182,79 @@ const ForumTopicPost = ({
         !editing &&
         new Date(lastEdit.editedAt).getTime() !==
           new Date(createdAt).getTime() && (
-        <div className="px-4 pb-4">
-          <div className="text-xs text-gray-500">
-            Last edited by{' '}
-            {lastEdit.editor ? (
-              <Link
-                to={`/private/user/${lastEdit.editor.username}`}
-                className="text-gray-400 hover:text-gray-200"
-              >
-                {lastEdit.editor.username}
-              </Link>
-            ) : (
-              'Unknown'
-            )}{' '}
-            <Time date={lastEdit.editedAt} />
-          </div>
-
-          {canModerate && (
-            <div className="mt-2">
-              <button
-                type="button"
-                onClick={toggleEditHistory}
-                className="text-xs text-gray-400 hover:text-gray-200"
-              >
-                {showEditHistory ? 'Hide edit history' : 'View edit history'}
-              </button>
-
-              {showEditHistory && (
-                <div className="mt-3 space-y-3 rounded border border-gray-800 bg-gray-950/60 p-3">
-                  {loadingEditHistory && (
-                    <div className="text-xs text-gray-500">
-                      Loading edit history…
-                    </div>
-                  )}
-                  {!loadingEditHistory && renderedEdits.length === 0 && (
-                    <div className="text-xs text-gray-500">
-                      No edit history available.
-                    </div>
-                  )}
-                  {!loadingEditHistory &&
-                    renderedEdits.map((edit, index) => (
-                      <div
-                        key={edit.id}
-                        className={
-                          index === renderedEdits.length - 1
-                            ? ''
-                            : 'border-b border-gray-800 pb-3'
-                        }
-                      >
-                        <div className="mb-2 text-xs text-gray-500">
-                          Edited by{' '}
-                          {edit.editor ? (
-                            <Link
-                              to={`/private/user/${edit.editor.username}`}
-                              className="text-gray-400 hover:text-gray-200"
-                            >
-                              {edit.editor.username}
-                            </Link>
-                          ) : (
-                            'Unknown'
-                          )}{' '}
-                          <Time date={edit.editedAt} />
-                        </div>
-                        <pre className="whitespace-pre-wrap break-words rounded bg-gray-900/80 p-3 text-sm text-gray-300">
-                          {edit.previousBody}
-                        </pre>
-                      </div>
-                    ))}
-                </div>
-              )}
+          <div className="px-4 pb-4">
+            <div className="text-xs text-gray-500">
+              Last edited by{' '}
+              {lastEdit.editor ? (
+                <Link
+                  to={`/private/user/${lastEdit.editor.username}`}
+                  className="text-gray-400 hover:text-gray-200"
+                >
+                  {lastEdit.editor.username}
+                </Link>
+              ) : (
+                'Unknown'
+              )}{' '}
+              <Time date={lastEdit.editedAt} />
             </div>
-          )}
-        </div>
-      )}
+
+            {canModerate && (
+              <div className="mt-2">
+                <button
+                  type="button"
+                  onClick={toggleEditHistory}
+                  className="text-xs text-gray-400 hover:text-gray-200"
+                >
+                  {showEditHistory ? 'Hide edit history' : 'View edit history'}
+                </button>
+
+                {showEditHistory && (
+                  <div className="mt-3 space-y-3 rounded border border-gray-800 bg-gray-950/60 p-3">
+                    {loadingEditHistory && (
+                      <div className="text-xs text-gray-500">
+                        Loading edit history…
+                      </div>
+                    )}
+                    {!loadingEditHistory && renderedEdits.length === 0 && (
+                      <div className="text-xs text-gray-500">
+                        No edit history available.
+                      </div>
+                    )}
+                    {!loadingEditHistory &&
+                      renderedEdits.map((edit, index) => (
+                        <div
+                          key={edit.id}
+                          className={
+                            index === renderedEdits.length - 1
+                              ? ''
+                              : 'border-b border-gray-800 pb-3'
+                          }
+                        >
+                          <div className="mb-2 text-xs text-gray-500">
+                            Edited by{' '}
+                            {edit.editor ? (
+                              <Link
+                                to={`/private/user/${edit.editor.username}`}
+                                className="text-gray-400 hover:text-gray-200"
+                              >
+                                {edit.editor.username}
+                              </Link>
+                            ) : (
+                              'Unknown'
+                            )}{' '}
+                            <Time date={edit.editedAt} />
+                          </div>
+                          <pre className="whitespace-pre-wrap break-words rounded bg-gray-900/80 p-3 text-sm text-gray-300">
+                            {edit.previousBody}
+                          </pre>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 };

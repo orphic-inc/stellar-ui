@@ -27,7 +27,9 @@ const PrivateHomepage = () => {
   const { data: announcements, isLoading } = useGetAnnouncementsQuery();
   const { data: stats } = useGetSiteStatsQuery();
   const { data: featured } = useGetHomepageFeaturedQuery();
-  const [expandedAnnouncement, setExpandedAnnouncement] = useState<number | null>(null);
+  const [expandedAnnouncement, setExpandedAnnouncement] = useState<
+    number | null
+  >(null);
 
   const blogPosts = announcements?.blogPosts ?? [];
   const aotm = featured?.albumOfTheMonth;
