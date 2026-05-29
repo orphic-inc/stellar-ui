@@ -30,7 +30,7 @@ type Tab = 'appearance' | 'privacy' | 'security' | 'donor';
 const PARANOIA_LABELS: Record<number, string> = {
   0: 'No restrictions — your profile is fully visible',
   1: 'Hide your email address and last-seen time',
-  2: 'Also hide your contributed/consumed (upload/download) stats',
+  2: 'Also hide your contributed/consumed stats',
   3: 'Also hide your ratio and buffer — nearly all activity stats are hidden'
 };
 
@@ -61,7 +61,7 @@ const Settings = () => {
 
   const { data: profile, isLoading } = useGetMyProfileQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
-  const { register, handleSubmit, reset, watch } = useForm<ProfileForm>();
+  const { register, handleSubmit, reset, watch, setValue } = useForm<ProfileForm>();
 
   useEffect(() => {
     if (profile) reset(toProfileForm(profile));
@@ -344,8 +344,9 @@ const Settings = () => {
                   >
                     <input
                       type="radio"
-                      value={level}
-                      {...register('paranoia', { valueAsNumber: true })}
+                      value={String(level)}
+                      checked={paranoiaValue === level}
+                      onChange={() => setValue('paranoia', level)}
                       className="mt-0.5 accent-indigo-500"
                     />
                     <span className="text-sm text-gray-300">

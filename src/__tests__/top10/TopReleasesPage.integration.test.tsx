@@ -74,7 +74,7 @@ describe('TopReleasesPage RTK Query integration', () => {
     const fetchMock = global.fetch as jest.Mock;
     const initialRequest = fetchMock.mock.calls[0][0] as Request;
     expect(initialRequest.url).toContain(
-      '/api/top10/releases?type=day&limit=10'
+      '/api/top10/releases?type=overall&limit=10'
     );
     expect(initialRequest.method).toBe('GET');
 

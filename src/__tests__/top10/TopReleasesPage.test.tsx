@@ -74,7 +74,7 @@ describe('TopReleasesPage', () => {
     expect(screen.getAllByText('jazz').length).toBeGreaterThan(0);
   });
 
-  it('queries with default type=day and limit=10', () => {
+  it('queries with default type=overall and limit=10', () => {
     mockUseGetTopReleasesQuery.mockReturnValue({
       data: { items: [] },
       isLoading: false,
@@ -82,7 +82,7 @@ describe('TopReleasesPage', () => {
     });
     renderWithProviders(<TopReleasesPage />);
     expect(mockUseGetTopReleasesQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'day', limit: 10 })
+      expect.objectContaining({ type: 'overall', limit: 10 })
     );
   });
 

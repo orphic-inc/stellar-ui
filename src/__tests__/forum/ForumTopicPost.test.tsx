@@ -345,6 +345,24 @@ describe('ForumTopicPost', () => {
     expect(screen.getByText('2024-03-03T00:00:00Z')).toBeInTheDocument();
   });
 
+  it('does not show Last edited when editedAt equals createdAt (unedited post)', () => {
+    // Seed data sometimes sets lastEdit with editedAt === createdAt on unedited posts.
+    const postWithSameTimestamp = {
+      ...mockPost,
+      lastEdit: {
+        id: 1,
+        forumPostId: 7,
+        editorId: 10,
+        editedAt: mockPost.createdAt, // same as createdAt — post was never actually edited
+        editor: { id: 10, username: 'alice' }
+      }
+    };
+    renderWithProviders(
+      <ForumTopicPost post={postWithSameTimestamp} forumId={1} topicId={5} />
+    );
+    expect(screen.queryByText(/last edited by/i)).not.toBeInTheDocument();
+  });
+
   it('does not show edit history control to non-moderators', () => {
     renderWithProviders(
       <ForumTopicPost post={mockEditedPost} forumId={1} topicId={5} />

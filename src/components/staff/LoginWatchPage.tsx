@@ -95,7 +95,9 @@ const LoginWatchPage = () => {
                     colSpan={6}
                     className="px-4 py-6 text-center text-gray-500"
                   >
-                    No sessions found.
+                    {userId
+                      ? 'No sessions found for this user.'
+                      : 'Enter a user ID above to search sessions.'}
                   </td>
                 </tr>
               ) : (

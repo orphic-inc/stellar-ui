@@ -114,7 +114,7 @@ const SiteSettingsPage = () => {
             htmlFor="approved-domains"
             className="block text-sm text-gray-400 mb-1"
           >
-            Approved download domains{' '}
+            Approved contribution link domains{' '}
             <span className="text-gray-600 text-xs">(optional)</span>
           </label>
           <textarea

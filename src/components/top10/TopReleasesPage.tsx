@@ -38,7 +38,7 @@ const selectCls =
   'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
 
 const TopReleasesPage = () => {
-  const [type, setType] = useState<NonNullable<ReleaseType>>('day');
+  const [type, setType] = useState<NonNullable<ReleaseType>>('overall');
   const [limit, setLimit] = useState<LimitValue>(10);
   const [excludeTags, setExcludeTags] = useState('');
   const [format, setFormat] = useState('');

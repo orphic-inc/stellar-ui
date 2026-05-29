@@ -305,7 +305,7 @@ describe('UserProfile RTK Query integration', () => {
     });
     renderAs(STAFF_USER);
 
-    expect(await screen.findByText('Staff PMs')).toBeInTheDocument();
+    expect(await screen.findByText('Support Tickets')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument(); // total
     expect(screen.getByText('2')).toBeInTheDocument(); // unresolved
     expect(

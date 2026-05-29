@@ -178,7 +178,10 @@ const ForumTopicPost = ({
         </div>
       )}
 
-      {lastEdit && !editing && (
+      {lastEdit &&
+        !editing &&
+        new Date(lastEdit.editedAt).getTime() !==
+          new Date(createdAt).getTime() && (
         <div className="px-4 pb-4">
           <div className="text-xs text-gray-500">
             Last edited by{' '}

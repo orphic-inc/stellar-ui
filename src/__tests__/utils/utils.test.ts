@@ -1,4 +1,4 @@
-import { formatDate, readableTime, formatBytes } from '../../utils';
+import { formatDate, readableTime, formatBytes, ordinalSuffix } from '../../utils';
 
 describe('formatDate', () => {
   it('returns empty string for undefined input', () => {
@@ -53,6 +53,42 @@ describe('readableTime', () => {
     ).toISOString();
     const result = readableTime(twoMonthsAgo);
     expect(result).toMatch(/\d{4}/);
+  });
+});
+
+describe('ordinalSuffix', () => {
+  it('uses st for 1, 21, 31', () => {
+    expect(ordinalSuffix(1)).toBe('1st');
+    expect(ordinalSuffix(21)).toBe('21st');
+    expect(ordinalSuffix(31)).toBe('31st');
+  });
+
+  it('uses nd for 2, 22, 32', () => {
+    expect(ordinalSuffix(2)).toBe('2nd');
+    expect(ordinalSuffix(22)).toBe('22nd');
+  });
+
+  it('uses rd for 3, 23, 33', () => {
+    expect(ordinalSuffix(3)).toBe('3rd');
+    expect(ordinalSuffix(23)).toBe('23rd');
+  });
+
+  it('uses th for 4-20 (including teens)', () => {
+    expect(ordinalSuffix(4)).toBe('4th');
+    expect(ordinalSuffix(11)).toBe('11th');
+    expect(ordinalSuffix(12)).toBe('12th');
+    expect(ordinalSuffix(13)).toBe('13th');
+    expect(ordinalSuffix(20)).toBe('20th');
+  });
+
+  it('uses th for 111, 112, 113 (teen rule takes priority)', () => {
+    expect(ordinalSuffix(111)).toBe('111th');
+    expect(ordinalSuffix(112)).toBe('112th');
+    expect(ordinalSuffix(113)).toBe('113th');
+  });
+
+  it('handles 100th correctly', () => {
+    expect(ordinalSuffix(100)).toBe('100th');
   });
 });
 

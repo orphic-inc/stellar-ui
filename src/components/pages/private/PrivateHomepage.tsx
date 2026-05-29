@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { useGetAnnouncementsQuery } from '../../../store/services/announcementApi';
@@ -6,6 +7,7 @@ import { useGetSiteStatsQuery } from '../../../store/services/siteApi';
 import { Link } from 'react-router-dom';
 import Time from '../../layout/Time';
 import Spinner from '../../layout/Spinner';
+import DOMPurify from 'dompurify';
 
 const StatRow = ({
   label,
@@ -25,6 +27,7 @@ const PrivateHomepage = () => {
   const { data: announcements, isLoading } = useGetAnnouncementsQuery();
   const { data: stats } = useGetSiteStatsQuery();
   const { data: featured } = useGetHomepageFeaturedQuery();
+  const [expandedAnnouncement, setExpandedAnnouncement] = useState<number | null>(null);
 
   const blogPosts = announcements?.blogPosts ?? [];
   const aotm = featured?.albumOfTheMonth;
@@ -59,16 +62,34 @@ const PrivateHomepage = () => {
                 <p className="p-4 text-sm text-gray-500">No announcements.</p>
               ) : (
                 announcements.announcements.map((n) => (
-                  <div
-                    key={n.id}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-gray-700/30 transition-colors"
-                  >
-                    <span className="font-medium text-gray-200 text-sm">
-                      {n.title}
-                    </span>
-                    <span className="text-xs text-gray-500 shrink-0 ml-4">
-                      <Time date={n.createdAt} />
-                    </span>
+                  <div key={n.id}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExpandedAnnouncement(
+                          expandedAnnouncement === n.id ? null : n.id
+                        )
+                      }
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-700/30 transition-colors text-left"
+                    >
+                      <span className="font-medium text-gray-200 text-sm">
+                        {n.title}
+                      </span>
+                      <span className="text-xs text-gray-500 shrink-0 ml-4 flex items-center gap-2">
+                        <Time date={n.createdAt} />
+                        <span className="text-gray-600">
+                          {expandedAnnouncement === n.id ? '▲' : '▼'}
+                        </span>
+                      </span>
+                    </button>
+                    {expandedAnnouncement === n.id && n.body && (
+                      <div
+                        className="px-4 pb-4 text-sm text-gray-300 border-t border-gray-700/50"
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(n.body)
+                        }}
+                      />
+                    )}
                   </div>
                 ))
               )}

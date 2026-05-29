@@ -102,6 +102,12 @@ const ForumTopicPage = () => {
         <Link to="/private/forums" className="hover:text-gray-300">
           Forums
         </Link>
+        {forum.forumCategory && (
+          <>
+            {' › '}
+            <span>{forum.forumCategory.name}</span>
+          </>
+        )}
         {' › '}
         <Link to={`/private/forums/${fId}`} className="hover:text-gray-300">
           {forum.name}

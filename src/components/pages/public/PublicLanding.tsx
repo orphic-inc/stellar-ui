@@ -17,7 +17,7 @@ const PublicLanding = () => {
       <div className="landing-hero">
         <h1>Stellar</h1>
         <p className="lead">A curated community for music and media.</p>
-        <div className="landing-actions">
+        <div className="landing-actions flex gap-3">
           <Link to="/login" className="btn btn-primary">
             Sign In
           </Link>

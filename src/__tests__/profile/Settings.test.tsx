@@ -486,4 +486,19 @@ describe('Settings', () => {
     await user.click(screen.getByRole('button', { name: /security/i }));
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
+
+  it('pre-selects the radio button matching the saved paranoia level', async () => {
+    const profile = makeProfile();
+    profile.userSettings.paranoia = 2;
+    mockUseGetMyProfileQuery.mockReturnValue({ data: profile, isLoading: false });
+
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /privacy/i }));
+
+    const radios = screen.getAllByRole('radio') as HTMLInputElement[];
+    const checked = radios.find((r) => r.checked);
+    expect(checked).toBeDefined();
+    expect(checked?.value).toBe('2');
+  });
 });

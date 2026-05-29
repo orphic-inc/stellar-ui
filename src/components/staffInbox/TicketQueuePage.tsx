@@ -169,15 +169,17 @@ const TicketQueuePage = () => {
                     />
                   </td>
                   <td className="py-2 pr-3">
+                    <div className="flex items-center gap-1">
+                      {ticket.status === 'Unanswered' && (
+                        <span className="text-yellow-400 text-xs" aria-label="Unread">●</span>
+                      )}
                     <Link
                       to={`/private/staff/tickets/${ticket.id}`}
                       className="hover:underline text-blue-400"
                     >
-                      {ticket.status === 'Unanswered' && (
-                        <span className="mr-1 text-yellow-400">●</span>
-                      )}
                       {ticket.subject}
                     </Link>
+                    </div>
                   </td>
                   <td className="py-2 pr-3 text-gray-300">
                     {ticket.user?.username ?? '—'}

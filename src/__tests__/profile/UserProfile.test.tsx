@@ -342,13 +342,14 @@ describe('UserProfile', () => {
     expect(screen.getByText('Elite')).toBeInTheDocument();
   });
 
-  it('renders formatCount fallback for unparseable BigInt string in stats', () => {
+  it('renders 0 B for unparseable byte stat string', () => {
     mockProfileData = {
       ...mockProfile,
       stats: { ...mockProfile.stats, contributed: 'not-a-valid-bigint' }
     } as never;
     renderWithProviders(<UserProfile />);
-    expect(screen.getByText('not-a-valid-bigint')).toBeInTheDocument();
+    // Falls through to formatBytes(NaN) which returns '0 B'
+    expect(screen.getAllByText('0 B').length).toBeGreaterThan(0);
   });
 
   it('renders Hidden when stats value is null', () => {
@@ -657,6 +658,7 @@ describe('UserProfile', () => {
     });
 
     it('dispatches danger alert when revoke donor fails', async () => {
+      mockProfileData = { ...mockProfile, isDonor: true } as never;
       mockRevokeDonor.mockReturnValue({ unwrap: () => Promise.reject({}) });
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
@@ -728,6 +730,7 @@ describe('UserProfile', () => {
     });
 
     it('clicks Revoke donor status', async () => {
+      mockProfileData = { ...mockProfile, isDonor: true } as never;
       const user = userEvent.setup();
       renderWithProviders(<UserProfile />);
       await user.click(
@@ -897,7 +900,7 @@ describe('UserProfile', () => {
         staffPmOverview: { total: 0, unresolved: 0, recentConversations: [] }
       } as never;
       renderWithProviders(<UserProfile />);
-      expect(screen.getByText('Staff PMs')).toBeInTheDocument();
+      expect(screen.getByText('Support Tickets')).toBeInTheDocument();
     });
 
     it('renders unknown conversation status with fallback class', () => {
@@ -1145,5 +1148,20 @@ describe('UserProfile', () => {
     renderWithProviders(<UserProfile />);
     expect(screen.getByText('Kind of Blue')).toBeInTheDocument();
     expect(screen.getByText('Miles Davis')).toBeInTheDocument();
+  });
+
+  it('displays community stats requests with expanded labels not abbreviations', () => {
+    renderWithProviders(<UserProfile />);
+    // Should contain "created / filled" text, not single-letter abbreviations like "0c / 0f"
+    expect(screen.queryByText(/\dc\s*\/\s*\df/)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/created/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/filled/i).length).toBeGreaterThan(0);
+  });
+
+  it('displays community stats forums with expanded labels not abbreviations', () => {
+    renderWithProviders(<UserProfile />);
+    expect(screen.queryByText(/\dt\s*\/\s*\dp/)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/topics/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/posts/i).length).toBeGreaterThan(0);
   });
 });
