@@ -47,10 +47,14 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
         <form onSubmit={handleSave} className="space-y-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="sm:col-span-2">
-              <label className="block text-xs text-gray-400 mb-0.5">
+              <label
+                htmlFor={`fe-name-${forum.id}`}
+                className="block text-xs text-gray-400 mb-0.5"
+              >
                 Name *
               </label>
               <input
+                id={`fe-name-${forum.id}`}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -59,8 +63,14 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-0.5">Sort</label>
+              <label
+                htmlFor={`fe-sort-${forum.id}`}
+                className="block text-xs text-gray-400 mb-0.5"
+              >
+                Sort
+              </label>
               <input
+                id={`fe-sort-${forum.id}`}
                 type="number"
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
@@ -68,10 +78,14 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-0.5">
+              <label
+                htmlFor={`fe-minread-${forum.id}`}
+                className="block text-xs text-gray-400 mb-0.5"
+              >
                 Min read
               </label>
               <input
+                id={`fe-minread-${forum.id}`}
                 type="number"
                 value={minRead}
                 onChange={(e) => setMinRead(e.target.value)}
@@ -79,10 +93,14 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs text-gray-400 mb-0.5">
+              <label
+                htmlFor={`fe-desc-${forum.id}`}
+                className="block text-xs text-gray-400 mb-0.5"
+              >
                 Description
               </label>
               <input
+                id={`fe-desc-${forum.id}`}
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -90,10 +108,14 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-0.5">
+              <label
+                htmlFor={`fe-minwrite-${forum.id}`}
+                className="block text-xs text-gray-400 mb-0.5"
+              >
                 Min write
               </label>
               <input
+                id={`fe-minwrite-${forum.id}`}
                 type="number"
                 value={minWrite}
                 onChange={(e) => setMinWrite(e.target.value)}
@@ -101,10 +123,14 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-400 mb-0.5">
+              <label
+                htmlFor={`fe-mincreate-${forum.id}`}
+                className="block text-xs text-gray-400 mb-0.5"
+              >
                 Min create topics
               </label>
               <input
+                id={`fe-mincreate-${forum.id}`}
                 type="number"
                 value={minCreate}
                 onChange={(e) => setMinCreate(e.target.value)}

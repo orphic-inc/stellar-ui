@@ -121,10 +121,14 @@ const SubPageEditForm = ({
         className={`${inputClass} w-full font-mono`}
       />
       <div className="flex items-center gap-3">
-        <label className="text-sm text-gray-400 whitespace-nowrap">
+        <label
+          htmlFor={`spe-sort-${page.id}`}
+          className="text-sm text-gray-400 whitespace-nowrap"
+        >
           Sort order
         </label>
         <input
+          id={`spe-sort-${page.id}`}
           type="number"
           min={0}
           value={sortOrder}
