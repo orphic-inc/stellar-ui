@@ -37,6 +37,7 @@ module.exports = {
       {
         ignore: [
           '^@reduxjs/toolkit$',
+          '^@sentry/react$',
           'dompurify',
           '^@reduxjs/toolkit/query$',
           '^@reduxjs/toolkit/query/react$',
