@@ -3,3 +3,5 @@ dist/
 .playwright-mcp/
 e2e/.auth/
 playwright-report/
+.env
+.DS_Store
