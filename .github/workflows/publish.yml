@@ -25,10 +25,16 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Format check
+        run: npx prettier --check src
+      - name: Lint
+        run: npm run lint
       - name: Type check
         run: npm run typecheck
       - name: Unit tests
         run: npm test
+      # Playwright E2E requires both stellar-api and stellar-ui running with
+      # seeded test users. Setup is tracked separately; add here once ready.
 
   publish:
     needs: [test]

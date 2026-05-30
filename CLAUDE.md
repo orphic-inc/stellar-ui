@@ -5,11 +5,30 @@ React / TypeScript frontend for the Stellar platform. Uses Vite, RTK Query, Reac
 ## Commands
 
 ```bash
-npm run dev              # Vite dev server (proxies /api → localhost:8080)
+npm run dev              # Webpack dev server on :9000 (proxies /api → STELLAR_API_URL, default :8080)
 npm run build            # Production build
-npx tsc --noEmit         # Type-check only (run before committing)
-npx prettier --write ... # Format — ESLint treats Prettier violations as errors; always run on edited files
+npm run typecheck        # tsc --noEmit
+npm run lint             # ESLint
+npm run format           # Prettier --write src
+npm test                 # Jest unit tests (--runInBand)
+npm run test:e2e         # Playwright E2E (requires running API + UI — see below)
 ```
+
+## Environment variables
+
+Copy `.env.example` to `.env.local` (ignored by git) and fill in values:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `STELLAR_API_URL` | `http://localhost:8080` | Webpack dev-server API proxy target |
+| `API_URL` | `http://localhost:8080` | Playwright global setup — API base URL |
+| `BASE_URL` | `http://localhost:9000` | Playwright — UI base URL |
+| `TEST_USER` | `testuser` | Playwright — regular user username |
+| `TEST_USER_PASSWORD` | `changeme` | Playwright — regular user password |
+| `TEST_STAFF_USER` | `staffuser` | Playwright — staff user username |
+| `TEST_STAFF_PASSWORD` | `changeme` | Playwright — staff user password |
+
+The Playwright users must exist in the running stellar-api instance before `npm run test:e2e` is called. Create them via the dev-tools seed page or `npm run db:seed` in stellar-api.
 
 ## Architecture
 
