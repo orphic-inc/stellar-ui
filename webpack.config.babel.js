@@ -1,4 +1,6 @@
 import { resolve } from 'path';
+import webpack from 'webpack';
+import dotenv from 'dotenv';
 import HtmlPlugin from 'html-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
@@ -7,10 +9,16 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 
+dotenv.config();
+dotenv.config({ path: '.env.local', override: true });
+
 const dev = process.env.NODE_ENV === 'development';
 const apiUrl = process.env.STELLAR_API_URL || 'http://localhost:8080';
 
 const plugins = [
+  new webpack.DefinePlugin({
+    __SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN || '')
+  }),
   new CleanPlugin(),
   new StylelintPlugin({
     configFile: '.stylelintrc',
