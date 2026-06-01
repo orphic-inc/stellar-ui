@@ -3,6 +3,10 @@ import { Link, NavLink } from 'react-router-dom';
 import UserMenu from '../../../layout/UserMenu';
 import kuroLogo from '../../../../assets/kuro-logo.png';
 import kuroLogoHover from '../../../../assets/kuro-logo-hover.png';
+import darkAmbientLogo from '../../../../assets/dark-ambient-logo.png';
+import layerCakeLogo from '../../../../assets/layer-cake-logo.png';
+import postmodLogo from '../../../../assets/postmod-logo.png';
+import protonLogo from '../../../../assets/proton-logo.png';
 import Alert from '../../../layout/Alert';
 import ModBar from '../../../admin/ModBar';
 import QuickSearch from '../../../layout/QuickSearch';
@@ -19,10 +23,13 @@ import {
 } from '../../../../store/services/staffInboxApi';
 import { useGetMyProfileQuery } from '../../../../store/services/profileApi';
 
-// Add an entry here when a theme-specific logo asset is available.
 // Asset naming convention: src/assets/{theme}-logo.png, src/assets/{theme}-logo-hover.png
 const THEME_LOGOS: Record<string, [string, string]> = {
-  kuro: [kuroLogo, kuroLogoHover]
+  kuro: [kuroLogo, kuroLogoHover],
+  'dark-ambient': [darkAmbientLogo, darkAmbientLogo],
+  'layer-cake': [layerCakeLogo, layerCakeLogo],
+  postmod: [postmodLogo, postmodLogo],
+  proton: [protonLogo, protonLogo]
 };
 const DEFAULT_LOGO: [string, string] = [kuroLogo, kuroLogoHover];
 
