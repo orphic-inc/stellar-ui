@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import UserMenu from '../../../layout/UserMenu';
-import logoDefault from '../../../../assets/kuro-logo.png';
-import logoHover from '../../../../assets/kuro-logo-hover.png';
+import kuroLogo from '../../../../assets/kuro-logo.png';
+import kuroLogoHover from '../../../../assets/kuro-logo-hover.png';
 import Alert from '../../../layout/Alert';
 import ModBar from '../../../admin/ModBar';
 import QuickSearch from '../../../layout/QuickSearch';
@@ -17,6 +17,14 @@ import {
   useGetQueueCountQuery,
   useGetMyTicketCountQuery
 } from '../../../../store/services/staffInboxApi';
+import { useGetMyProfileQuery } from '../../../../store/services/profileApi';
+
+// Add an entry here when a theme-specific logo asset is available.
+// Asset naming convention: src/assets/{theme}-logo.png, src/assets/{theme}-logo-hover.png
+const THEME_LOGOS: Record<string, [string, string]> = {
+  kuro: [kuroLogo, kuroLogoHover]
+};
+const DEFAULT_LOGO: [string, string] = [kuroLogo, kuroLogoHover];
 
 interface Props {
   user: AuthUser;
@@ -36,6 +44,9 @@ const navLinks = [
 
 const PrivateHeader = ({ user }: Props) => {
   const [hovered, setHovered] = useState(false);
+  const { data: profile } = useGetMyProfileQuery();
+  const [logo, logoHovered] =
+    THEME_LOGOS[profile?.userSettings?.siteAppearance ?? ''] ?? DEFAULT_LOGO;
   const showModBar = canSeeModBar(user);
   const showStaffQueue = canAccessStaffQueue(user);
   const { data: inboxData } = useGetUnreadCountQuery();
@@ -61,7 +72,7 @@ const PrivateHeader = ({ user }: Props) => {
           onMouseLeave={() => setHovered(false)}
         >
           <img
-            src={hovered ? logoHover : logoDefault}
+            src={hovered ? logoHovered : logo}
             alt="Stellar"
             className="h-8 w-auto"
           />

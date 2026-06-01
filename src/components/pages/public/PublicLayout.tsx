@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
-import logoDefault from '../../../assets/kuro-logo.png';
-import logoHover from '../../../assets/kuro-logo-hover.png';
+import kuroLogo from '../../../assets/kuro-logo.png';
+import kuroLogoHover from '../../../assets/kuro-logo-hover.png';
 import Alert from '../../layout/Alert';
 import { useGetInstallStatusQuery } from '../../../store/services/installApi';
 
@@ -24,7 +24,7 @@ const PublicLayout = ({ children }: Props) => {
             onMouseLeave={() => setHovered(false)}
           >
             <img
-              src={hovered ? logoHover : logoDefault}
+              src={hovered ? kuroLogoHover : kuroLogo}
               alt="Stellar"
               className="h-8 w-auto"
             />
