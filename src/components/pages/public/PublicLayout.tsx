@@ -1,5 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
+import kuroLogo from '../../../assets/kuro-logo.png';
+import kuroLogoHover from '../../../assets/kuro-logo-hover.png';
 import Alert from '../../layout/Alert';
 import { useGetInstallStatusQuery } from '../../../store/services/installApi';
 
@@ -10,6 +12,7 @@ interface Props {
 
 const PublicLayout = ({ children }: Props) => {
   const { data: installStatus } = useGetInstallStatusQuery();
+  const [hovered, setHovered] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
@@ -17,9 +20,14 @@ const PublicLayout = ({ children }: Props) => {
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link
             to="/"
-            className="text-xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
           >
-            Stellar
+            <img
+              src={hovered ? kuroLogoHover : kuroLogo}
+              alt="Stellar"
+              className="h-8 w-auto"
+            />
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link

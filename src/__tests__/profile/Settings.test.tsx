@@ -24,6 +24,28 @@ jest.mock('../../store/services/authApi', () => ({
   useRevokeSessionMutation: () => mockUseRevokeSessionMutation()
 }));
 
+jest.mock('../../store/services/siteApi', () => ({
+  useGetStylesheetsQuery: () => ({
+    data: [
+      {
+        id: 1,
+        name: 'sublime',
+        description: 'Default',
+        cssUrl: '/stylesheets/sublime/style.css',
+        isDefault: true
+      },
+      {
+        id: 2,
+        name: 'kuro',
+        description: 'Dark',
+        cssUrl: '/stylesheets/kuro/style.css',
+        isDefault: false
+      }
+    ],
+    isLoading: false
+  })
+}));
+
 jest.mock('../../store/slices/authSlice', () => ({
   selectCurrentUser: () => ({ id: 7, username: 'testuser' })
 }));
@@ -386,7 +408,7 @@ describe('Settings', () => {
     await user.click(screen.getByRole('button', { name: /^privacy$/i }));
     expect(screen.getByText(/paranoia level/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /^appearance$/i }));
-    expect(screen.getByLabelText(/site appearance/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^stylesheet$/i)).toBeInTheDocument();
   });
 
   it('shows "Saving…" on Appearance tab when isSaving is true', () => {

@@ -748,7 +748,7 @@ export interface paths {
             profileTitle?: string;
             profileInfo?: string;
             siteAppearance?: string;
-            externalStylesheet?: string | '';
+            externalStylesheet?: string;
             styledTooltips?: boolean;
             paranoia?: number | null;
             /** @enum {string} */
@@ -1750,8 +1750,11 @@ export interface paths {
         content: {
           'application/json': {
             name: string;
-            /** Format: uri */
+            /** @default  */
+            description?: string;
             cssUrl: string;
+            /** @default false */
+            isDefault?: boolean;
           };
         };
       };
@@ -1776,6 +1779,41 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stylesheet/admin/stats': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Stylesheet user counts (admin only) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['StylesheetStat'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -1820,7 +1858,55 @@ export interface paths {
         };
       };
     };
-    put?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name?: string;
+            description?: string;
+            cssUrl?: string;
+            isDefault?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Stylesheet updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Stylesheet'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     post?: never;
     delete: {
       parameters: {
@@ -1839,6 +1925,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Cannot delete the default stylesheet */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
@@ -11391,7 +11486,9 @@ export interface components {
     Stylesheet: {
       id: number;
       name: string;
+      description: string;
       cssUrl: string;
+      isDefault: boolean;
       createdAt: string;
     };
     GlobalNotice: {
@@ -11404,6 +11501,11 @@ export interface components {
         id: number;
         username: string;
       };
+    };
+    StylesheetStat: {
+      id: number;
+      name: string;
+      userCount: number;
     };
     Forum: {
       id: number;

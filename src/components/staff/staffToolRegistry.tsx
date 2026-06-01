@@ -7,6 +7,7 @@ import ForumControlPanel from '../admin/ForumControlPanel';
 import CommunityManager from '../admin/CommunityManager';
 import NewsManager from '../admin/NewsManager';
 import SiteSettingsPage from '../admin/SiteSettingsPage';
+import StylesheetManager from '../admin/StylesheetManager';
 import RatioPolicyPanel from '../admin/RatioPolicyPanel';
 import RulesManager from '../admin/RulesManager';
 import TicketQueuePage from '../staffInbox/TicketQueuePage';
@@ -155,6 +156,14 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Site settings',
     permissions: ['admin'],
     element: <SiteSettingsPage />,
+    section: 'Administration'
+  },
+  {
+    id: 'stylesheets',
+    path: 'staff/tools/stylesheets',
+    label: 'Stylesheets',
+    permissions: ['admin'],
+    element: <StylesheetManager />,
     section: 'Administration'
   },
   {

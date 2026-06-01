@@ -15,6 +15,7 @@ import {
 import { addAlert } from '../../../store/slices/alertSlice';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
+import { useGetStylesheetsQuery } from '../../../store/services/siteApi';
 import Spinner from '../../layout/Spinner';
 import DonorSettingsTab from './DonorSettingsTab';
 import type { paths } from '../../../types/api';
@@ -61,6 +62,7 @@ const Settings = () => {
 
   const { data: profile, isLoading } = useGetMyProfileQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
+  const { data: stylesheets } = useGetStylesheetsQuery();
   const { register, handleSubmit, reset, watch, setValue } =
     useForm<ProfileForm>();
 
@@ -279,14 +281,22 @@ const Settings = () => {
                 htmlFor="settings-site-appearance"
                 className="block text-sm text-gray-300 mb-1"
               >
-                Site appearance
+                Stylesheet
               </label>
-              <input
+              <select
                 id="settings-site-appearance"
-                type="text"
                 {...register('siteAppearance')}
                 className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+              >
+                {stylesheets?.map((s) => (
+                  <option key={s.name} value={s.name}>
+                    {s.name
+                      .split('-')
+                      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                      .join(' ')}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
@@ -302,6 +312,9 @@ const Settings = () => {
                 {...register('externalStylesheet')}
                 className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                If set, this URL overrides the selected stylesheet above.
+              </p>
             </div>
 
             <div className="flex items-center gap-3">

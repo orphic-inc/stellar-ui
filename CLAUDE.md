@@ -143,7 +143,7 @@ Five rounds of audit remediation applied. Key items:
 - `artistApi` field names aligned to backend: `similarArtistId`, `redirectId`, `tagId`
 - `votePoll` requires `topicId` and invalidates `ForumTopic` (not all `Forum`)
 - `forumApi` has `updateForum`, `deleteForum`, `deleteTopic` mutations
-- `UserRankFormPage` uses 14 backend VALID_PERMISSIONS (was 34 Gazelle-era names)
+- `UserRankFormPage` uses 14 backend VALID_PERMISSIONS
 - `Toolbox` stripped to implemented links only, permission-filtered per user
 - 403 removed from logout trigger (403 = insufficient permissions, not invalid session)
 - `NewUserForm` logout hack removed; navigates to toolbox on success
