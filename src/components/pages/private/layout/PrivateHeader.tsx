@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import UserMenu from '../../../layout/UserMenu';
+import logoDefault from '../../../../assets/kuro-logo.png';
+import logoHover from '../../../../assets/kuro-logo-hover.png';
 import Alert from '../../../layout/Alert';
 import ModBar from '../../../admin/ModBar';
 import QuickSearch from '../../../layout/QuickSearch';
@@ -32,6 +35,7 @@ const navLinks = [
 ];
 
 const PrivateHeader = ({ user }: Props) => {
+  const [hovered, setHovered] = useState(false);
   const showModBar = canSeeModBar(user);
   const showStaffQueue = canAccessStaffQueue(user);
   const { data: inboxData } = useGetUnreadCountQuery();
@@ -53,9 +57,14 @@ const PrivateHeader = ({ user }: Props) => {
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
         <Link
           to="/private/"
-          className="text-2xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
         >
-          Stellar
+          <img
+            src={hovered ? logoHover : logoDefault}
+            alt="Stellar"
+            className="h-8 w-auto"
+          />
         </Link>
         <UserMenu user={user} />
       </div>
