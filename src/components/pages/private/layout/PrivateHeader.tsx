@@ -5,6 +5,7 @@ import kuroLogo from '../../../../assets/kuro-logo.png';
 import kuroLogoHover from '../../../../assets/kuro-logo-hover.png';
 import darkAmbientLogo from '../../../../assets/dark-ambient-logo.png';
 import layerCakeLogo from '../../../../assets/layer-cake-logo.png';
+import layerCakeLogoHover from '../../../../assets/layer-cake-logo-hover.png';
 import postmodLogo from '../../../../assets/postmod-logo.png';
 import protonLogo from '../../../../assets/proton-logo.png';
 import Alert from '../../../layout/Alert';
@@ -27,7 +28,7 @@ import { useGetMyProfileQuery } from '../../../../store/services/profileApi';
 const THEME_LOGOS: Record<string, [string, string]> = {
   kuro: [kuroLogo, kuroLogoHover],
   'dark-ambient': [darkAmbientLogo, darkAmbientLogo],
-  'layer-cake': [layerCakeLogo, layerCakeLogo],
+  'layer-cake': [layerCakeLogo, layerCakeLogoHover],
   postmod: [postmodLogo, postmodLogo],
   proton: [protonLogo, protonLogo]
 };
