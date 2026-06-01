@@ -246,12 +246,6 @@ header .text-gray-300 {
   color: #2f2f2f !important;
 }
 
-header .hover\:text-gray-200:hover,
-header .hover\:text-gray-300:hover,
-header .hover\:text-white:hover {
-  color: #111 !important;
-}
-
 header .bg-indigo-600 {
   background-color: #666 !important;
 }
@@ -272,6 +266,12 @@ header .bg-amber-600 {
 .hover\:text-gray-200:hover,
 .hover\:text-gray-300:hover {
   color: #444 !important;
+}
+
+header .hover\:text-gray-200:hover,
+header .hover\:text-gray-300:hover,
+header .hover\:text-white:hover {
+  color: #111 !important;
 }
 
 .hover\:text-indigo-300:hover,

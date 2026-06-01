@@ -360,17 +360,11 @@ a.similar_artist:hover {
 .text-green-200 {
   color: #98c198 !important;
 }
-.text-yellow-300 {
-  color: #c0a848 !important;
-}
 .text-yellow-200 {
   color: #d6bf72 !important;
 }
 .text-blue-300 {
   color: #7aaad0 !important;
-}
-.text-gray-300 {
-  color: var(--kuro-text) !important;
 }
 .border-green-700,
 .border-green-900 {

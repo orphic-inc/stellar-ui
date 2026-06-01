@@ -162,6 +162,15 @@ h6 {
   color: #444 !important;
 }
 
+header .text-gray-500 {
+  color: #b3aa98 !important;
+}
+
+header .text-gray-400,
+header .text-gray-300 {
+  color: #f1ece1 !important;
+}
+
 .bg-gray-800 .text-white,
 .bg-gray-800 .text-gray-100,
 .bg-gray-800 .text-gray-200 {
@@ -284,11 +293,6 @@ h6 {
   color: #0c9ccf !important;
 }
 
-.hover\:text-gray-300:hover,
-.hover\:text-gray-200:hover {
-  color: #f3f0e8 !important;
-}
-
 .hover\:text-red-400:hover {
   color: #d18a8a !important;
 }
@@ -369,15 +373,6 @@ header .bg-gradient-to-r.bg-clip-text.text-transparent {
   color: #f3f0e8 !important;
   -webkit-text-fill-color: #f3f0e8 !important;
   text-shadow: 0 1px 2px rgb(0 0 0 / 65%);
-}
-
-header .text-gray-500 {
-  color: #b3aa98 !important;
-}
-
-header .text-gray-400,
-header .text-gray-300 {
-  color: #f1ece1 !important;
 }
 
 header .hover\:text-gray-200:hover,
