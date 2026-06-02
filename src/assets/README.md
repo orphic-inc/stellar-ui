@@ -7,6 +7,7 @@ these at build time — they have **no stable URL**. Use for static UI chrome.
 assets/
   logos/          # per-stylesheet wordmarks: {stylesheet}-logo.png (+ -hover.png)
   iconography/    # UI icons rendered in JSX: bookmark.png, signal-on.png, …
+  avatars/        # default.png (fallback), seeded.png (devTools seeded users)
 ```
 
 ```tsx
@@ -17,13 +18,16 @@ import bookmarkIcon from '../../assets/iconography/bookmark.png';
 ## When NOT to use `assets/`
 
 If an asset is referenced by a **URL string** — a fixed `src` path, CSS `url()`,
-a `<link href>`, or a path stored in the API — it must be **served verbatim**, not
-bundled. Those go in `src/static/` (served at `/static/`):
-
-- `src/static/common/avatars/` — `default.png`, `seeded.jpg`
-- `src/static/common/icons/` — only icons chosen dynamically by path/data
+or a `<link href>` — it must be **served verbatim**, not bundled.
 
 Per-stylesheet served assets (fonts, background images referenced from theme CSS)
-live alongside their CSS in `src/stylesheets/{stylesheet}/images/`.
+live alongside their CSS in `src/stylesheets/{stylesheet}/images/`, served at
+`/stylesheets/`.
 
-**Rule of thumb:** `import` it → `assets/`. Reference it by a URL string → `static/`.
+**Avatars are bundled** (`avatars/`), not served. The API can't reference a
+hashed bundle by URL, so for devTools-seeded users it stamps the sentinel
+string `'seeded'` and `utils/avatar.ts` maps it to the bundled `seeded.png`;
+null/empty maps to `default.png`; a real external URL passes through.
+
+**Rule of thumb:** `import` it → `assets/`. Referenced by a fixed URL from theme
+CSS → `stylesheets/{name}/images/`.

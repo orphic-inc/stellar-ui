@@ -35,10 +35,7 @@ const plugins = [
     template: './src/index.html'
   }),
   new CopyPlugin({
-    patterns: [
-      { from: 'src/stylesheets', to: 'stylesheets' },
-      { from: 'src/static', to: 'static' }
-    ]
+    patterns: [{ from: 'src/stylesheets', to: 'stylesheets' }]
   })
 ];
 
@@ -55,10 +52,6 @@ export default {
       {
         directory: resolve(__dirname, 'src/stylesheets'),
         publicPath: '/stylesheets'
-      },
-      {
-        directory: resolve(__dirname, 'src/static'),
-        publicPath: '/static'
       }
     ],
     compress: dev,
