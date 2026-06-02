@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
-import kuroLogo from '../../../assets/kuro-logo.png';
-import kuroLogoHover from '../../../assets/kuro-logo-hover.png';
+import kuroLogo from '../../../assets/logos/kuro-logo.png';
+import kuroLogoHover from '../../../assets/logos/kuro-logo-hover.png';
 import Alert from '../../layout/Alert';
 import { useGetInstallStatusQuery } from '../../../store/services/installApi';
 
