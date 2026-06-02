@@ -13,7 +13,7 @@ const PrivateFooter = () => (
           CHANGELOG
         </a>
       </div>
-      <span>Powered by Stellar v0.5</span>
+      <span>Powered by Stellar v{__APP_VERSION__}</span>
     </div>
   </footer>
 );
