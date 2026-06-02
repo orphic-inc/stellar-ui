@@ -8,6 +8,7 @@ import {
   useDeletePostMutation
 } from '../../store/services/forumApi';
 import { parseBBCode, quotePost } from '../../utils/bbcode';
+import { avatarSrc, onAvatarError } from '../../utils/avatar';
 import type { ForumPost, ForumPostEdit } from '../../types';
 
 interface Props {
@@ -166,7 +167,8 @@ const ForumTopicPost = ({
         <div className="flex gap-4 p-4">
           <div className="flex-shrink-0">
             <img
-              src={author?.avatar ?? '/static/common/avatars/default.png'}
+              src={avatarSrc(author?.avatar)}
+              onError={onAvatarError}
               alt={`${author?.username}'s avatar`}
               className="w-16 h-16 rounded object-cover"
             />

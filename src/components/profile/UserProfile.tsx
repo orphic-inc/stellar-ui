@@ -37,6 +37,7 @@ import {
 } from '../../store/services/friendApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { avatarSrc, onAvatarError } from '../../utils/avatar';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
@@ -1415,11 +1416,8 @@ const UserProfile = () => {
                 width={150}
                 alt={`${profile.username}'s avatar`}
                 className="rounded object-cover w-full"
-                src={
-                  profile.profile?.avatar ??
-                  profile.avatar ??
-                  '/static/common/avatars/default.png'
-                }
+                src={avatarSrc(profile.profile?.avatar ?? profile.avatar)}
+                onError={onAvatarError}
               />
             </div>
           </div>
