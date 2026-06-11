@@ -46,6 +46,34 @@ const AUDIO_FILE_TYPES: FileType[] = [
   'm4a'
 ];
 
+// Encoding / bitrate + source media — values mirror the API enums.
+const BITRATES = [
+  { value: 'Lossless', label: 'Lossless' },
+  { value: 'Lossless24', label: 'Lossless (24-bit)' },
+  { value: 'Kbps320', label: '320 kbps' },
+  { value: 'Kbps256', label: '256 kbps' },
+  { value: 'KbpsV0', label: 'V0 (VBR)' },
+  { value: 'Kbps192', label: '192 kbps' },
+  { value: 'KbpsV2', label: 'V2 (VBR)' },
+  { value: 'Kbps128', label: '128 kbps' },
+  { value: 'Other', label: 'Other' }
+] as const;
+type Bitrate = (typeof BITRATES)[number]['value'];
+
+const MEDIA = [
+  { value: 'CD', label: 'CD' },
+  { value: 'WEB', label: 'WEB' },
+  { value: 'Vinyl', label: 'Vinyl' },
+  { value: 'SACD', label: 'SACD' },
+  { value: 'DVD', label: 'DVD' },
+  { value: 'Cassette', label: 'Cassette' },
+  { value: 'BluRay', label: 'Blu-ray' },
+  { value: 'DAT', label: 'DAT' },
+  { value: 'Soundboard', label: 'Soundboard' },
+  { value: 'Other', label: 'Other' }
+] as const;
+type ReleaseMedia = (typeof MEDIA)[number]['value'];
+
 const inputClass =
   'w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 focus:outline-none focus:border-indigo-500';
 const labelClass = 'block text-sm text-gray-400 mb-1';
@@ -74,8 +102,8 @@ const AddContributionForm = () => {
   const [downloadUrl, setDownloadUrl] = useState('');
   const [sizeMB, setSizeMB] = useState('');
   const [releaseDescription, setReleaseDescription] = useState('');
-  const [bitrate, setBitrate] = useState('');
-  const [media, setMedia] = useState('');
+  const [bitrate, setBitrate] = useState<Bitrate | ''>('');
+  const [media, setMedia] = useState<ReleaseMedia | ''>('');
   const [hasLog, setHasLog] = useState(false);
   const [hasCue, setHasCue] = useState(false);
   const [isScene, setIsScene] = useState(false);
@@ -219,27 +247,39 @@ const AddContributionForm = () => {
                 <label htmlFor="add-bitrate" className={labelClass}>
                   Bitrate
                 </label>
-                <input
+                <select
                   id="add-bitrate"
-                  type="text"
                   value={bitrate}
-                  onChange={(e) => setBitrate(e.target.value)}
-                  placeholder="e.g. 320, V0, Lossless"
+                  onChange={(e) => setBitrate(e.target.value as Bitrate | '')}
                   className={inputClass}
-                />
+                >
+                  <option value="">—</option>
+                  {BITRATES.map((b) => (
+                    <option key={b.value} value={b.value}>
+                      {b.label}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label htmlFor="add-media" className={labelClass}>
                   Media
                 </label>
-                <input
+                <select
                   id="add-media"
-                  type="text"
                   value={media}
-                  onChange={(e) => setMedia(e.target.value)}
-                  placeholder="e.g. CD, Vinyl, WEB"
+                  onChange={(e) =>
+                    setMedia(e.target.value as ReleaseMedia | '')
+                  }
                   className={inputClass}
-                />
+                >
+                  <option value="">—</option>
+                  {MEDIA.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="flex gap-6">

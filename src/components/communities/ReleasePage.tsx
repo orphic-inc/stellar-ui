@@ -22,9 +22,7 @@ const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
   description: 'Description',
   image: 'Cover art',
-  year: 'Year',
-  isEdition: 'Edition',
-  edition: 'Edition data'
+  year: 'Year'
 };
 
 const formatFieldValue = (field: string, value: unknown): string => {
@@ -32,7 +30,6 @@ const formatFieldValue = (field: string, value: unknown): string => {
   if (field === 'description' && typeof value === 'string') {
     return value.length > 120 ? value.slice(0, 120) + '…' : value;
   }
-  if (field === 'isEdition') return value ? 'Yes' : 'No';
   if (typeof value === 'string' || typeof value === 'number')
     return String(value);
   return JSON.stringify(value);
@@ -647,24 +644,6 @@ const ReleasePage = () => {
                   <span className="text-gray-300">{release.year}</span>
                 </li>
               )}
-              {(release as { isEdition?: boolean }).isEdition && (
-                <li className="flex justify-between px-3 py-1.5">
-                  <span className="text-gray-500">Edition</span>
-                  <span className="text-gray-300">
-                    {(() => {
-                      const ed = (release as { edition?: unknown }).edition;
-                      if (ed && typeof ed === 'object') {
-                        const { title, year } = ed as {
-                          title?: string;
-                          year?: number;
-                        };
-                        return [title, year].filter(Boolean).join(' ');
-                      }
-                      return typeof ed === 'string' ? ed : 'Yes';
-                    })()}
-                  </span>
-                </li>
-              )}
             </ul>
           </div>
         </div>
@@ -733,20 +712,6 @@ const ReleasePage = () => {
                     }
                     className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
-                </label>
-                <label className="flex items-center gap-2 mt-5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={editForm.isEdition}
-                    onChange={(e) =>
-                      setEditForm((f) => ({
-                        ...f,
-                        isEdition: e.target.checked
-                      }))
-                    }
-                    className="accent-indigo-500 w-4 h-4"
-                  />
-                  <span className="text-xs text-gray-300">Edition</span>
                 </label>
               </div>
               <label className="block">

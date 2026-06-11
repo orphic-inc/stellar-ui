@@ -114,10 +114,34 @@ describe('ContributeForm', () => {
     expect(screen.getByLabelText(/content type/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/year/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/album title/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/file type/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/format/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/file size/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/download url/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/artist name/i)).toBeInTheDocument();
+  });
+
+  it('renders the new Music metadata fields (release type, label, catalogue №, bitrate, media)', () => {
+    renderWithProviders(<ContributeForm />);
+    expect(screen.getByLabelText(/release type/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/record label/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/catalogue number/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/bitrate/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^media/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/scene release/i)).toBeInTheDocument();
+  });
+
+  it('renders a disabled MusicBrainz "Find info" stub', () => {
+    renderWithProviders(<ContributeForm />);
+    expect(screen.getByRole('button', { name: /find info/i })).toBeDisabled();
+  });
+
+  it('hides Music-only fields for non-Music types', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ContributeForm />);
+    await user.selectOptions(screen.getByLabelText(/content type/i), 'EBooks');
+    expect(screen.queryByLabelText(/release type/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/bitrate/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/edition information/i)).not.toBeInTheDocument();
   });
 
   it('shows release description field for Music type', () => {
@@ -147,9 +171,17 @@ describe('ContributeForm', () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
     await user.click(screen.getByRole('button', { name: /add artist/i }));
-    const removeBtn = screen.getByRole('button', { name: '✕' });
+    const removeBtn = screen.getByRole('button', { name: /remove artist 2/i });
     await user.click(removeBtn);
     expect(screen.getAllByPlaceholderText(/artist name/i).length).toBe(1);
+  });
+
+  it('moves focus to the new artist row when one is added', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ContributeForm />);
+    await user.click(screen.getByRole('button', { name: /add artist/i }));
+    const inputs = screen.getAllByPlaceholderText(/artist name/i);
+    expect(inputs[1]).toHaveFocus();
   });
 
   it('submits with correct payload for Music type', async () => {
@@ -256,7 +288,7 @@ describe('ContributeForm', () => {
       screen.getByDisplayValue('Main artist'),
       'Remixer'
     );
-    await user.selectOptions(screen.getByLabelText(/file type/i), 'flac');
+    await user.selectOptions(screen.getByLabelText(/format/i), 'flac');
     expect(
       (screen.getByDisplayValue('Remixer') as HTMLSelectElement).value
     ).toBe('Remixer');
@@ -351,7 +383,7 @@ describe('ContributeForm', () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
     await user.selectOptions(screen.getByLabelText(/content type/i), 'EBooks');
-    const titleInput = screen.getByLabelText(/title \*/i);
+    const titleInput = screen.getByLabelText(/^title/i);
     await user.type(titleInput, 'My EBook');
     expect((titleInput as HTMLInputElement).value).toBe('My EBook');
   });
@@ -369,5 +401,90 @@ describe('ContributeForm', () => {
     expect(
       screen.getByRole('link', { name: /submit a request/i })
     ).toBeInTheDocument();
+  });
+
+  it('reveals edition fields when the edition checkbox is ticked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ContributeForm />);
+    expect(screen.queryByLabelText(/edition title/i)).not.toBeInTheDocument();
+    await user.click(screen.getByLabelText(/this is a specific edition/i));
+    expect(screen.getByLabelText(/edition title/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/edition year/i)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/this edition is a remaster/i)
+    ).toBeInTheDocument();
+  });
+
+  it('submits the full legacy-parity payload for a Music release', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ContributeForm />);
+
+    await fillMusicForm(user);
+    await user.selectOptions(screen.getByLabelText(/release type/i), 'EP');
+    fireEvent.change(screen.getByLabelText(/record label/i), {
+      target: { value: 'Blue Note' }
+    });
+    fireEvent.change(screen.getByLabelText(/catalogue number/i), {
+      target: { value: 'BN-1577' }
+    });
+    await user.selectOptions(screen.getByLabelText(/bitrate/i), 'Lossless');
+    await user.selectOptions(screen.getByLabelText(/^media/i), 'CD');
+    await user.click(screen.getByLabelText(/scene release/i));
+    await user.click(screen.getByLabelText(/includes a rip log/i));
+
+    await user.click(screen.getByLabelText(/this is a specific edition/i));
+    fireEvent.change(screen.getByLabelText(/edition title/i), {
+      target: { value: 'Deluxe Edition' }
+    });
+    fireEvent.change(screen.getByLabelText(/edition year/i), {
+      target: { value: '2015' }
+    });
+    await user.click(screen.getByLabelText(/this edition is a remaster/i));
+
+    await user.click(
+      screen.getByRole('button', { name: /contribute release/i })
+    );
+
+    await waitFor(() => {
+      expect(mockCreateContribution).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'Music',
+          releaseCategory: 'EP',
+          recordLabel: 'Blue Note',
+          catalogueNumber: 'BN-1577',
+          bitrate: 'Lossless',
+          media: 'CD',
+          isScene: true,
+          hasLog: true,
+          editionTitle: 'Deluxe Edition',
+          editionYear: 2015,
+          isRemaster: true,
+          collaborators: expect.arrayContaining([
+            expect.objectContaining({
+              artist: 'Miles Davis',
+              importance: 'Main artist'
+            })
+          ])
+        })
+      );
+    });
+  });
+
+  it('does not send Music-only fields for a non-Music submission', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ContributeForm />);
+    await user.selectOptions(screen.getByLabelText(/content type/i), 'EBooks');
+    fireEvent.submit(document.querySelector('form')!);
+    await waitFor(() => {
+      expect(mockCreateContribution).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'EBooks',
+          releaseCategory: undefined,
+          recordLabel: undefined,
+          bitrate: undefined,
+          isRemaster: undefined
+        })
+      );
+    });
   });
 });

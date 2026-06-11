@@ -1,17 +1,18 @@
 # CLAUDE.md — stellar-ui
 
-React / TypeScript frontend for the Stellar platform. Uses Vite, RTK Query, React Router, Tailwind CSS.
+React / TypeScript frontend for the Stellar platform. Uses Webpack, RTK Query, React Router, Tailwind CSS.
 
 ## Commands
 
 ```bash
-npm run dev              # Webpack dev server on :9000 (proxies /api → STELLAR_API_URL, default :8080)
+npm start                # Webpack dev server on :9000 (proxies /api → STELLAR_API_URL, default :8080)
 npm run build            # Production build
 npm run typecheck        # tsc --noEmit
 npm run lint             # ESLint
 npm run format           # Prettier --write src
 npm test                 # Jest unit tests (--runInBand)
 npm run test:e2e         # Playwright E2E (requires running API + UI — see below)
+npm run api:generate     # Export openapi.json from stellar-api, regenerate src/types/api.ts, run Prettier
 ```
 
 ## Environment variables
@@ -56,7 +57,7 @@ src/
       subscriptionApi.ts      # Forum topic + comment subscriptions
       profileApi.ts           # Profile read/write
       announcementApi.ts      # Announcements
-      siteApi.ts              # SiteStats, Stylesheets, SiteSettings
+      siteApi.ts              # SiteStats, Stylesheets (CRUD + stats), SiteSettings
       messagesApi.ts          # Private messages (inbox, sent, compose)
       staffInboxApi.ts        # Support tickets + staff inbox + canned responses
       reportsApi.ts           # User-facing reports + staff queue
@@ -64,15 +65,29 @@ src/
   types/
     index.ts                  # Re-exports from generated api.ts + handwritten types
     api.ts                    # Generated from stellar-api openapi.json (do not edit by hand)
+  types/
+    globals.d.ts              # Declare __SENTRY_DSN__, *.png, *.jpg module types
   utils/
-    permissions.ts            # hasPermission, hasAnyPermission, isStaffUser
+    permissions.ts            # hasPermission, hasAnyPermission, isStaffUser, canSeeModBar, hasStrictAdmin
+    avatar.ts                 # avatarSrc(avatar?) → string; onAvatarError handler; SEEDED_AVATAR_SENTINEL
+  stylesheets/                # Bundled CSS themes served at /stylesheets — do not import directly
+    kuro/                     # Dark theme
+    layer-cake/               # Default Stellar theme
+    postmod/                  # WCD-era theme
+    proton/                   # Light theme
+    sublime/                  # Empty (base Tailwind only)
   components/
-    admin/                    # Staff toolbox, user rank manager, news, user create
+    admin/                    # User rank manager, forum/community controls, news, stylesheet manager
+    staff/                    # Staff pages + registry
+      staffToolRegistry.tsx   # Central registry of all staff tool routes + permission gates
+      staffAffordances.ts     # canSeeModBar, canAccessStaffQueue, canUseReportActions, etc.
+      StaffPage.tsx           # /private/staff — staff landing
+      (+ ~20 other staff pages — see staffToolRegistry for full list)
     auth/                     # Login, Register, Install pages
     forum/                    # Forum pages and post components
     communities/              # Community, release, artist pages
     profile/                  # User profile, settings
-    layout/                   # Navbar, Sidebar, UserMenu, Spinner, PostBox, etc.
+    layout/                   # Navbar, Sidebar, UserMenu, Spinner, PostBox, StylesheetInjector, etc.
 ```
 
 ## Types
@@ -110,16 +125,41 @@ Access error details as `err.data?.msg` (single message) or `err.data?.errors` (
 
 `src/utils/permissions.ts` exports:
 ```ts
-hasPermission(user, 'admin')           // boolean
+hasPermission(user, 'admin')                    // boolean; admin bypasses all checks
 hasAnyPermission(user, ['staff', 'admin'])
-isStaffUser(user)                      // any staff/admin permission present
+isStaffUser(user)                               // any staff/admin permission present
+canSeeModBar(user)                              // requires 'staff'
+hasStrictAdmin(user)                            // literal 'admin' only — staff alone does not pass
 ```
 
-The 14 valid backend permissions: `forums_read`, `forums_post`, `forums_moderate`, `forums_manage`, `communities_manage`, `collages_manage`, `collages_moderate`, `news_manage`, `invites_manage`, `users_edit`, `users_warn`, `users_disable`, `staff`, `admin`.
+`src/components/staff/staffAffordances.ts` exports role-specific checks that combine permission keys:
+```ts
+canAccessStaffQueue(user)     // 'staff_inbox_manage'
+canUseReportActions(user)     // 'reports_manage' | 'staff'
+canUseTicketStaffActions(user)// 'staff_inbox_manage' | 'staff'
+canUseRequestModeration(user) // 'requests_moderate' | 'staff'
+canSeeTop10History(user)      // 'staff'
+```
 
-## Toolbox link policy
+Valid backend permissions are defined in `stellar-api/src/lib/rankPermissions.ts` and exported as `VALID_PERMISSIONS` (~42 keys across 11 groups). The `Permission` type is derived from the OpenAPI spec — use `components['schemas']['PermissionKey']` in the UI. Key groups:
 
-`Toolbox.tsx` shows links filtered by user permissions. Only add links for routes that are actually implemented. Do not add placeholder links for planned features.
+| Group | Example keys |
+|---|---|
+| Discovery | `advanced_search`, `users_search` |
+| Forums | `forums_read`, `forums_post`, `forums_moderate`, `forums_manage` |
+| Communities | `communities_manage`, `contributions_manage`, `dnc_manage` |
+| Collages | `collages_create`, `collages_manage`, `collages_moderate` |
+| Requests | `requests_create`, `requests_moderate` |
+| Wiki | `wiki_edit`, `wiki_manage` |
+| Content | `news_manage`, `rules_manage`, `tags_manage`, `reports_manage`, `staff_inbox_manage` |
+| Users | `users_edit`, `users_warn`, `users_disable`, `users_view_ips`, `users_view_email`, `recovery_manage`, `invites_manage`, `ratio_policy_manage` |
+| Operations | `site_history_manage`, `ip_bans_manage`, `email_blacklist_manage`, `donor_ranks_manage`, `donation_log_view`, `messages_mass_pm` |
+| Staff Tools | `login_watch_view`, `duplicate_ips_view`, `registration_log_view`, `staff` |
+| Administration | `rank_permissions_manage`, `staff_groups_manage`, `admin` |
+
+## Toolbox / staff tool registry
+
+`Toolbox.tsx` renders links driven by `staffToolRegistry.tsx`. Each registered tool declares its `path`, `label`, `section`, and required `permissions[]`. `Toolbox` filters by `hasAnyPermission` — only add entries for routes that are actually implemented. Do not add placeholder links for planned features.
 
 ## Commit workflow
 
@@ -128,10 +168,18 @@ Run every step before committing. All must pass clean on new/changed files.
 1. `npm run format` — format **all** of `src/` (not just changed files — confirms nothing else drifted)
 2. `npm run lint` — must be clean on new/changed files; pre-existing errors in untouched files are acceptable
 3. `npx tsc --noEmit` — must be clean
-4. `npm run test --no-coverage` — full suite must pass
+4. `npm test -- --no-coverage` — full suite must pass (unit + integration tests together via Jest)
 5. Commit with descriptive message following existing log style
 
 > Order matters: format before lint (Prettier violations are ESLint errors), and lint before type-check.
+
+## Testing
+
+`src/__tests__/` contains two test flavors:
+- **Unit tests** (`*.test.tsx` / `*.test.ts`): mock RTK Query, run with Jest + jsdom, fast.
+- **Integration tests** (`*.integration.test.tsx`): hit real RTK Query hooks against a mock server or rendered tree; same Jest run, slower. Both run via `npm test`.
+
+E2E tests live in `e2e/` and run via Playwright (`npm run test:e2e`). Current coverage: smoke, auth paths, messaging, releases, reports, tickets.
 
 ## Audit history
 
@@ -143,7 +191,7 @@ Five rounds of audit remediation applied. Key items:
 - `artistApi` field names aligned to backend: `similarArtistId`, `redirectId`, `tagId`
 - `votePoll` requires `topicId` and invalidates `ForumTopic` (not all `Forum`)
 - `forumApi` has `updateForum`, `deleteForum`, `deleteTopic` mutations
-- `UserRankFormPage` uses 14 backend VALID_PERMISSIONS
+- `UserRankFormPage` uses backend VALID_PERMISSIONS from OpenAPI spec (`PermissionKey`)
 - `Toolbox` stripped to implemented links only, permission-filtered per user
 - 403 removed from logout trigger (403 = insufficient permissions, not invalid session)
 - `NewUserForm` logout hack removed; navigates to toolbox on success
@@ -166,14 +214,10 @@ Do not add frontend code, OpenAPI paths, or Toolbox links for these until the ba
 
 ## Regenerating api.ts
 
-When stellar-api's OpenAPI spec changes:
+When stellar-api's OpenAPI spec changes, run from the stellar-ui directory:
 ```bash
-# In stellar-api:
-npm run openapi:export       # writes openapi.json to repo root
-
-# In stellar-ui (must run from the stellar-ui directory):
-npx openapi-typescript /path/to/stellar-api/openapi.json -o src/types/api.ts
-npx tsc --noEmit             # verify no type regressions
+npm run api:generate     # exports openapi.json from ../stellar-api, regenerates src/types/api.ts, runs Prettier
+npm run typecheck        # verify no type regressions
 ```
 
 This is a manual step before every PR that touches API response shapes.
