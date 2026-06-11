@@ -41,7 +41,10 @@ module.exports = {
           'dompurify',
           '^@reduxjs/toolkit/query$',
           '^@reduxjs/toolkit/query/react$',
-          'recharts'
+          'recharts',
+          // exports-field package the node resolver can't parse (e2e isn't in
+          // the typescript-resolver tsconfig); same treatment as the above.
+          '^@axe-core/playwright$'
         ]
       }
     ]
