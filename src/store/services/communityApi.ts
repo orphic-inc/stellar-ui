@@ -116,10 +116,7 @@ export const communityApi = api.injectEndpoints({
       ReleaseResponse,
       ReleaseArgs &
         Partial<
-          Pick<
-            ReleaseResponse,
-            'title' | 'description' | 'image' | 'year' | 'isEdition' | 'edition'
-          >
+          Pick<ReleaseResponse, 'title' | 'description' | 'image' | 'year'>
         > & { editSummary?: string }
     >({
       query: ({ communityId, releaseId, ...data }) => ({

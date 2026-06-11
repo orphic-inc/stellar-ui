@@ -24,7 +24,6 @@ type ReleaseWithVote = {
   voteAggregate?: VoteAggregate | null;
   releaseTags?: ReleaseTag[];
   isContributor?: boolean;
-  isEdition?: boolean;
   title?: string;
   description?: string;
   year?: number;
@@ -56,7 +55,6 @@ export const useReleaseWorkbench = ({
     description: '',
     year: 0,
     image: '',
-    isEdition: false,
     editSummary: ''
   });
   const [editError, setEditError] = useState<string | null>(null);
@@ -143,7 +141,6 @@ export const useReleaseWorkbench = ({
       description: releaseView?.description ?? '',
       year: releaseView?.year ?? new Date().getFullYear(),
       image: releaseView?.image ?? '',
-      isEdition: Boolean(releaseView?.isEdition),
       editSummary: ''
     });
     setEditError(null);
@@ -160,7 +157,6 @@ export const useReleaseWorkbench = ({
         description: editForm.description.trim() || undefined,
         year: editForm.year || undefined,
         image: editForm.image.trim() || undefined,
-        isEdition: editForm.isEdition,
         editSummary: editForm.editSummary.trim() || undefined
       }).unwrap();
       dispatch(addAlert('Release updated.', 'success'));

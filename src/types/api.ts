@@ -748,7 +748,7 @@ export interface paths {
             profileTitle?: string;
             profileInfo?: string;
             siteAppearance?: string;
-            externalStylesheet?: string;
+            externalStylesheet?: string | '';
             styledTooltips?: boolean;
             paranoia?: number | null;
             /** @enum {string} */
@@ -3487,6 +3487,61 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{id}/health': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Community link-health pulse */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CommunityHealthPulse'];
+          };
+        };
+        /** @description Not a member of this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{id}/releases': {
     parameters: {
       query?: never;
@@ -3896,8 +3951,29 @@ export interface paths {
             downloadUrl: string;
             sizeInBytes?: number;
             releaseDescription?: string;
-            bitrate?: string;
-            media?: string;
+            /** @enum {string} */
+            bitrate?:
+              | 'Lossless'
+              | 'Lossless24'
+              | 'Kbps320'
+              | 'Kbps256'
+              | 'KbpsV0'
+              | 'Kbps192'
+              | 'KbpsV2'
+              | 'Kbps128'
+              | 'Other';
+            /** @enum {string} */
+            media?:
+              | 'CD'
+              | 'WEB'
+              | 'Vinyl'
+              | 'SACD'
+              | 'DVD'
+              | 'Cassette'
+              | 'BluRay'
+              | 'DAT'
+              | 'Soundboard'
+              | 'Other';
             /** @default false */
             hasLog?: boolean;
             /** @default false */
@@ -4029,8 +4105,51 @@ export interface paths {
             image?: string | '';
             description?: string;
             releaseDescription?: string;
-            bitrate?: string;
-            media?: string;
+            /** @enum {string} */
+            bitrate?:
+              | 'Lossless'
+              | 'Lossless24'
+              | 'Kbps320'
+              | 'Kbps256'
+              | 'KbpsV0'
+              | 'Kbps192'
+              | 'KbpsV2'
+              | 'Kbps128'
+              | 'Other';
+            /** @enum {string} */
+            media?:
+              | 'CD'
+              | 'WEB'
+              | 'Vinyl'
+              | 'SACD'
+              | 'DVD'
+              | 'Cassette'
+              | 'BluRay'
+              | 'DAT'
+              | 'Soundboard'
+              | 'Other';
+            /** @enum {string} */
+            releaseCategory?:
+              | 'Album'
+              | 'Single'
+              | 'EP'
+              | 'Anthology'
+              | 'Compilation'
+              | 'DJMix'
+              | 'Live'
+              | 'Remix'
+              | 'Bootleg'
+              | 'Interview'
+              | 'Mixtape'
+              | 'Demo'
+              | 'ConcertRecording'
+              | 'Unknown';
+            recordLabel?: string;
+            catalogueNumber?: string;
+            editionTitle?: string;
+            editionYear?: number;
+            /** @default false */
+            isRemaster?: boolean;
             /** @default false */
             hasLog?: boolean;
             /** @default false */
@@ -8940,6 +9059,7 @@ export interface paths {
             groupId: number;
             threadId: number;
             title: string;
+            image?: string | '';
             /** Format: date-time */
             started: string;
             /** Format: date-time */
@@ -9958,8 +10078,27 @@ export interface paths {
             | 'png'
             | 'gif'
             | 'txt';
-          bitrate?: string;
-          media?: string;
+          bitrate?:
+            | 'Lossless'
+            | 'Lossless24'
+            | 'Kbps320'
+            | 'Kbps256'
+            | 'KbpsV0'
+            | 'Kbps192'
+            | 'KbpsV2'
+            | 'Kbps128'
+            | 'Other';
+          media?:
+            | 'CD'
+            | 'WEB'
+            | 'Vinyl'
+            | 'SACD'
+            | 'DVD'
+            | 'Cassette'
+            | 'BluRay'
+            | 'DAT'
+            | 'Soundboard'
+            | 'Other';
           hasLog?: boolean | null;
           hasCue?: boolean | null;
           isScene?: boolean | null;
@@ -9985,15 +10124,12 @@ export interface paths {
                 type: string;
                 releaseType: string;
                 communityId: number | null;
-                catalogueNumber: string | null;
-                recordLabel: string | null;
                 description: string;
                 createdAt: string;
                 artist: {
                   id: number;
                   name: string;
-                  vanityHouse: boolean;
-                };
+                } | null;
                 tags: {
                   id: number;
                   name: string;
@@ -11491,6 +11627,11 @@ export interface components {
       isDefault: boolean;
       createdAt: string;
     };
+    StylesheetStat: {
+      id: number;
+      name: string;
+      userCount: number;
+    };
     GlobalNotice: {
       id: number;
       message: string;
@@ -11501,11 +11642,6 @@ export interface components {
         id: number;
         username: string;
       };
-    };
-    StylesheetStat: {
-      id: number;
-      name: string;
-      userCount: number;
     };
     Forum: {
       id: number;
@@ -11711,6 +11847,9 @@ export interface components {
       type: string;
       downloadUrl: string;
       sizeInBytes?: number | null;
+      /** @enum {string} */
+      linkStatus: 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL';
+      linkCheckedAt?: string | null;
       collaborators: {
         id: number;
         name: string;
@@ -11741,8 +11880,6 @@ export interface components {
       description: string;
       image: string | null;
       year: number;
-      isEdition: boolean;
-      edition?: unknown;
       tagIds: number[];
       tagNames: string[];
     };
@@ -11779,10 +11916,8 @@ export interface components {
       releaseType?: string | null;
       image?: string | null;
       description?: string | null;
-      isEdition?: boolean;
-      edition?: unknown;
       createdAt?: string;
-      artist?: components['schemas']['ReleaseArtist'];
+      artist?: components['schemas']['ReleaseArtist'] & unknown;
       tags?: components['schemas']['ReleaseTag'][];
       releaseTags?: components['schemas']['ReleaseTagEnriched'][];
       /** @enum {string|null} */
@@ -12289,6 +12424,18 @@ export interface components {
         id: number;
         username: string;
       } | null;
+    };
+    CommunityHealthPulse: {
+      pass: number;
+      warn: number;
+      fail: number;
+      unknown: number;
+      total: number;
+      checked: number;
+      coverage: number | null;
+      pulse: number | null;
+      /** @enum {string} */
+      status: 'Healthy' | 'Ailing' | 'Critical' | 'Unknown';
     };
   };
   responses: never;

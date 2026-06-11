@@ -121,8 +121,8 @@ const ReleaseBrowsePage = () => {
     type: type as never,
     releaseType: releaseType as never,
     format: format as never,
-    bitrate,
-    media,
+    bitrate: bitrate as never,
+    media: media as never,
     hasLog,
     hasCue,
     isScene,
@@ -560,13 +560,17 @@ const ReleaseBrowsePage = () => {
                             {r.title}
                           </span>
                         )}
-                        <span className="text-gray-500 mx-1">—</span>
-                        <Link
-                          to={`/private/artists/${r.artist.id}`}
-                          className="text-gray-400 hover:text-gray-200"
-                        >
-                          {r.artist.name}
-                        </Link>
+                        {r.artist && (
+                          <>
+                            <span className="text-gray-500 mx-1">—</span>
+                            <Link
+                              to={`/private/artists/${r.artist.id}`}
+                              className="text-gray-400 hover:text-gray-200"
+                            >
+                              {r.artist.name}
+                            </Link>
+                          </>
+                        )}
                       </td>
                       <td className="py-2 pr-4 text-gray-400">{r.year}</td>
                       <td className="py-2 pr-4 text-gray-400">

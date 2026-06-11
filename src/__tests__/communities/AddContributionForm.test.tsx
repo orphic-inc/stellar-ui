@@ -152,8 +152,8 @@ describe('AddContributionForm', () => {
     );
     await user.clear(screen.getByLabelText(/file size/i));
     await user.type(screen.getByLabelText(/file size/i), '500');
-    await user.type(screen.getByLabelText(/bitrate/i), '320');
-    await user.type(screen.getByLabelText(/media/i), 'CD');
+    await user.selectOptions(screen.getByLabelText(/bitrate/i), 'Kbps320');
+    await user.selectOptions(screen.getByLabelText(/media/i), 'CD');
     await user.click(screen.getByLabelText(/has log/i));
     await user.click(screen.getByLabelText(/has cue/i));
     await user.click(screen.getByLabelText(/scene release/i));
@@ -166,7 +166,7 @@ describe('AddContributionForm', () => {
         expect.objectContaining({
           communityId: 3,
           releaseId: 7,
-          bitrate: '320',
+          bitrate: 'Kbps320',
           media: 'CD',
           hasLog: true,
           hasCue: true,
@@ -182,8 +182,8 @@ describe('AddContributionForm', () => {
     renderWithProviders(<AddContributionForm />);
 
     // Fill in audio fields while type is mp3 (default)
-    await user.type(screen.getByLabelText(/bitrate/i), '320');
-    await user.type(screen.getByLabelText(/media/i), 'CD');
+    await user.selectOptions(screen.getByLabelText(/bitrate/i), 'Kbps320');
+    await user.selectOptions(screen.getByLabelText(/media/i), 'CD');
     await user.click(screen.getByLabelText(/has log/i));
 
     // Switch to non-audio type — audio fields disappear
