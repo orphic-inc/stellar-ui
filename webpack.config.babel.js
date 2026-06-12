@@ -22,7 +22,9 @@ const plugins = [
   new webpack.DefinePlugin({
     __SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN || ''),
     // Footer version surface — pinned to the manifest so it can't drift.
-    __APP_VERSION__: JSON.stringify(pkg.version)
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    // Deploy environment for Sentry (dev/production), from NODE_ENV.
+    __APP_ENV__: JSON.stringify(process.env.NODE_ENV || 'development')
   }),
   new CleanPlugin(),
   new StylelintPlugin({
