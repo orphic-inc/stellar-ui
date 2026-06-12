@@ -1,10 +1,5 @@
-import { useEffect } from 'react';
-import * as Sentry from '@sentry/react';
-import { useSelector } from 'react-redux';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import { selectCurrentUser } from '../store/slices/authSlice';
-import { sentryUserFromAuthUser } from '../utils/sentry';
 import PublicLayout from './pages/public/PublicLayout';
 import PublicLanding from './pages/public/PublicLanding';
 import Install from './pages/public/Install';
@@ -21,13 +16,6 @@ const App = () => {
     isLoading,
     isError
   } = useGetInstallStatusQuery();
-
-  // Keep Sentry's user context in sync with auth state: set on login, clear on
-  // logout — so errors carry who-hit-them.
-  const currentUser = useSelector(selectCurrentUser);
-  useEffect(() => {
-    Sentry.setUser(sentryUserFromAuthUser(currentUser));
-  }, [currentUser]);
 
   if (isLoading)
     return (

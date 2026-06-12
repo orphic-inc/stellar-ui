@@ -7,6 +7,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 
 import './index.scss';
 import App from './components/App';
+import SentryUserSync from './components/SentryUserSync';
 import store from './store';
 import { sentryBeforeSend } from './utils/sentry';
 
@@ -26,6 +27,7 @@ const root = createRoot(container);
 
 root.render(
   <Provider store={store}>
+    <SentryUserSync />
     <Router>
       <App />
     </Router>
