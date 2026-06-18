@@ -470,6 +470,44 @@ describe('ContributeForm', () => {
     });
   });
 
+  it('submits sizeInBytes derived from the value field and unit selector', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ContributeForm />);
+
+    await fillMusicForm(user);
+    fireEvent.change(screen.getByLabelText(/file size/i), {
+      target: { value: '4.5' }
+    });
+    await user.selectOptions(screen.getByLabelText(/size unit/i), 'GiB');
+
+    await user.click(
+      screen.getByRole('button', { name: /contribute release/i })
+    );
+
+    await waitFor(() => {
+      expect(mockCreateContribution).toHaveBeenCalledWith(
+        expect.objectContaining({ sizeInBytes: Math.round(4.5 * 1024 ** 3) })
+      );
+    });
+  });
+
+  it('blocks submit and shows an error when the size is invalid', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ContributeForm />);
+
+    await fillMusicForm(user);
+    fireEvent.change(screen.getByLabelText(/file size/i), {
+      target: { value: 'abc' }
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: /contribute release/i })
+    );
+
+    expect(await screen.findByText(/valid file size/i)).toBeInTheDocument();
+    expect(mockCreateContribution).not.toHaveBeenCalled();
+  });
+
   it('does not send Music-only fields for a non-Music submission', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);

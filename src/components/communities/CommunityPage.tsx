@@ -17,7 +17,7 @@ import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
-import { formatBytes } from '../../utils';
+import { formatSize } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
 
 interface ContributionRow {
@@ -348,7 +348,7 @@ const CommunityPage = () => {
                             </span>
                             <span className="text-xs text-gray-500 w-20 shrink-0">
                               {c.sizeInBytes
-                                ? formatBytes(Number(c.sizeInBytes))
+                                ? formatSize(Number(c.sizeInBytes))
                                 : '—'}
                             </span>
                             <Link

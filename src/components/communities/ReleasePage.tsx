@@ -14,7 +14,7 @@ import Time from '../layout/Time';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
-import { formatBytes } from '../../utils';
+import { formatSize } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
 import { useReleaseWorkbench } from './useReleaseWorkbench';
 
@@ -251,7 +251,7 @@ const ReleasePage = () => {
                         </td>
                         <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
                           {c.sizeInBytes
-                            ? formatBytes(Number(c.sizeInBytes))
+                            ? formatSize(Number(c.sizeInBytes))
                             : '—'}
                         </td>
                         <td className="px-4 py-2">

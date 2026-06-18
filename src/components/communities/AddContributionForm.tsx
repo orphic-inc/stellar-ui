@@ -7,7 +7,9 @@ import {
 } from '../../store/services/communityApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { parseSize, SIZE_INPUT_UNITS } from '../../utils';
 import Spinner from '../layout/Spinner';
+import type { BinarySizeUnit } from '../../utils';
 
 const FILE_TYPES = [
   'mp3',
@@ -100,7 +102,8 @@ const AddContributionForm = () => {
 
   const [fileType, setFileType] = useState<FileType>('mp3');
   const [downloadUrl, setDownloadUrl] = useState('');
-  const [sizeMB, setSizeMB] = useState('');
+  const [sizeValue, setSizeValue] = useState('');
+  const [sizeUnit, setSizeUnit] = useState<BinarySizeUnit>('MiB');
   const [releaseDescription, setReleaseDescription] = useState('');
   const [bitrate, setBitrate] = useState<Bitrate | ''>('');
   const [media, setMedia] = useState<ReleaseMedia | ''>('');
@@ -110,17 +113,29 @@ const AddContributionForm = () => {
 
   const isAudio = AUDIO_FILE_TYPES.includes(fileType);
 
+  const trimmedSize = sizeValue.trim();
+  const sizeInBytes = trimmedSize
+    ? parseSize(trimmedSize, sizeUnit)
+    : undefined;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (trimmedSize && sizeInBytes === null) {
+      dispatch(
+        addAlert(
+          'Enter a valid file size (e.g. 85.4 MiB or 4.5 GiB).',
+          'danger'
+        )
+      );
+      return;
+    }
     try {
       await addContribution({
         communityId: cId,
         releaseId: rId,
         fileType,
         downloadUrl,
-        sizeInBytes: sizeMB
-          ? Math.round(parseFloat(sizeMB) * 1_048_576)
-          : undefined,
+        sizeInBytes: sizeInBytes ?? undefined,
         releaseDescription: releaseDescription || undefined,
         ...(isAudio && {
           bitrate: bitrate || undefined,
@@ -221,19 +236,32 @@ const AddContributionForm = () => {
         </div>
 
         <div>
-          <label htmlFor="add-size-mb" className={labelClass}>
-            File size (MB, optional)
+          <label htmlFor="add-size" className={labelClass}>
+            File size (optional)
           </label>
-          <input
-            id="add-size-mb"
-            type="number"
-            min="0"
-            step="0.01"
-            value={sizeMB}
-            onChange={(e) => setSizeMB(e.target.value)}
-            placeholder="e.g. 85.4"
-            className={inputClass}
-          />
+          <div className="flex gap-2">
+            <input
+              id="add-size"
+              type="text"
+              inputMode="decimal"
+              value={sizeValue}
+              onChange={(e) => setSizeValue(e.target.value)}
+              placeholder="e.g. 85.4 or 4.5 GiB"
+              className={inputClass}
+            />
+            <select
+              aria-label="Size unit"
+              value={sizeUnit}
+              onChange={(e) => setSizeUnit(e.target.value as BinarySizeUnit)}
+              className={inputClass + ' w-24'}
+            >
+              {SIZE_INPUT_UNITS.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Rip-specific fields — audio only */}

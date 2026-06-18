@@ -207,6 +207,45 @@ describe('AddContributionForm', () => {
     });
   });
 
+  it('derives sizeInBytes from the value field and unit selector', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AddContributionForm />);
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/file.flac'
+    );
+    await user.type(screen.getByLabelText(/file size/i), '4.5');
+    await user.selectOptions(screen.getByLabelText(/size unit/i), 'GiB');
+    await user.click(screen.getByRole('button', { name: /add contribution/i }));
+    await waitFor(() => {
+      expect(mockAddContribution).toHaveBeenCalledWith(
+        expect.objectContaining({ sizeInBytes: Math.round(4.5 * 1024 ** 3) })
+      );
+    });
+  });
+
+  it('blocks submit and shows an error when the size is invalid', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AddContributionForm />);
+    await user.type(
+      screen.getByLabelText(/download url/i),
+      'https://example.com/file.flac'
+    );
+    await user.type(screen.getByLabelText(/file size/i), 'abc');
+    await user.click(screen.getByRole('button', { name: /add contribution/i }));
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            msg: expect.stringMatching(/valid file size/i),
+            alertType: 'danger'
+          })
+        })
+      );
+    });
+    expect(mockAddContribution).not.toHaveBeenCalled();
+  });
+
   it('dispatches danger alert with API message on failure', async () => {
     mockAddContribution.mockReturnValue({
       unwrap: () => Promise.reject({ data: { msg: 'Duplicate format.' } })

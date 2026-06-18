@@ -9,8 +9,10 @@ import {
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { parseSize, SIZE_INPUT_UNITS } from '../../utils';
 import Spinner from '../layout/Spinner';
 import type { Collaborator } from '../../types';
+import type { BinarySizeUnit } from '../../utils';
 
 const ARTIST_TYPES = [
   'Main artist',
@@ -151,7 +153,8 @@ const ContributeForm = () => {
   const [bitrate, setBitrate] = useState<BitrateValue | ''>('');
   const [media, setMedia] = useState<MediaValue | ''>('');
   const [downloadUrl, setDownloadUrl] = useState('');
-  const [sizeMB, setSizeMB] = useState('');
+  const [sizeValue, setSizeValue] = useState('');
+  const [sizeUnit, setSizeUnit] = useState<BinarySizeUnit>('MiB');
   const [title, setTitle] = useState('');
   const [album, setAlbum] = useState('');
   const [recordLabel, setRecordLabel] = useState('');
@@ -228,10 +231,19 @@ const ContributeForm = () => {
     setCollaborators(updated);
   };
 
+  const trimmedSize = sizeValue.trim();
+  const sizeInBytes = trimmedSize
+    ? parseSize(trimmedSize, sizeUnit)
+    : undefined;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setSubmitError(null);
+    if (trimmedSize && sizeInBytes === null) {
+      setSubmitError('Enter a valid file size (e.g. 85.4 MiB or 4.5 GiB).');
+      return;
+    }
     try {
       await createContribution({
         communityId: parseInt(community),
@@ -240,9 +252,7 @@ const ContributeForm = () => {
         year: parseInt(year, 10),
         fileType,
         downloadUrl,
-        sizeInBytes: sizeMB
-          ? Math.round(parseFloat(sizeMB) * 1_048_576)
-          : undefined,
+        sizeInBytes: sizeInBytes ?? undefined,
         tags,
         image,
         description,
@@ -771,21 +781,36 @@ const ContributeForm = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className={fieldWrap}>
               <label htmlFor="contribute-size" className={labelClass}>
-                File size (MB)
+                File size
                 <RequiredMark />
               </label>
-              <input
-                id="contribute-size"
-                type="number"
-                min="0.01"
-                step="0.01"
-                value={sizeMB}
-                onChange={(e) => setSizeMB(e.target.value)}
-                placeholder="e.g. 85.4"
-                required
-                aria-required="true"
-                className={inputClass}
-              />
+              <div className="flex gap-2">
+                <input
+                  id="contribute-size"
+                  type="text"
+                  inputMode="decimal"
+                  value={sizeValue}
+                  onChange={(e) => setSizeValue(e.target.value)}
+                  placeholder="e.g. 85.4 or 4.5 GiB"
+                  required
+                  aria-required="true"
+                  className={inputClass}
+                />
+                <select
+                  aria-label="Size unit"
+                  value={sizeUnit}
+                  onChange={(e) =>
+                    setSizeUnit(e.target.value as BinarySizeUnit)
+                  }
+                  className={inputClass + ' w-24'}
+                >
+                  {SIZE_INPUT_UNITS.map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className={fieldWrap}>

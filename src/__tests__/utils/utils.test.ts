@@ -2,7 +2,9 @@ import {
   formatDate,
   readableTime,
   formatBytes,
-  ordinalSuffix
+  ordinalSuffix,
+  parseSize,
+  formatSize
 } from '../../utils';
 
 describe('formatDate', () => {
@@ -121,4 +123,89 @@ describe('formatBytes', () => {
   it('formats gigabytes', () => {
     expect(formatBytes(1073741824)).toBe('1.00 GB');
   });
+});
+
+describe('parseSize', () => {
+  it('returns null for empty or whitespace input', () => {
+    expect(parseSize('')).toBeNull();
+    expect(parseSize('   ')).toBeNull();
+  });
+
+  it('interprets a bare number as the default unit', () => {
+    expect(parseSize('500', 'MiB')).toBe(500 * 1024 ** 2);
+    expect(parseSize('2', 'GiB')).toBe(2 * 1024 ** 3);
+  });
+
+  it('defaults to bytes when no unit is given or selected', () => {
+    expect(parseSize('1024')).toBe(1024);
+  });
+
+  it('parses a natural string, overriding the default unit', () => {
+    expect(parseSize('4.5 GiB', 'MiB')).toBe(Math.round(4.5 * 1024 ** 3));
+    expect(parseSize('85.4 MiB')).toBe(Math.round(85.4 * 1024 ** 2));
+  });
+
+  it('is case-insensitive and tolerates missing space', () => {
+    expect(parseSize('1gib')).toBe(1024 ** 3);
+    expect(parseSize('1 TIB')).toBe(1024 ** 4);
+  });
+
+  it('treats SI shorthand (KB/MB/GB/TB) as binary', () => {
+    expect(parseSize('1 MB')).toBe(1024 ** 2);
+    expect(parseSize('1 GB')).toBe(1024 ** 3);
+  });
+
+  it('returns null for malformed input', () => {
+    expect(parseSize('abc')).toBeNull();
+    expect(parseSize('1.2.3 GiB')).toBeNull();
+    expect(parseSize('-5 MiB')).toBeNull();
+  });
+
+  it('returns null for an unrecognized unit', () => {
+    expect(parseSize('5 PB')).toBeNull();
+  });
+
+  it('returns null when the result exceeds Number.MAX_SAFE_INTEGER', () => {
+    expect(parseSize('999999 TiB')).toBeNull();
+    expect(parseSize(`${Number.MAX_SAFE_INTEGER} B`)).toBe(
+      Number.MAX_SAFE_INTEGER
+    );
+    expect(parseSize(`${Number.MAX_SAFE_INTEGER + 1} B`)).toBeNull();
+  });
+});
+
+describe('formatSize', () => {
+  it('returns "0 B" for falsy or negative input', () => {
+    expect(formatSize(undefined)).toBe('0 B');
+    expect(formatSize(null)).toBe('0 B');
+    expect(formatSize(0)).toBe('0 B');
+    expect(formatSize(-5)).toBe('0 B');
+  });
+
+  it('keeps sub-KiB values in whole bytes', () => {
+    expect(formatSize(512)).toBe('512 B');
+  });
+
+  it('uses binary unit labels', () => {
+    expect(formatSize(1024)).toBe('1 KiB');
+    expect(formatSize(1024 ** 2)).toBe('1 MiB');
+    expect(formatSize(1024 ** 3)).toBe('1 GiB');
+    expect(formatSize(1024 ** 4)).toBe('1 TiB');
+  });
+
+  it('trims trailing zeros', () => {
+    expect(formatSize(Math.round(4.5 * 1024 ** 3))).toBe('4.5 GiB');
+    expect(formatSize(2 * 1024 ** 2)).toBe('2 MiB');
+  });
+});
+
+describe('parseSize / formatSize round-trips', () => {
+  it.each(['4.5 GiB', '85.4 MiB', '1 TiB', '512 B', '2 GiB'])(
+    'round-trips %s',
+    (input) => {
+      const bytes = parseSize(input);
+      expect(bytes).not.toBeNull();
+      expect(formatSize(bytes)).toBe(input);
+    }
+  );
 });

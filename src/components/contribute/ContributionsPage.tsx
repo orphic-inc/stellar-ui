@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useGetContributionsQuery } from '../../store/services/communityApi';
-import { formatBytes } from '../../utils';
+import { formatSize } from '../../utils';
 import Spinner from '../layout/Spinner';
 
 const ContributionsPage = () => {
@@ -71,7 +71,7 @@ const ContributionsPage = () => {
                   </td>
                   <td className="px-4 py-2 text-gray-400 text-xs">{c.type}</td>
                   <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
-                    {c.sizeInBytes ? formatBytes(Number(c.sizeInBytes)) : '—'}
+                    {c.sizeInBytes ? formatSize(Number(c.sizeInBytes)) : '—'}
                   </td>
                   <td className="px-4 py-2 text-gray-400">
                     {c.collaborators.length
