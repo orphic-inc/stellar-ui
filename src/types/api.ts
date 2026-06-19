@@ -3542,6 +3542,63 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{id}/health/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          period?: 'Daily' | 'Monthly' | 'Yearly';
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Community link-health pulse history (time series) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CommunityHealthSnapshot'][];
+          };
+        };
+        /** @description Not a member of this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{id}/releases': {
     parameters: {
       query?: never;
@@ -8127,6 +8184,44 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/rules/tree': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The composable Rule/SubRule tree with CRS weights (PRD-05 #1) */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Rule tree, each rule with its nested sub-rules */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              rules: components['schemas']['Rule'][];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/rules': {
     parameters: {
       query?: never;
@@ -8359,6 +8454,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** List accepted friends */
     get: {
       parameters: {
         query?: {
@@ -8371,7 +8467,7 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description Paginated friends list */
+        /** @description Paginated accepted-friends list */
         200: {
           headers: {
             [name: string]: unknown;
@@ -8402,6 +8498,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/friends/requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List incoming pending friend requests */
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated incoming-requests list */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['FriendRequest'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/friends/status/{userId}': {
     parameters: {
       query?: never;
@@ -8409,6 +8556,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** Relationship status with a user */
     get: {
       parameters: {
         query?: never;
@@ -8427,6 +8575,13 @@ export interface paths {
           };
           content: {
             'application/json': {
+              /** @enum {string} */
+              status:
+                | 'none'
+                | 'pending_sent'
+                | 'pending_received'
+                | 'accepted'
+                | 'rejected';
               isFriend: boolean;
             };
           };
@@ -8459,6 +8614,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /** Send a friend request (or accept a reciprocal pending one) */
     post: {
       parameters: {
         query?: never;
@@ -8470,12 +8626,23 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description Friend added */
+        /** @description A reciprocal pending request existed and was accepted (now friends) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['FriendEntry'];
+          };
+        };
+        /** @description Friend request sent (pending) */
         201: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': components['schemas']['FriendRequestSent'];
+          };
         };
         /** @description Cannot add self */
         400: {
@@ -8495,7 +8662,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Already friends */
+        /** @description Already friends or a request is already pending */
         409: {
           headers: {
             [name: string]: unknown;
@@ -8506,6 +8673,7 @@ export interface paths {
         };
       };
     };
+    /** Remove a friend or cancel a request */
     delete: {
       parameters: {
         query?: never;
@@ -8517,7 +8685,7 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description Friend removed */
+        /** @description Friendship/request removed */
         204: {
           headers: {
             [name: string]: unknown;
@@ -8540,6 +8708,100 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/friends/{userId}/accept': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Accept a pending request from a user */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Request accepted — now friends */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['FriendEntry'];
+          };
+        };
+        /** @description No pending request from this user */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/friends/{userId}/reject': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reject a pending request from a user */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Request rejected */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No pending request from this user */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/friends/{userId}/comment': {
     parameters: {
       query?: never;
@@ -8548,6 +8810,7 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
+    /** Set a note on an accepted friendship */
     put: {
       parameters: {
         query?: never;
@@ -8570,7 +8833,9 @@ export interface paths {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Validation error */
         400: {
@@ -8873,6 +9138,46 @@ export interface paths {
             'application/json': {
               data: components['schemas']['InviteTreeItem'][];
               meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/invite-tree': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description A member's invite subtree + summary */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              tree: components['schemas']['MemberInviteTreeNode'][];
+              summary: components['schemas']['InviteTreeSummary'];
             };
           };
         };
@@ -11381,6 +11686,22 @@ export interface components {
       ratio?: string;
       children?: components['schemas']['InviteNode'][];
     };
+    CommunityStats: {
+      friends: number;
+      invites: {
+        direct: number;
+        total: number;
+        depth: number;
+      };
+      reputation: {
+        score: number;
+        dimensions: {
+          name: string;
+          subScore: number;
+          weighted: number;
+        }[];
+      };
+    };
     PublicProfile: {
       id: number;
       username: string;
@@ -11393,6 +11714,8 @@ export interface components {
       isDonor: boolean;
       disabled: boolean;
       warned: string | null;
+      /** @enum {string} */
+      standing: 'pristine' | 'clean' | 'neutral' | 'poor' | 'hammer';
       inviteCount: number | null;
       staffBio: string | null;
       stats: components['schemas']['ProfileStats'];
@@ -11409,6 +11732,7 @@ export interface components {
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
+      community: components['schemas']['CommunityStats'] & unknown;
     };
     MyProfile: {
       id: number;
@@ -11422,6 +11746,8 @@ export interface components {
       isDonor: boolean;
       disabled: boolean;
       warned: string | null;
+      /** @enum {string} */
+      standing: 'pristine' | 'clean' | 'neutral' | 'poor' | 'hammer';
       inviteCount: number | null;
       staffBio: string | null;
       stats: components['schemas']['ProfileStats'];
@@ -11438,6 +11764,7 @@ export interface components {
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
+      community: components['schemas']['CommunityStats'] & unknown;
       userSettings: components['schemas']['UserSettings'];
     };
     AdminCreatedUser: {
@@ -12295,16 +12622,58 @@ export interface components {
       createdAt: string;
       updatedAt: string;
     };
+    SubRule: {
+      id: number;
+      ruleId: number;
+      code: string;
+      title: string;
+      description: string;
+      complianceWeight: number;
+      violationWeight: number;
+      sortOrder: number;
+      createdAt: string;
+      updatedAt: string;
+    };
+    Rule: {
+      id: number;
+      code: string;
+      title: string;
+      description: string;
+      complianceWeight: number;
+      violationWeight: number;
+      sortOrder: number;
+      subRules: components['schemas']['SubRule'][];
+      createdAt: string;
+      updatedAt: string;
+    };
+    FriendUserSummary: {
+      id: number;
+      username: string;
+      avatar: string | null;
+    };
     FriendEntry: {
       id: number;
-      userId: number;
       friendId: number;
       comment: string;
-      friend: {
-        id: number;
-        username: string;
-        avatar: string | null;
-      };
+      /** @enum {string} */
+      status: 'pending' | 'accepted' | 'rejected';
+      createdAt: string;
+      friend: components['schemas']['FriendUserSummary'];
+    };
+    FriendRequest: {
+      id: number;
+      requesterId: number;
+      createdAt: string;
+      requester: components['schemas']['FriendUserSummary'];
+    };
+    FriendRequestSent: {
+      id: number;
+      requesterId: number;
+      recipientId: number;
+      /** @enum {string} */
+      status: 'pending' | 'accepted' | 'rejected';
+      createdAt: string;
+      recipient: components['schemas']['FriendUserSummary'];
     };
     TagAliasItem: {
       id: number;
@@ -12349,14 +12718,47 @@ export interface components {
         id: number;
         username: string;
       };
-      inviterId: number;
+      inviterId: number | null;
       inviter: {
         id: number;
         username: string;
       } | null;
-      treeId: number;
-      treeLevel: number;
-      treePosition: number;
+    };
+    MemberInviteTreeNode: {
+      userId: number;
+      username: string;
+      rankName: string;
+      isDonor: boolean;
+      disabled: boolean;
+      depth: number;
+      stats: {
+        contributed: string;
+        consumed: string;
+        ratio: string;
+      } | null;
+      children: components['schemas']['MemberInviteTreeNode'][];
+    };
+    InviteTreeSummary: {
+      entries: number;
+      branches: number;
+      depth: number;
+      disabledCount: number;
+      donorCount: number;
+      hiddenCount: number;
+      byRank: {
+        rankName: string;
+        count: number;
+      }[];
+      total: {
+        contributed: string;
+        consumed: string;
+        ratio: string;
+      };
+      topLevel: {
+        contributed: string;
+        consumed: string;
+        ratio: string;
+      };
     };
     RatioWatchItem: {
       userId: number;
@@ -12436,6 +12838,23 @@ export interface components {
       pulse: number | null;
       /** @enum {string} */
       status: 'Healthy' | 'Ailing' | 'Critical' | 'Unknown';
+    };
+    CommunityHealthSnapshot: {
+      id: number;
+      communityId: number;
+      /** @enum {string} */
+      period: 'Daily' | 'Monthly' | 'Yearly';
+      bucketAt: string;
+      capturedAt: string;
+      pass: number;
+      warn: number;
+      fail: number;
+      unknown: number;
+      total: number;
+      checked: number;
+      coverage: number | null;
+      pulse: number | null;
+      status: string;
     };
   };
   responses: never;

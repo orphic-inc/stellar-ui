@@ -143,7 +143,6 @@ These Prisma models exist in stellar-api but have no API routes or UI:
 | `CoverArt`, `FeaturedAlbum`                  | Planned — release art management        |
 | `Donation`, `BitcoinDonation`, `DonorReward` | Planned — donor system                  |
 | `Applicant`, `Thread`                        | Planned — application/thread system     |
-| `Friend`, `Bookmark*`                        | Planned — social features               |
 | `ApiApplication`, `ApiUser`                  | Deferred indefinitely                   |
 
 Do not add frontend code, OpenAPI paths, or Toolbox links for these until the backend routes are implemented.
