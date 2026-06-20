@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
   useGetMyFriendsQuery,
+  useGetFriendRequestsQuery,
+  useAcceptFriendRequestMutation,
+  useRejectFriendRequestMutation,
   useRemoveFriendMutation,
   useUpdateFriendCommentMutation
 } from '../../../../store/services/friendApi';
@@ -18,10 +21,42 @@ const FriendsPage = () => {
   );
 
   const { data, isLoading, error } = useGetMyFriendsQuery(page);
+  const { data: requests } = useGetFriendRequestsQuery(1);
+  const [acceptRequest] = useAcceptFriendRequestMutation();
+  const [rejectRequest] = useRejectFriendRequestMutation();
   const [removeFriend] = useRemoveFriendMutation();
   const [updateComment] = useUpdateFriendCommentMutation();
 
   const totalPages = data?.meta.totalPages ?? 1;
+  const pendingRequests = requests?.data ?? [];
+
+  const handleAccept = async (userId: number, username: string) => {
+    try {
+      await acceptRequest(userId).unwrap();
+      dispatch(addAlert(`You and ${username} are now friends.`, 'success'));
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to accept request.',
+          'danger'
+        )
+      );
+    }
+  };
+
+  const handleReject = async (userId: number, username: string) => {
+    try {
+      await rejectRequest(userId).unwrap();
+      dispatch(addAlert(`Request from ${username} rejected.`, 'success'));
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to reject request.',
+          'danger'
+        )
+      );
+    }
+  };
 
   const handleRemove = async (userId: number, username: string) => {
     if (!window.confirm(`Remove ${username} from your friends list?`)) return;
@@ -58,6 +93,53 @@ const FriendsPage = () => {
 
   return (
     <div className="space-y-4">
+      {pendingRequests.length > 0 && (
+        <div className="rounded border border-indigo-700/50 bg-indigo-950/30 overflow-hidden">
+          <h2 className="px-4 py-3 text-sm font-semibold text-indigo-200 border-b border-indigo-700/50">
+            Friend requests ({pendingRequests.length})
+          </h2>
+          <ul className="divide-y divide-gray-800">
+            {pendingRequests.map((request) => (
+              <li
+                key={request.id}
+                className="flex items-center justify-between px-4 py-3"
+              >
+                <Link
+                  to={`/private/user/${request.requester.id}`}
+                  className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+                >
+                  {request.requester.username}
+                </Link>
+                <div className="space-x-3 whitespace-nowrap text-sm">
+                  <button
+                    onClick={() =>
+                      handleAccept(
+                        request.requester.id,
+                        request.requester.username
+                      )
+                    }
+                    className="text-green-400 hover:text-green-300 transition-colors"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleReject(
+                        request.requester.id,
+                        request.requester.username
+                      )
+                    }
+                    className="text-red-500 hover:text-red-400 transition-colors"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <h1 className="text-xl font-semibold text-white">Friends</h1>
 
       {!data || data.data.length === 0 ? (

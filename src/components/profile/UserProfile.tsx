@@ -33,6 +33,7 @@ import {
 import {
   useGetFriendStatusQuery,
   useAddFriendMutation,
+  useAcceptFriendRequestMutation,
   useRemoveFriendMutation
 } from '../../store/services/friendApi';
 import { addAlert } from '../../store/slices/alertSlice';
@@ -931,6 +932,7 @@ const UserProfile = () => {
     skip: !profile || isOwnProfile || !currentUser
   });
   const [addFriend] = useAddFriendMutation();
+  const [acceptRequest] = useAcceptFriendRequestMutation();
   const [removeFriend] = useRemoveFriendMutation();
 
   if (isLoading) return <Spinner />;
@@ -1017,7 +1019,7 @@ const UserProfile = () => {
               >
                 Send Message
               </Link>
-              {friendStatus?.isFriend ? (
+              {friendStatus?.status === 'accepted' ? (
                 <button
                   onClick={async () => {
                     try {
@@ -1041,6 +1043,33 @@ const UserProfile = () => {
                 >
                   Remove Friend
                 </button>
+              ) : friendStatus?.status === 'pending_received' ? (
+                <button
+                  onClick={async () => {
+                    try {
+                      await acceptRequest(profile.id).unwrap();
+                      dispatch(
+                        addAlert(
+                          `You and ${profile.username} are now friends.`,
+                          'success'
+                        )
+                      );
+                    } catch (err) {
+                      dispatch(
+                        addAlert(
+                          getApiErrorMessage(err) ??
+                            'Failed to accept request.',
+                          'danger'
+                        )
+                      );
+                    }
+                  }}
+                  className="text-green-400 hover:text-green-300 transition-colors"
+                >
+                  Accept Friend Request
+                </button>
+              ) : friendStatus?.status === 'pending_sent' ? (
+                <span className="text-gray-500">Friend Request Sent</span>
               ) : (
                 <button
                   onClick={async () => {
@@ -1048,7 +1077,7 @@ const UserProfile = () => {
                       await addFriend(profile.id).unwrap();
                       dispatch(
                         addAlert(
-                          `${profile.username} added to friends.`,
+                          `Friend request sent to ${profile.username}.`,
                           'success'
                         )
                       );

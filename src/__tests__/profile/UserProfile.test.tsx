@@ -205,8 +205,11 @@ jest.mock('../../store/services/profileApi', () => ({
 }));
 
 jest.mock('../../store/services/friendApi', () => ({
-  useGetFriendStatusQuery: () => ({ data: { isFriend: false } }),
+  useGetFriendStatusQuery: () => ({
+    data: { status: 'none', isFriend: false }
+  }),
   useAddFriendMutation: () => [jest.fn(), { isLoading: false }],
+  useAcceptFriendRequestMutation: () => [jest.fn(), { isLoading: false }],
   useRemoveFriendMutation: () => [jest.fn(), { isLoading: false }]
 }));
 
