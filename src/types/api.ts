@@ -300,6 +300,76 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/users/{id}/irc-nick': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            ircNick: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description Nick claim opened (returns the verification code + instructions), nick cleared, or already verified */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['IrcNickLinkResult'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not self or admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Nick already verified by another account */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/users/settings': {
     parameters: {
       query?: never;
@@ -11772,6 +11842,14 @@ export interface components {
       username: string;
       /** Format: email */
       email: string;
+    };
+    IrcNickLinkResult: {
+      msg: string;
+      ircNick?: string | null;
+      code?: string;
+      /** Format: date-time */
+      expiresAt?: string;
+      instructions?: string;
     };
     RecoveryRequestItem: {
       id: number;

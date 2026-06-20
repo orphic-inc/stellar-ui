@@ -18,6 +18,7 @@ import { getApiErrorMessage } from '../../../utils/apiError';
 import { useGetStylesheetsQuery } from '../../../store/services/siteApi';
 import Spinner from '../../layout/Spinner';
 import DonorSettingsTab from './DonorSettingsTab';
+import IrcNickSettings from './IrcNickSettings';
 import type { paths } from '../../../types/api';
 
 type ProfileForm = NonNullable<
@@ -419,6 +420,7 @@ const Settings = () => {
       {/* Security tab */}
       {activeTab === 'security' && (
         <div className="space-y-6">
+          {currentUser && <IrcNickSettings userId={currentUser.id} />}
           {/* Change password */}
           <div className="bg-gray-800 rounded-lg border border-gray-700 p-5">
             <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider mb-4">

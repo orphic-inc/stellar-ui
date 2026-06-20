@@ -407,6 +407,24 @@ export const userApi = api.injectEndpoints({
         { type: 'Profile', id },
         'Profile'
       ]
+    }),
+
+    // IRC nick link (ADR-0015): open a Nick Claim (returns the verification
+    // code + instructions) or clear the link with ircNick: null.
+    linkIrcNick: build.mutation<
+      paths['/users/{id}/irc-nick']['put']['responses'][200]['content']['application/json'],
+      { id: number; ircNick: string | null }
+    >({
+      query: ({ id, ircNick }) => ({
+        url: `/users/${id}/irc-nick`,
+        method: 'PUT',
+        body: { ircNick }
+      }),
+      invalidatesTags: (_, __, { id }) => [
+        { type: 'User', id },
+        { type: 'Profile', id },
+        'Profile'
+      ]
     })
   })
 });
@@ -431,6 +449,7 @@ export const {
   useEnableUserMutation,
   useGetUserRankAssignmentQuery,
   useSetUserRankMutation,
+  useLinkIrcNickMutation,
   useGetUserIpHistoryQuery,
   useGetUserEmailHistoryQuery,
   useGetSnatchListQuery,
