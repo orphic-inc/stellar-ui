@@ -201,7 +201,8 @@ jest.mock('../../store/services/profileApi', () => ({
     isLoading: mockIsLoading,
     error: mockError
   }),
-  useGetMyRatioStatsQuery: () => ({ data: mockMyRatioStats, isLoading: false })
+  useGetMyRatioStatsQuery: () => ({ data: mockMyRatioStats, isLoading: false }),
+  useGetMyProgressionQuery: () => ({ data: null, isLoading: false })
 }));
 
 jest.mock('../../store/services/friendApi', () => ({

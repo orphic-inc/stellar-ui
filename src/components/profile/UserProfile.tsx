@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { formatBytes, ordinalSuffix } from '../../utils';
 import DOMPurify from 'dompurify';
+import ProgressToNextClass from './ProgressToNextClass';
 import {
   useGetMyRatioStatsQuery,
   useGetProfileByUserIdQuery
@@ -1530,6 +1531,8 @@ const UserProfile = () => {
               )}
             </ul>
           </div>
+
+          {isOwnProfile && <ProgressToNextClass />}
 
           <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">

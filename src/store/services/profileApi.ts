@@ -15,6 +15,13 @@ type CreateInviteArgs = NonNullable<
 type CreateInviteResponse =
   paths['/profile/referral/create-invite']['post']['responses'][201]['content']['application/json'];
 
+// openapi-typescript drops the `| null` from the nullable `gap` $ref, so re-add
+// it here — the route really returns gap: null at the top of the ladder.
+type ProgressionResponse = Omit<
+  components['schemas']['ProfileProgression'],
+  'gap'
+> & { gap: components['schemas']['ProgressionGap'] | null };
+
 type DonorRewardsResponse = components['schemas']['DonorRewards'];
 type UpdateDonorRewardsArgs = NonNullable<
   paths['/profile/me/donor-rewards']['put']['requestBody']
@@ -53,6 +60,10 @@ export const profileApi = api.injectEndpoints({
       query: () => '/profile/me/ratio',
       providesTags: ['Profile']
     }),
+    getMyProgression: build.query<ProgressionResponse, void>({
+      query: () => '/profile/me/progression',
+      providesTags: ['Profile']
+    }),
     getDonorRewards: build.query<DonorRewardsResponse, void>({
       query: () => '/profile/me/donor-rewards',
       providesTags: ['DonorReward']
@@ -89,6 +100,7 @@ export const {
   useDeleteMyProfileMutation,
   useCreateInviteMutation,
   useGetMyRatioStatsQuery,
+  useGetMyProgressionQuery,
   useGetDonorRewardsQuery,
   useUpdateDonorRewardsMutation,
   useUpdateDonorForumTitleMutation
