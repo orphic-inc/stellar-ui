@@ -342,6 +342,21 @@ describe('UserProfile', () => {
     expect(screen.getByText('Elite')).toBeInTheDocument();
   });
 
+  it('renders the rank badge on the class line when present', () => {
+    mockProfileData = {
+      ...mockProfile,
+      userRank: {
+        name: 'Stellarige',
+        color: '#f0f',
+        badge: '✦',
+        level: 450,
+        displayStaff: false
+      } as typeof mockProfile.userRank & { badge: string }
+    };
+    renderWithProviders(<UserProfile />);
+    expect(screen.getByText('✦ Stellarige')).toBeInTheDocument();
+  });
+
   it('renders 0 B for unparseable byte stat string', () => {
     mockProfileData = {
       ...mockProfile,

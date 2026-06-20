@@ -1450,6 +1450,7 @@ const UserProfile = () => {
                 <li>
                   <span className="text-gray-500">Class:</span>{' '}
                   <span style={{ color: profile.userRank.color }}>
+                    {profile.userRank.badge ? `${profile.userRank.badge} ` : ''}
                     {profile.userRank.name}
                   </span>
                 </li>
