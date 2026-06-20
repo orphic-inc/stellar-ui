@@ -873,6 +873,59 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/profile/me/progression': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Gap to the next auto-class rung */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ProfileProgression'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Profile not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/profile/user/{userId}': {
     parameters: {
       query?: never;
@@ -4684,6 +4737,237 @@ export interface paths {
         };
         /** @description Rank still assigned to users */
         409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/tools/promotion-rules': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Promotion rules */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PromotionRule'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            fromRankId: number;
+            toRankId: number;
+            minContributed?: string;
+            minRatio?: number;
+            minContributions?: number;
+            minAccountAgeDays?: number;
+            /** @enum {string|null} */
+            extra?: 'DISTINCT_RELEASES_500' | 'QUALITY_CONTRIB_500' | null;
+            enabled?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Promotion rule created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PromotionRule'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Duplicate rank pair */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description fromRank or toRank not found */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/tools/promotion-rules/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Promotion rule */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PromotionRule'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            fromRankId?: number;
+            toRankId?: number;
+            minContributed?: string;
+            minRatio?: number;
+            minContributions?: number;
+            minAccountAgeDays?: number;
+            /** @enum {string|null} */
+            extra?: 'DISTINCT_RELEASES_500' | 'QUALITY_CONTRIB_500' | null;
+            enabled?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Promotion rule updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PromotionRule'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Duplicate rank pair */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description fromRank or toRank not found */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Promotion rule deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -11880,6 +12164,21 @@ export interface components {
         username: string;
       } | null;
     };
+    ProgressionGap: {
+      toRankName: string | null;
+      contributedShortBytes: string;
+      ratioShort: number;
+      contributionsShort: number;
+      ageShortDays: number;
+      /** @enum {string|null} */
+      extraUnmet: 'DISTINCT_RELEASES_500' | 'QUALITY_CONTRIB_500' | null;
+    };
+    ProfileProgression: {
+      currentRankId: number;
+      currentRankName: string | null;
+      rankLocked: boolean;
+      gap: components['schemas']['ProgressionGap'] & unknown;
+    };
     DonorRewards: {
       rewards: {
         iconMouseOverText: string;
@@ -12438,6 +12737,22 @@ export interface components {
     PaginatedComments: {
       data: components['schemas']['Comment'][];
       meta: components['schemas']['PaginationMeta'];
+    };
+    PromotionRule: {
+      id: number;
+      fromRankId: number;
+      fromRankName: string | null;
+      toRankId: number;
+      toRankName: string | null;
+      minContributed: string;
+      minRatio: number;
+      minContributions: number;
+      minAccountAgeDays: number;
+      /** @enum {string|null} */
+      extra: 'DISTINCT_RELEASES_500' | 'QUALITY_CONTRIB_500' | null;
+      enabled: boolean;
+      createdAt: string;
+      updatedAt: string;
     };
     Artist: {
       id: number;
