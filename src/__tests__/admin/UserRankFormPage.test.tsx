@@ -10,6 +10,10 @@ const mockUpdateUserRank = jest.fn();
 const mockNavigate = jest.fn();
 const mockDispatch = jest.fn();
 const mockUseParams = jest.fn();
+const mockGetPromotionRules = jest.fn();
+const mockGetUserRanks = jest.fn();
+const mockCreatePromotionRule = jest.fn();
+const mockUpdatePromotionRule = jest.fn();
 
 const mockPermissionCatalog = [
   {
@@ -42,7 +46,11 @@ jest.mock('../../store/services/userApi', () => ({
   useCreateUserRankMutation: () => [mockCreateUserRank],
   useUpdateUserRankMutation: () => [mockUpdateUserRank],
   useGetStaffGroupsQuery: () => ({ data: [] }),
-  useGetPermissionCatalogQuery: () => ({ data: mockPermissionCatalog })
+  useGetPermissionCatalogQuery: () => ({ data: mockPermissionCatalog }),
+  useGetPromotionRulesQuery: () => mockGetPromotionRules(),
+  useGetUserRanksQuery: () => mockGetUserRanks(),
+  useCreatePromotionRuleMutation: () => [mockCreatePromotionRule],
+  useUpdatePromotionRuleMutation: () => [mockUpdatePromotionRule]
 }));
 
 jest.mock('../../store/services/forumApi', () => ({
@@ -101,6 +109,11 @@ describe('UserRankFormPage — create mode', () => {
     renderWithProviders(<UserRankFormPage />);
     expect(screen.getByText(/read forums/i)).toBeInTheDocument();
     expect(screen.getByText(/administrator/i)).toBeInTheDocument();
+  });
+
+  it('does not render the promotion-criteria section in create mode', () => {
+    renderWithProviders(<UserRankFormPage />);
+    expect(screen.queryByText(/promotion criteria/i)).not.toBeInTheDocument();
   });
 
   it('calls createUserRank with form data and navigates on success', async () => {
@@ -162,6 +175,14 @@ describe('UserRankFormPage — edit mode', () => {
       isLoading: false
     });
     mockUpdateUserRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockGetPromotionRules.mockReturnValue({ data: [] });
+    mockGetUserRanks.mockReturnValue({ data: [] });
+    mockCreatePromotionRule.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+    mockUpdatePromotionRule.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
   });
 
   it('renders "Edit User Rank" heading and Save Changes button', () => {
@@ -249,6 +270,96 @@ describe('UserRankFormPage — edit mode', () => {
       );
       expect(mockNavigate).toHaveBeenCalledWith(
         '/private/staff/tools/user-ranks'
+      );
+    });
+  });
+});
+
+describe('UserRankFormPage — promotion criteria (#170)', () => {
+  const existingRule = {
+    id: 11,
+    fromRankId: 3,
+    fromRankName: 'Elite',
+    toRankId: 4,
+    toRankName: 'Stellarific',
+    minContributed: '536870912000',
+    minRatio: 1.05,
+    minContributions: 500,
+    minAccountAgeDays: 56,
+    extra: null,
+    enabled: true,
+    createdAt: '2026-01-01',
+    updatedAt: '2026-01-01'
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseParams.mockReturnValue({ id: '3' });
+    mockGetUserRankByIdQuery.mockReturnValue({
+      data: { id: 3, level: 300, name: 'Elite', permissions: {} },
+      isLoading: false
+    });
+    mockUpdateUserRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockGetUserRanks.mockReturnValue({
+      data: [
+        { id: 3, name: 'Elite', level: 300, permissions: {} },
+        { id: 4, name: 'Stellarific', level: 350, permissions: {} }
+      ]
+    });
+    mockCreatePromotionRule.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+    mockUpdatePromotionRule.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+  });
+
+  it('prefills the promotion fields from the outgoing rule', async () => {
+    mockGetPromotionRules.mockReturnValue({ data: [existingRule] });
+    renderWithProviders(<UserRankFormPage />);
+    await waitFor(() => {
+      expect(
+        (screen.getByLabelText(/min contributed/i) as HTMLInputElement).value
+      ).toBe('536870912000');
+    });
+    expect(
+      (screen.getByLabelText(/promotes to/i) as HTMLSelectElement).value
+    ).toBe('4');
+  });
+
+  it('updates the existing rule with minContributed kept as a string', async () => {
+    mockGetPromotionRules.mockReturnValue({ data: [existingRule] });
+    const user = userEvent.setup();
+    renderWithProviders(<UserRankFormPage />);
+    await waitFor(() =>
+      expect(
+        (screen.getByLabelText(/min contributed/i) as HTMLInputElement).value
+      ).toBe('536870912000')
+    );
+    await user.click(
+      screen.getByRole('button', { name: /save promotion criteria/i })
+    );
+    await waitFor(() => {
+      expect(mockUpdatePromotionRule).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 11, minContributed: '536870912000' })
+      );
+    });
+    expect(typeof mockUpdatePromotionRule.mock.calls[0][0].minContributed).toBe(
+      'string'
+    );
+  });
+
+  it('creates a rule when none exists for this rank', async () => {
+    mockGetPromotionRules.mockReturnValue({ data: [] });
+    const user = userEvent.setup();
+    renderWithProviders(<UserRankFormPage />);
+    await user.selectOptions(screen.getByLabelText(/promotes to/i), '4');
+    await user.click(
+      screen.getByRole('button', { name: /save promotion criteria/i })
+    );
+    await waitFor(() => {
+      expect(mockCreatePromotionRule).toHaveBeenCalledWith(
+        expect.objectContaining({ fromRankId: 3, toRankId: 4 })
       );
     });
   });

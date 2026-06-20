@@ -22,6 +22,16 @@ type UpdateUserRankBody = NonNullable<
   paths['/tools/user-ranks/{id}']['put']['requestBody']
 >['content']['application/json'];
 type UpdateUserRankArgs = { id: number } & UpdateUserRankBody;
+type PromotionRulesResponse =
+  paths['/tools/promotion-rules']['get']['responses'][200]['content']['application/json'];
+type PromotionRule = PromotionRulesResponse[number];
+type CreatePromotionRuleArgs = NonNullable<
+  paths['/tools/promotion-rules']['post']['requestBody']
+>['content']['application/json'];
+type UpdatePromotionRuleBody = NonNullable<
+  paths['/tools/promotion-rules/{id}']['put']['requestBody']
+>['content']['application/json'];
+type UpdatePromotionRuleArgs = { id: number } & UpdatePromotionRuleBody;
 type StaffGroupsResponse =
   paths['/tools/staff-groups']['get']['responses'][200]['content']['application/json'];
 type PermissionCatalogResponse =
@@ -120,6 +130,39 @@ export const userApi = api.injectEndpoints({
     deleteUserRank: build.mutation<void, number>({
       query: (id) => ({ url: `/tools/user-ranks/${id}`, method: 'DELETE' }),
       invalidatesTags: ['UserRank']
+    }),
+
+    // Rank promotion rules (#170)
+    getPromotionRules: build.query<PromotionRulesResponse, void>({
+      query: () => '/tools/promotion-rules',
+      providesTags: ['PromotionRule']
+    }),
+    createPromotionRule: build.mutation<PromotionRule, CreatePromotionRuleArgs>(
+      {
+        query: (data) => ({
+          url: '/tools/promotion-rules',
+          method: 'POST',
+          body: data
+        }),
+        invalidatesTags: ['PromotionRule']
+      }
+    ),
+    updatePromotionRule: build.mutation<PromotionRule, UpdatePromotionRuleArgs>(
+      {
+        query: ({ id, ...data }) => ({
+          url: `/tools/promotion-rules/${id}`,
+          method: 'PUT',
+          body: data
+        }),
+        invalidatesTags: ['PromotionRule']
+      }
+    ),
+    deletePromotionRule: build.mutation<void, number>({
+      query: (id) => ({
+        url: `/tools/promotion-rules/${id}`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['PromotionRule']
     }),
 
     // Staff user actions
@@ -440,6 +483,10 @@ export const {
   useCreateUserRankMutation,
   useUpdateUserRankMutation,
   useDeleteUserRankMutation,
+  useGetPromotionRulesQuery,
+  useCreatePromotionRuleMutation,
+  useUpdatePromotionRuleMutation,
+  useDeletePromotionRuleMutation,
   useWarnUserMutation,
   useGetUserWarningsQuery,
   useGetUserNotesQuery,

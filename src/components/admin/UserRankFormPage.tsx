@@ -12,6 +12,7 @@ import {
 import { useGetForumCategoriesQuery } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
+import PromotionCriteriaSection from './PromotionCriteriaSection';
 
 interface FormValues {
   level: number;
@@ -309,6 +310,11 @@ const UserRankFormPage = () => {
             ))}
           </div>
         </div>
+
+        {/* Promotion criteria (#170) — only when editing an existing rank */}
+        {isEditing && id && (
+          <PromotionCriteriaSection fromRankId={parseInt(id)} />
+        )}
 
         {/* Staff display */}
         <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">

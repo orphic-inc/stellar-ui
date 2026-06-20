@@ -37,6 +37,7 @@ export const api = createApi({
     'Stylesheet',
     'Contribution',
     'UserRank',
+    'PromotionRule',
     'Stats',
     'Request',
     'Download',
