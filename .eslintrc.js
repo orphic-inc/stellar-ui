@@ -44,7 +44,10 @@ module.exports = {
           'recharts',
           // exports-field package the node resolver can't parse (e2e isn't in
           // the typescript-resolver tsconfig); same treatment as the above.
-          '^@axe-core/playwright$'
+          '^@axe-core/playwright$',
+          // exports-field package: resolves locally but Codacy's no-install
+          // sandbox can't parse it (same class as the entries above).
+          '^react-hook-form$'
         ]
       }
     ]
