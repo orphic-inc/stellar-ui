@@ -177,7 +177,19 @@ const mockProfile = {
   staffBio: null as string | null,
   isDonor: false,
   recentContributions: [],
-  recentSnatches: []
+  recentSnatches: [],
+  community: {
+    friends: 7,
+    invites: { direct: 2, total: 9, depth: 3 },
+    reputation: {
+      score: 0.82,
+      dimensions: [
+        { name: 'longevity', subScore: 0.9, weighted: 0.18 },
+        { name: 'ratio', subScore: 0.7, weighted: 0.14 },
+        { name: 'friends', subScore: 0.6, weighted: 0.06 }
+      ]
+    }
+  } as Record<string, unknown> | null
 };
 
 let mockProfileData: typeof mockProfile | undefined = mockProfile;
@@ -1181,5 +1193,70 @@ describe('UserProfile', () => {
     expect(screen.queryByText(/\dt\s*\/\s*\dp/)).not.toBeInTheDocument();
     expect(screen.getAllByText(/topics/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/posts/i).length).toBeGreaterThan(0);
+  });
+});
+
+describe('UserProfile — reputation & community block (#80)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockProfileData = mockProfile;
+    mockIsLoading = false;
+    mockError = undefined;
+    mockCurrentUser = { id: 99, username: 'bob' };
+  });
+
+  it('renders the reputation score from the community block', () => {
+    renderWithProviders(<UserProfile />);
+    expect(screen.getByText(/community reputation score/i)).toBeInTheDocument();
+    expect(screen.getByText('0.82')).toBeInTheDocument();
+  });
+
+  it('renders each CRS dimension by name', () => {
+    renderWithProviders(<UserProfile />);
+    expect(screen.getByText('longevity')).toBeInTheDocument();
+    expect(screen.getByText('ratio')).toBeInTheDocument();
+    expect(screen.getByText('friends')).toBeInTheDocument();
+  });
+
+  it('renders friends and invite counts', () => {
+    renderWithProviders(<UserProfile />);
+    expect(screen.getByText('7')).toBeInTheDocument(); // friends
+    expect(screen.getByText(/2 direct \/ 9 total/)).toBeInTheDocument();
+  });
+
+  it('omits the reputation block entirely when community is null (paranoia)', () => {
+    mockProfileData = {
+      ...mockProfile,
+      community: null as unknown as (typeof mockProfile)['community']
+    };
+    renderWithProviders(<UserProfile />);
+    expect(
+      screen.queryByText(/community reputation score/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it('renders only the dimensions present when ratio is hidden', () => {
+    mockProfileData = {
+      ...mockProfile,
+      community: {
+        friends: 7,
+        invites: { direct: 2, total: 9, depth: 3 },
+        reputation: {
+          score: 0.8,
+          dimensions: [
+            { name: 'longevity', subScore: 0.9, weighted: 0.18 },
+            { name: 'friends', subScore: 0.6, weighted: 0.06 }
+          ]
+        }
+      } as (typeof mockProfile)['community']
+    };
+    renderWithProviders(<UserProfile />);
+    expect(screen.getByText('longevity')).toBeInTheDocument();
+    expect(screen.queryByText('ratio')).not.toBeInTheDocument();
+  });
+
+  it('still renders the renamed Activity card', () => {
+    renderWithProviders(<UserProfile />);
+    expect(screen.getByText('Activity')).toBeInTheDocument();
   });
 });

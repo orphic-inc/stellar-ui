@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { formatBytes, ordinalSuffix } from '../../utils';
+import type { components } from '../../types/api';
 import DOMPurify from 'dompurify';
+
+type CommunityStats = components['schemas']['CommunityStats'];
 import {
   useGetMyRatioStatsQuery,
   useGetProfileByUserIdQuery
@@ -968,6 +971,9 @@ const UserProfile = () => {
   const profileIsDonor = profile.isDonor;
   const profileStats = profile.stats;
   const activitySummary = profile.activitySummary;
+  // Paranoia-gated (stellar-api #193): null when the viewer's tier hides stats.
+  // The generated type drops the `| null` from the nullable $ref, so cast.
+  const communityStats = profile.community as CommunityStats | null;
   const donorPresentation = profile.donorPresentation;
   const featuredShelves = profile.collageShelves.featuredPersonalCollages;
   const publicShelves = profile.collageShelves.publicCollages;
@@ -1531,10 +1537,67 @@ const UserProfile = () => {
             </ul>
           </div>
 
+          {communityStats && (
+            <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
+              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Reputation
+                </span>
+              </div>
+              <div className="px-3 py-2 border-b border-gray-800">
+                <div className="text-gray-500 text-xs uppercase tracking-wide">
+                  Community Reputation Score
+                </div>
+                <div className="mt-0.5 text-lg font-semibold text-indigo-300">
+                  {communityStats.reputation.score.toFixed(2)}
+                </div>
+              </div>
+              <ul className="divide-y divide-gray-800 text-xs">
+                {communityStats.reputation.dimensions.map((dim) => (
+                  <li
+                    key={dim.name}
+                    className="flex items-center justify-between px-3 py-1.5"
+                  >
+                    <span className="capitalize text-gray-400">{dim.name}</span>
+                    <span className="text-gray-300">
+                      {dim.subScore.toFixed(2)}
+                      <span className="text-gray-600 ml-1">
+                        (×wt {dim.weighted.toFixed(2)})
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="grid gap-px bg-gray-800 grid-cols-2 border-t border-gray-800">
+                <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
+                  <div className="text-gray-500 uppercase tracking-wide">
+                    Friends
+                  </div>
+                  <div className="mt-0.5 text-sm text-white">
+                    {communityStats.friends}
+                  </div>
+                </div>
+                <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
+                  <div className="text-gray-500 uppercase tracking-wide">
+                    Invites
+                  </div>
+                  <div className="mt-0.5 text-sm text-white">
+                    {communityStats.invites.direct} direct /{' '}
+                    {communityStats.invites.total} total
+                    <span className="text-gray-500">
+                      {' '}
+                      (depth {communityStats.invites.depth})
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
             <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
               <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Community Stats
+                Activity
               </span>
             </div>
             <div className="grid gap-px bg-gray-800 grid-cols-1">
