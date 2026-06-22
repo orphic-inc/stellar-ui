@@ -96,3 +96,17 @@ To run TypeScript typechecking without emitting files:
 ```bash
 npm run typecheck
 ```
+
+### End-to-end tests
+
+The Playwright end-to-end suite lives in `e2e/` and runs against a running app at `BASE_URL` (default `http://localhost:9000`):
+
+```bash
+npm run test:e2e
+```
+
+After a run, open the HTML report:
+
+```bash
+npm run test:e2e:report
+```
