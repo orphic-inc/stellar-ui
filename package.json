@@ -5,7 +5,8 @@
   "author": "ayan4m1 <andrew@bulletlogic.com>, Kyle O'Brien <obrienk@webbhost.net>",
   "license": "MIT",
   "scripts": {
-    "api:generate": "npm --prefix ../stellar-api run openapi:export && npx --no-install openapi-typescript ../stellar-api/openapi.json -o src/types/api.ts && npx --no-install prettier --write src/types/api.ts",
+    "api:generate": "npx --no-install openapi-typescript src/types/openapi.json -o src/types/api.ts && npx --no-install prettier --write src/types/api.ts",
+    "api:sync": "cp ../stellar-api/openapi.json src/types/openapi.json && npm run api:generate",
     "build": "cross-env NODE_ENV=production webpack",
     "clean": "rm -rf dist",
     "start": "cross-env NODE_ENV=development webpack serve",

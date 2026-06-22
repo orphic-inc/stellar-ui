@@ -16,6 +16,11 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: API contract freshness
+        # Regenerate api.ts from the vendored, pinned openapi.json; a stale
+        # committed copy reds the build (mirrors stellar-api's OpenAPI/ERD gates,
+        # ADR-0018). Re-sync deliberately with `npm run api:sync`.
+        run: npm run api:generate && git diff --exit-code src/types/api.ts
       - name: Format check
         run: npx prettier --check src
       - name: Lint

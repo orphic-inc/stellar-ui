@@ -1,0 +1,3 @@
+# Vendored OpenAPI contract — kept byte-identical to stellar-api's generator
+# (same rationale as stellar-api's own .prettierignore). Re-vendor via `npm run api:sync`.
+src/types/openapi.json

@@ -926,6 +926,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/profile/me/reputation/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Community Reputation Score over time (own trend series) */
+    get: {
+      parameters: {
+        query: {
+          period: 'Monthly' | 'Yearly';
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description CRS snapshot history (ascending by capturedAt) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CrsSnapshot'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/profile/user/{userId}': {
     parameters: {
       query?: never;
@@ -11922,6 +11969,7 @@ export interface components {
       showContributedStats: boolean;
       showConsumedStats: boolean;
       showRatioStats: boolean;
+      ircNick?: string | null;
     };
     ProfileStats: {
       contributed: string | null;
@@ -13219,6 +13267,17 @@ export interface components {
         id: number;
         username: string;
       } | null;
+    };
+    CrsSnapshot: {
+      capturedAt: string;
+      /** @enum {string} */
+      period: 'Monthly' | 'Yearly';
+      score: number;
+      dimensions: {
+        name: string;
+        subScore: number;
+        weighted: number;
+      }[];
     };
     CommunityHealthPulse: {
       pass: number;
