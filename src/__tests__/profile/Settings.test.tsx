@@ -411,6 +411,35 @@ describe('Settings', () => {
     expect(screen.getByLabelText(/^stylesheet$/i)).toBeInTheDocument();
   });
 
+  // Regression guard for #97: switching a tab must *replace* the panel, not
+  // stack on top of Appearance. The original report was that Privacy/Security
+  // never rendered while Appearance stayed mounted — so each non-Appearance tab
+  // asserts both its distinctive content present AND Appearance content gone.
+  // Security additionally surfaces the IRC-nick linker (#82/#201), the feature
+  // #97 said was unreachable behind the inert tabs.
+  it.each([
+    ['privacy', /paranoia level/i],
+    ['security', /^irc nick$/i]
+  ] as const)(
+    'replaces Appearance when switching to the %s tab',
+    async (tab, distinctive) => {
+      const user = userEvent.setup();
+      renderWithProviders(<Settings />);
+      // Appearance is the default panel.
+      expect(screen.getByLabelText(/^stylesheet$/i)).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole('button', { name: new RegExp(`^${tab}$`, 'i') })
+      );
+
+      // Distinctive panel content present (IRC Nick appears as both a heading
+      // and a field label, hence getAllByText).
+      expect(screen.getAllByText(distinctive).length).toBeGreaterThan(0);
+      expect(screen.queryByLabelText(/^stylesheet$/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/avatar url/i)).not.toBeInTheDocument();
+    }
+  );
+
   it('shows "Saving…" on Appearance tab when isSaving is true', () => {
     mockUseUpdateMyProfileMutation.mockReturnValue([
       jest.fn(),
