@@ -2,6 +2,13 @@
 
 @plugin "@tailwindcss/forms";
 
+/* Stylesheet themes (ADR-0003): a user theme is injected as a plain <link> and
+   may visually override anything — there is deliberately no "protected chrome"
+   reset. CSS cascade cannot contain an `!important` theme anyway, and the
+   product goal is maximal theming freedom. The boundary is code injection only,
+   held outside the cascade: store-time CSS sanitization on the API
+   (lib/cssSanitize.ts) plus the app-wide CSP in index.html. */
+
 /* BBCode rendered content */
 .bbcode-content blockquote.bbcode-quote {
   border-left: 3px solid rgb(99 102 241);

@@ -18,6 +18,27 @@ dotenv.config({ path: '.env.local', override: true });
 const dev = process.env.NODE_ENV === 'development';
 const apiUrl = process.env.STELLAR_API_URL || 'http://localhost:8080';
 
+// Content-Security-Policy — the inject-time half of the stylesheet boundary
+// (ADR-0003). User themes may restyle anything, so the policy is permissive on
+// the *resource* axes (style/img/font/connect) to keep that freedom and avoid
+// breaking legit assets (avatars, cover art, Sentry ingest). Its teeth are the
+// code-execution axes: `script-src 'self'` (no inline/eval/remote script — the
+// real XSS gate), `object-src 'none'`, `base-uri`/`form-action 'self'`. Emitted
+// in production builds only — dev uses eval source-maps + ws: HMR that a strict
+// script-src/connect-src would break. (frame-ancestors can't be set via <meta>;
+// it needs a response header — tracked separately.)
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline' https:",
+  "img-src 'self' data: https: http:",
+  "font-src 'self' data: https:",
+  "connect-src 'self' https:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'"
+].join('; ');
+
 const plugins = [
   new webpack.DefinePlugin({
     __SENTRY_DSN__: JSON.stringify(process.env.SENTRY_DSN || ''),
@@ -38,7 +59,16 @@ const plugins = [
     filename: '[name]-[chunkhash].css'
   }),
   new HtmlPlugin({
-    template: './src/index.html'
+    template: './src/index.html',
+    // Prod-only: dev's eval source-maps + ws: HMR need a looser policy.
+    meta: dev
+      ? {}
+      : {
+          'Content-Security-Policy': {
+            'http-equiv': 'Content-Security-Policy',
+            content: CSP
+          }
+        }
   }),
   new CopyPlugin({
     patterns: [{ from: 'src/stylesheets', to: 'stylesheets' }]
