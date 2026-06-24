@@ -46,6 +46,8 @@ export interface UserStatSnapshot {
   consumed: string | null;
   contributionCount: number;
 }
+type VersionResponse =
+  paths['/version']['get']['responses'][200]['content']['application/json'];
 type StylesheetsResponse =
   paths['/stylesheet']['get']['responses'][200]['content']['application/json'];
 type StylesheetStatsResponse =
@@ -75,6 +77,12 @@ export const siteApi = api.injectEndpoints({
     getSiteStats: build.query<SiteStatsResponse, void>({
       query: () => '/stats',
       providesTags: ['Stats']
+    }),
+    // Running platform version (#105) — the build-time __APP_VERSION__ tracks
+    // only the UI bundle and never moves with API releases.
+    getVersion: build.query<VersionResponse, void>({
+      query: () => '/version',
+      providesTags: ['SiteInfo']
     }),
     getStylesheets: build.query<StylesheetsResponse, void>({
       query: () => '/stylesheet',
@@ -129,6 +137,7 @@ export const siteApi = api.injectEndpoints({
 
 export const {
   useGetSiteStatsQuery,
+  useGetVersionQuery,
   useGetStylesheetsQuery,
   useGetSiteSettingsQuery,
   useUpdateSiteSettingsMutation,
