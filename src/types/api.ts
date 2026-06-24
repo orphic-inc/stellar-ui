@@ -1361,6 +1361,41 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/version': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The running platform version */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['VersionResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/announcements': {
     parameters: {
       query?: never;
@@ -1875,6 +1910,186 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stylesheet/author': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+            source: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Author stylesheet created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AuthorStylesheet'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stylesheet/author/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description An author's stylesheets */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AuthorStylesheet'][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stylesheet/author-stylesheet/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Author stylesheet */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AuthorStylesheet'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stylesheet/author-stylesheet/{id}/adopt': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Stylesheet adopted into the Site Stylesheet slot */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AdoptionResult'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -8592,7 +8807,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description The composable Rule/SubRule tree with CRS weights (PRD-05 #1) */
+    /** @description The composable Rule/SubRule tree with CRS weights (PRD-05 #1), plus the resolved ${...} variables map (PRD-09 / ADR-0020) */
     get: {
       parameters: {
         query?: never;
@@ -8602,7 +8817,7 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description Rule tree, each rule with its nested sub-rules */
+        /** @description Rule tree (each rule with its nested sub-rules) and the variables map the UI substitutes into the verbatim bodies */
         200: {
           headers: {
             [name: string]: unknown;
@@ -8610,6 +8825,9 @@ export interface paths {
           content: {
             'application/json': {
               rules: components['schemas']['Rule'][];
+              variables: {
+                [key: string]: string;
+              };
             };
           };
         };
@@ -12371,6 +12589,9 @@ export interface components {
       id: number;
       topicId: number;
     };
+    VersionResponse: {
+      version: string;
+    };
     Stylesheet: {
       id: number;
       name: string;
@@ -12383,6 +12604,18 @@ export interface components {
       id: number;
       name: string;
       userCount: number;
+    };
+    AuthorStylesheet: {
+      id: number;
+      authorId: number;
+      name: string;
+      source: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+    AdoptionResult: {
+      authorStylesheet: components['schemas']['AuthorStylesheet'];
+      scored: boolean;
     };
     GlobalNotice: {
       id: number;
@@ -12553,6 +12786,7 @@ export interface components {
       registrationStatus?: string | null;
       image?: string | null;
       allowDuplicateFormats: boolean;
+      leaderId?: number | null;
       staff?: components['schemas']['CommunityStaffMember'][];
       consumers?: components['schemas']['CommunityConsumer'][];
       _count?: {
