@@ -12,7 +12,7 @@ test('P-01: login navigates to authenticated layout', async ({ page }) => {
   await page.getByLabel(/password/i).fill(password);
   await page.getByRole('button', { name: /sign in/i }).click();
 
-  await page.waitForURL('**/private/**');
+  await page.waitForURL(/\/private\/?$/);
   await expect(page.getByRole('link', { name: /communities/i })).toBeVisible();
   await expect(page.getByRole('link', { name: /forums/i })).toBeVisible();
 });
