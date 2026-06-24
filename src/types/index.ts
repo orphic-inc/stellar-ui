@@ -50,6 +50,9 @@ export type Release = components['schemas']['Release'];
 // ─── Profile ─────────────────────────────────────────────────────────────────
 
 export type InviteNode = components['schemas']['InviteNode'];
+export type MemberInviteTreeNode =
+  components['schemas']['MemberInviteTreeNode'];
+export type InviteTreeSummary = components['schemas']['InviteTreeSummary'];
 
 // ─── Misc ────────────────────────────────────────────────────────────────────
 

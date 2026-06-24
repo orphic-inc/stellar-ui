@@ -22,6 +22,8 @@ type UpdateUserRankBody = NonNullable<
   paths['/tools/user-ranks/{id}']['put']['requestBody']
 >['content']['application/json'];
 type UpdateUserRankArgs = { id: number } & UpdateUserRankBody;
+type MemberInviteTreeResponse =
+  paths['/users/{id}/invite-tree']['get']['responses'][200]['content']['application/json'];
 type PromotionRulesResponse =
   paths['/tools/promotion-rules']['get']['responses'][200]['content']['application/json'];
 type PromotionRule = PromotionRulesResponse[number];
@@ -74,6 +76,11 @@ export const userApi = api.injectEndpoints({
     getUserSettings: build.query<UserSettingsResponse, void>({
       query: () => '/users/settings',
       providesTags: ['User']
+    }),
+    // Per-member invite subtree + summary rollup (#74; stellar-api #154).
+    getMemberInviteTree: build.query<MemberInviteTreeResponse, number>({
+      query: (id) => `/users/${id}/invite-tree`,
+      providesTags: (_, __, id) => [{ type: 'InviteTree', id }]
     }),
     updateUserSettings: build.mutation<
       UpdateUserSettingsResponse,
@@ -474,6 +481,7 @@ export const userApi = api.injectEndpoints({
 
 export const {
   useGetUserByIdQuery,
+  useGetMemberInviteTreeQuery,
   useGetPermissionCatalogQuery,
   useGetUserSettingsQuery,
   useUpdateUserSettingsMutation,

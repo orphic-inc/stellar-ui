@@ -101,6 +101,7 @@ const PrivateContent = () => (
     <Route path="user/edit/:id" element={wrap(Settings)} />
     <Route path="user/snatch-list" element={wrap(SnatchList)} />
     <Route path="user/invite-tree" element={<InviteTree />} />
+    <Route path="user/:id/invite-tree" element={<InviteTree />} />
     <Route path="user/:id" element={wrap(UserProfile)} />
     <Route path="invite" element={<InviteForm />} />
     <Route path="donate" element={wrap(DonatePage)} />
