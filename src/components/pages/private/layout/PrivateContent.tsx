@@ -67,6 +67,7 @@ import WikiEditPage from '../../../wiki/WikiEditPage';
 import WikiHistoryPage from '../../../wiki/WikiHistoryPage';
 import { useGetMeQuery } from '../../../../store/services/authApi';
 import StaffGate from '../../../staff/StaffGate';
+import StaffPage from '../../../staff/StaffPage';
 import { canSeeTop10History } from '../../../staff/staffAffordances';
 import { canAccessToolbox, staffTools } from '../../../staff/staffToolRegistry';
 
@@ -107,6 +108,10 @@ const PrivateContent = () => (
     <Route path="ratio" element={wrap(RatioRulesPage)} />
     <Route path="bookmarks" element={wrap(BookmarksPage)} />
     <Route path="friends" element={wrap(FriendsPage)} />
+
+    {/* Member-facing staff roster — readable by any authenticated member
+        (GET /api/staff is auth-only). The toolbox below stays staff-gated. */}
+    <Route path="staff" element={wrap(StaffPage)} />
 
     <Route
       path="staff/tools"

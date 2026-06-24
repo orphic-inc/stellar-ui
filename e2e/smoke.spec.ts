@@ -40,17 +40,20 @@ test.describe('as regular user', () => {
     }
   });
 
-  test('P-03: staff nav absent; direct URL to staff tools redirects', async ({
+  test('P-03: staff roster is member-facing; toolbox stays gated', async ({
     page
   }) => {
     await page.goto('/private/');
 
-    // Staff nav link must not be visible
-    await expect(
-      page.getByRole('link', { name: /^staff$/i })
-    ).not.toBeVisible();
+    // The Staff roster is member-facing — the nav entry is visible to a
+    // regular member and lands on the read-only roster.
+    const staffLink = page.getByRole('link', { name: /^staff$/i });
+    await expect(staffLink).toBeVisible();
+    await staffLink.click();
+    await page.waitForURL('**/private/staff');
+    await expect(page.getByRole('heading', { name: /^staff$/i })).toBeVisible();
 
-    // Direct URL access redirects back to /private
+    // But the staff toolbox stays gated — a direct hit redirects out.
     await page.goto('/private/staff/tools');
     await expect(page).toHaveURL(/\/private\/?$/);
   });
@@ -61,14 +64,17 @@ test.describe('as regular user', () => {
 test.describe('as staff user', () => {
   test.use({ storageState: AUTH_STAFF });
 
-  test('P-03b: staff nav visible and toolbox loads', async ({ page }) => {
+  test('P-03b: staff nav lands on the staff roster', async ({ page }) => {
     await page.goto('/private/');
 
     const staffLink = page.getByRole('link', { name: /^staff$/i });
     await expect(staffLink).toBeVisible();
 
     await staffLink.click();
-    await page.waitForURL('**/private/staff/tools**');
-    await expect(page.getByRole('heading', { name: /toolbox/i })).toBeVisible();
+    await page.waitForURL('**/private/staff');
+    await expect(page.getByRole('heading', { name: /^staff$/i })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /contact staff/i })
+    ).toBeVisible();
   });
 });

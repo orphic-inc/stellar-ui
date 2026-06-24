@@ -15,7 +15,6 @@ import CannedResponsesPage from '../staffInbox/CannedResponsesPage';
 import TicketView from '../staffInbox/TicketView';
 import ReportsQueuePage from '../reports/ReportsQueuePage';
 import ReportDetailPage from '../reports/ReportDetailPage';
-import StaffPage from './StaffPage';
 import StaffGroupsPage from './StaffGroupsPage';
 import SiteHistoryPage from './SiteHistoryPage';
 import MassPmPage from './MassPmPage';
@@ -70,14 +69,6 @@ export type StaffToolDefinition = {
 };
 
 export const staffTools: StaffToolDefinition[] = [
-  {
-    id: 'staff-home',
-    path: 'staff',
-    label: 'Staff',
-    permissions: ['staff'],
-    element: <StaffPage />,
-    showInToolbox: false
-  },
   {
     id: 'staff-groups',
     path: 'staff/tools/staff-groups',
