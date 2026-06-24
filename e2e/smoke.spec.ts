@@ -10,7 +10,7 @@ test('P-01: login navigates to authenticated layout', async ({ page }) => {
   await page.goto('/login');
   await page.getByLabel(/email/i).fill(email);
   await page.getByLabel(/password/i).fill(password);
-  await page.getByRole('button', { name: /log in/i }).click();
+  await page.getByRole('button', { name: /sign in/i }).click();
 
   await page.waitForURL('**/private/**');
   await expect(page.getByRole('link', { name: /communities/i })).toBeVisible();
