@@ -5,7 +5,7 @@ import { AUTH_USER, AUTH_STAFF } from './auth-paths';
 
 test('P-01: login navigates to authenticated layout', async ({ page }) => {
   const email = process.env.TEST_USER_EMAIL ?? 'testuser@example.com';
-  const password = process.env.TEST_USER_PASSWORD ?? 'testpass';
+  const password = process.env.TEST_USER_PASSWORD ?? 'changeme';
 
   await page.goto('/login');
   await page.getByLabel(/email/i).fill(email);

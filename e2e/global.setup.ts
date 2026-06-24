@@ -32,12 +32,12 @@ async function saveAuthState(
 
 setup('authenticate as regular user', async () => {
   const email = process.env.TEST_USER_EMAIL ?? 'testuser@example.com';
-  const password = process.env.TEST_USER_PASSWORD ?? 'testpass';
+  const password = process.env.TEST_USER_PASSWORD ?? 'changeme';
   await saveAuthState(email, password, AUTH_USER);
 });
 
 setup('authenticate as staff user', async () => {
   const email = process.env.TEST_STAFF_EMAIL ?? 'staffuser@example.com';
-  const password = process.env.TEST_STAFF_PASSWORD ?? 'staffpass';
+  const password = process.env.TEST_STAFF_PASSWORD ?? 'changeme';
   await saveAuthState(email, password, AUTH_STAFF);
 });
