@@ -4,11 +4,11 @@ import { AUTH_USER, AUTH_STAFF } from './auth-paths';
 // ─── P-01: Login flow ────────────────────────────────────────────────────────
 
 test('P-01: login navigates to authenticated layout', async ({ page }) => {
-  const username = process.env.TEST_USER ?? 'testuser';
+  const email = process.env.TEST_USER_EMAIL ?? 'testuser@example.com';
   const password = process.env.TEST_USER_PASSWORD ?? 'testpass';
 
   await page.goto('/login');
-  await page.getByLabel(/username/i).fill(username);
+  await page.getByLabel(/email/i).fill(email);
   await page.getByLabel(/password/i).fill(password);
   await page.getByRole('button', { name: /log in/i }).click();
 

@@ -5,22 +5,23 @@ import { AUTH_USER, AUTH_STAFF } from './auth-paths';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
+// POST /api/auth authenticates by email (LoginBody = { email, password }),
+// not username — so the login fixtures use *_EMAIL env vars. The username
+// vars remain for specs that assert on the displayed username.
 async function saveAuthState(
-  username: string,
+  email: string,
   password: string,
   statePath: string
 ): Promise<void> {
   const ctx = await playwrightRequest.newContext({ baseURL: API_URL });
 
   const res = await ctx.post('/api/auth', {
-    data: { username, password }
+    data: { email, password }
   });
 
   if (!res.ok()) {
     const body = await res.text();
-    throw new Error(
-      `Login failed for "${username}" (${res.status()}): ${body}`
-    );
+    throw new Error(`Login failed for "${email}" (${res.status()}): ${body}`);
   }
 
   const state = await ctx.storageState();
@@ -30,13 +31,13 @@ async function saveAuthState(
 }
 
 setup('authenticate as regular user', async () => {
-  const username = process.env.TEST_USER ?? 'testuser';
+  const email = process.env.TEST_USER_EMAIL ?? 'testuser@example.com';
   const password = process.env.TEST_USER_PASSWORD ?? 'testpass';
-  await saveAuthState(username, password, AUTH_USER);
+  await saveAuthState(email, password, AUTH_USER);
 });
 
 setup('authenticate as staff user', async () => {
-  const username = process.env.TEST_STAFF_USER ?? 'staffuser';
+  const email = process.env.TEST_STAFF_EMAIL ?? 'staffuser@example.com';
   const password = process.env.TEST_STAFF_PASSWORD ?? 'staffpass';
-  await saveAuthState(username, password, AUTH_STAFF);
+  await saveAuthState(email, password, AUTH_STAFF);
 });
