@@ -11,6 +11,12 @@ jest.mock('../../store/services/profileApi', () => ({
   useCreateInviteMutation: () => [mockCreateInvite, { isLoading: false }]
 }));
 
+// InviteTree is embedded above the form; it has its own test suite.
+jest.mock('../../components/profile/invite/InviteTree', () => ({
+  __esModule: true,
+  default: () => <div data-testid="invite-tree" />
+}));
+
 jest.mock('../../store/slices/authSlice', () => ({
   selectCurrentUser: () => ({ id: 7, username: 'testuser' })
 }));
@@ -30,9 +36,7 @@ describe('InviteForm', () => {
     renderWithProviders(<InviteForm />);
     expect(document.querySelector('input[type="email"]')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /invite/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: /invite tree/i })
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('invite-tree')).toBeInTheDocument();
   });
 
   it('shows warning text about invite responsibility', () => {

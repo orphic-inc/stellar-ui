@@ -105,7 +105,9 @@ const Summary = ({ summary }: { summary: InviteTreeSummary }) => (
   </div>
 );
 
-const InviteTree = () => {
+// `embedded` drops the full-page wrapper so the tree can sit inline above the
+// invite form (the signed-in user's own tree, no :id param).
+const InviteTree = ({ embedded = false }: { embedded?: boolean }) => {
   // Defaults to the signed-in user; an `:id` param yields the per-member view.
   const { id } = useParams<{ id?: string }>();
   const currentUser = useSelector(selectCurrentUser);
@@ -116,7 +118,7 @@ const InviteTree = () => {
   });
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className={embedded ? 'mb-6' : 'max-w-4xl mx-auto px-4 py-6'}>
       <h2 className="text-xl font-semibold text-white mb-6">Invite Tree</h2>
 
       {isLoading || !data ? (

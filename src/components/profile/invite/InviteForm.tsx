@@ -5,6 +5,7 @@ import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { useCreateInviteMutation } from '../../../store/services/profileApi';
 import { addAlert } from '../../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
+import InviteTree from './InviteTree';
 
 const InviteForm = () => {
   const dispatch = useDispatch();
@@ -51,11 +52,7 @@ const InviteForm = () => {
           Invites
         </h2>
       </div>
-      <div className="linkbox">
-        <Link to="/private/user/invite-tree" className="brackets">
-          Invite tree
-        </Link>
-      </div>
+      <InviteTree embedded />
 
       <div className="box pad">
         <p>
