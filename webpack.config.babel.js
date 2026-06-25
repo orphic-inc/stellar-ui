@@ -71,7 +71,17 @@ const plugins = [
         }
   }),
   new CopyPlugin({
-    patterns: [{ from: 'src/stylesheets', to: 'stylesheets' }]
+    patterns: [
+      { from: 'src/stylesheets', to: 'stylesheets' },
+      // The footer links to these repo-root files as raw paths (/LICENSE,
+      // /CHANGELOG.md). Emit them into the output root so they resolve as real
+      // assets in dev and prod — otherwise historyApiFallback swallows /LICENSE
+      // into the SPA shell and 404s /CHANGELOG.md on the dot-rule.
+      { from: 'CHANGELOG.md', to: 'CHANGELOG.md' },
+      // toType 'file' is required: LICENSE has no extension, so CopyPlugin would
+      // otherwise treat the target as a directory and emit dist/LICENSE/LICENSE.
+      { from: 'LICENSE', to: 'LICENSE', toType: 'file' }
+    ]
   })
 ];
 

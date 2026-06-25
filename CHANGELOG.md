@@ -8,6 +8,31 @@ All notable changes to stellar-ui are documented here.
 
 ---
 
+## [0.6.0] — 2026-06-25
+
+### Added
+
+- **Vendored OpenAPI contract + CI freshness gate** — `api.ts` is generated from a pinned `src/types/openapi.json` rather than a live API, with a CI step that reds on staleness (`api:sync` re-syncs to stellar-api) [#94] (ADR-0002)
+- **Stylesheet code-injection boundary** for themes — a CSP-aware injection seam that applies theme CSS without locking site chrome [#73] (ADR-0003)
+- **Invite-tree** embedded above the invite form, consuming the per-member subtree contract, with E2E coverage [#74]
+- **EAC/XLD rip-log checker** embedded in the FLAC contribute flow
+- Footer now shows the **running platform version** (`GET /api/version`, fallback `__APP_VERSION__`) [#105]
+
+### Changed
+
+- **Version policy** — the UI's `major.minor` now tracks the vendored API contract it ships (`src/types/openapi.json`); the patch digit stays the UI's own cadence. Manifest bumped `0.5.4` → `0.6.0` to realign with the `0.6.0` contract, enforced by `version:check` (ADR-0004)
+- Staff roster made member-facing via the Staff nav [#115]
+- Settings tab mutual-exclusion guard + IRC-nick surface [#97]
+- Standardized the issue tracker to match stellar-api (ADR-0018)
+- Quick-wins batch: jest test-noise cleanup [#112], contribute-form add-artist alignment and TiB removal [#99], `docs/adr/` home [#106], version-consistency gate [#107]
+- Documented the Playwright E2E setup (`test:e2e`)
+
+### Fixed
+
+- Playwright auth fixes — authenticate by email, default fixture password, and the P-01 `/private` home + Sign In selector; assert the seeded invite tree rather than the empty branch [#74]
+
+---
+
 ## [0.5.4] — 2026-06-20
 
 ### Added
