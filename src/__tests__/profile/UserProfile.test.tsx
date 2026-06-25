@@ -54,6 +54,7 @@ const mockWarnUser = jest.fn();
 const mockDisableUser = jest.fn();
 const mockEnableUser = jest.fn();
 const mockSetUserRank = jest.fn();
+const mockSetUserRankLock = jest.fn();
 const mockAddUserNote = jest.fn();
 const mockDeleteUserNote = jest.fn();
 const mockRemoveUserWarning = jest.fn();
@@ -68,7 +69,8 @@ let mockGrantDonorLoading = false;
 let mockUserRanks: Array<{ id: number; name: string }> = [];
 let mockUserRankAssignment = {
   userRankId: 10,
-  secondaryRankIds: [] as number[]
+  secondaryRankIds: [] as number[],
+  rankLocked: false
 };
 let mockDonorRanks: Array<{ id: number; name: string }> = [];
 let mockNotes: Array<{
@@ -113,6 +115,7 @@ jest.mock('../../store/services/userApi', () => ({
     mockSetUserRank,
     { isLoading: mockSetUserRankLoading }
   ],
+  useSetUserRankLockMutation: () => [mockSetUserRankLock, { isLoading: false }],
   useGetUserIpHistoryQuery: () => ({ data: mockIpHistory }),
   useGetUserEmailHistoryQuery: () => ({ data: mockEmailHistory }),
   useGetUserRanksQuery: () => ({ data: mockUserRanks }),
@@ -245,7 +248,11 @@ describe('UserProfile', () => {
     mockCurrentUser = { id: 99, username: 'bob' };
     mockHasAnyPermission = false;
     mockUserRanks = [];
-    mockUserRankAssignment = { userRankId: 10, secondaryRankIds: [] };
+    mockUserRankAssignment = {
+      userRankId: 10,
+      secondaryRankIds: [],
+      rankLocked: false
+    };
     mockDonorRanks = [];
     mockNotes = [];
     mockWarnings = [];
@@ -262,6 +269,7 @@ describe('UserProfile', () => {
     mockDisableUser.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockEnableUser.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSetUserRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockSetUserRankLock.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockAddUserNote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockDeleteUserNote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveUserWarning.mockReturnValue({
@@ -556,7 +564,11 @@ describe('UserProfile', () => {
         { id: 10, name: 'Senior', level: 100, secondary: false } as never,
         { id: 11, name: 'Forum Staff', level: 500, secondary: true } as never
       ];
-      mockUserRankAssignment = { userRankId: 10, secondaryRankIds: [] };
+      mockUserRankAssignment = {
+        userRankId: 10,
+        secondaryRankIds: [],
+        rankLocked: false
+      };
       mockDonorRanks = [{ id: 20, name: 'Gold' }];
     });
 
@@ -634,6 +646,64 @@ describe('UserProfile', () => {
       await waitFor(() => {
         expect(mockSetUserRank).toHaveBeenCalled();
       });
+    });
+
+    it('reflects the current rankLocked state in the lock toggle', () => {
+      mockUserRankAssignment = {
+        userRankId: 10,
+        secondaryRankIds: [],
+        rankLocked: true
+      };
+      renderWithProviders(<UserProfile />);
+      expect(
+        screen.getByRole('checkbox', { name: /lock rank/i })
+      ).toBeChecked();
+    });
+
+    it('locks an unlocked user via setUserRankLock', async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<UserProfile />);
+      const toggle = screen.getByRole('checkbox', { name: /lock rank/i });
+      expect(toggle).not.toBeChecked();
+      await user.click(toggle);
+      await waitFor(() => {
+        expect(mockSetUserRankLock).toHaveBeenCalledWith({
+          id: 42,
+          rankLocked: true
+        });
+      });
+    });
+
+    it('unlocks a locked user via setUserRankLock', async () => {
+      mockUserRankAssignment = {
+        userRankId: 10,
+        secondaryRankIds: [],
+        rankLocked: true
+      };
+      const user = userEvent.setup();
+      renderWithProviders(<UserProfile />);
+      await user.click(screen.getByRole('checkbox', { name: /lock rank/i }));
+      await waitFor(() => {
+        expect(mockSetUserRankLock).toHaveBeenCalledWith({
+          id: 42,
+          rankLocked: false
+        });
+      });
+    });
+
+    it('reverts the toggle when the rank-lock mutation fails', async () => {
+      mockSetUserRankLock.mockReturnValue({
+        unwrap: () => Promise.reject({})
+      });
+      const user = userEvent.setup();
+      renderWithProviders(<UserProfile />);
+      const toggle = screen.getByRole('checkbox', { name: /lock rank/i });
+      await user.click(toggle);
+      await waitFor(() => {
+        expect(mockSetUserRankLock).toHaveBeenCalled();
+      });
+      // optimistic flip reverts on rejection
+      await waitFor(() => expect(toggle).not.toBeChecked());
     });
 
     it('dispatches danger alert when delete note fails', async () => {

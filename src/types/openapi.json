@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Stellar API",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "REST API for the Stellar community tracker. All routes under `/api/*`. Authentication uses JWT cookies (`token` cookie set on login)."
   },
   "servers": [
@@ -1430,75 +1430,6 @@
           "expiresAt",
           "createdAt",
           "warnedBy"
-        ]
-      },
-      "ProgressionGap": {
-        "type": "object",
-        "properties": {
-          "toRankName": {
-            "type": "string",
-            "nullable": true
-          },
-          "contributedShortBytes": {
-            "type": "string"
-          },
-          "ratioShort": {
-            "type": "number"
-          },
-          "contributionsShort": {
-            "type": "number"
-          },
-          "ageShortDays": {
-            "type": "number"
-          },
-          "extraUnmet": {
-            "type": "string",
-            "nullable": true,
-            "enum": [
-              "DISTINCT_RELEASES_500",
-              "QUALITY_CONTRIB_500",
-              null
-            ]
-          }
-        },
-        "required": [
-          "toRankName",
-          "contributedShortBytes",
-          "ratioShort",
-          "contributionsShort",
-          "ageShortDays",
-          "extraUnmet"
-        ]
-      },
-      "ProfileProgression": {
-        "type": "object",
-        "properties": {
-          "currentRankId": {
-            "type": "number"
-          },
-          "currentRankName": {
-            "type": "string",
-            "nullable": true
-          },
-          "rankLocked": {
-            "type": "boolean"
-          },
-          "gap": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ProgressionGap"
-              },
-              {
-                "nullable": true
-              }
-            ]
-          }
-        },
-        "required": [
-          "currentRankId",
-          "currentRankName",
-          "rankLocked",
-          "gap"
         ]
       },
       "DonorRewards": {
@@ -6131,6 +6062,82 @@
         }
       }
     },
+    "/users/{id}/rank-lock": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rankLocked": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "rankLocked"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rank lock toggled (freezes/unfreezes auto class-progression)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing users_edit permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/settings": {
       "get": {
         "tags": [
@@ -6733,45 +6740,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MyProfile"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not authenticated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Profile not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/profile/me/progression": {
-      "get": {
-        "tags": [
-          "Profile"
-        ],
-        "responses": {
-          "200": {
-            "description": "Gap to the next auto-class rung",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProfileProgression"
                 }
               }
             }

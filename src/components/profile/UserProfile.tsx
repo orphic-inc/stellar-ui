@@ -21,6 +21,7 @@ import {
   useEnableUserMutation,
   useGetUserRankAssignmentQuery,
   useSetUserRankMutation,
+  useSetUserRankLockMutation,
   useGetUserIpHistoryQuery,
   useGetUserEmailHistoryQuery,
   useGetUserRanksQuery,
@@ -239,6 +240,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
   const [selectedSecondaryRankIds, setSelectedSecondaryRankIds] = useState<
     number[]
   >([]);
+  const [rankLocked, setRankLocked] = useState(false);
   const [donorRankId, setDonorRankId] = useState<number | ''>('');
   const [donorExpiry, setDonorExpiry] = useState('');
 
@@ -275,11 +277,14 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     if (!rankAssignment) return;
     setSelectedRankId(rankAssignment.userRankId);
     setSelectedSecondaryRankIds(rankAssignment.secondaryRankIds);
+    setRankLocked(rankAssignment.rankLocked);
   }, [rankAssignment]);
 
   const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
   const [enableUser, { isLoading: isEnabling }] = useEnableUserMutation();
   const [setUserRank, { isLoading: isSettingRank }] = useSetUserRankMutation();
+  const [setUserRankLock, { isLoading: isTogglingLock }] =
+    useSetUserRankLockMutation();
   const [addUserNote, { isLoading: isAddingNote }] = useAddUserNoteMutation();
   const [deleteUserNote] = useDeleteUserNoteMutation();
   const [removeUserWarning] = useRemoveUserWarningMutation();
@@ -329,6 +334,30 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     } catch (err) {
       dispatch(
         addAlert(getApiErrorMessage(err) ?? 'Failed to set rank.', 'danger')
+      );
+    }
+  };
+
+  const handleToggleRankLock = async () => {
+    const next = !rankLocked;
+    setRankLocked(next); // optimistic; refetch reconciles on settle
+    try {
+      await setUserRankLock({ id: profileId, rankLocked: next }).unwrap();
+      dispatch(
+        addAlert(
+          next
+            ? 'Rank locked — frozen from auto class-progression.'
+            : 'Rank unlocked.',
+          'success'
+        )
+      );
+    } catch (err) {
+      setRankLocked(!next); // revert on failure
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to update rank lock.',
+          'danger'
+        )
       );
     }
   };
@@ -603,6 +632,25 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                   </div>
                 </div>
               ) : null}
+              <label
+                aria-label="Lock rank"
+                className="flex items-start gap-3 rounded border border-gray-800 px-3 py-2 cursor-pointer hover:border-gray-700"
+              >
+                <input
+                  type="checkbox"
+                  checked={rankLocked}
+                  disabled={isTogglingLock}
+                  onChange={handleToggleRankLock}
+                  className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 disabled:opacity-50"
+                />
+                <span className="min-w-0">
+                  <span className="block text-sm text-gray-200">Lock rank</span>
+                  <span className="block text-xs text-gray-500">
+                    Freeze this user from automatic class progression. Manual
+                    rank changes above still apply.
+                  </span>
+                </span>
+              </label>
             </div>
           </div>
 

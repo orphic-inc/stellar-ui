@@ -59,12 +59,18 @@ export interface UserRankRecord {
 export interface UserRankAssignment {
   userRankId: number;
   secondaryRankIds: number[];
+  rankLocked: boolean;
 }
 
 type SetUserRankArgs = {
   id: number;
   userRankId: number;
   secondaryRankIds?: number[];
+};
+
+type SetUserRankLockArgs = {
+  id: number;
+  rankLocked: boolean;
 };
 
 export const userApi = api.injectEndpoints({
@@ -249,6 +255,17 @@ export const userApi = api.injectEndpoints({
         url: `/users/${id}/rank`,
         method: 'PUT',
         body: { userRankId, secondaryRankIds }
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
+    }),
+    // Freezes/unfreezes a user from auto class-progression. Separate from
+    // setUserRank by design: that route rewrites the whole secondary-rank set,
+    // so folding the lock into it would strip Donor/VIP on every toggle.
+    setUserRankLock: build.mutation<{ msg: string }, SetUserRankLockArgs>({
+      query: ({ id, rankLocked }) => ({
+        url: `/users/${id}/rank-lock`,
+        method: 'PUT',
+        body: { rankLocked }
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
@@ -504,6 +521,7 @@ export const {
   useEnableUserMutation,
   useGetUserRankAssignmentQuery,
   useSetUserRankMutation,
+  useSetUserRankLockMutation,
   useLinkIrcNickMutation,
   useGetUserIpHistoryQuery,
   useGetUserEmailHistoryQuery,

@@ -370,6 +370,76 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/users/{id}/rank-lock': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            rankLocked: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Rank lock toggled (freezes/unfreezes auto class-progression) */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Validation failed */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing users_edit permission */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/users/settings': {
     parameters: {
       query?: never;
@@ -866,59 +936,6 @@ export interface paths {
         };
       };
     };
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/profile/me/progression': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Gap to the next auto-class rung */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['ProfileProgression'];
-          };
-        };
-        /** @description Not authenticated */
-        401: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-        /** @description Profile not found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-      };
-    };
-    put?: never;
     post?: never;
     delete?: never;
     options?: never;
@@ -12499,21 +12516,6 @@ export interface components {
         id: number;
         username: string;
       } | null;
-    };
-    ProgressionGap: {
-      toRankName: string | null;
-      contributedShortBytes: string;
-      ratioShort: number;
-      contributionsShort: number;
-      ageShortDays: number;
-      /** @enum {string|null} */
-      extraUnmet: 'DISTINCT_RELEASES_500' | 'QUALITY_CONTRIB_500' | null;
-    };
-    ProfileProgression: {
-      currentRankId: number;
-      currentRankName: string | null;
-      rankLocked: boolean;
-      gap: components['schemas']['ProgressionGap'] & unknown;
     };
     DonorRewards: {
       rewards: {
