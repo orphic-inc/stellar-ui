@@ -47,7 +47,7 @@ jest.mock('react-router-dom', () => ({
     const inactiveClass =
       typeof className === 'function'
         ? className({ isActive: false })
-        : className ?? '';
+        : (className ?? '');
     const activeClass =
       typeof className === 'function' ? className({ isActive: true }) : '';
     return (

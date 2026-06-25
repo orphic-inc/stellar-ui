@@ -106,7 +106,7 @@ const UserRankManager = () => {
                     <td className="px-4 py-3 text-gray-400">
                       {rank.personalCollageLimit === 0
                         ? '∞'
-                        : rank.personalCollageLimit ?? '∞'}
+                        : (rank.personalCollageLimit ?? '∞')}
                     </td>
                     <td className="px-4 py-3 flex gap-2">
                       <Link

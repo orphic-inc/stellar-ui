@@ -86,20 +86,20 @@ const ReleaseBrowsePage = () => {
     searchParams.get('hasLog') === 'true'
       ? true
       : searchParams.get('hasLog') === 'false'
-      ? false
-      : undefined;
+        ? false
+        : undefined;
   const hasCue =
     searchParams.get('hasCue') === 'true'
       ? true
       : searchParams.get('hasCue') === 'false'
-      ? false
-      : undefined;
+        ? false
+        : undefined;
   const isScene =
     searchParams.get('isScene') === 'true'
       ? true
       : searchParams.get('isScene') === 'false'
-      ? false
-      : undefined;
+        ? false
+        : undefined;
   const vanityHouse =
     searchParams.get('vanityHouse') === 'true' ? true : undefined;
 
@@ -181,7 +181,7 @@ const ReleaseBrowsePage = () => {
 
   const communityList = Array.isArray(communities)
     ? communities
-    : (communities as { data?: { id: number; name: string }[] })?.data ?? [];
+    : ((communities as { data?: { id: number; name: string }[] })?.data ?? []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
