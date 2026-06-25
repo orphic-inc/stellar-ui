@@ -145,7 +145,7 @@ describe('ReleaseBrowsePage RTK Query integration', () => {
     });
   });
 
-  it('shows a spinner while the releases query is pending', () => {
+  it('shows a spinner while the releases query is pending', async () => {
     // Hold the releases fetch so isLoading stays true
     (global.fetch as jest.Mock).mockImplementation((request: Request) => {
       const url = new URL(request.url, 'http://localhost');
@@ -159,6 +159,9 @@ describe('ReleaseBrowsePage RTK Query integration', () => {
 
     renderWithProviders(<ReleaseBrowsePage />);
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    // The auth/communities queries resolve after the synchronous assertion
+    // above; flush them inside act so the state update doesn't warn.
+    await act(async () => {});
   });
 
   it('shows an error message when the releases API returns a server error', async () => {

@@ -125,7 +125,7 @@ describe('WikiListPage RTK Query integration', () => {
     });
   });
 
-  it('shows a spinner while wiki pages are loading', () => {
+  it('shows a spinner while wiki pages are loading', async () => {
     (global.fetch as jest.Mock).mockImplementation((request: Request) => {
       const url = new URL(request.url, 'http://localhost');
       if (url.pathname === '/api/auth')
@@ -134,6 +134,9 @@ describe('WikiListPage RTK Query integration', () => {
     });
     renderWithProviders(<WikiListPage />);
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+    // The auth query resolves after the synchronous assertion above; flush it
+    // inside act so the state update doesn't warn.
+    await act(async () => {});
   });
 
   it('shows an error message when the wiki API fails', async () => {

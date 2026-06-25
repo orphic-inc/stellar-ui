@@ -24,8 +24,9 @@ const inputClass =
 const labelClass = 'block text-sm font-medium text-gray-300 mb-1';
 
 // Edits the auto-class promotion rule whose `fromRankId` is the rank being
-// edited (the outgoing rung). Creates one when none exists yet. Self-contained
-// form so it doesn't entangle with the rank-definition form above it.
+// edited (the outgoing rung). Creates one when none exists yet. Its own <form>
+// with its own save mutation — rendered as a sibling of the rank-definition
+// form, never nested inside it (nested <form>s are invalid DOM).
 const PromotionCriteriaSection = ({ fromRankId }: { fromRankId: number }) => {
   const dispatch = useDispatch();
   const { data: rules } = useGetPromotionRulesQuery();

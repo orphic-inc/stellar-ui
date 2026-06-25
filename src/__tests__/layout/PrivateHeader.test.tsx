@@ -81,6 +81,14 @@ jest.mock('../../components/staff/staffAffordances', () => ({
     )
 }));
 
+// PrivateHeader fires useGetMyProfileQuery for the donor/warning surface; mock
+// it so the test store doesn't issue a real fetch (no jsdom Request → no
+// unhandled-rejection / act() noise). These tests assert on the `user` prop, not
+// the profile query.
+jest.mock('../../store/services/profileApi', () => ({
+  useGetMyProfileQuery: () => ({ data: undefined })
+}));
+
 jest.mock('../../store/services/messagesApi', () => ({
   useGetUnreadCountQuery: () => mockUseGetUnreadCountQuery()
 }));

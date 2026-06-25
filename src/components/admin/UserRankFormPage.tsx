@@ -311,11 +311,6 @@ const UserRankFormPage = () => {
           </div>
         </div>
 
-        {/* Promotion criteria (#170) — only when editing an existing rank */}
-        {isEditing && id && (
-          <PromotionCriteriaSection fromRankId={parseInt(id)} />
-        )}
-
         {/* Staff display */}
         <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
           <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
@@ -371,6 +366,12 @@ const UserRankFormPage = () => {
           </button>
         </div>
       </form>
+
+      {/* Promotion criteria (#170) — only when editing an existing rank. A
+          sibling of the rank form (its own <form> + save), never nested. */}
+      {isEditing && id && (
+        <PromotionCriteriaSection fromRankId={parseInt(id)} />
+      )}
     </div>
   );
 };

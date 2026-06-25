@@ -27,6 +27,19 @@ jest.mock('../../components/layout/NotificationCorner', () => ({
   default: () => <div data-testid="notification-corner">Notifications</div>
 }));
 
+// These shell children each fire their own RTK Query on mount; stub them so the
+// layout test doesn't issue real fetches (no jsdom Request → no unhandled-
+// rejection / act() noise). Neither is asserted by these tests.
+jest.mock('../../components/layout/StylesheetInjector', () => ({
+  __esModule: true,
+  default: () => null
+}));
+
+jest.mock('../../components/layout/GlobalNoticeBanner', () => ({
+  __esModule: true,
+  default: () => null
+}));
+
 describe('PrivateLayout', () => {
   beforeEach(() => {
     mockUseGetMeQuery.mockReset();

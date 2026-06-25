@@ -21,6 +21,12 @@ jobs:
         # committed copy reds the build (mirrors stellar-api's OpenAPI/ERD gates,
         # ADR-0018). Re-sync deliberately with `npm run api:sync`.
         run: npm run api:generate && git diff --exit-code src/types/api.ts
+      - name: Version consistency
+        # Internal version surfaces (lockfile, CHANGELOG) must match the manifest
+        # — mirrors stellar-api's version:check (ADR-0018). The footer's displayed
+        # version is derived at runtime from the platform (#105), so it isn't
+        # gated here; this guards the remaining committed surfaces.
+        run: npm run version:check
       - name: Format check
         run: npx prettier --check src
       - name: Lint

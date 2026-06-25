@@ -32,8 +32,11 @@ export const BINARY_SIZE_UNITS = ['B', 'KiB', 'MiB', 'GiB', 'TiB'] as const;
 export type BinarySizeUnit = (typeof BINARY_SIZE_UNITS)[number];
 
 // Units offered in the contribution form's unit selector (bytes is too granular
-// to type by hand — the natural-string parser still accepts a bare "B").
-export const SIZE_INPUT_UNITS: BinarySizeUnit[] = ['KiB', 'MiB', 'GiB', 'TiB'];
+// to type by hand — the natural-string parser still accepts a bare "B"). TiB is
+// deliberately excluded: no ReleaseType upload-size cap permits a TiB-scale
+// release, so offering it only invites an always-rejected value (#99). TiB stays
+// in BINARY_SIZE_UNITS so formatSize can still render large *existing* sizes.
+export const SIZE_INPUT_UNITS: BinarySizeUnit[] = ['KiB', 'MiB', 'GiB'];
 
 // Multipliers for every unit token parseSize recognizes. SI shorthands (KB, MB,
 // …) are treated as binary too, since that's what users usually mean here.

@@ -458,15 +458,20 @@ const ContributeForm = () => {
                     </option>
                   ))}
                 </select>
-                {i > 0 && (
+                {/* The remove control occupies a fixed-width slot on every row
+                    (a spacer on the first, non-removable row) so the role-select
+                    column stays aligned as rows are added/removed (#99). */}
+                {i > 0 ? (
                   <button
                     type="button"
                     onClick={(e) => removeCollaborator(e, i)}
                     aria-label={`Remove ${creatorWord} ${i + 1}`}
-                    className="text-gray-500 hover:text-red-400 text-sm px-1"
+                    className="w-6 shrink-0 text-center text-gray-500 hover:text-red-400 text-sm"
                   >
                     <span aria-hidden="true">✕</span>
                   </button>
+                ) : (
+                  <span className="w-6 shrink-0" aria-hidden="true" />
                 )}
               </div>
             ))}
