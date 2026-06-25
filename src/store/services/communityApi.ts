@@ -75,6 +75,9 @@ export const communityApi = api.injectEndpoints({
         registrationStatus?: string;
         allowDuplicateFormats?: boolean;
         staffIds?: number[];
+        // Transfers the community leader (ADR-0021); communities_manage-gated
+        // server-side. null clears the leader.
+        leaderId?: number | null;
       }
     >({
       query: ({ id, ...data }) => ({

@@ -1,4 +1,13 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
+
+// The composable Rule/SubRule tree plus the resolved ${...} variables map the UI
+// substitutes into the verbatim bodies (PRD-09 / ADR-0020). Derived from the
+// generated contract — `rules` is the verbatim tree, `variables` is token→value.
+export type RulesTreeResponse =
+  paths['/rules/tree']['get']['responses'][200]['content']['application/json'];
+export type RuleNode = RulesTreeResponse['rules'][number];
+export type SubRuleNode = RuleNode['subRules'][number];
 
 export interface RulesPageAuthor {
   id: number;
@@ -45,6 +54,10 @@ export const rulesApi = api.injectEndpoints({
       query: () => '/rules',
       providesTags: ['RulesPage']
     }),
+    getRulesTree: build.query<RulesTreeResponse, void>({
+      query: () => '/rules/tree',
+      providesTags: ['RulesPage']
+    }),
     getRulesPage: build.query<RulesPage, string>({
       query: (slug) => `/rules/${slug}`,
       providesTags: (_result, _err, slug) => [{ type: 'RulesPage', id: slug }]
@@ -70,6 +83,7 @@ export const rulesApi = api.injectEndpoints({
 
 export const {
   useGetRulesIndexQuery,
+  useGetRulesTreeQuery,
   useGetRulesPageQuery,
   useCreateRulesPageMutation,
   useUpdateRulesPageMutation,

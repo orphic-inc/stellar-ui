@@ -59,6 +59,9 @@ const EditRow = ({
   );
   const [staffMembers, setStaffMembers] = useState(community.staff ?? []);
   const [newStaffUserId, setNewStaffUserId] = useState('');
+  const [leaderId, setLeaderId] = useState(
+    community.leaderId != null ? String(community.leaderId) : ''
+  );
 
   const handleAddStaff = () => {
     const uid = parseInt(newStaffUserId, 10);
@@ -79,7 +82,8 @@ const EditRow = ({
       description,
       registrationStatus,
       allowDuplicateFormats,
-      staffIds: staffMembers.map((s) => s.id)
+      staffIds: staffMembers.map((s) => s.id),
+      leaderId: leaderId.trim() === '' ? null : parseInt(leaderId, 10)
     });
     onDone();
   };
@@ -141,6 +145,23 @@ const EditRow = ({
                   </option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label
+                htmlFor={`edit-cm-leader-${community.id}`}
+                className="block text-xs text-gray-400 mb-1"
+              >
+                Leader (User ID)
+              </label>
+              <input
+                id={`edit-cm-leader-${community.id}`}
+                type="number"
+                min={1}
+                value={leaderId}
+                onChange={(e) => setLeaderId(e.target.value)}
+                placeholder="—"
+                className="w-24 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
             </div>
             <div className="flex items-center gap-2 self-end pb-1">
               <input
@@ -240,7 +261,7 @@ const CommunityManager = () => {
   const [newStatus, setNewStatus] = useState<RegistrationStatus>('open');
   const [newAllowDuplicateFormats, setNewAllowDuplicateFormats] =
     useState(true);
-  const [newOwnerId, setNewOwnerId] = useState('');
+  const [newLeaderId, setNewLeaderId] = useState('');
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -251,7 +272,7 @@ const CommunityManager = () => {
         type: newType,
         registrationStatus: newStatus,
         allowDuplicateFormats: newAllowDuplicateFormats,
-        ...(newOwnerId !== '' && { ownerId: parseInt(newOwnerId, 10) })
+        ...(newLeaderId !== '' && { leaderId: parseInt(newLeaderId, 10) })
       }).unwrap();
       dispatch(addAlert('Community created successfully.', 'success'));
       setNewName('');
@@ -259,7 +280,7 @@ const CommunityManager = () => {
       setNewType('Music');
       setNewStatus('open');
       setNewAllowDuplicateFormats(true);
-      setNewOwnerId('');
+      setNewLeaderId('');
     } catch (err) {
       dispatch(
         addAlert(
@@ -459,17 +480,17 @@ const CommunityManager = () => {
           {newStatus !== 'open' && (
             <div>
               <label
-                htmlFor="cm-owner-id"
+                htmlFor="cm-leader-id"
                 className="block text-sm font-medium text-gray-300 mb-1"
               >
-                Owner User ID <span className="text-red-400">*</span>
+                Leader User ID <span className="text-red-400">*</span>
               </label>
               <input
-                id="cm-owner-id"
+                id="cm-leader-id"
                 type="number"
                 min={1}
-                value={newOwnerId}
-                onChange={(e) => setNewOwnerId(e.target.value)}
+                value={newLeaderId}
+                onChange={(e) => setNewLeaderId(e.target.value)}
                 required
                 placeholder="User ID"
                 className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-28"

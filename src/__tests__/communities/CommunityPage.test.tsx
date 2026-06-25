@@ -180,6 +180,39 @@ describe('CommunityPage', () => {
     expect(screen.getByText('All jazz, all the time.')).toBeInTheDocument();
   });
 
+  it('surfaces the leader, resolving the username from the staff list', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity({ leaderId: 99 }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    const leaderLink = screen.getByRole('link', { name: 'staffmember' });
+    expect(leaderLink).toHaveAttribute('href', '/private/user/staffmember');
+    expect(screen.getByText(/leader:/i)).toBeInTheDocument();
+  });
+
+  it('falls back to a profile-by-id link when the leader is not in staff/consumers', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity({ leaderId: 555 }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    const leaderLink = screen.getByRole('link', { name: 'User #555' });
+    expect(leaderLink).toHaveAttribute('href', '/private/user/555');
+  });
+
+  it('omits the leader line when the community has no leader', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(screen.queryByText(/leader:/i)).not.toBeInTheDocument();
+  });
+
   it('renders releases with contributor and snatch stats', () => {
     mockUseGetCommunityByIdQuery.mockReturnValue({
       data: makeCommunity(),

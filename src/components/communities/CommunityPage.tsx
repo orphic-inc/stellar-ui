@@ -93,6 +93,16 @@ const CommunityPage = () => {
   const canManageMembers =
     isStaff || hasAnyPermission(user, ['communities_manage', 'admin']);
 
+  // The leader (ADR-0021) is a first-class role, surfaced separately from the
+  // staff roster. The contract carries only leaderId, so resolve a username from
+  // the staff/consumer lists when possible; otherwise link the profile by id.
+  const leader =
+    community.leaderId != null
+      ? (community.staff?.find((s) => s.id === community.leaderId) ??
+        community.consumers?.find((c) => c.user.id === community.leaderId)
+          ?.user)
+      : undefined;
+
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     const uid = parseInt(newMemberUserId, 10);
@@ -128,6 +138,18 @@ const CommunityPage = () => {
 
       {community.description && (
         <p className="text-sm text-gray-400 mb-4">{community.description}</p>
+      )}
+
+      {community.leaderId != null && (
+        <p className="text-sm text-gray-400 mb-4">
+          <span className="text-gray-500">Leader: </span>
+          <Link
+            to={`/private/user/${leader?.username ?? community.leaderId}`}
+            className="text-indigo-400 hover:text-indigo-300"
+          >
+            {leader?.username ?? `User #${community.leaderId}`}
+          </Link>
+        </p>
       )}
 
       {canManageMembers && (

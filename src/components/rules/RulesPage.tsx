@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { useGetRulesIndexQuery } from '../../store/services/rulesApi';
+import {
+  useGetRulesIndexQuery,
+  useGetRulesTreeQuery
+} from '../../store/services/rulesApi';
+import { renderRuleText } from '../../utils/rulesText';
 import Spinner from '../layout/Spinner';
 
 const ALLOWED_TAGS = [
@@ -22,20 +26,64 @@ const ALLOWED_TAGS = [
 ];
 
 const RulesPage = () => {
-  const { data, isLoading, error } = useGetRulesIndexQuery();
+  const {
+    data: tree,
+    isLoading: treeLoading,
+    error: treeError
+  } = useGetRulesTreeQuery();
+  const { data: index } = useGetRulesIndexQuery();
 
-  if (isLoading) return <Spinner />;
+  if (treeLoading) return <Spinner />;
 
-  if (error)
-    return <div className="text-red-400 p-4">Failed to load rules.</div>;
-
-  const { main, pages } = data ?? { main: null, pages: [] };
+  const variables = tree?.variables ?? {};
+  const rules = tree?.rules ?? [];
+  const { main, pages } = index ?? { main: null, pages: [] };
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-white mb-6">Rules</h1>
 
-      {main ? (
+      {/* The six Golden Rules (GET /api/rules/tree). Bodies are verbatim; the
+          ${...} tokens are resolved against the variables map at render time. */}
+      {treeError ? (
+        <div className="text-red-400 mb-8">Failed to load the rules.</div>
+      ) : rules.length === 0 ? (
+        <p className="text-gray-400 mb-8">
+          No rules content has been published yet.
+        </p>
+      ) : (
+        <div className="space-y-8 mb-10">
+          {rules.map((rule) => (
+            <section key={rule.id} className="space-y-3">
+              <h2 className="text-xl font-semibold text-white">
+                <span className="text-gray-500 mr-2">{rule.code}.</span>
+                {rule.title}
+              </h2>
+              {rule.description && (
+                <p className="text-gray-300">
+                  {renderRuleText(rule.description, variables)}
+                </p>
+              )}
+              {rule.subRules.length > 0 && (
+                <ul className="space-y-3 border-l border-gray-700 pl-4">
+                  {rule.subRules.map((sub) => (
+                    <li key={sub.id} className="text-gray-300">
+                      <span className="font-semibold text-gray-100">
+                        <span className="text-gray-500 mr-2">{sub.code}</span>
+                        {sub.title}
+                      </span>{' '}
+                      {renderRuleText(sub.description, variables)}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
+      )}
+
+      {/* Supplementary prose pages (GET /api/rules), shown when published. */}
+      {main && (
         <div
           className="prose prose-invert max-w-none mb-8 text-gray-200"
           dangerouslySetInnerHTML={{
@@ -45,10 +93,6 @@ const RulesPage = () => {
             })
           }}
         />
-      ) : (
-        <p className="text-gray-400 mb-8">
-          No rules content has been published yet.
-        </p>
       )}
 
       {pages.length > 0 && (

@@ -161,7 +161,7 @@ describe('CommunityManager', () => {
     });
   });
 
-  it('shows owner ID field when status is not open', async () => {
+  it('shows leader ID field when status is not open', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [] },
@@ -169,12 +169,12 @@ describe('CommunityManager', () => {
       error: undefined
     });
     renderWithProviders(<CommunityManager />);
-    expect(screen.queryByLabelText(/owner user id/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/leader user id/i)).not.toBeInTheDocument();
     await user.selectOptions(
       screen.getByLabelText(/registration/i),
       'Invite only'
     );
-    expect(screen.getByLabelText(/owner user id/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/leader user id/i)).toBeInTheDocument();
   });
 
   it('allows changing type and description in create form', async () => {
@@ -300,6 +300,42 @@ describe('CommunityManager', () => {
     });
   });
 
+  it('sends leaderId from the edit row leader field', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(8)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    await user.type(screen.getByLabelText(/leader \(user id\)/i), '42');
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    await waitFor(() => {
+      expect(mockUpdateCommunity).toHaveBeenCalledWith(
+        expect.objectContaining({ leaderId: 42 })
+      );
+    });
+  });
+
+  it('clears the leader (null) when the edit row leader field is emptied', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [{ ...makeCommunity(8), leaderId: 5 }] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    await user.clear(screen.getByLabelText(/leader \(user id\)/i));
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+    await waitFor(() => {
+      expect(mockUpdateCommunity).toHaveBeenCalledWith(
+        expect.objectContaining({ leaderId: null })
+      );
+    });
+  });
+
   it('does not add a staff member when user ID is zero or empty', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({
@@ -335,7 +371,7 @@ describe('CommunityManager', () => {
     expect(screen.getAllByText('existing').length).toBe(1);
   });
 
-  it('allows typing in the owner ID field when registration is invite-only', async () => {
+  it('allows typing in the leader ID field when registration is invite-only', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [] },
@@ -347,9 +383,9 @@ describe('CommunityManager', () => {
       screen.getByLabelText(/registration/i),
       'Invite only'
     );
-    const ownerInput = screen.getByLabelText(/owner user id/i);
-    await user.type(ownerInput, '5');
-    expect((ownerInput as HTMLInputElement).value).toBe('5');
+    const leaderInput = screen.getByLabelText(/leader user id/i);
+    await user.type(leaderInput, '5');
+    expect((leaderInput as HTMLInputElement).value).toBe('5');
   });
 
   it('shows Creating… when isCreating is true', () => {
@@ -410,7 +446,7 @@ describe('CommunityManager', () => {
     expect(screen.getByDisplayValue('No Desc')).toBeInTheDocument();
   });
 
-  it('creates community with owner ID when invite registration is selected', async () => {
+  it('creates community with leader ID when invite registration is selected', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [] },
@@ -423,11 +459,11 @@ describe('CommunityManager', () => {
       screen.getByLabelText(/registration \*/i),
       'Invite only'
     );
-    await user.type(screen.getByLabelText(/owner user id/i), '7');
+    await user.type(screen.getByLabelText(/leader user id/i), '7');
     await user.click(screen.getByRole('button', { name: /create community/i }));
     await waitFor(() => {
       expect(mockCreateCommunity).toHaveBeenCalledWith(
-        expect.objectContaining({ ownerId: 7 })
+        expect.objectContaining({ leaderId: 7 })
       );
     });
   });
