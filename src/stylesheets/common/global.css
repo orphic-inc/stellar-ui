@@ -1,5 +1,5 @@
 /*
- * global.css — Stellar role-token seed + Collage semantic-hook contract
+ * global.css — Stellar role-token seed + semantic-hook contract
  * ============================================================================
  *
  * Two layers, per stellar-ui ADR-0005 (Injected Theme Contract):
@@ -15,19 +15,19 @@
  *      Contribution / Community — never "torrent"). Rules consume tokens only,
  *      so a theme that repaints tokens repaints these surfaces for free.
  *
- * The Collage hooks below are Tier-2 parts (daisyUI-style: parts scoped inside
- * the Tier-1 roles), per ADR-0005's two-tier vocabulary. They encode the three
- * things a good-quality Collage shows that today's flat `CollageDetail.tsx`
- * does not — this file IS that diff, expressed as a contract:
+ * Hooks come in two tiers (ADR-0005 / docs/theming.md §3):
  *
- *   • a Release is a STACK of Editions (format / encoding / media), with
- *     LOSSLESS as the headline quality axis            → [data-st="edition-*"]
- *   • contribution is POWER-LAW, not flat — one or two curators carry the
- *     collage over a long tail; both must read         → [data-st="contributor-*"]
- *   • cover art is a first-class weighted surface       → [data-st="coverart-*"]
+ *   • TIER-1 ROLES — a small, fixed, app-wide set (panel, colhead, list, row,
+ *     title, meta, chip, icon, rollup, bar). Styling one re-skins every surface
+ *     that uses it. Growing this set is rare and deliberate.
+ *   • TIER-2 PARTS — scoped inside a Role, added only when no composition of
+ *     Roles expresses the structure; each carries a one-line justification. Only
+ *     two earn their place: `edition-*` (D-2) and `coverart-*` (D-4).
+ *     `contributor-*` and `collector-*` were candidates that DECOMPOSED to
+ *     Tier-1 (D-5) — they are not Parts.
  *
- * CSS-only contract: these hooks are the target the components adopt later.
- * Nothing here depends on a component existing yet.
+ * This file unblocks WS2 (the Collage pilot, CollageDetail.tsx); nothing here
+ * depends on a component existing yet.
  * ============================================================================ */
 
 /* ── 1. ROLE THEME TOKENS ─────────────────────────────────────────────────── */
@@ -69,7 +69,8 @@
   --st-warning: oklch(79.5% 0.184 86.047); /* #eab308 yellow-500          */
   --st-info: oklch(62.3% 0.214 259.815); /* #3b82f6 blue-500            */
 
-  /* ── Collage-specific roles (Tier-2 parts; ADR-0005) ────────────────────── */
+  /* Quality + weight — core tokens (D-3): the lossless cue recurs across
+     listings / search / the workbench; weight feeds the `bar` Role. */
   --st-lossless: oklch(72.3% 0.219 149.579); /* lossless = green quality cue */
   --st-lossy: var(--st-text-faint); /* lossy = quiet, not penalized */
   --st-weight: var(--st-accent-ring); /* contribution-weight bar fill */
@@ -84,15 +85,20 @@
     ui-monospace, 'SFMono-Regular', 'JetBrains Mono', 'Menlo', monospace;
 }
 
-/* ── 2. COLLAGE SEMANTIC HOOKS ────────────────────────────────────────────── */
+/* ── 2. SEMANTIC HOOKS ────────────────────────────────────────────────────── */
 
-/* Panel + column-head — the repeating panel/header unit (Tier-1 roles). */
+/* ── 2a. Tier-1 Roles — the fixed, app-wide set (§3.2). Style once, re-skin
+ *        every surface that uses the Role. */
+
+/* panel — a bounded surface (card / box). */
 [data-st='panel'] {
   background: var(--st-panel);
   border: 1px solid var(--st-border);
   border-radius: var(--st-radius);
   overflow: hidden;
 }
+
+/* colhead — a column / section header bar. */
 [data-st='colhead'] {
   display: flex;
   align-items: center;
@@ -108,47 +114,91 @@
   color: var(--st-text-muted);
 }
 
-/* Release list — one row per Release; the row is a disclosure for its Editions. */
-[data-st='release-list'] {
+/* list — a vertical stack of rows (layout only). */
+[data-st='list'] {
   display: flex;
   flex-direction: column;
 }
-[data-st='release-row'] {
-  display: grid;
-  grid-template-columns: 1.5rem 1.25rem 1fr auto;
+
+/* row — one record in a list; may be a disclosure ([data-st-open]). A row that
+ * holds a `bar` gets the positioning context so the fill can sit behind it. */
+[data-st='row'] {
+  display: flex;
   align-items: center;
   gap: var(--st-gap);
   padding: var(--st-row-pad);
   border-top: 1px solid var(--st-border-subtle);
   transition: background-color 120ms ease;
 }
-[data-st='release-row']:first-child {
+[data-st='row']:first-child {
   border-top: 0;
 }
-[data-st='release-row']:hover {
+[data-st='row']:hover {
   background: color-mix(in oklch, var(--st-raised) 28%, transparent);
 }
-[data-st='release-row'][data-st-open] {
+[data-st='row'][data-st-open] {
   background: color-mix(in oklch, var(--st-accent) 14%, transparent);
 }
-[data-st='release-row'] [data-st='release-title'] {
+[data-st='row']:has([data-st='bar']) {
+  position: relative;
+  isolation: isolate;
+}
+
+/* title — the primary label / click-target of a row or panel. */
+[data-st='title'] {
+  flex: 1;
+  min-width: 0;
   color: var(--st-link);
   font-weight: 600;
 }
-[data-st='release-row'] [data-st='release-title']:hover {
+[data-st='title']:hover {
   color: var(--st-link-hover);
 }
-[data-st='release-row'] [data-st='release-artist'] {
+/* a lead row strengthens its title (e.g. the top contributor). */
+[data-st='row'][data-st-lead] [data-st='title'] {
+  color: var(--st-text-strong);
+}
+
+/* meta — a secondary / muted metadata run. Modifiers: -em (emphasised, e.g. an
+ * artist) and -num (tabular figures, e.g. a year). */
+[data-st='meta'] {
   color: var(--st-text-muted);
+}
+[data-st='meta'][data-st-em] {
   font-style: italic;
 }
-[data-st='release-row'] [data-st='release-year'] {
+[data-st='meta'][data-st-num] {
   color: var(--st-text-faint);
   font-variant-numeric: tabular-nums;
 }
 
-/* Category sprite — the `.cats_music.tags_*`; a fixed glyph slot, theme-paintable. */
-[data-st='category-icon'] {
+/* chip — a small bordered token (tag, flag, format). Modifiers: -mono (format
+ * codes) and -selected (a pickable chip in its chosen state). */
+[data-st='chip'] {
+  display: inline-flex;
+  padding: 0 0.4375rem;
+  border: 1px solid var(--st-border);
+  border-radius: var(--st-radius-sm);
+  background: var(--st-raised);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--st-text-muted);
+}
+[data-st='chip']:hover {
+  color: var(--st-text);
+  border-color: var(--st-border-strong);
+}
+[data-st='chip'][data-st-mono] {
+  font-family: var(--st-mono);
+}
+[data-st='chip'][data-st-selected] {
+  border-color: var(--st-accent-ring);
+  color: var(--st-text-strong);
+  background: color-mix(in oklch, var(--st-accent) 22%, transparent);
+}
+
+/* icon — a fixed glyph slot (e.g. the category sprite). */
+[data-st='icon'] {
   width: 1.25rem;
   height: 1.25rem;
   border-radius: var(--st-radius-sm);
@@ -156,11 +206,57 @@
   flex: none;
 }
 
-/* Edition stack — the part today's UI collapses. Revealed under an open Release. */
+/* rollup — an aggregate list (label + count): Top Tags / Top Artists. */
+[data-st='rollup'] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.5rem 0.75rem;
+}
+[data-st='rollup-item'] {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--st-gap);
+  font-size: 0.8125rem;
+}
+[data-st='rollup-item'] a {
+  color: var(--st-link);
+}
+[data-st='rollup-item'] a:hover {
+  color: var(--st-link-hover);
+}
+[data-st='rollup-count'] {
+  font-family: var(--st-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--st-text-faint);
+}
+
+/* bar — a proportional fill (weight / progress). The component sets `--st-w`
+ * (0–100); place it as a row's first child to back the label. [data-st-lead]
+ * brightens the leader's fill. */
+[data-st='bar'] {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: clamp(0%, calc(var(--st-w, 0) * 1%), 100%);
+  background: var(--st-weight-track);
+  border-radius: var(--st-radius-sm);
+  z-index: -1;
+}
+[data-st='bar'][data-st-lead] {
+  background: color-mix(in oklch, var(--st-weight) 38%, transparent);
+}
+
+/* ── 2b. Tier-2 Parts — scoped inside a Role; each earns its place (§3.3). */
+
+/* edition-* — Part (D-2): a Release's format/quality disclosure under a `row`.
+ * A nested grid with lossless tiering that `row` + `meta` cannot express; shared
+ * with the release workbench, so it lives in common/, not a Collage scope.
+ * `edition-availability` is a speculative sub-slot — reconciled to a real
+ * release-workbench field in WS2. */
 [data-st='edition-stack'] {
   display: flex;
   flex-direction: column;
-  margin: 0.25rem 0 0.5rem 2.75rem; /* indent under the release title col */
+  margin: 0.25rem 0 0.5rem 2.75rem; /* indent under the title column */
   border-left: 2px solid var(--st-border);
 }
 [data-st='edition'] {
@@ -177,13 +273,11 @@
   font-weight: 500;
 }
 [data-st='edition'] [data-st='edition-size'],
-[data-st='edition'] [data-st='edition-seeders'] {
+[data-st='edition'] [data-st='edition-availability'] {
   font-family: var(--st-mono);
   font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
 }
-
-/* Lossless emphasis — FLAC/ALAC/WAV/DTS read as a quality tier, not just a string. */
 [data-st='edition'][data-st-lossless] {
   color: var(--st-text);
 }
@@ -192,7 +286,7 @@
   font-weight: 600;
 }
 [data-st='edition-flag'] {
-  /* Log(100)/Cue/24bit provenance chips */
+  /* Log(100) / Cue / 24bit provenance chips */
   display: inline-flex;
   align-items: center;
   padding: 0 0.3125rem;
@@ -208,53 +302,8 @@
   color: var(--st-lossless);
 }
 
-/* Weighted contributor list — make the power-law legible. The component sets
- * `--st-w` (0–100) per row; the bar is the contributor's share of entries. */
-[data-st='contributor-list'] {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.5rem 0.75rem;
-}
-[data-st='contributor'] {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: var(--st-gap);
-  position: relative;
-  padding: 0.1875rem 0.5rem;
-  border-radius: var(--st-radius-sm);
-  isolation: isolate;
-}
-[data-st='contributor']::before {
-  /* the weight bar, behind the label */
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: clamp(0%, calc(var(--st-w, 0) * 1%), 100%);
-  background: var(--st-weight-track);
-  border-radius: var(--st-radius-sm);
-  z-index: -1;
-}
-[data-st='contributor'][data-st-lead]::before {
-  background: color-mix(in oklch, var(--st-weight) 38%, transparent);
-}
-[data-st='contributor'] [data-st='contributor-name'] {
-  color: var(--st-link);
-  font-size: 0.8125rem;
-}
-[data-st='contributor'] [data-st='contributor-weight'] {
-  font-family: var(--st-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.75rem;
-  color: var(--st-text-muted);
-}
-[data-st='contributor'][data-st-lead] [data-st='contributor-name'] {
-  color: var(--st-text-strong);
-  font-weight: 600;
-}
-
-/* Cover-art mosaic — a weighted, gap-less grid; the lead cell may span 2×2. */
+/* coverart-* — Part (D-4): a weighted, gap-less mosaic with a 2×2 lead cell —
+ * geometry no `list` / `row` gives. Missing covers render a placeholder cell. */
 [data-st='coverart-mosaic'] {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr));
@@ -285,68 +334,7 @@
   grid-row: span 2;
 }
 
-/* Computed rollups — Top Tags / Top Artists, the on-read aggregates. */
-[data-st='rollup'] {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  padding: 0.5rem 0.75rem;
-}
-[data-st='rollup-item'] {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--st-gap);
-  font-size: 0.8125rem;
-}
-[data-st='rollup-item'] a {
-  color: var(--st-link);
-}
-[data-st='rollup-item'] a:hover {
-  color: var(--st-link-hover);
-}
-[data-st='rollup-count'] {
-  font-family: var(--st-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--st-text-faint);
-}
-
-/* Tag chip */
-[data-st='tag'] {
-  display: inline-flex;
-  padding: 0 0.4375rem;
-  border: 1px solid var(--st-border);
-  border-radius: var(--st-radius-sm);
-  background: var(--st-raised);
-  font-size: 0.6875rem;
-  line-height: 1.5;
-  color: var(--st-text-muted);
-}
-[data-st='tag']:hover {
-  color: var(--st-text);
-  border-color: var(--st-border-strong);
-}
-
-/* Collector — the download-collage-in-preferred-format affordance. */
-[data-st='collector'] {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  padding: 0.5rem 0.75rem;
-}
-[data-st='collector-format'] {
-  padding: 0.125rem 0.5rem;
-  border: 1px solid var(--st-border);
-  border-radius: var(--st-radius-sm);
-  font-family: var(--st-mono);
-  font-size: 0.6875rem;
-  color: var(--st-text-muted);
-  cursor: pointer;
-}
-[data-st='collector-format'][data-st-selected] {
-  border-color: var(--st-accent-ring);
-  color: var(--st-text-strong);
-  background: color-mix(in oklch, var(--st-accent) 22%, transparent);
-}
+/* ── 2c. Cross-cutting (tier-agnostic) ────────────────────────────────────── */
 
 /* Focus — one ring, token-driven, for every interactive hook above. */
 [data-st] :focus-visible,

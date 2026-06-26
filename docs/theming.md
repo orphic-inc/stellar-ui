@@ -60,7 +60,7 @@ The learnable core. Each means the same thing on every page; styling it once re-
 | `rollup`  | an aggregate list (label + count) — top tags/artists | `--st-link`, `--st-text-faint`, `--st-mono`                                      |
 | `bar`     | a proportional fill bar (weight / progress)          | `--st-weight`, `--st-weight-track`                                               |
 
-> **Rename from the parked `global.css`:** `release-list → list`, `release-row → row`, `tag → chip`, `category-icon → icon`. Release-specific bits (`release-title/artist/year`) are **dropped** and re-expressed as `title` + `meta` inside `row` (D-1) — no entity-named slots, no generic `cell`. This re-sort is **WS1**.
+> **Applied in WS1:** `release-list → list`, `release-row → row`, `tag → chip`, `category-icon → icon`; the release-specific slots (`release-title/artist/year`) dropped and re-expressed as the generic `title` + `meta` Roles inside `row` (D-1) — no entity-named slots, no generic `cell`. `bar` — previously trapped as a contributor pseudo-element — is now a first-class Tier-1 hook. `global.css` matches this table.
 
 ### 3.3 Tier-2 Parts — scoped inside a Role, must earn their place
 
@@ -68,15 +68,15 @@ A Part is justified **only** when no composition of Tier-1 Roles expresses the s
 
 | Part (in Role)                                                                     | Why it can't be Tier-1 composition                                                                                                                                                                                                                                                                                                                                                        |
 | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `edition-stack` / `edition` / `edition-format` / `edition-flag` (in `panel`/`row`) | the format-and-quality disclosure under a release row — nested grid + lossless emphasis that `row` alone can't carry. **Shared release Part (D-2)** — also used by the release workbench, not Collage-owned. Speculative sub-slots (`edition-size`, `edition-seeders`) reconcile to real fields in WS2; **`edition-seeders` is torrent-era vocabulary and must be renamed** (CONTEXT.md). |
+| `edition-stack` / `edition` / `edition-format` / `edition-flag` (in `panel`/`row`) | the format-and-quality disclosure under a release row — nested grid + lossless emphasis that `row` alone can't carry. **Shared release Part (D-2)** — also used by the release workbench, not Collage-owned. Speculative sub-slots (`edition-size`, `edition-availability`) reconcile to real fields in WS2; the torrent-era `edition-seeders` was renamed to `edition-availability` in WS1 (CONTEXT.md). |
 | `coverart-mosaic` / `coverart-cell` (in `panel`)                                   | a weighted gap-less grid with a 2×2 lead cell — geometry no `list`/`row` gives. Empty state per **D-4**: missing covers render a placeholder cell; the mosaic panel is omitted only when the whole collage has zero art.                                                                                                                                                                  |
 
-**Candidates that must be re-examined under the rule (likely collapse to Tier-1 — WS1):**
+**Resolved in WS1 (D-5) — both candidates decomposed; neither is a Part:**
 
-- `contributor-list` / `contributor` / `contributor-name` / `contributor-weight` → probably `list` + `row` + `bar` + `meta`. If so, **drop the Part** and compose.
-- `collector` / `collector-format` → probably `panel` + a row of `chip`s. If so, **drop the Part** and compose.
+- `contributor*` → `list` + `row` + `bar` + `title` (name) + `meta` (weight). The weight bar became the Tier-1 `bar` Role (extracted from the old contributor pseudo-element); the leader emphasis is `[data-st-lead]` on the `row`.
+- `collector*` → a `panel` region of `chip`s. The format picker is `chip[data-st-mono]` with the new `chip[data-st-selected]` modifier; no container hook is needed (chips flow inline).
 
-These two are the worked examples of the governance rule: the first task of the migration is to _prove_ whether they earn Part status or decompose.
+The table above (`edition*`, `coverart*`) is therefore the complete Part set. These two were the worked examples that gave the governance rule teeth — a named feature does not buy a Part.
 
 ---
 
@@ -126,9 +126,10 @@ Each is independently grabbable; clear context between them.
 ## 9. Resolved design decisions
 
 - **D-1 — Row content uses Tier-1 vocabulary; no entity slots.** `release-title/artist/year` are dropped; a row's primary label is the new Tier-1 `title` Role, secondary fields are `meta`. No per-entity slots (they'd re-sprawl one level down) and no generic `cell` (too meaningless to paint). A field needing distinct treatment (e.g. tabular year) takes a small modifier on `meta`, not a new Role.
-- **D-2 — `edition*` is a _shared_ release Part.** It earns Part status (nested grid + lossless tiering isn't `row`+`meta`) but is not Collage-owned — the release workbench uses it too, so it lives in `common/`. `edition-seeders` is torrent-era vocabulary and is renamed during WS2's sub-slot reconciliation.
+- **D-2 — `edition*` is a _shared_ release Part.** It earns Part status (nested grid + lossless tiering isn't `row`+`meta`) but is not Collage-owned — the release workbench uses it too, so it lives in `common/`. The torrent-era `edition-seeders` slot was renamed to `edition-availability` in WS1; the slot stays speculative until WS2 reconciles it to a real release-workbench field.
 - **D-3 — Quality tokens are core.** `--st-lossless/lossy` (quality-tier cue, recurs in listings/search/workbench) and `--st-weight/weight-track` (the app-wide `bar` Role) stay in the core token set, not a Collage scope.
 - **D-4 — Coverart empty state: placeholder, then omit.** Missing covers render a placeholder cell (keeps the region's identity, no layout jolt); the mosaic panel is omitted entirely only when the whole collage has zero art.
+- **D-5 — `contributor` and `collector` decompose; they are not Parts.** Applying the §3.3 rule to the two worked examples: `contributor*` is `list`+`row`+`bar`+`title`+`meta` (the weight bar extracted into the Tier-1 `bar` Role; the leader is `[data-st-lead]` on the `row`), and `collector*` is a `panel` region of `chip`s (`chip[data-st-mono]` + the new `chip[data-st-selected]` modifier). Only `edition*` (D-2) and `coverart*` (D-4) earn Part status — the governance rule's worked proof that a named feature does not buy a Part.
 
 ## 10. Success criteria
 
