@@ -106,6 +106,14 @@ describe('ForumTopicPost', () => {
     expect(screen.getByText('Hello forum world')).toBeInTheDocument();
   });
 
+  it('renders the data-st contract hooks (ADR-0005 / WS4)', () => {
+    const { container } = renderWithProviders(
+      <ForumTopicPost post={mockPost} forumId={1} topicId={5} />
+    );
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="colhead"]')).toBeInTheDocument();
+  });
+
   it('shows Quote button always', () => {
     renderWithProviders(
       <ForumTopicPost post={mockPost} forumId={1} topicId={5} />

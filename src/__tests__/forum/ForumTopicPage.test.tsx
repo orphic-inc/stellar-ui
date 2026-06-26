@@ -192,11 +192,17 @@ describe('ForumTopicPage', () => {
       isLoading: false
     });
 
-    renderWithProviders(<ForumTopicPage />, { store });
+    const { container } = renderWithProviders(<ForumTopicPage />, { store });
 
     // Poll results visible because closed=true
     expect(screen.getByText('CD')).toBeInTheDocument();
     expect(screen.getAllByText(/50%/).length).toBe(2);
+
+    // Results render through the data-st contract: panel + list of rows, each
+    // backed by a `bar` Role (ADR-0005 / WS4).
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-st="row"]').length).toBe(2);
+    expect(container.querySelectorAll('[data-st="bar"]').length).toBe(2);
 
     // Quote a post then clear it via onQuoteConsumed
     await user.click(screen.getByRole('button', { name: /quote post 101/i }));

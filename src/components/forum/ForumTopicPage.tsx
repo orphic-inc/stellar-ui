@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -116,21 +116,15 @@ const ForumTopicPage = () => {
         <strong className="text-gray-200">{topic.title}</strong>
       </nav>
 
-      <div className="rounded border border-gray-700 bg-gray-900 mb-4">
-        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-200">
+      <div data-st="panel" className="mb-4">
+        <div data-st="colhead">
+          <span className="flex items-center gap-2">
             {topic.title}
-            {topic.isLocked && (
-              <span className="ml-2 text-xs text-yellow-500 font-normal">
-                [Locked]
-              </span>
-            )}
-            {topic.isSticky && (
-              <span className="ml-2 text-xs text-blue-400 font-normal">
-                [Sticky]
-              </span>
-            )}
+            {topic.isLocked && <span data-st="chip">[Locked]</span>}
+            {topic.isSticky && <span data-st="chip">[Sticky]</span>}
           </span>
+          {/* Moderation / subscribe / catch-up are interactive chrome — no
+              contract Role covers them, so they keep their utility paint. */}
           <div className="flex items-center gap-3">
             {affordances.canModerate && (
               <>
@@ -205,37 +199,45 @@ const ForumTopicPage = () => {
       )}
 
       {poll && !pollParseError && answers.length > 0 && (
-        <div className="rounded border border-gray-700 bg-gray-900 mb-4 p-4">
+        <div data-st="panel" className="mb-4 p-4">
           <strong className="text-sm text-gray-200">{poll.question}</strong>
           {showPollResults ? (
-            <table className="w-full text-sm mt-3">
-              <tbody>
-                {answers.map((answer, i) => {
-                  const count = voteCounts[i];
-                  const pct =
-                    totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-                  return (
-                    <tr
-                      key={i}
-                      className={myVote?.vote === i ? 'font-medium' : ''}
+            // Each answer is a row backed by the `bar` Role (--st-w = pct); the
+            // voter's own choice leads (brighter fill), mirroring CollageDetail.
+            <div data-st="list" className="mt-3">
+              {answers.map((answer, i) => {
+                const count = voteCounts[i];
+                const pct =
+                  totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+                const mine = myVote?.vote === i;
+                return (
+                  <div
+                    key={i}
+                    data-st="row"
+                    data-st-lead={mine ? '' : undefined}
+                  >
+                    <div
+                      data-st="bar"
+                      data-st-lead={mine ? '' : undefined}
+                      style={{ '--st-w': pct } as CSSProperties}
+                    />
+                    <span
+                      className={`flex-1 min-w-0 text-sm ${mine ? 'font-medium' : ''}`}
+                      style={{ color: 'var(--st-text)' }}
                     >
-                      <td className="py-1 pr-3 text-gray-300 w-40">{answer}</td>
-                      <td className="py-1 pr-3">
-                        <div className="bg-gray-700 h-3 rounded overflow-hidden">
-                          <div
-                            className="bg-indigo-500 h-full rounded"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </td>
-                      <td className="py-1 text-gray-400 text-right whitespace-nowrap text-xs">
-                        {count} ({pct}%)
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                      {answer}
+                    </span>
+                    <span
+                      data-st="meta"
+                      data-st-num
+                      className="text-xs whitespace-nowrap"
+                    >
+                      {count} ({pct}%)
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <form onSubmit={handleVote} className="mt-3 space-y-1">
               {answers.map((answer, i) => (
