@@ -391,4 +391,100 @@ describe('CollageDetail', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/private/collages');
     });
   });
+
+  it('renders the Top Contributors power-law block with a highlighted leader', () => {
+    mockUseGetCollageQuery.mockReturnValue({
+      data: {
+        id: 8,
+        userId: 7,
+        name: 'Pop',
+        categoryId: 1,
+        isLocked: false,
+        isDeleted: false,
+        isSubscribed: false,
+        isBookmarked: false,
+        numEntries: 3,
+        numSubscribers: 0,
+        description: '',
+        tags: [],
+        user: { username: 'alice' },
+        entries: [
+          {
+            id: 1,
+            releaseId: 11,
+            userId: 7,
+            user: { id: 7, username: 'alice' }
+          },
+          {
+            id: 2,
+            releaseId: 12,
+            userId: 7,
+            user: { id: 7, username: 'alice' }
+          },
+          { id: 3, releaseId: 13, userId: 9, user: { id: 9, username: 'bob' } }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CollageDetail />);
+    expect(screen.getByText('Top Contributors')).toBeInTheDocument();
+    // one bar per distinct contributor; alice (2 of 3) leads
+    expect(document.querySelectorAll('[data-st="bar"]').length).toBe(2);
+    const leadBars = document.querySelectorAll('[data-st="bar"][data-st-lead]');
+    expect(leadBars.length).toBe(1);
+    expect((leadBars[0] as HTMLElement).style.getPropertyValue('--st-w')).toBe(
+      '67'
+    );
+  });
+
+  it('marks the first cover cell as the 2×2 mosaic lead', () => {
+    mockUseGetCollageQuery.mockReturnValue({
+      data: {
+        id: 8,
+        userId: 7,
+        name: 'Imgs',
+        categoryId: 1,
+        isLocked: false,
+        isDeleted: false,
+        isSubscribed: false,
+        isBookmarked: false,
+        numEntries: 2,
+        numSubscribers: 0,
+        description: '',
+        tags: [],
+        user: { username: 'alice' },
+        entries: [
+          {
+            id: 1,
+            releaseId: 11,
+            userId: 7,
+            user: { id: 7, username: 'alice' },
+            release: { title: 'A', image: 'https://e/1.jpg', communityId: 1 }
+          },
+          {
+            id: 2,
+            releaseId: 12,
+            userId: 7,
+            user: { id: 7, username: 'alice' },
+            release: { title: 'B', image: 'https://e/2.jpg', communityId: 1 }
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CollageDetail />);
+    const cells = document.querySelectorAll('[data-st="coverart-cell"]');
+    expect(cells.length).toBe(2);
+    expect(cells[0].hasAttribute('data-st-lead')).toBe(true);
+    expect(cells[1].hasAttribute('data-st-lead')).toBe(false);
+  });
+
+  it('renders Collage surfaces from data-st Role/Part hooks', () => {
+    renderWithProviders(<CollageDetail />);
+    for (const hook of ['panel', 'colhead', 'list', 'row', 'title', 'chip']) {
+      expect(document.querySelector(`[data-st="${hook}"]`)).toBeInTheDocument();
+    }
+  });
 });

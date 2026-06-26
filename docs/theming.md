@@ -88,13 +88,13 @@ The table above (`edition*`, `coverart*`) is therefore the complete Part set. Th
 
 ---
 
-## 5. Data readiness (WS0 verification)
+## 5. Data readiness (WS2 finding)
 
-The Collage pilot does **not** wait on a stellar-api milestone. The model is faithful and already richer than the pilot needs — `Release → Edition → Contribution → ReleaseFile` with full rip-quality (`bitrate`, `hasLog`, `hasCue`, `isScene`), media, and edition metadata, all serialized and present in the vendored contract. The fidelity gap is therefore **UI rendering**, with exactly one scoped data choice:
+This section's original optimism — that editions could lazy-load "from the release-workbench endpoint, no API change" — is **wrong**, a WS2 finding. The contributor and cover-mosaic enrichments need no API; the **edition disclosure does**:
 
-- **Collage read path is identity-only.** `GET /api/collages/:id` selects each entry's `release` as `id, title, image, year, communityId, releaseType, credits` — no `editions` / `contributions` / `releaseFile`. To render the edition stack, either extend that one handler's `release` select, **or** lazy-load editions per release on row-expand from the release-workbench endpoint (no API change). Resolved in WS2.
-- **Contributor weights are computable now.** The detail endpoint returns the full entry set with per-entry `user`; the UI groups by user to derive the power-law weights. No API dependency.
-- **Sequence:** contributor Parts are buildable immediately; edition Parts need the include-extension-or-lazy-load decision first.
+- **No read path exposes rip-quality.** `bitrate` / `media` / `hasLog` / `hasCue` / `isScene` are absent from every UI-readable response in the vendored contract: `getReleaseById` → `Release.contributions` (`ReleaseContribution`) is lean (`user`, `sizeInBytes`, `collaborators`); `/contributions` → `Contribution` omits quality; and `/communities/{id}/releases/{id}/contributions` is `get?: never`. Quality exists only as POST inputs and release-**search filters** — never read back. So the **edition stack is blocked on a stellar-api change** (expose quality in a release-scoped contributions response), out of the UI-only scope. The `edition-*` Part CSS stays as the pre-wired target.
+- **Contributor weights are computable now.** The detail endpoint returns the full entry set with per-entry `user`; the UI groups by user to derive the power-law weights. No API dependency. _(Shipped in WS2.)_
+- **Cover mosaic is identity-only** — `entry.release.image` is enough for the weighted 2×2 mosaic. _(Shipped in WS2.)_
 
 ## 6. Workstreams (the `/to-issues` seam)
 
@@ -102,7 +102,7 @@ Each is independently grabbable; clear context between them.
 
 - **WS0 — Wire the contract.** Import `common/global.css` into the build (it is currently **unimported** — it does nothing yet), confirm the unlayered cascade, no visual change. Acceptance: tokens resolve in devtools; a hand-set `data-st="panel"` paints.
 - **WS1 — Finalize the Tier-1 inventory + re-sort `global.css`.** Apply §3.2 renames; resolve the `contributor`/`collector` collapse question; land the Role table as CSS. Acceptance: §3.2/§3.3 match the file; no Part lacks justification.
-- **WS2 — Collage pilot.** Convert `CollageDetail.tsx` to Roles + justified Parts; lazy-load edition/quality from the release-workbench endpoint (**no API change**); no visual regression. The end-to-end proof.
+- **WS2 — Collage pilot (UI-only).** `CollageDetail.tsx` renders from Roles + Parts + tokens (no inline paint, no regression), adding the contributor power-law block (`bar` Role) and the weighted 2×2 cover mosaic. The edition disclosure is **deferred** — its quality data is in no read schema (§5); the `edition-*` Part stays defined-but-unwired pending a stellar-api change. _Done._
 - **WS3 — Author guide + token-only reference theme.** Convert one existing theme to _tokens only_ to prove a recolor is "just tokens." Acceptance: that theme carries zero utility-class overrides.
 - **WS4…n — Per-surface migration.** One issue per surface, in the order below. Each: move the surface's look out of inline utilities into Roles/Parts, no regression.
 

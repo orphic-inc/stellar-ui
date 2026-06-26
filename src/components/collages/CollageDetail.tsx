@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, type CSSProperties } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
@@ -40,6 +40,30 @@ const CollageDetail = () => {
   const [releaseIdInput, setReleaseIdInput] = useState('');
   const [addError, setAddError] = useState('');
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
+
+  // Contributor power-law — group entries by the user who added them. The detail
+  // payload carries per-entry `user`, so weights derive client-side with no API
+  // dependency (PRD §5 / D-5); `share` drives the `bar` Role's --st-w. Declared
+  // above the loading/error guards to keep hook order stable.
+  const contributors = useMemo(() => {
+    const entries = collage?.entries ?? [];
+    const byUser = new Map<number, { username: string; count: number }>();
+    for (const e of entries) {
+      if (!e.user) continue;
+      const cur = byUser.get(e.user.id);
+      if (cur) cur.count += 1;
+      else byUser.set(e.user.id, { username: e.user.username, count: 1 });
+    }
+    const total = entries.length;
+    return [...byUser.entries()]
+      .map(([id, v]) => ({
+        id,
+        username: v.username,
+        count: v.count,
+        share: total ? Math.round((v.count / total) * 100) : 0
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [collage]);
 
   if (isLoading) return <Spinner />;
   if (error || !collage)
@@ -209,56 +233,49 @@ const CollageDetail = () => {
       <div className="flex gap-6 items-start">
         {/* Main */}
         <div className="flex-1 min-w-0 space-y-4">
-          {/* Cover art mosaic */}
+          {/* Cover art mosaic — coverart Part (D-4); the first cell leads 2×2. */}
           {coverImages.length > 0 && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-                <span className="text-sm font-semibold text-gray-200">
-                  Cover Art
-                </span>
+            <div data-st="panel">
+              <div data-st="colhead">
+                <span>Cover Art</span>
               </div>
-              <div className="grid grid-cols-4 sm:grid-cols-6">
-                {coverImages.map(({ src, releaseId }) => (
+              <div data-st="coverart-mosaic">
+                {coverImages.map(({ src, releaseId }, i) => (
                   <button
                     key={releaseId}
+                    data-st="coverart-cell"
+                    data-st-lead={i === 0 ? '' : undefined}
                     onClick={() => scrollToEntry(releaseId)}
-                    className="focus:outline-none"
                     title="Scroll to release"
                   >
-                    <img
-                      src={src}
-                      alt=""
-                      className="w-full aspect-square object-cover hover:opacity-80 transition-opacity cursor-pointer"
-                    />
+                    <img src={src} alt="" />
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Entry list */}
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
-              <span className="text-sm font-semibold text-gray-200">
-                Entries
-              </span>
-              <span className="text-xs text-gray-500">
-                {collage.numEntries} entries
-              </span>
+          {/* Entry list — list of rows; release link is the `title`, artist is
+              `meta`. Editions deferred (rip-quality not in the read contract). */}
+          <div data-st="panel">
+            <div data-st="colhead">
+              <span>Entries</span>
+              <span>{collage.numEntries} entries</span>
             </div>
             {!collage.entries || collage.entries.length === 0 ? (
               <p className="px-4 py-4 text-sm text-gray-500">No entries yet.</p>
             ) : (
-              <div className="divide-y divide-gray-800">
+              <div data-st="list">
                 {collage.entries.map((entry, i) => (
                   <div
                     id={`entry-${entry.releaseId}`}
                     key={entry.id}
-                    className={`flex items-center gap-3 px-4 py-2 transition-colors ${
+                    data-st="row"
+                    className={
                       highlightedId === entry.releaseId
                         ? 'bg-indigo-900/30'
-                        : 'hover:bg-gray-800/30'
-                    }`}
+                        : undefined
+                    }
                   >
                     <span className="text-xs text-gray-600 w-6 shrink-0 text-right">
                       {i + 1}
@@ -277,19 +294,20 @@ const CollageDetail = () => {
                         to={`/private/communities/${
                           entry.release?.communityId ?? 0
                         }/releases/${entry.releaseId}`}
-                        className="text-sm text-blue-400 hover:underline truncate block"
+                        data-st="title"
+                        className="block truncate"
                       >
                         {entry.release?.title ?? `Release #${entry.releaseId}`}
                       </Link>
                       {entry.release?.artist?.name && (
-                        <div className="text-xs text-gray-500 italic">
+                        <div data-st="meta" data-st-em className="text-xs">
                           {entry.release.artist.name}
                         </div>
                       )}
                     </div>
-                    <div className="text-xs text-gray-600 shrink-0">
+                    <span className="text-xs text-gray-600 shrink-0">
                       added by {entry.user?.username ?? '—'}
-                    </div>
+                    </span>
                     {(isOwner || isStaff || entry.userId === user?.id) && (
                       <button
                         onClick={() => handleRemoveEntry(entry.releaseId)}
@@ -308,10 +326,8 @@ const CollageDetail = () => {
         {/* Sidebar */}
         <div className="w-56 shrink-0 space-y-4">
           {/* Category */}
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Category
-            </div>
+          <div data-st="panel">
+            <div data-st="colhead">Category</div>
             <div className="px-3 py-2 text-sm text-gray-300">
               {CATEGORY_LABELS[collage.categoryId] ?? 'Unknown'}
             </div>
@@ -319,10 +335,8 @@ const CollageDetail = () => {
 
           {/* Description */}
           {collage.description && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Description
-              </div>
+            <div data-st="panel">
+              <div data-st="colhead">Description</div>
               <div className="px-3 py-2 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
                 {collage.description}
               </div>
@@ -331,16 +345,11 @@ const CollageDetail = () => {
 
           {/* Tags */}
           {collage.tags.length > 0 && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Tags
-              </div>
+            <div data-st="panel">
+              <div data-st="colhead">Tags</div>
               <div className="px-3 py-2 flex flex-wrap gap-1.5">
                 {collage.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded border border-gray-700"
-                  >
+                  <span key={tag} data-st="chip">
                     {tag}
                   </span>
                 ))}
@@ -349,10 +358,8 @@ const CollageDetail = () => {
           )}
 
           {/* Statistics */}
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-              Statistics
-            </div>
+          <div data-st="panel">
+            <div data-st="colhead">Statistics</div>
             <div className="px-3 py-2 text-xs text-gray-400 space-y-1">
               <div className="flex justify-between">
                 <span>Entries</span>
@@ -376,12 +383,46 @@ const CollageDetail = () => {
             </div>
           </div>
 
+          {/* Top Contributors — the power-law block (D-5): the decomposed
+              contributor pattern in practice (list › row › bar + title + meta),
+              exercising the new `bar` Role. The leader reads loudest. */}
+          {contributors.length > 0 && (
+            <div data-st="panel">
+              <div data-st="colhead">
+                <span>Top Contributors</span>
+              </div>
+              <div data-st="list">
+                {contributors.map((c, i) => (
+                  <div
+                    key={c.id}
+                    data-st="row"
+                    data-st-lead={i === 0 ? '' : undefined}
+                  >
+                    <div
+                      data-st="bar"
+                      data-st-lead={i === 0 ? '' : undefined}
+                      style={{ '--st-w': c.share } as CSSProperties}
+                    />
+                    <Link
+                      to={`/private/user/${c.username}`}
+                      data-st="title"
+                      className="truncate text-sm"
+                    >
+                      {c.username}
+                    </Link>
+                    <span data-st="meta" data-st-num className="text-xs">
+                      {c.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Add entry */}
           {canManageEntries && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Add Release
-              </div>
+            <div data-st="panel">
+              <div data-st="colhead">Add Release</div>
               <div className="px-3 py-2">
                 <form onSubmit={handleAddEntry} className="flex gap-2">
                   <input
