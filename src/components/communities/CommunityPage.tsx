@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
@@ -153,12 +153,10 @@ const CommunityPage = () => {
       )}
 
       {canManageMembers && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
-          <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-200">Members</span>
-            <span className="text-xs text-gray-500">
-              {community._count?.consumers ?? 0} total
-            </span>
+        <div data-st="panel" className="mb-4">
+          <div data-st="colhead">
+            <span>Members</span>
+            <span>{community._count?.consumers ?? 0} total</span>
           </div>
           <div className="px-4 py-3 border-b border-gray-800">
             <form onSubmit={handleAddMember} className="flex gap-2">
@@ -180,24 +178,19 @@ const CommunityPage = () => {
             </form>
           </div>
           {community.consumers && community.consumers.length > 0 ? (
-            <div className="divide-y divide-gray-800">
+            <div data-st="list">
               {community.consumers.map((c) => {
                 const memberIsStaff =
                   community.staff?.some((s) => s.id === c.user.id) ?? false;
                 return (
                   <div
                     key={c.user.id}
-                    className="flex items-center justify-between px-4 py-2"
+                    data-st="row"
+                    className="justify-between"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-300">
-                        {c.user.username}
-                      </span>
-                      {memberIsStaff && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-900 text-indigo-300 border border-indigo-700 font-medium">
-                          Staff
-                        </span>
-                      )}
+                      <span data-st="meta">{c.user.username}</span>
+                      {memberIsStaff && <span data-st="chip">Staff</span>}
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -240,10 +233,10 @@ const CommunityPage = () => {
         </div>
       )}
 
-      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-200">Releases</span>
-          <span className="text-xs text-gray-500">{total} total</span>
+      <div data-st="panel">
+        <div data-st="colhead">
+          <span>Releases</span>
+          <span>{total} total</span>
         </div>
 
         {loadingReleases ? (
@@ -255,7 +248,7 @@ const CommunityPage = () => {
             No releases yet.
           </p>
         ) : (
-          <div className="divide-y divide-gray-800">
+          <div data-st="list">
             {releaseList.map((release) => {
               const tags =
                 (release as { tags?: { name: string }[] }).tags ?? [];
@@ -272,9 +265,9 @@ const CommunityPage = () => {
               );
 
               return (
-                <div key={release.id}>
+                <Fragment key={release.id}>
                   {/* Release header row */}
-                  <div className="flex gap-3 px-4 py-3 hover:bg-gray-800/20 transition-colors">
+                  <div data-st="row">
                     <Link
                       to={`/private/communities/${communityId}/releases/${release.id}`}
                       className="shrink-0"
@@ -296,26 +289,29 @@ const CommunityPage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline gap-1.5 flex-wrap">
                         {release.artist && (
-                          <span className="text-sm font-medium text-gray-200">
+                          <span data-st="meta" data-st-em className="text-sm">
                             {release.artist.name}
                           </span>
                         )}
                         {release.artist && (
-                          <span className="text-gray-600 text-sm">—</span>
+                          <span data-st="meta" className="text-sm">
+                            —
+                          </span>
                         )}
                         <Link
                           to={`/private/communities/${communityId}/releases/${release.id}`}
-                          className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+                          data-st="title"
+                          className="text-sm"
                         >
                           {release.title}
                         </Link>
                         {release.year && (
-                          <span className="text-gray-500 text-xs">
+                          <span data-st="meta" data-st-num className="text-xs">
                             [{release.year}]
                           </span>
                         )}
                         {release.type && (
-                          <span className="text-gray-600 text-xs">
+                          <span data-st="meta" className="text-xs">
                             [{release.type}]
                           </span>
                         )}
@@ -324,10 +320,7 @@ const CommunityPage = () => {
                       {tags.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-1">
                           {tags.map((t) => (
-                            <span
-                              key={t.name}
-                              className="text-[10px] text-gray-500 italic"
-                            >
+                            <span key={t.name} data-st="chip">
                               {t.name}
                             </span>
                           ))}
@@ -336,9 +329,9 @@ const CommunityPage = () => {
                     </div>
 
                     {/* Release-level stats */}
-                    <div className="shrink-0 self-center text-right text-xs text-gray-600 space-y-0.5 whitespace-nowrap">
+                    <div className="shrink-0 self-center text-right space-y-0.5 whitespace-nowrap">
                       {contributorCount > 0 && (
-                        <div>
+                        <div data-st="meta" data-st-num className="text-xs">
                           {contributorCount}{' '}
                           {contributorCount === 1
                             ? 'contributor'
@@ -346,7 +339,7 @@ const CommunityPage = () => {
                         </div>
                       )}
                       {consumerCount > 0 && (
-                        <div>
+                        <div data-st="meta" data-st-num className="text-xs">
                           {consumerCount}{' '}
                           {consumerCount === 1 ? 'snatch' : 'snatches'}
                         </div>
@@ -356,19 +349,24 @@ const CommunityPage = () => {
 
                   {/* Format rows */}
                   {contributions.length > 0 && (
-                    <div className="border-t border-gray-800/60">
+                    <div data-st="list" className="pl-[4.25rem]">
                       {contributions.map((c) => {
                         const linkStatus = (c.linkStatus ??
                           'UNKNOWN') as LinkHealthStatus;
                         return (
-                          <div
-                            key={c.id}
-                            className="flex items-center gap-3 px-4 py-1.5 pl-[4.25rem] bg-gray-900/60 hover:bg-gray-800/30 transition-colors"
-                          >
-                            <span className="text-xs text-gray-500 font-medium w-24 shrink-0">
+                          <div key={c.id} data-st="row">
+                            <span
+                              data-st="chip"
+                              data-st-mono
+                              className="shrink-0"
+                            >
                               {c.type}
                             </span>
-                            <span className="text-xs text-gray-500 w-20 shrink-0">
+                            <span
+                              data-st="meta"
+                              data-st-num
+                              className="text-xs w-20 shrink-0"
+                            >
                               {c.sizeInBytes
                                 ? formatSize(Number(c.sizeInBytes))
                                 : '—'}
@@ -379,7 +377,11 @@ const CommunityPage = () => {
                             >
                               {c.user.username}
                             </Link>
-                            <span className="text-xs text-gray-600 shrink-0">
+                            <span
+                              data-st="meta"
+                              data-st-num
+                              className="text-xs shrink-0"
+                            >
                               {c._count?.consumers ?? 0}{' '}
                               {(c._count?.consumers ?? 0) === 1
                                 ? 'snatch'
@@ -405,7 +407,7 @@ const CommunityPage = () => {
                       })}
                     </div>
                   )}
-                </div>
+                </Fragment>
               );
             })}
           </div>

@@ -226,6 +226,26 @@ describe('CommunityPage', () => {
     expect(screen.getAllByText(/snatch/i).length).toBeGreaterThan(0);
   });
 
+  it('exposes the theming Role/Part hooks on the releases surface', () => {
+    // WS4 (ADR-0005): the release listing paints from data-st Roles, not inline
+    // utilities, so a token-only theme can reskin it. Assert the hooks are emitted.
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(document.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="colhead"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="list"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="row"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="title"]')).toBeInTheDocument();
+    // FLAC format token is a mono chip; jazz tag is a chip.
+    expect(
+      document.querySelector('[data-st="chip"][data-st-mono]')
+    ).toBeInTheDocument();
+  });
+
   it('shows empty releases message when list is empty', () => {
     mockUseGetCommunityByIdQuery.mockReturnValue({
       data: makeCommunity(),
