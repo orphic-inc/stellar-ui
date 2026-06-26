@@ -15,6 +15,12 @@ npm run test:e2e         # Playwright E2E (requires running API + UI — see bel
 npm run api:generate     # Export openapi.json from stellar-api, regenerate src/types/api.ts, run Prettier
 ```
 
+> **Phantom overlay errors:** if the dev server's overlay shows `prettier/prettier`
+> errors for files the CLI (`npm run lint`, `npx prettier --check`) reports clean,
+> it's a stale `eslint-webpack-plugin` cache, not the code. Delete
+> `node_modules/.cache/eslint-webpack-plugin/.eslintcache` and restart the dev
+> server — don't chase a prettier version mismatch.
+
 ## Environment variables
 
 Copy `.env.example` to `.env.local` (ignored by git) and fill in values:
@@ -35,8 +41,9 @@ The Playwright users must exist in the running stellar-api instance before `npm 
 
 ```
 src/
-  main.tsx                    # React root, Redux Provider, Router
-  App.tsx                     # Install probe → route tree
+  index.tsx                   # React root (createRoot), Redux Provider, Router; webpack entry
+                              # imports stylesheets/common/global.css — the theming contract
+  components/App.tsx          # Install probe → route tree
   store/
     index.ts                  # Redux store + AppDispatch / RootState types
     api.ts                    # RTK Query base API (baseUrl /api, cookie creds)
@@ -71,6 +78,7 @@ src/
     permissions.ts            # hasPermission, hasAnyPermission, isStaffUser, canSeeModBar, hasStrictAdmin
     avatar.ts                 # avatarSrc(avatar?) → string; onAvatarError handler; SEEDED_AVATAR_SENTINEL
   stylesheets/                # Bundled CSS themes served at /stylesheets — do not import directly
+    common/global.css         # The theming contract: --st-* Role Tokens + data-st hooks (see Theming)
     kuro/                     # Dark theme
     layer-cake/               # Classic-gray alternate; token-only reference theme (ADR-0005 / WS3)
     postmod/                  # Legacy tracker-era theme
@@ -89,6 +97,40 @@ src/
     profile/                  # User profile, settings
     layout/                   # Navbar, Sidebar, UserMenu, Spinner, PostBox, StylesheetInjector, etc.
 ```
+
+## Theming (the data-st contract)
+
+Themes are **injected stylesheets** that re-skin the app by redefining `--st-*`
+Role Tokens — never by writing selectors. The contract lives in
+`src/stylesheets/common/global.css` (imported once by `index.tsx`, unlayered so
+its `data-st` hooks beat Tailwind utilities). Authority: ADR-0005
+(`docs/adr/0005-injected-theme-contract.md`), `docs/theming.md`, and the
+`CONTEXT.md` glossary (use its words — Theme / Theme Token / Semantic Hook;
+Role vs Part).
+
+- **Sublime** is the baseline — injects nothing; the bundled Tailwind *is*
+  Sublime and seeds the `--st-*` defaults. **Layer Cake** is the token-only
+  reference theme: it only fully re-skins surfaces that have been *migrated*,
+  so on un-migrated surfaces it falls back to the Sublime look (expected).
+- **Tier-1 Roles** (generic, app-wide): `panel` `colhead` `list` `row` `title`
+  `meta` `chip` `icon` `rollup` `bar` `prose` `control` (`colhead` takes a
+  `-title` modifier for content titles vs structural labels). **Tier-2 Parts**
+  (scoped, justified): `edition-*` `coverart-*`. Boolean modifiers are bare
+  `data-st-*` attributes (`data-st-lead`, `data-st-num`, `data-st-strong`,
+  `data-st-primary`, `data-st-danger`, …); `bar` reads `--st-w` (0–100) via
+  inline style.
+
+**Migrating a surface (the WS4 per-surface pass, ongoing):** move
+color/border/background utilities onto the `data-st` hooks; **keep layout**
+utilities (flex/grid/spacing/sizing). Table listings convert to div
+`panel`/`colhead`/`list`/`row`. Body/heading copy uses **`prose`** (`-strong`
+for headings) and interactive buttons/links use **`control`** (`-primary` CTA,
+`-danger` destructive) — both paint from tokens, so don't leave them as inline
+gray utilities, which go illegible on a light theme. Add a hooks-present test
+assertion per migrated surface, and keep rendered text/links/controls intact so
+the existing suite stays green. Worked examples: `CollageDetail`,
+`CommunityPage`, `LogBrowsePage`, `ForumPage`, `ForumTopicPage` +
+`ForumTopicPost` (the last established `prose`/`control`).
 
 ## Types
 
