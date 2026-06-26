@@ -59,8 +59,12 @@ The learnable core. Each means the same thing on every page; styling it once re-
 | `icon`    | a fixed glyph slot (e.g. category sprite)            | `--st-raised`, `--st-radius-sm`                                                  |
 | `rollup`  | an aggregate list (label + count) — top tags/artists | `--st-link`, `--st-text-faint`, `--st-mono`                                      |
 | `bar`     | a proportional fill bar (weight / progress)          | `--st-weight`, `--st-weight-track`                                               |
+| `prose`   | body / heading copy inside a surface                 | `--st-text` (`-strong` → `--st-text-strong`; `-muted` → `--st-text-muted`)       |
+| `control` | an interactive affordance (button or link)           | `--st-link` / `--st-link-hover` (`-primary` → `--st-accent` fill; `-danger` → `--st-danger` on hover) |
 
 > **Applied in WS1:** `release-list → list`, `release-row → row`, `tag → chip`, `category-icon → icon`; the release-specific slots (`release-title/artist/year`) dropped and re-expressed as the generic `title` + `meta` Roles inside `row` (D-1) — no entity-named slots, no generic `cell`. `bar` — previously trapped as a contributor pseudo-element — is now a first-class Tier-1 hook. `global.css` matches this table.
+
+> **Added in WS4 (forum topic page):** `prose` and `control`. Live-rendering a real topic + poll proved both load-bearing (D-6): prose copy on a token-painted `panel` was going light-on-light without a hook, and inline-gray buttons/links went illegible on a light theme. Same pass added the `colhead[data-st-title]` modifier — the header bar carrying a _content_ title (a thread/post subject) drops the uppercase/tracking a structural label wants — and gave `bar[data-st-lead]` a leading accent edge so the leader reads on a light theme. `global.css` matches this table.
 
 ### 3.3 Tier-2 Parts — scoped inside a Role, must earn their place
 
@@ -151,6 +155,7 @@ Each is independently grabbable; clear context between them.
 - **D-3 — Quality tokens are core.** `--st-lossless/lossy` (quality-tier cue, recurs in listings/search/workbench) and `--st-weight/weight-track` (the app-wide `bar` Role) stay in the core token set, not a Collage scope.
 - **D-4 — Coverart empty state: placeholder, then omit.** Missing covers render a placeholder cell (keeps the region's identity, no layout jolt); the mosaic panel is omitted entirely only when the whole collage has zero art.
 - **D-5 — `contributor` and `collector` decompose; they are not Parts.** Applying the §3.3 rule to the two worked examples: `contributor*` is `list`+`row`+`bar`+`title`+`meta` (the weight bar extracted into the Tier-1 `bar` Role; the leader is `[data-st-lead]` on the `row`), and `collector*` is a `panel` region of `chip`s (`chip[data-st-mono]` + the new `chip[data-st-selected]` modifier). Only `edition*` (D-2) and `coverart*` (D-4) earn Part status — the governance rule's worked proof that a named feature does not buy a Part.
+- **D-6 — `prose` and `control` join Tier-1; chrome and copy are Roles, not inline utilities.** WS4 grew the set by two, against the "rare and deliberate" bar, because a real forum topic page proved them load-bearing: prose copy on a token `panel` (post body, poll question/answer, vote labels) needs a text-token hook or it stays light-on-light, and interactive buttons/links (moderation actions, vote, byline) need a token hook or they keep a fixed gray that goes illegible on a light theme. Both replace inline `var()`/utility bridges rather than adding new structure. The same pass split content titles from structural labels via the `colhead[data-st-title]` modifier (no uppercase) and added a leading accent edge to `bar[data-st-lead]` so the leader reads on any theme. **Non-goal:** form _inputs_ (textarea/radio/select) stay utility-styled — they aren't yet a Role.
 
 ## 10. Success criteria
 
