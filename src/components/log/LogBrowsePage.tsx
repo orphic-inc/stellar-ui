@@ -56,96 +56,100 @@ const LogBrowsePage = () => {
     setSearchParams(next);
   };
 
-  const renderTopics = (topics: TopicSearchResult[], meta: PaginatedMeta) => (
-    <div className="space-y-2">
-      <p className="text-xs text-gray-500">
-        {meta.total} topic{meta.total !== 1 ? 's' : ''}
-      </p>
-      {topics.map((t) => (
-        <div key={t.id} className="border-b border-gray-800/50 py-2">
-          <Link
-            to={`/private/forums/topics/${t.id}`}
-            className="text-indigo-400 hover:text-indigo-300 font-medium text-sm"
+  // Pagination has no contract Role (active-page paint is deferred table-era
+  // work); it stays inline Tailwind and sits below the result panel.
+  const renderPager = (meta: PaginatedMeta) =>
+    meta.totalPages > 1 ? (
+      <div className="flex gap-1 flex-wrap pt-2">
+        {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
+          <button
+            key={p}
+            onClick={() => setPage(p)}
+            className={`px-2.5 py-1 text-xs rounded ${
+              p === page
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
           >
-            {t.title}
-          </Link>
-          <span className="text-gray-500 text-xs ml-3">
-            by {t.author.username} ·{' '}
-            {new Date(t.createdAt).toLocaleDateString()} · {t.numPosts} posts
-          </span>
+            {p}
+          </button>
+        ))}
+      </div>
+    ) : null;
+
+  const renderTopics = (topics: TopicSearchResult[], meta: PaginatedMeta) => (
+    <>
+      <div data-st="panel">
+        <div data-st="colhead">
+          <span>Topics</span>
+          <span>{meta.total} total</span>
         </div>
-      ))}
-      {meta.totalPages > 1 && (
-        <div className="flex gap-1 flex-wrap pt-2">
-          {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`px-2.5 py-1 text-xs rounded ${
-                p === page
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {p}
-            </button>
+        <div data-st="list">
+          {topics.map((t) => (
+            <div key={t.id} data-st="row">
+              <Link
+                to={`/private/forums/topics/${t.id}`}
+                data-st="title"
+                className="text-sm"
+              >
+                {t.title}
+              </Link>
+              <span data-st="meta" className="text-xs">
+                by {t.author.username} ·{' '}
+                {new Date(t.createdAt).toLocaleDateString()} · {t.numPosts}{' '}
+                posts
+              </span>
+            </div>
           ))}
         </div>
-      )}
-    </div>
+      </div>
+      {renderPager(meta)}
+    </>
   );
 
   const renderPosts = (posts: PostSearchResult[], meta: PaginatedMeta) => (
-    <div className="space-y-2">
-      <p className="text-xs text-gray-500">
-        {meta.total} post{meta.total !== 1 ? 's' : ''}
-      </p>
-      {posts.map((p) => (
-        <div key={p.id} className="border-b border-gray-800/50 py-2">
-          <Link
-            to={`/private/forums/topics/${p.forumTopicId}#post-${p.id}`}
-            className="text-indigo-400 hover:text-indigo-300 text-sm"
-          >
-            Post by {p.author.username}
-          </Link>
-          <span className="text-gray-500 text-xs ml-3">
-            {new Date(p.createdAt).toLocaleDateString()}
-          </span>
-          <p className="text-gray-400 text-xs mt-1 line-clamp-2">{p.body}</p>
+    <>
+      <div data-st="panel">
+        <div data-st="colhead">
+          <span>Posts</span>
+          <span>{meta.total} total</span>
         </div>
-      ))}
-      {meta.totalPages > 1 && (
-        <div className="flex gap-1 flex-wrap pt-2">
-          {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`px-2.5 py-1 text-xs rounded ${
-                p === page
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {p}
-            </button>
+        <div data-st="list">
+          {posts.map((p) => (
+            <div key={p.id} data-st="row">
+              {/* stacked: title+date over body — the block parent makes title's
+                  flex:1 inert so the two-line layout holds (CollageDetail gotcha) */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-1.5 flex-wrap">
+                  <Link
+                    to={`/private/forums/topics/${p.forumTopicId}#post-${p.id}`}
+                    data-st="title"
+                    className="text-sm"
+                  >
+                    Post by {p.author.username}
+                  </Link>
+                  <span data-st="meta" data-st-num className="text-xs">
+                    {new Date(p.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <p data-st="meta" className="text-xs mt-1 line-clamp-2">
+                  {p.body}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
-      )}
-    </div>
+      </div>
+      {renderPager(meta)}
+    </>
   );
 
   const renderResults = (results: LogSearchResponse) => {
     if (hasSplitLists(results)) {
       return (
         <div className="space-y-8">
-          <div>
-            <h2 className="text-sm font-semibold text-gray-300 mb-3">Topics</h2>
-            {renderTopics(results.topics.data, results.topics.meta)}
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-gray-300 mb-3">Posts</h2>
-            {renderPosts(results.posts.data, results.posts.meta)}
-          </div>
+          {renderTopics(results.topics.data, results.topics.meta)}
+          {renderPosts(results.posts.data, results.posts.meta)}
         </div>
       );
     }
@@ -161,7 +165,7 @@ const LogBrowsePage = () => {
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
       <h1 className="text-2xl font-bold text-white">Forum Log</h1>
 
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+      <div data-st="panel" className="p-4">
         <form
           onSubmit={handleSubmit}
           className="flex flex-wrap items-end gap-3"

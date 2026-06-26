@@ -92,6 +92,10 @@ describe('LogBrowsePage', () => {
     expect(screen.getByText('Topic 1')).toBeInTheDocument();
     expect(screen.getByText(/by alice/i)).toBeInTheDocument();
     expect(screen.getByText(/3 posts/i)).toBeInTheDocument();
+    // Theming contract: results render on the data-st Role hooks (WS4·2).
+    expect(document.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="row"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="title"]')).toBeInTheDocument();
   });
 
   it('renders combined topics and posts when type=all', () => {
@@ -114,6 +118,9 @@ describe('LogBrowsePage', () => {
     expect(screen.getAllByText('Posts').length).toBeGreaterThan(0);
     expect(screen.getByText('Topic 1')).toBeInTheDocument();
     expect(screen.getByText(/post by bob/i)).toBeInTheDocument();
+    // Split view renders a section header per list (Topics + Posts); the form
+    // card is also a panel, so assert on colhead, which is results-only.
+    expect(document.querySelectorAll('[data-st="colhead"]')).toHaveLength(2);
   });
 
   it('updates search params on form submit', async () => {
