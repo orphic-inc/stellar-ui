@@ -200,7 +200,14 @@ const ForumTopicPage = () => {
 
       {poll && !pollParseError && answers.length > 0 && (
         <div data-st="panel" className="mb-4 p-4">
-          <strong className="text-sm text-gray-200">{poll.question}</strong>
+          {/* Heading-strength prose has no Tier-1 Role; read --st-text-strong
+              directly so the question stays legible on a token-painted panel. */}
+          <strong
+            className="text-sm"
+            style={{ color: 'var(--st-text-strong)' }}
+          >
+            {poll.question}
+          </strong>
           {showPollResults ? (
             // Each answer is a row backed by the `bar` Role (--st-w = pct); the
             // voter's own choice leads (brighter fill), mirroring CollageDetail.
@@ -243,7 +250,8 @@ const ForumTopicPage = () => {
               {answers.map((answer, i) => (
                 <label
                   key={i}
-                  className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer"
+                  className="flex items-center gap-2 text-sm cursor-pointer"
+                  style={{ color: 'var(--st-text)' }}
                 >
                   <input
                     type="radio"
