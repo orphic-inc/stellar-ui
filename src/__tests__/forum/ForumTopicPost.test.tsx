@@ -112,6 +112,8 @@ describe('ForumTopicPost', () => {
     );
     expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
     expect(container.querySelector('[data-st="colhead"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="prose"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="control"]')).toBeInTheDocument();
   });
 
   it('shows Quote button always', () => {

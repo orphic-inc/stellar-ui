@@ -117,19 +117,21 @@ const ForumTopicPage = () => {
       </nav>
 
       <div data-st="panel" className="mb-4">
-        <div data-st="colhead">
+        {/* colhead -title: a content title (the thread subject), so it is not
+            uppercased like a structural label. Actions are `control` hooks so
+            they recolor with the theme instead of going gray-on-light. */}
+        <div data-st="colhead" data-st-title>
           <span className="flex items-center gap-2">
             {topic.title}
             {topic.isLocked && <span data-st="chip">[Locked]</span>}
             {topic.isSticky && <span data-st="chip">[Sticky]</span>}
           </span>
-          {/* Moderation / subscribe / catch-up are interactive chrome — no
-              contract Role covers them, so they keep their utility paint. */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 text-xs">
             {affordances.canModerate && (
               <>
                 <button
                   type="button"
+                  data-st="control"
                   onClick={() =>
                     updateTopic({
                       forumId: fId,
@@ -138,12 +140,12 @@ const ForumTopicPage = () => {
                     })
                   }
                   disabled={updatingTopic}
-                  className="text-xs text-gray-400 hover:text-yellow-400 disabled:opacity-50"
                 >
                   {topic.isLocked ? 'Unlock' : 'Lock'}
                 </button>
                 <button
                   type="button"
+                  data-st="control"
                   onClick={() =>
                     updateTopic({
                       forumId: fId,
@@ -152,15 +154,15 @@ const ForumTopicPage = () => {
                     })
                   }
                   disabled={updatingTopic}
-                  className="text-xs text-gray-400 hover:text-blue-400 disabled:opacity-50"
                 >
                   {topic.isSticky ? 'Unsticky' : 'Sticky'}
                 </button>
                 <button
                   type="button"
+                  data-st="control"
+                  data-st-danger
                   onClick={handleTrash}
                   disabled={trashing}
-                  className="text-xs text-gray-400 hover:text-red-400 disabled:opacity-50"
                 >
                   Trash
                 </button>
@@ -168,6 +170,7 @@ const ForumTopicPage = () => {
             )}
             <button
               type="button"
+              data-st="control"
               onClick={() =>
                 subscribe({
                   topicId: tId,
@@ -177,14 +180,13 @@ const ForumTopicPage = () => {
                 })
               }
               disabled={subscribing}
-              className="text-xs text-gray-400 hover:text-gray-200"
             >
               {subscription.isSubscribed ? 'Unsubscribe' : 'Subscribe'}
             </button>
             <button
               type="button"
+              data-st="control"
               onClick={() => catchupForum(fId)}
-              className="text-xs text-gray-400 hover:text-gray-200"
             >
               Catch Up
             </button>
@@ -200,12 +202,7 @@ const ForumTopicPage = () => {
 
       {poll && !pollParseError && answers.length > 0 && (
         <div data-st="panel" className="mb-4 p-4">
-          {/* Heading-strength prose has no Tier-1 Role; read --st-text-strong
-              directly so the question stays legible on a token-painted panel. */}
-          <strong
-            className="text-sm"
-            style={{ color: 'var(--st-text-strong)' }}
-          >
+          <strong data-st="prose" data-st-strong className="text-sm">
             {poll.question}
           </strong>
           {showPollResults ? (
@@ -229,8 +226,8 @@ const ForumTopicPage = () => {
                       style={{ '--st-w': pct } as CSSProperties}
                     />
                     <span
+                      data-st="prose"
                       className={`flex-1 min-w-0 text-sm ${mine ? 'font-medium' : ''}`}
-                      style={{ color: 'var(--st-text)' }}
                     >
                       {answer}
                     </span>
@@ -250,8 +247,8 @@ const ForumTopicPage = () => {
               {answers.map((answer, i) => (
                 <label
                   key={i}
+                  data-st="prose"
                   className="flex items-center gap-2 text-sm cursor-pointer"
-                  style={{ color: 'var(--st-text)' }}
                 >
                   <input
                     type="radio"
@@ -267,12 +264,14 @@ const ForumTopicPage = () => {
               <div className="mt-2 flex items-center gap-3">
                 <button
                   type="submit"
-                  className="px-3 py-1 text-sm rounded bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50"
+                  data-st="control"
+                  data-st-primary
+                  className="text-sm"
                   disabled={selectedAnswer === null || voting}
                 >
                   Vote
                 </button>
-                <span className="text-xs text-gray-500">
+                <span data-st="meta" data-st-num className="text-xs">
                   {totalVotes} vote{totalVotes !== 1 ? 's' : ''}
                 </span>
               </div>

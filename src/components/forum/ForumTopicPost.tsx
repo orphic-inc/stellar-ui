@@ -81,33 +81,30 @@ const ForumTopicPost = ({
 
   return (
     <div id={`post${id}`} data-st="panel" className="mb-3">
-      {/* The byline bar is a colhead; the author opts out of its uppercase so
-          the username stays readable. Action links/buttons are interactive
-          chrome and keep their utility paint (deferred). */}
+      {/* Byline bar is a colhead; the author opts out of its uppercase so the
+          username stays readable. Links/buttons are `control` hooks so they
+          recolor with the theme. */}
       <div data-st="colhead" className="text-xs">
         <div className="flex items-center gap-2">
-          <Link to={`#post${id}`} className="text-gray-500 hover:text-gray-300">
+          <Link to={`#post${id}`} data-st="control">
             #{id}
           </Link>
           <Link
             to={`/private/user/${author?.username}`}
-            className="font-semibold normal-case tracking-normal hover:text-white"
+            data-st="control"
+            className="font-semibold normal-case tracking-normal"
           >
             {author?.username}
           </Link>
           <Time date={createdAt} />
-          <button
-            type="button"
-            onClick={handleQuote}
-            className="text-gray-500 hover:text-gray-300"
-          >
+          <button type="button" data-st="control" onClick={handleQuote}>
             Quote
           </button>
           {canEdit && !editing && (
             <button
               type="button"
+              data-st="control"
               onClick={() => setEditing(true)}
-              className="text-gray-500 hover:text-gray-300"
             >
               Edit
             </button>
@@ -115,8 +112,9 @@ const ForumTopicPost = ({
           {canDelete && (
             <button
               type="button"
+              data-st="control"
+              data-st-danger
               onClick={handleDelete}
-              className="text-gray-500 hover:text-red-400"
             >
               Delete
             </button>
@@ -125,11 +123,11 @@ const ForumTopicPost = ({
         <div className="flex items-center gap-2">
           <Link
             to={`/private/reports/new?targetType=ForumPost&targetId=${id}`}
-            className="hover:text-gray-200"
+            data-st="control"
           >
             Report
           </Link>
-          <Link to="#top" className="hover:text-gray-200">
+          <Link to="#top" data-st="control">
             ↑
           </Link>
         </div>
@@ -146,18 +144,21 @@ const ForumTopicPost = ({
           <div className="flex gap-2">
             <button
               type="submit"
+              data-st="control"
+              data-st-primary
               disabled={saving || !editBody.trim()}
-              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs rounded disabled:opacity-50"
+              className="text-xs"
             >
               {saving ? 'Saving…' : 'Save'}
             </button>
             <button
               type="button"
+              data-st="control"
               onClick={() => {
                 setEditing(false);
                 setEditBody(body);
               }}
-              className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs rounded"
+              className="text-xs"
             >
               Cancel
             </button>
@@ -173,12 +174,9 @@ const ForumTopicPost = ({
               className="w-16 h-16 rounded object-cover"
             />
           </div>
-          {/* Post prose has no Tier-1 Role; it reads the --st-text body token
-              directly so it recolors with the theme (CONTEXT.md: components
-              read Theme Tokens) instead of staying light-on-light on a panel. */}
           <div
+            data-st="prose"
             className="flex-1 text-sm bbcode-content"
-            style={{ color: 'var(--st-text)' }}
             dangerouslySetInnerHTML={{ __html: renderedBody }}
           />
         </div>
@@ -194,7 +192,7 @@ const ForumTopicPost = ({
               {lastEdit.editor ? (
                 <Link
                   to={`/private/user/${lastEdit.editor.username}`}
-                  className="text-gray-400 hover:text-gray-200"
+                  data-st="control"
                 >
                   {lastEdit.editor.username}
                 </Link>
@@ -208,8 +206,9 @@ const ForumTopicPost = ({
               <div className="mt-2">
                 <button
                   type="button"
+                  data-st="control"
                   onClick={toggleEditHistory}
-                  className="text-xs text-gray-400 hover:text-gray-200"
+                  className="text-xs"
                 >
                   {showEditHistory ? 'Hide edit history' : 'View edit history'}
                 </button>
@@ -241,7 +240,7 @@ const ForumTopicPost = ({
                             {edit.editor ? (
                               <Link
                                 to={`/private/user/${edit.editor.username}`}
-                                className="text-gray-400 hover:text-gray-200"
+                                data-st="control"
                               >
                                 {edit.editor.username}
                               </Link>

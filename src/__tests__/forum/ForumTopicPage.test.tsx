@@ -203,6 +203,17 @@ describe('ForumTopicPage', () => {
     expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
     expect(container.querySelectorAll('[data-st="row"]').length).toBe(2);
     expect(container.querySelectorAll('[data-st="bar"]').length).toBe(2);
+    // Redesign Roles: the topic title is a content-title colhead and the
+    // moderation actions are `control` hooks (WS4 contract extension).
+    expect(
+      container.querySelector('[data-st="colhead"][data-st-title]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelectorAll('[data-st="control"]').length
+    ).toBeGreaterThan(0);
+    expect(
+      container.querySelector('[data-st="prose"][data-st-strong]')
+    ).toBeInTheDocument();
 
     // Quote a post then clear it via onQuoteConsumed
     await user.click(screen.getByRole('button', { name: /quote post 101/i }));

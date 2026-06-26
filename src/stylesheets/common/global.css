@@ -18,8 +18,10 @@
  * Hooks come in two tiers (ADR-0005 / docs/theming.md §3):
  *
  *   • TIER-1 ROLES — a small, fixed, app-wide set (panel, colhead, list, row,
- *     title, meta, chip, icon, rollup, bar). Styling one re-skins every surface
- *     that uses it. Growing this set is rare and deliberate.
+ *     title, meta, chip, icon, rollup, bar, prose, control; colhead takes a
+ *     -title modifier). Styling one re-skins every surface that uses it.
+ *     Growing this set is rare and deliberate (prose + control were added in
+ *     WS4 once a real forum topic page proved them load-bearing).
  *   • TIER-2 PARTS — scoped inside a Role, added only when no composition of
  *     Roles expresses the structure; each carries a one-line justification. Only
  *     two earn their place: `edition-*` (D-2) and `coverart-*` (D-4).
@@ -244,6 +246,72 @@
 }
 [data-st='bar'][data-st-lead] {
   background: color-mix(in oklch, var(--st-weight) 38%, transparent);
+  /* A leading accent edge so the winner/leader reads even on a light theme,
+     where the weight fill alone is too quiet (forum-poll finding, WS4). */
+  border-left: 2px solid var(--st-accent-ring);
+}
+
+/* prose — body copy painted from the text tokens, so a token theme keeps it
+ * legible inside a panel instead of leaving it light-on-light. Modifiers:
+ * -strong (a heading / lead line) and -muted (a quiet aside). Added in WS4 when
+ * the forum topic page needed four ad-hoc `color: var(--st-text)` bridges. */
+[data-st='prose'] {
+  color: var(--st-text);
+}
+[data-st='prose'][data-st-strong] {
+  color: var(--st-text-strong);
+  font-weight: 600;
+}
+[data-st='prose'][data-st-muted] {
+  color: var(--st-text-muted);
+}
+
+/* control — an interactive affordance (button or link) that paints from the
+ * accent/link tokens, so it recolors with the theme rather than staying a fixed
+ * gray that goes illegible on a light surface. Plain = a text-link control;
+ * -primary = a filled CTA; -danger = a destructive action (red on hover).
+ * Resets native <button> chrome so the same hook serves <a> and <button>. */
+[data-st='control'] {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--st-link);
+  cursor: pointer;
+}
+[data-st='control']:hover {
+  color: var(--st-link-hover);
+}
+[data-st='control']:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+[data-st='control'][data-st-danger]:hover {
+  color: var(--st-danger);
+}
+[data-st='control'][data-st-primary] {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--st-radius-sm);
+  background: var(--st-accent);
+  color: var(--st-text-strong);
+}
+[data-st='control'][data-st-primary]:hover {
+  background: var(--st-accent-hover);
+  color: var(--st-text-strong);
+}
+[data-st='control'][data-st-primary]:disabled:hover {
+  background: var(--st-accent);
+}
+
+/* colhead -title — the same header bar carrying a *content* title (a thread /
+ * post subject) rather than a structural label: drop the uppercase + tracking
+ * and read at title strength. Keeps plain `colhead` for "TOPICS"-style labels
+ * (the forum topic page needed this split — WS4). */
+[data-st='colhead'][data-st-title] {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.875rem;
+  color: var(--st-text-strong);
 }
 
 /* ── 2b. Tier-2 Parts — scoped inside a Role; each earns its place (§3.3). */
