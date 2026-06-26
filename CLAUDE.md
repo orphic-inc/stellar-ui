@@ -72,10 +72,10 @@ src/
     avatar.ts                 # avatarSrc(avatar?) → string; onAvatarError handler; SEEDED_AVATAR_SENTINEL
   stylesheets/                # Bundled CSS themes served at /stylesheets — do not import directly
     kuro/                     # Dark theme
-    layer-cake/               # Default Stellar theme
-    postmod/                  # WCD-era theme
+    layer-cake/               # Classic-gray alternate; token-only reference theme (ADR-0005 / WS3)
+    postmod/                  # Legacy tracker-era theme
     proton/                   # Light theme
-    sublime/                  # Empty (base Tailwind only)
+    sublime/                  # Default/baseline — injects nothing; bundled Tailwind IS Sublime (seeds the --st-* token defaults)
   components/
     admin/                    # User rank manager, forum/community controls, news, stylesheet manager
     staff/                    # Staff pages + registry

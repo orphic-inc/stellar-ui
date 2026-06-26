@@ -80,11 +80,32 @@ The table above (`edition*`, `coverart*`) is therefore the complete Part set. Th
 
 ---
 
-## 4. Authoring model (informative)
+## 4. Authoring a theme (the guide)
 
-- **Recolor theme:** a `:root { --st-accent: …; --st-panel: …; }` block. Nothing else. Re-skins every hooked surface.
-- **Structural theme:** the above, plus overrides on Roles (`[data-st="row"] { … }`) and, rarely, Parts. Still one stylesheet, still no chasing utility classes.
-- Member-authored CSS arrives **pre-sanitized from the API** (ADR-0003); the UI does not re-sanitize.
+A theme is one CSS file, injected as a `<link>` after the bundled `global.css`
+(ADR-0003). Both `:root` blocks are unlayered, so the theme's values win by
+source order — **no `!important`, no selectors to chase.**
+
+- **Recolor theme — the common case: a `:root { --st-* }` block, nothing else.**
+  Redefine the **primitive** role tokens (surfaces, text, accent/link, borders,
+  status). The **derived** tokens follow automatically — they reference the
+  primitives via `var()` and resolve lazily, so you never restate them:
+  `--st-lossy → var(--st-text-faint)`, `--st-weight → var(--st-accent-ring)`,
+  `--st-weight-track → color-mix(… var(--st-raised) …)`. Geometry/type
+  (`--st-radius`, `--st-gap`, `--st-mono`) inherit unless you want to retune
+  density. Token catalogue: §3.1.
+  - **Worked example:** `src/stylesheets/layer-cake/style.css` — the classic-gray
+    theme, expressed as ~20 primitive token redefinitions and **zero** utility
+    overrides (WS3). It is the reference every recolor should look like.
+- **Structural theme:** the recolor block, plus overrides on **Roles**
+  (`[data-st="row"] { … }`) and, rarely, **Parts**. Still one stylesheet, still
+  no chasing utility classes.
+- **During the migration:** a token-only theme only re-skins surfaces already on
+  the hook contract (the Collage today; more as WS4+ migrates). A theme that must
+  also cover not-yet-migrated surfaces keeps its old utility overrides until
+  those surfaces convert.
+- Member-authored CSS arrives **pre-sanitized from the API** (ADR-0003); the UI
+  does not re-sanitize.
 
 ---
 
@@ -103,7 +124,7 @@ Each is independently grabbable; clear context between them.
 - **WS0 — Wire the contract.** Import `common/global.css` into the build (it is currently **unimported** — it does nothing yet), confirm the unlayered cascade, no visual change. Acceptance: tokens resolve in devtools; a hand-set `data-st="panel"` paints.
 - **WS1 — Finalize the Tier-1 inventory + re-sort `global.css`.** Apply §3.2 renames; resolve the `contributor`/`collector` collapse question; land the Role table as CSS. Acceptance: §3.2/§3.3 match the file; no Part lacks justification.
 - **WS2 — Collage pilot (UI-only).** `CollageDetail.tsx` renders from Roles + Parts + tokens (no inline paint, no regression), adding the contributor power-law block (`bar` Role) and the weighted 2×2 cover mosaic. The edition disclosure is **deferred** — its quality data is in no read schema (§5); the `edition-*` Part stays defined-but-unwired pending a stellar-api change. _Done._
-- **WS3 — Author guide + token-only reference theme.** Convert one existing theme to _tokens only_ to prove a recolor is "just tokens." Acceptance: that theme carries zero utility-class overrides.
+- **WS3 — Author guide + token-only reference theme.** Convert one existing theme to _tokens only_ to prove a recolor is "just tokens." Acceptance: that theme carries zero utility-class overrides. _Done — Layer Cake is now a ~20-token recolor with zero overrides (§4); the guide lives in §4._
 - **WS4…n — Per-surface migration.** One issue per surface, in the order below. Each: move the surface's look out of inline utilities into Roles/Parts, no regression.
 
 ## 7. Migration order (per surface)
@@ -133,7 +154,7 @@ Each is independently grabbable; clear context between them.
 
 ## 10. Success criteria
 
-- A recolor theme is expressible as **token values only** (WS3 proves it).
+- A recolor theme is expressible as **token values only** — proven: `layer-cake/style.css` is ~20 primitive token redefinitions, zero overrides (WS3).
 - The Collage renders entirely from Roles/Parts + tokens, no inline paint, no regression (WS2).
 - A power-user theme can restyle `row`/`panel`/`colhead` once and visibly re-skin every migrated surface.
 - Tier-1 stays small; every Tier-2 Part in `global.css` has a one-line justification.
