@@ -9,3 +9,8 @@ test-results/
 
 # Photoshop sources — keep local, not in git (LFS TBD)
 *.psd
+
+# Handoff/scrap docs stay out of the committed tree. docs/ is durable-only
+# (adr/, agents/, PRDs). Persistent home for handoffs: ~/.claude/projects/.../handoff/.
+docs/*handoff*.md
+docs/handoff/
