@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import './index.scss';
+import './stylesheets/common/global.css'; // WS0: theming contract — role tokens + data-st hooks (ADR-0005); unlayered, so hooks win over Tailwind utilities
 import App from './components/App';
 import SentryUserSync from './components/SentryUserSync';
 import store from './store';
