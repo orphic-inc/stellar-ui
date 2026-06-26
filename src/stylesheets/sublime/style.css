@@ -1,1 +1,79 @@
-/* Sublime — default Stellar theme. No overrides needed; the bundled Tailwind styles are Sublime. */
+/*
+ * Sublime — the default Stellar theme.
+ * ============================================================================
+ *
+ * Sublime ships NO CSS overrides. It is the unmodified Tailwind v4 default
+ * palette, consumed directly by the utility classes in the components. The
+ * bundled Tailwind styles ARE Sublime — so this file is intentionally rule-free.
+ *
+ * Why this file is just comments
+ * ------------------------------
+ * `src/index.scss` does `@import "tailwindcss";` with NO `@theme { ... }` block,
+ * so Tailwind's stock colors apply verbatim. The other themes (kuro, layer-cake,
+ * proton, postmod) are CSS files that repaint these same utility classes with
+ * `!important`. Sublime has nothing to repaint — it is the baseline they diverge
+ * from. Adding rules here would no longer be "Sublime."
+ *
+ * This block documents the intended palette so it can't silently drift again.
+ * The tokens below are the canonical contract every other theme overrides; if
+ * you add a new Tailwind color class to a component, add it here AND to the four
+ * override themes, or Sublime and the alternates fall out of sync.
+ *
+ * Source of truth for the values: node_modules/tailwindcss/theme.css (v4 ships
+ * colors in oklch). Hex values below are the published Tailwind equivalents,
+ * given for human readability — oklch is authoritative.
+ *
+ * ── Surfaces / backgrounds ────────────────────────────────────────────────
+ *   gray-950  oklch(13%   0.028 261.692)  ≈ #030712   page backdrop (outermost)
+ *   gray-900  oklch(21%   0.034 264.665)  ≈ #111827   app/page base, header, footer
+ *   gray-800  oklch(27.8% 0.033 256.848)  ≈ #1f2937   panels, cards, modals
+ *   gray-700  oklch(37.3% 0.034 259.733)  ≈ #374151   raised rows, inputs, chips
+ *     (also used at /40 /50 /60 alpha for subtle fills and hover states)
+ *
+ * ── Text ──────────────────────────────────────────────────────────────────
+ *   white                                  #ffffff    primary headings / strong
+ *   gray-100  oklch(96.7% 0.003 264.542)  ≈ #f3f4f6   high-emphasis text
+ *   gray-200  oklch(92.8% 0.006 264.531)  ≈ #e5e7eb   strong body text
+ *   gray-300  oklch(87.2% 0.01  258.338)  ≈ #d1d5db   default body text
+ *   gray-400  oklch(70.7% 0.022 261.325)  ≈ #9ca3af   muted / secondary text
+ *   gray-500  oklch(55.1% 0.027 264.364)  ≈ #6b7280   faint / placeholder
+ *   gray-600  oklch(44.6% 0.03  256.802)  ≈ #4b5563   faintest labels
+ *
+ * ── Accent / primary (indigo) ──────────────────────────────────────────────
+ *   indigo-600 oklch(51.1% 0.262 276.966) ≈ #4f46e5   primary buttons, CTAs
+ *   indigo-700 oklch(45.7% 0.24  277.023) ≈ #4338ca   primary button hover
+ *   indigo-500 oklch(58.5% 0.233 277.117) ≈ #6366f1   focus rings, accent-color
+ *   indigo-400 oklch(67.3% 0.182 276.935) ≈ #818cf8   links, accent text
+ *   indigo-300 oklch(78.5% 0.115 274.713) ≈ #a5b4fc   link hover, lighter accent
+ *   indigo-200 oklch(87%   0.065 274.039) ≈ #c7d2fe   lightest accent text
+ *   indigo-900 oklch(35.9% 0.144 278.697) ≈ #312e81   subtle accent fill (/30 alpha)
+ *
+ * ── Borders ─────────────────────────────────────────────────────────────────
+ *   gray-700   ≈ #374151   default borders, divides (also /40 alpha)
+ *   gray-800   ≈ #1f2937   subtle borders
+ *   gray-600   ≈ #4b5563   emphasized / hover borders
+ *
+ * ── Status: danger (red) ─────────────────────────────────────────────────────
+ *   red-300 ≈ #fca5a5 · red-400 ≈ #f87171 · red-500 ≈ #ef4444 · red-600 ≈ #dc2626
+ *   red-700 ≈ #b91c1c · red-800 ≈ #991b1b · red-900 ≈ #7f1d1d (bg at /30–/70 alpha)
+ *
+ * ── Status: success (green) ──────────────────────────────────────────────────
+ *   green-200 ≈ #bbf7d0 · green-300 ≈ #86efac · green-400 ≈ #4ade80
+ *   green-500 ≈ #22c55e · green-700 ≈ #15803d · green-800 ≈ #166534
+ *   green-900 ≈ #14532d (bg at /30–/70 alpha)
+ *
+ * ── Status: warning (yellow / amber) ─────────────────────────────────────────
+ *   yellow-200 ≈ #fef08a · yellow-300 ≈ #fde047 · yellow-500 ≈ #eab308 (focus ring)
+ *   yellow-700 ≈ #a16207 · yellow-800 ≈ #854d0e
+ *   amber-600  ≈ #d97706 (header badge) · amber-800 ≈ #92400e (border, /40 alpha)
+ *
+ * ── Status: info (blue) ──────────────────────────────────────────────────────
+ *   blue-300 ≈ #93c5fd · blue-400 ≈ #60a5fa · blue-500 ≈ #3b82f6 (focus border)
+ *
+ * ── Header brand gradient ────────────────────────────────────────────────────
+ *   The logotype uses a clipped gradient (`bg-gradient-to-r .bg-clip-text
+ *   .text-transparent`). Sublime keeps the Tailwind gradient; light themes flatten
+ *   it to a solid color. No override here.
+ *
+ * To regenerate the authoritative values:  grep '^  --color-' node_modules/tailwindcss/theme.css
+ */
