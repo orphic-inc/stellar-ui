@@ -128,4 +128,15 @@ describe('NewTopicForm', () => {
       expect(alerts.some((a) => a.msg === 'Topic locked')).toBe(true);
     });
   });
+
+  it('paints inputs and the submit CTA from the data-st contract (ADR-0006)', () => {
+    const { container } = renderWithProviders(<NewTopicForm />);
+
+    // Text inputs carry the field Role so they recolor under a token theme
+    // instead of leaving dark "remainder" boxes on a light surface.
+    expect(container.querySelectorAll('[data-st="field"]').length).toBe(2);
+    expect(
+      container.querySelector('[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
 });

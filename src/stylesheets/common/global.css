@@ -314,6 +314,85 @@
   color: var(--st-text-strong);
 }
 
+/* field — a form control (input / textarea / select). Inputs recur on every
+ * filtered / edit surface and no composition of listing Roles paints one, so it
+ * earns a Role (§3.3, ADR-0006). Paint only — width/spacing stay layout
+ * utilities. Labels DECOMPOSE to `meta` and do not get a Role. The focus ring is
+ * the shared [data-st] :focus-visible rule below; accent-color tints native
+ * radio / checkbox / range. Added in WS5 (NewTopicForm proof). */
+[data-st='field'] {
+  background: var(--st-raised);
+  border: 1px solid var(--st-border);
+  border-radius: var(--st-radius-sm);
+  color: var(--st-text);
+  padding: 0.375rem 0.625rem;
+  font-size: 0.875rem;
+  accent-color: var(--st-accent);
+}
+[data-st='field']::placeholder {
+  color: var(--st-text-faint);
+}
+[data-st='field']:hover {
+  border-color: var(--st-border-strong);
+}
+
+/* Table variant of `colhead` + `row` (ADR-0006). The SAME Roles paint a
+ * <table>, so a theme that styles `row`/`colhead` reskins div listings and
+ * genuine data tables alike (the §10 gate) — list-shaped data stays div
+ * panel/list/row, columnar data keeps its <table> and column alignment.
+ * <table> defeats flex; these tag-qualified rules swap to table layout while
+ * the token paint carries over. tag+attr outranks the bare-attr flex base
+ * rule, so they win regardless of source order. `grid` is a layout-only helper
+ * that sets border-collapse. */
+table[data-st='grid'] {
+  width: 100%;
+  border-collapse: collapse; /* row dividers read as single lines */
+}
+/* header row — drop flex, keep the uppercase muted treatment on the cells */
+thead[data-st='colhead'] {
+  display: table-header-group;
+  background: var(--st-base);
+}
+thead[data-st='colhead'] th {
+  padding: 0.375rem 0.75rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-text-muted);
+  border-bottom: 1px solid var(--st-border);
+}
+/* body row — drop the flex base; cells carry padding + divider, row carries
+ * hover. The base rule's padding/gap are inert on a table-row box. */
+tr[data-st='row'] {
+  display: table-row;
+  border-top: 0; /* divider lives on the td in collapse mode */
+}
+tr[data-st='row'] > td {
+  padding: var(--st-row-pad);
+  border-top: 1px solid var(--st-border-subtle);
+  vertical-align: middle;
+  color: var(--st-text);
+}
+tr[data-st='row']:first-child > td {
+  border-top: 0;
+}
+/* pinned / sticky / disclosure rows reuse the open-row accent wash */
+tr[data-st='row'][data-st-open],
+tr[data-st='row'][data-st-lead] {
+  background: color-mix(in oklch, var(--st-accent) 14%, transparent);
+}
+/* numeric / right-aligned column (header or cell) */
+th[data-st-num],
+td[data-st-num] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+tr[data-st='row'] > td[data-st-num] {
+  color: var(--st-text-faint);
+}
+
 /* ── 2b. Tier-2 Parts — scoped inside a Role; each earns its place (§3.3). */
 
 /* edition-* — Part (D-2): a Release's format/quality disclosure under a `row`.

@@ -59,6 +59,43 @@ describe('ForumCategoryPage', () => {
     expect(screen.getByText('Ambient')).toBeInTheDocument();
   });
 
+  it('renders from the data-st table-hook contract (ADR-0006)', () => {
+    mockUseGetForumCategoriesQuery.mockReturnValue({
+      data: [
+        {
+          id: 1,
+          name: 'Music',
+          forums: [
+            {
+              id: 11,
+              name: 'Jazz',
+              description: 'Talk about jazz',
+              numTopics: 20,
+              numPosts: 88,
+              lastTopic: { id: 4, title: 'Best of Blue Note' }
+            }
+          ]
+        }
+      ],
+      isLoading: false,
+      error: undefined
+    });
+
+    const { container } = renderWithProviders(<ForumCategoryPage />);
+
+    // Genuine table keeps its <table>; the contract paints it via the grid
+    // helper + the row/colhead table variants.
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    expect(container.querySelector('td[data-st-num]')).toBeInTheDocument();
+  });
+
   it('shows spinner while loading', () => {
     mockUseGetForumCategoriesQuery.mockReturnValue({
       data: undefined,

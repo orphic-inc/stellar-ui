@@ -113,24 +113,33 @@ Role vs Part).
   reference theme: it only fully re-skins surfaces that have been *migrated*,
   so on un-migrated surfaces it falls back to the Sublime look (expected).
 - **Tier-1 Roles** (generic, app-wide): `panel` `colhead` `list` `row` `title`
-  `meta` `chip` `icon` `rollup` `bar` `prose` `control` (`colhead` takes a
-  `-title` modifier for content titles vs structural labels). **Tier-2 Parts**
+  `meta` `chip` `icon` `rollup` `bar` `prose` `control` `field` (`colhead` takes
+  a `-title` modifier for content titles vs structural labels). **Tier-2 Parts**
   (scoped, justified): `edition-*` `coverart-*`. Boolean modifiers are bare
   `data-st-*` attributes (`data-st-lead`, `data-st-num`, `data-st-strong`,
   `data-st-primary`, `data-st-danger`, …); `bar` reads `--st-w` (0–100) via
   inline style.
+- **Tables reuse `colhead`/`row`** (ADR-0006): a genuine data `<table>` keeps its
+  markup and gets `data-st="grid"` on the `<table>`, `data-st="colhead"` on the
+  `<thead>`, `data-st="row"` on each `<tr>`; tag-qualified CSS swaps flex→table
+  layout while the token paint carries over. List-shaped data stays div
+  `panel`/`list`/`row`; columnar data stays a table (alignment is the point).
+  `field` paints form inputs/textareas/selects; labels decompose to `meta`.
 
 **Migrating a surface (the WS4 per-surface pass, ongoing):** move
 color/border/background utilities onto the `data-st` hooks; **keep layout**
-utilities (flex/grid/spacing/sizing). Table listings convert to div
-`panel`/`colhead`/`list`/`row`. Body/heading copy uses **`prose`** (`-strong`
-for headings) and interactive buttons/links use **`control`** (`-primary` CTA,
-`-danger` destructive) — both paint from tokens, so don't leave them as inline
+utilities (flex/grid/spacing/sizing). List-shaped tables convert to div
+`panel`/`colhead`/`list`/`row`; genuine columnar tables keep their `<table>` and
+use the `grid`/`colhead`/`row` table variant (ADR-0006) so alignment survives.
+Body/heading copy uses **`prose`** (`-strong` for headings), interactive
+buttons/links use **`control`** (`-primary` CTA, `-danger` destructive), and form
+inputs use **`field`** — all paint from tokens, so don't leave them as inline
 gray utilities, which go illegible on a light theme. Add a hooks-present test
 assertion per migrated surface, and keep rendered text/links/controls intact so
 the existing suite stays green. Worked examples: `CollageDetail`,
 `CommunityPage`, `LogBrowsePage`, `ForumPage`, `ForumTopicPage` +
-`ForumTopicPost` (the last established `prose`/`control`).
+`ForumTopicPost` (established `prose`/`control`), `ForumCategoryPage` (table
+variant) + `NewTopicForm` (`field`).
 
 ## Types
 
