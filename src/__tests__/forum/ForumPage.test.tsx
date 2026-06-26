@@ -86,6 +86,17 @@ describe('ForumPage', () => {
     });
   });
 
+  it('renders the data-st contract hooks (ADR-0005 / WS4)', () => {
+    const { container } = renderWithProviders(<ForumPage />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="colhead"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="list"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="row"]')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Favorite labels' })
+    ).toHaveAttribute('data-st', 'title');
+  });
+
   it('renders spinner when forumLoading is true', () => {
     mockUseGetForumByIdQuery.mockReturnValue({
       data: undefined,

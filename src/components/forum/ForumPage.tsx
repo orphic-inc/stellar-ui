@@ -40,102 +40,80 @@ const ForumPage = () => {
         <strong className="text-gray-200">{forum.name}</strong>
       </nav>
 
-      <div className="rounded border border-gray-700 bg-gray-900">
-        <div className="px-4 py-2 bg-gray-800 border-b border-gray-700 rounded-t flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-200">
-            {forum.name}
-          </span>
+      <div data-st="panel">
+        <div data-st="colhead">
+          <span>{forum.name}</span>
+          {/* New Topic is interactive chrome — no contract Role covers a CTA
+              yet, so it keeps its utility paint (deferred, per CommunityPage). */}
           <Link
             to={`/private/forums/${forumId}/new`}
-            className="text-xs text-indigo-400 hover:text-indigo-300"
+            className="text-xs text-indigo-400 hover:text-indigo-300 normal-case tracking-normal"
           >
             + New Topic
           </Link>
         </div>
 
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-gray-400">
-              <th className="px-4 py-2 font-medium w-8" />
-              <th className="px-4 py-2 font-medium">Topic</th>
-              <th className="px-4 py-2 font-medium text-right">Replies</th>
-              <th className="px-4 py-2 font-medium">Author</th>
-              <th className="px-4 py-2 font-medium">Latest</th>
-            </tr>
-          </thead>
-          <tbody>
-            {topicsPage && topicsPage.data.length > 0 ? (
-              topicsPage.data.map((topic) => (
-                <tr
-                  key={topic.id}
-                  className={`border-b border-gray-800 hover:bg-gray-800/30 ${
-                    topic.isSticky ? 'bg-gray-800/20' : ''
-                  }`}
+        <div data-st="list">
+          {topicsPage && topicsPage.data.length > 0 ? (
+            topicsPage.data.map((topic) => (
+              <div key={topic.id} data-st="row">
+                {topic.isLocked && <span data-st="chip">[Locked]</span>}
+                {topic.isSticky && <span data-st="chip">[Sticky]</span>}
+                <Link
+                  to={`/private/forums/${forumId}/topics/${topic.id}`}
+                  data-st="title"
+                  className="text-sm"
                 >
-                  <td className="px-4 py-3 text-center">
-                    {topic.isLocked && (
-                      <span className="text-xs text-gray-400">[Locked]</span>
-                    )}
-                    {topic.isSticky && (
-                      <span className="text-xs text-yellow-600">[Sticky]</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      to={`/private/forums/${forumId}/topics/${topic.id}`}
-                      className="text-indigo-400 hover:text-indigo-300 font-medium"
-                    >
-                      {topic.title}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-gray-400 text-right">
-                    {topic.numPosts}
-                  </td>
-                  <td className="px-4 py-3 text-gray-400">
-                    <Link
-                      to={`/private/user/${topic.author?.username}`}
-                      className="hover:text-gray-200"
-                    >
-                      {topic.author?.username}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs">
-                    {topic.lastPost && <Time date={topic.lastPost.createdAt} />}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={5} className="px-4 py-6 text-gray-500 text-center">
-                  No topics yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-
-        {topicsPage && topicsPage.meta.totalPages > 1 && (
-          <div className="flex justify-center items-center gap-3 px-4 py-3 border-t border-gray-800 text-sm text-gray-400">
-            <button
-              className="hover:text-gray-200 disabled:opacity-40"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              ‹ Prev
-            </button>
-            <span>
-              Page {page} of {topicsPage.meta.totalPages}
-            </span>
-            <button
-              className="hover:text-gray-200 disabled:opacity-40"
-              disabled={page >= topicsPage.meta.totalPages}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Next ›
-            </button>
-          </div>
-        )}
+                  {topic.title}
+                </Link>
+                <span data-st="meta" data-st-num className="text-xs">
+                  {topic.numPosts} replies
+                </span>
+                <Link
+                  to={`/private/user/${topic.author?.username}`}
+                  data-st="meta"
+                  className="text-xs"
+                >
+                  by {topic.author?.username}
+                </Link>
+                {topic.lastPost && (
+                  <span data-st="meta" data-st-num className="text-xs">
+                    <Time date={topic.lastPost.createdAt} />
+                  </span>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-6 text-center">
+              <span data-st="meta">No topics yet.</span>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Pagination has no contract Role (active-state paint is deferred); it
+          stays inline Tailwind and sits below the result panel, per WS4·2. */}
+      {topicsPage && topicsPage.meta.totalPages > 1 && (
+        <div className="flex justify-center items-center gap-3 pt-3 text-sm text-gray-400">
+          <button
+            className="hover:text-gray-200 disabled:opacity-40"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            ‹ Prev
+          </button>
+          <span>
+            Page {page} of {topicsPage.meta.totalPages}
+          </span>
+          <button
+            className="hover:text-gray-200 disabled:opacity-40"
+            disabled={page >= topicsPage.meta.totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next ›
+          </button>
+        </div>
+      )}
     </div>
   );
 };
