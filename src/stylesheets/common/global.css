@@ -5,10 +5,13 @@
  * Two layers, per stellar-ui ADR-0005 (Injected Theme Contract):
  *
  *   1. ROLE THEME TOKENS  — the fixed `--st-*` set, named by role (surface,
- *      panel, accent, danger…), seeded here with Sublime's Tailwind-default
- *      values. A theme reskins the app by REDEFINING these values, never by
- *      writing selectors. oklch is authoritative (matches Tailwind v4 / the
- *      Sublime palette doc in ../sublime/style.css); hex is for readability.
+ *      panel, accent, danger…). The PRIMITIVE color tokens are Sublime's
+ *      defaults and live in `src/index.scss` as a Tailwind `@theme` block that
+ *      references the palette (`--st-panel: var(--color-gray-800)`) — one source,
+ *      no hand-copied oklch. This file keeps only the DERIVED tokens (which
+ *      reference the primitives via var() and resolve lazily) and the
+ *      geometry/type tokens. A theme reskins the app by REDEFINING token values
+ *      in its injected :root, never by writing selectors.
  *
  *   2. SEMANTIC HOOKS     — structural rules keyed off `data-st` attributes the
  *      components emit, named in Stellar's domain language (Release / Edition /
@@ -34,46 +37,15 @@
 
 /* ── 1. ROLE THEME TOKENS ─────────────────────────────────────────────────── */
 
+/* Primitive color tokens (surfaces, text, accent/link, borders, status,
+ * --st-lossless) are Sublime's defaults and live in src/index.scss as a Tailwind
+ * `@theme` block sourced from the palette by reference — see that file. They are
+ * emitted to :root from there; the derived + geometry tokens below complete the
+ * set and resolve against them. */
 :root {
-  /* Surfaces — outermost backdrop → raised row, matching Sublime gray-950→700 */
-  --st-backdrop: oklch(13% 0.028 261.692); /* #030712  page backdrop      */
-  --st-base: oklch(21% 0.034 264.665); /* #111827  app base, header   */
-  --st-panel: oklch(27.8% 0.033 256.848); /* #1f2937  cards, boxes       */
-  --st-raised: oklch(37.3% 0.034 259.733); /* #374151  rows, inputs, chips */
-
-  /* Text */
-  --st-text-strong: #ffffff; /* headings, strong            */
-  --st-text: oklch(87.2% 0.01 258.338); /* #d1d5db  default body       */
-  --st-text-muted: oklch(70.7% 0.022 261.325); /* #9ca3af  secondary          */
-  --st-text-faint: oklch(
-    55.1% 0.027 264.364
-  ); /* #6b7280  labels, placeholder */
-
-  /* Accent — indigo */
-  --st-accent: oklch(51.1% 0.262 276.966); /* #4f46e5 primary / CTA       */
-  --st-accent-hover: oklch(
-    45.7% 0.24 277.023
-  ); /* #4338ca                     */
-  --st-accent-ring: oklch(
-    58.5% 0.233 277.117
-  ); /* #6366f1 focus ring          */
-  --st-link: oklch(67.3% 0.182 276.935); /* #818cf8 links / accent text */
-  --st-link-hover: oklch(78.5% 0.115 274.713); /* #a5b4fc                     */
-
-  /* Borders */
-  --st-border: oklch(37.3% 0.034 259.733); /* #374151 default          */
-  --st-border-subtle: oklch(27.8% 0.033 256.848); /* #1f2937 quiet divides    */
-  --st-border-strong: oklch(44.6% 0.03 256.802); /* #4b5563 hover / emphasis */
-
-  /* Status */
-  --st-danger: oklch(63.7% 0.237 25.331); /* #ef4444 red-500             */
-  --st-success: oklch(72.3% 0.219 149.579); /* #22c55e green-500           */
-  --st-warning: oklch(79.5% 0.184 86.047); /* #eab308 yellow-500          */
-  --st-info: oklch(62.3% 0.214 259.815); /* #3b82f6 blue-500            */
-
   /* Quality + weight — core tokens (D-3): the lossless cue recurs across
-     listings / search / the workbench; weight feeds the `bar` Role. */
-  --st-lossless: oklch(72.3% 0.219 149.579); /* lossless = green quality cue */
+     listings / search / the workbench; weight feeds the `bar` Role.
+     (--st-lossless is primitive — it lives in the index.scss @theme block.) */
   --st-lossy: var(--st-text-faint); /* lossy = quiet, not penalized */
   --st-weight: var(--st-accent-ring); /* contribution-weight bar fill */
   --st-weight-track: color-mix(in oklch, var(--st-raised) 60%, transparent);

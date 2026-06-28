@@ -2,6 +2,60 @@
 
 @plugin "@tailwindcss/forms";
 
+/* ── Sublime baseline = Tailwind's own theme (ADR-0005, @theme prototype) ─────
+ * The `--st-*` Role Theme Tokens the data-st contract paints from. Sublime is
+ * "just the default token values" (docs/theming.md §2), so its defaults ARE
+ * Tailwind's palette — sourced here by REFERENCE (`var(--color-*)`), not by
+ * hand-copying oklch literals into common/global.css. One source: a Tailwind
+ * palette bump propagates; Sublime and the contract can no longer drift.
+ *
+ * `static` forces emission so the tokens land on :root even before a utility or
+ * hook references them (default @theme tree-shakes unused vars). Only PRIMITIVE
+ * color tokens live here; derived tokens (--st-lossy/weight/…) and geometry stay
+ * in common/global.css next to the hooks that consume them. Injected themes
+ * (layer-cake, kuro, …) still win by source order — their <link> :root loads
+ * after this and after global.css.
+ *
+ * Migration-safe: a `@theme` cross-reference self-pins its anchor — referencing
+ * `var(--color-gray-800)` here marks gray-800 "used", so Tailwind keeps emitting
+ * it to :root even after WS4+ deletes the last `bg-gray-800` utility (verified
+ * with a zero-utility probe color). The contract therefore does NOT depend on
+ * the components' utility classes surviving migration. */
+@theme static {
+  /* Surfaces — outermost backdrop → raised row */
+  --st-backdrop: var(--color-gray-950);
+  --st-base: var(--color-gray-900);
+  --st-panel: var(--color-gray-800);
+  --st-raised: var(--color-gray-700);
+
+  /* Text */
+  --st-text-strong: var(--color-white);
+  --st-text: var(--color-gray-300);
+  --st-text-muted: var(--color-gray-400);
+  --st-text-faint: var(--color-gray-500);
+
+  /* Accent — indigo */
+  --st-accent: var(--color-indigo-600);
+  --st-accent-hover: var(--color-indigo-700);
+  --st-accent-ring: var(--color-indigo-500);
+  --st-link: var(--color-indigo-400);
+  --st-link-hover: var(--color-indigo-300);
+
+  /* Borders */
+  --st-border: var(--color-gray-700);
+  --st-border-subtle: var(--color-gray-800);
+  --st-border-strong: var(--color-gray-600);
+
+  /* Status */
+  --st-danger: var(--color-red-500);
+  --st-success: var(--color-green-500);
+  --st-warning: var(--color-yellow-500);
+  --st-info: var(--color-blue-500);
+
+  /* Quality cue (D-3) — lossless reuses the success green */
+  --st-lossless: var(--color-green-500);
+}
+
 /* Stylesheet themes (ADR-0003): a user theme is injected as a plain <link> and
    may visually override anything — there is deliberately no "protected chrome"
    reset. CSS cascade cannot contain an `!important` theme anyway, and the
