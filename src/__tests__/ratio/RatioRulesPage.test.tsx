@@ -77,4 +77,41 @@ describe('RatioRulesPage', () => {
       screen.getByText(/5 GiB of free upload credit/i)
     ).toBeInTheDocument();
   });
+
+  it('paints the bracket table from the data-st grid/colhead/row contract (ADR-0006)', () => {
+    mockUseGetMyRatioStatsQuery.mockReturnValue({
+      data: {
+        ratio: 0.42,
+        requiredRatio: 0.3,
+        contributed: '10737418240',
+        consumed: '26843545600',
+        eligibleContributionBytes: '5368709120',
+        contributionCoverage: 0.5,
+        meetsRequirement: true,
+        bracket: { label: '20–30 GiB', maxRequired: 0.3, minRequired: 0.05 },
+        policy: {
+          status: 'WATCH',
+          watchStartedAt: '2026-05-17T12:00:00.000Z',
+          watchExpiresAt: '2026-05-31T12:00:00.000Z',
+          leechDisabledAt: null,
+          lastEvaluatedAt: '2026-05-17T18:00:00.000Z'
+        }
+      }
+    });
+    const { container } = renderWithProviders(<RatioRulesPage />);
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    // The active bracket row carries the open-row accent wash.
+    expect(
+      container.querySelector('tr[data-st="row"][data-st-open]')
+    ).toBeInTheDocument();
+    // Stats summary is a panel; labels decompose to meta.
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="meta"]')).toBeInTheDocument();
+  });
 });

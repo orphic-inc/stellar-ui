@@ -154,7 +154,13 @@ forms; tab buttons paint from token utilities, not a Role; locked donor perks
 stay `field`/`meta` and just dim via `opacity`), the **invite surfaces**
 (`InviteForm` — legacy tracker classes kept for layout, `data-st` hooks layered
 on so it themes; `InviteTree` — `grid`/`colhead`/`row` table + a summary
-`panel` of stat panels with rank `chip`s).
+`panel` of stat panels with rank `chip`s), the **ratio surfaces**
+(`RatioStats` — display `panel`/`colhead` with status-token banners and `meta`
+label rows; `RatioRulesPage` — prose-heavy page with the bracket reference
+table as `grid`/`colhead`/`row` and the active bracket on `data-st-open`;
+status hues come from the `--st-success/warning/danger` tokens via leaf
+utilities, not chip/control, since these are full-width banners and inline
+values, not chips).
 
 ## Types
 

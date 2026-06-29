@@ -79,6 +79,8 @@ The learnable core. Each means the same thing on every page; styling it once re-
 
 > **Applied in WS9 (invite surfaces):** `InviteForm` + `InviteTree`, **no new Roles or tokens**. `InviteTree` is a textbook ADR-0006 table migration — the invitee adjacency tree keeps its `<table>` (column alignment is the point) as `grid`/`colhead`/`row`, numeric stat columns carry `data-st-num`, the per-row member link is a `title` (or `meta` + `line-through` when the account is disabled), and the summary rollup is a `panel` of stat `panel`s with by-rank `chip`s. `InviteForm` is the first migrated surface built on **legacy tracker classes** (`box`/`pad`/`field_div`/`label`) rather than Tailwind grays: those classes are inert under Sublime and carry layout under legacy themes, so they stay and the `data-st` hooks (`panel`/`field`/`control`/`meta`/`prose`) layer on top to supply the token paint — nothing to strip, just hooks to add.
 
+> **Applied in WS10 (ratio surfaces — completes the Profile section):** `RatioStats` + `RatioRulesPage`, **no new Roles or tokens**. `RatioStats` is a display `panel` with a `colhead` cap and `meta` label/value rows; `RatioRulesPage` is a prose-heavy page (`prose` on the wrapper, `prose -strong` headings, `--st-text-strong` leaf utility on the inline `<strong>`s) with the bracket reference table as a `grid`/`colhead`/`row` variant and the user's active bracket flagged with `data-st-open` (the open-row accent wash). The notable call is **status colour without chip/control**: the WATCH / LEECH banners and the conditional ratio / coverage values are full-width banners and inline figures, not chips or buttons, so they paint straight from the `--st-success/warning/danger` status tokens via leaf utilities (`text-[var(--st-danger)]`, plus a `color-mix(... 12% transparent)` tint for the banner fill that mirrors the chip-status border recipe). This is the §3.2 leaf-colour escape hatch carrying *semantic* status colour where no Role spans the element — the status tokens are shared, only their delivery differs from WS7's chip/control modifiers.
+
 ### 3.3 Tier-2 Parts — scoped inside a Role, must earn their place
 
 A Part is justified **only** when no composition of Tier-1 Roles expresses the structure. Each Part names the Role it lives in.
@@ -148,7 +150,7 @@ Each is independently grabbable; clear context between them.
 
 1. **Collage** (WS2 pilot — validate the contract).
 2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.) _Done: `ReleaseBrowsePage` (the release listing) — WS6; `RandomLinks` is the only other `search/` surface._
-3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings forms (`Settings` + `DonorSettingsTab` + `IrcNickSettings`) — WS8; invite surfaces (`InviteForm` + `InviteTree`) — WS9; ratio surfaces remain._
+3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings forms (`Settings` + `DonorSettingsTab` + `IrcNickSettings`) — WS8; invite surfaces (`InviteForm` + `InviteTree`) — WS9; ratio surfaces (`RatioStats` + `RatioRulesPage`) — WS10. **Profile section complete.**_
 4. **App chrome** — Navbar, Sidebar, UserMenu.
 5. **Long tail** — admin/staff pages last (least theme-facing).
 
