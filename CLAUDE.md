@@ -151,7 +151,10 @@ control), `UserProfile` (the public profile + staff panel — proved the WS7
 brand flair by design, not migrated), the **settings forms** (`Settings` +
 `DonorSettingsTab` + `IrcNickSettings` — tabbed `panel`/`field`/`control`/`meta`
 forms; tab buttons paint from token utilities, not a Role; locked donor perks
-stay `field`/`meta` and just dim via `opacity`).
+stay `field`/`meta` and just dim via `opacity`), the **invite surfaces**
+(`InviteForm` — legacy tracker classes kept for layout, `data-st` hooks layered
+on so it themes; `InviteTree` — `grid`/`colhead`/`row` table + a summary
+`panel` of stat panels with rank `chip`s).
 
 ## Types
 

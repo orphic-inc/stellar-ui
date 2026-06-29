@@ -130,4 +130,20 @@ describe('InviteTree', () => {
     renderWithProviders(<InviteTree />);
     expect(screen.getByText('No invitees.')).toBeInTheDocument();
   });
+
+  it('paints the tree from the data-st grid/colhead/row contract (ADR-0006)', () => {
+    const { container } = renderWithProviders(<InviteTree />);
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    expect(container.querySelector('td[data-st-num]')).toBeInTheDocument();
+    // The summary rollup is a panel of stat panels with rank chips.
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="chip"]')).toBeInTheDocument();
+  });
 });

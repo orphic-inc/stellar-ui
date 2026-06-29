@@ -9,31 +9,30 @@ import type { MemberInviteTreeNode, InviteTreeSummary } from '../../../types';
 
 const renderNode = (node: MemberInviteTreeNode): React.ReactNode => (
   <React.Fragment key={node.userId}>
-    <tr className="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
+    <tr data-st="row">
       <td className="px-4 py-2.5">
         {/* depth drives indentation so the adjacency tree reads as a hierarchy */}
         <span style={{ paddingLeft: `${node.depth * 1.25}rem` }}>
           <Link
             to={`/private/user/${node.userId}`}
-            className={
-              node.disabled
-                ? 'text-gray-500 line-through hover:text-gray-400'
-                : 'text-indigo-400 hover:text-indigo-300 transition-colors'
-            }
+            data-st={node.disabled ? 'meta' : 'title'}
+            className={node.disabled ? 'line-through' : undefined}
           >
             {node.username}
           </Link>
           <UserBadges disabled={node.disabled} isDonor={node.isDonor} />
         </span>
       </td>
-      <td className="px-4 py-2.5 text-gray-400">{node.rankName}</td>
-      <td className="px-4 py-2.5 text-right text-gray-300">
+      <td className="px-4 py-2.5">
+        <span data-st="meta">{node.rankName}</span>
+      </td>
+      <td data-st-num className="px-4 py-2.5">
         {node.stats ? node.stats.contributed : '—'}
       </td>
-      <td className="px-4 py-2.5 text-right text-gray-300">
+      <td data-st-num className="px-4 py-2.5">
         {node.stats ? node.stats.consumed : '—'}
       </td>
-      <td className="px-4 py-2.5 text-right text-gray-300">
+      <td data-st-num className="px-4 py-2.5">
         {node.stats ? node.stats.ratio : '—'}
       </td>
     </tr>
@@ -42,14 +41,18 @@ const renderNode = (node: MemberInviteTreeNode): React.ReactNode => (
 );
 
 const Stat = ({ label, value }: { label: string; value: React.ReactNode }) => (
-  <div className="bg-gray-800/40 rounded px-3 py-2">
-    <div className="text-gray-500 text-xs">{label}</div>
-    <div className="text-white text-lg font-semibold">{value}</div>
+  <div data-st="panel" className="px-3 py-2">
+    <div data-st="meta" className="text-xs">
+      {label}
+    </div>
+    <div data-st="prose" data-st-strong className="text-lg">
+      {value}
+    </div>
   </div>
 );
 
 const Summary = ({ summary }: { summary: InviteTreeSummary }) => (
-  <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-6">
+  <div data-st="panel" className="p-4 mb-6">
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
       <Stat label="Members" value={summary.entries} />
       <Stat label="Branches" value={summary.branches} />
@@ -61,15 +64,18 @@ const Summary = ({ summary }: { summary: InviteTreeSummary }) => (
 
     {summary.byRank.length > 0 && (
       <div className="mt-4">
-        <div className="text-gray-500 text-xs mb-1">By rank</div>
+        <div data-st="meta" className="text-xs mb-1">
+          By rank
+        </div>
         <div className="flex flex-wrap gap-2">
           {summary.byRank.map((r) => (
             <span
               key={r.rankName}
-              className="inline-flex items-center gap-1 bg-gray-800/60 rounded px-2 py-1 text-xs text-gray-300"
+              data-st="chip"
+              className="items-center gap-1"
             >
               {r.rankName}
-              <span className="text-gray-500">{r.count}</span>
+              <span data-st="meta">{r.count}</span>
             </span>
           ))}
         </div>
@@ -78,18 +84,18 @@ const Summary = ({ summary }: { summary: InviteTreeSummary }) => (
 
     <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
       <div>
-        <div className="text-gray-500 text-xs">
+        <div data-st="meta" className="text-xs">
           Tree total (uploaded / downloaded)
         </div>
-        <div className="text-gray-300">
+        <div data-st="prose">
           {summary.total.contributed} / {summary.total.consumed}
         </div>
       </div>
       <div>
-        <div className="text-gray-500 text-xs">
+        <div data-st="meta" className="text-xs">
           Direct invitees (uploaded / downloaded · ratio)
         </div>
-        <div className="text-gray-300">
+        <div data-st="prose">
           {summary.topLevel.contributed} / {summary.topLevel.consumed} ·{' '}
           {summary.topLevel.ratio}
         </div>
@@ -97,7 +103,7 @@ const Summary = ({ summary }: { summary: InviteTreeSummary }) => (
     </div>
 
     {summary.hiddenCount > 0 && (
-      <p className="mt-3 text-gray-500 text-xs">
+      <p data-st="meta" className="mt-3 text-xs">
         {summary.hiddenCount} member{summary.hiddenCount === 1 ? '' : 's'}{' '}
         hidden from your view.
       </p>
@@ -119,7 +125,9 @@ const InviteTree = ({ embedded = false }: { embedded?: boolean }) => {
 
   return (
     <div className={embedded ? 'mb-6' : 'max-w-4xl mx-auto px-4 py-6'}>
-      <h2 className="text-xl font-semibold text-white mb-6">Invite Tree</h2>
+      <h2 data-st="prose" data-st-strong className="text-xl mb-6">
+        Invite Tree
+      </h2>
 
       {isLoading || !data ? (
         <Spinner />
@@ -127,17 +135,21 @@ const InviteTree = ({ embedded = false }: { embedded?: boolean }) => {
         <>
           <Summary summary={data.summary} />
 
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-700 text-left text-gray-400 text-xs">
-                  <th className="px-4 py-3 font-medium">Member</th>
-                  <th className="px-4 py-3 font-medium">Rank</th>
-                  <th className="px-4 py-3 font-medium text-right">Uploaded</th>
-                  <th className="px-4 py-3 font-medium text-right">
+          <div data-st="panel">
+            <table data-st="grid" className="w-full text-sm">
+              <thead data-st="colhead">
+                <tr>
+                  <th className="px-4 py-3">Member</th>
+                  <th className="px-4 py-3">Rank</th>
+                  <th data-st-num className="px-4 py-3">
+                    Uploaded
+                  </th>
+                  <th data-st-num className="px-4 py-3">
                     Downloaded
                   </th>
-                  <th className="px-4 py-3 font-medium text-right">Ratio</th>
+                  <th data-st-num className="px-4 py-3">
+                    Ratio
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -145,11 +157,8 @@ const InviteTree = ({ embedded = false }: { embedded?: boolean }) => {
                   data.tree.map(renderNode)
                 ) : (
                   <tr>
-                    <td
-                      colSpan={5}
-                      className="px-4 py-6 text-center text-gray-500"
-                    >
-                      No invitees.
+                    <td colSpan={5} className="px-4 py-6 text-center">
+                      <span data-st="meta">No invitees.</span>
                     </td>
                   </tr>
                 )}

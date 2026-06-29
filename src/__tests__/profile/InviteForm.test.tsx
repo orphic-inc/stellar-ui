@@ -46,6 +46,18 @@ describe('InviteForm', () => {
     ).toBeInTheDocument();
   });
 
+  it('paints from the data-st panel/field/control contract', () => {
+    const { container } = renderWithProviders(<InviteForm />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[type="email"][data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-st="meta"]')).toBeInTheDocument();
+  });
+
   it('submits invite with email and optional reason', async () => {
     mockCreateInvite.mockReturnValue({
       unwrap: () => Promise.resolve({ emailSent: true })

@@ -77,6 +77,8 @@ The learnable core. Each means the same thing on every page; styling it once re-
 
 > **Applied in WS8 (settings forms):** `Settings` + `DonorSettingsTab` + `IrcNickSettings` migrated with **no new Roles or tokens** — three tabbed forms built from `panel`/`field`/`control`(`-primary`/`-danger`)/`meta`/`prose`. Two patterns worth recording: (1) the **tab strip** is not a Role — its active/inactive border + text paint from token utilities (`border-[var(--st-accent)]`, `text-[var(--st-text-muted)]`, …) keyed off `activeTab`, the same leaf-color escape hatch §3.2 allows where no Role spans the element; using `control` would fight the Role's own color. (2) DonorSettingsTab's **locked perks** keep `field`/`meta` (so they theme) and signal the locked state with `opacity`/`cursor-not-allowed` layout utilities, not a dimmer color — the shared `inputClass`/`labelClass`/`lockedClass` consts were reduced to layout-only and the paint moved to per-site `data-st` hooks. The IRC verification callout decomposes to a neutral `panel` (it carried an indigo info tint that doesn't theme).
 
+> **Applied in WS9 (invite surfaces):** `InviteForm` + `InviteTree`, **no new Roles or tokens**. `InviteTree` is a textbook ADR-0006 table migration — the invitee adjacency tree keeps its `<table>` (column alignment is the point) as `grid`/`colhead`/`row`, numeric stat columns carry `data-st-num`, the per-row member link is a `title` (or `meta` + `line-through` when the account is disabled), and the summary rollup is a `panel` of stat `panel`s with by-rank `chip`s. `InviteForm` is the first migrated surface built on **legacy tracker classes** (`box`/`pad`/`field_div`/`label`) rather than Tailwind grays: those classes are inert under Sublime and carry layout under legacy themes, so they stay and the `data-st` hooks (`panel`/`field`/`control`/`meta`/`prose`) layer on top to supply the token paint — nothing to strip, just hooks to add.
+
 ### 3.3 Tier-2 Parts — scoped inside a Role, must earn their place
 
 A Part is justified **only** when no composition of Tier-1 Roles expresses the structure. Each Part names the Role it lives in.
@@ -146,7 +148,7 @@ Each is independently grabbable; clear context between them.
 
 1. **Collage** (WS2 pilot — validate the contract).
 2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.) _Done: `ReleaseBrowsePage` (the release listing) — WS6; `RandomLinks` is the only other `search/` surface._
-3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings forms (`Settings` + `DonorSettingsTab` + `IrcNickSettings`) — WS8; invite / ratio surfaces remain._
+3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings forms (`Settings` + `DonorSettingsTab` + `IrcNickSettings`) — WS8; invite surfaces (`InviteForm` + `InviteTree`) — WS9; ratio surfaces remain._
 4. **App chrome** — Navbar, Sidebar, UserMenu.
 5. **Long tail** — admin/staff pages last (least theme-facing).
 
