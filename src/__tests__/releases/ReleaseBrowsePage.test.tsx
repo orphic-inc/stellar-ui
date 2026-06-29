@@ -313,6 +313,81 @@ describe('ReleaseBrowsePage', () => {
     expect(params.get('order')).toBe('asc');
   });
 
+  it('paints the filter form from the data-st field/control/panel contract', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 7, userRank: { permissions: { advanced_search: true } } }
+    });
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0 } },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<ReleaseBrowsePage />);
+    // The form is a bounded surface; its inputs paint from `field`, labels
+    // decompose to `meta`, and the buttons are `control`s (no inline gray).
+    expect(
+      container.querySelector('form[data-st="panel"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    // Native radios/checkboxes carry `field` too, for accent-color tinting.
+    expect(
+      container.querySelector('input[type="radio"][data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('label[data-st="meta"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
+
+  it('renders results from the data-st table-hook contract (ADR-0006)', () => {
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: {
+        data: [makeRelease(1)],
+        meta: { total: 1, page: 1, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<ReleaseBrowsePage />);
+    // Columnar data keeps its <table>; the grid/colhead/row variant paints it.
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st-num]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="chip"]')).toBeInTheDocument();
+  });
+
+  it('paints the result count and pagination from prose/control', () => {
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: {
+        data: [makeRelease(1)],
+        meta: { total: 50, page: 1, totalPages: 3 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<ReleaseBrowsePage />);
+    // The result count is muted prose; the current page is a primary control.
+    expect(
+      container.querySelector('[data-st="prose"][data-st-muted]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
+
   it('shows random release and artist links', () => {
     mockUseSearchReleasesQuery.mockReturnValue({
       data: { data: [], meta: { total: 0 } },

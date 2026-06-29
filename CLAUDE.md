@@ -139,7 +139,10 @@ assertion per migrated surface, and keep rendered text/links/controls intact so
 the existing suite stays green. Worked examples: `CollageDetail`,
 `CommunityPage`, `LogBrowsePage`, `ForumPage`, `ForumTopicPage` +
 `ForumTopicPost` (established `prose`/`control`), `ForumCategoryPage` (table
-variant) + `NewTopicForm` (`field`).
+variant) + `NewTopicForm` (`field`), `ReleaseBrowsePage` (filter form + results
+table in one surface — first to migrate native checkboxes/radios, which carry
+`field` for its `accent-color`; the box rules are inert on an `appearance:auto`
+control).
 
 ## Types
 

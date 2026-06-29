@@ -71,6 +71,8 @@ The learnable core. Each means the same thing on every page; styling it once re-
 
 > **Added in WS5 (forum category page + new-topic form):** `field` (D-7, ADR-0006). Text inputs recur on every filtered/edit surface and no composition of listing Roles paints one, so it earns a Role; labels still decompose to `meta`. `control` already covered buttons, so no `btn` Role was minted. The same pass ratified the table variant of `colhead`/`row` (above) — no new table Roles, no new tokens, so every existing theme themes tables and forms for free. Modifiers extended: `-num` now also right-aligns table cells; `-open`/`-lead` cover pinned/sticky table rows. `global.css` matches this table.
 
+> **Applied in WS6 (release browser):** `ReleaseBrowsePage` migrated with **no new Roles, Parts, or tokens** — proof the WS5 vocabulary already covers a whole surface end-to-end (the release listing, item 2 of the §7 order). The filter form is a `panel` of `field` inputs with `meta` labels and `control`(`-primary`) buttons; the results are the `grid`/`colhead`/`row` table variant with `title`/`meta`(`-em`)/`chip` cells; pagination is `control`(`-primary` for the current page). First surface to carry native checkboxes/radios: they take `data-st="field"` for its `accent-color` tint — `field`'s box rules (bg/border/padding) are inert on an `appearance:auto` control, so no checkbox Role is needed. The `edition-*`/`coverart-*` Parts stay unwired here: rip-quality is in no readable schema (§5), and a per-row cover thumbnail is not the mosaic Part's job.
+
 ### 3.3 Tier-2 Parts — scoped inside a Role, must earn their place
 
 A Part is justified **only** when no composition of Tier-1 Roles expresses the structure. Each Part names the Role it lives in.
@@ -139,7 +141,7 @@ Each is independently grabbable; clear context between them.
 ## 7. Migration order (per surface)
 
 1. **Collage** (WS2 pilot — validate the contract).
-2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.)
+2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.) _Done: `ReleaseBrowsePage` (the release listing) — WS6; `RandomLinks` is the only other `search/` surface._
 3. **Profile** surfaces.
 4. **App chrome** — Navbar, Sidebar, UserMenu.
 5. **Long tail** — admin/staff pages last (least theme-facing).
