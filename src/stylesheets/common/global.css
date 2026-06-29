@@ -170,6 +170,24 @@
   color: var(--st-text-strong);
   background: color-mix(in oklch, var(--st-accent) 22%, transparent);
 }
+/* Status chips (WS7) — a chip in a semantic hue (ticket status, account state).
+ * Paint from the --st-* status tokens; mirrors the edition-flag tier cue. */
+[data-st='chip'][data-st-warning] {
+  color: var(--st-warning);
+  border-color: color-mix(in oklch, var(--st-warning) 55%, transparent);
+}
+[data-st='chip'][data-st-info] {
+  color: var(--st-info);
+  border-color: color-mix(in oklch, var(--st-info) 55%, transparent);
+}
+[data-st='chip'][data-st-success] {
+  color: var(--st-success);
+  border-color: color-mix(in oklch, var(--st-success) 55%, transparent);
+}
+[data-st='chip'][data-st-danger] {
+  color: var(--st-danger);
+  border-color: color-mix(in oklch, var(--st-danger) 55%, transparent);
+}
 
 /* icon — a fixed glyph slot (e.g. the category sprite). */
 [data-st='icon'] {
@@ -258,21 +276,42 @@
   opacity: 0.5;
   cursor: default;
 }
-[data-st='control'][data-st-danger]:hover {
+/* :not([data-st-primary]) so a filled primary+status button (below) keeps its
+ * strong label instead of recoloring its own text on hover. */
+[data-st='control'][data-st-danger]:not([data-st-primary]):hover {
   color: var(--st-danger);
 }
 [data-st='control'][data-st-primary] {
+  /* fill is a var so a status modifier can retarget the hue without
+     re-declaring the box; the base rules below always paint --st-fill. */
+  --st-fill: var(--st-accent);
+  --st-fill-hover: var(--st-accent-hover);
   padding: 0.25rem 0.75rem;
   border-radius: var(--st-radius-sm);
-  background: var(--st-accent);
+  background: var(--st-fill);
   color: var(--st-text-strong);
 }
 [data-st='control'][data-st-primary]:hover {
-  background: var(--st-accent-hover);
+  background: var(--st-fill-hover);
   color: var(--st-text-strong);
 }
 [data-st='control'][data-st-primary]:disabled:hover {
-  background: var(--st-accent);
+  background: var(--st-fill);
+}
+/* Status fills (WS7) — a filled control in a semantic hue: warn / enable /
+ * disable etc. The modifier only retargets --st-fill; the -primary rules paint.
+ * Reuses the --st-success/warning/danger status tokens (no new tokens). */
+[data-st='control'][data-st-primary][data-st-warning] {
+  --st-fill: var(--st-warning);
+  --st-fill-hover: color-mix(in oklch, var(--st-warning) 85%, black);
+}
+[data-st='control'][data-st-primary][data-st-success] {
+  --st-fill: var(--st-success);
+  --st-fill-hover: color-mix(in oklch, var(--st-success) 85%, black);
+}
+[data-st='control'][data-st-primary][data-st-danger] {
+  --st-fill: var(--st-danger);
+  --st-fill-hover: color-mix(in oklch, var(--st-danger) 85%, black);
 }
 
 /* colhead -title — the same header bar carrying a *content* title (a thread /

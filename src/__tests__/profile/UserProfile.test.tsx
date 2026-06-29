@@ -1266,6 +1266,65 @@ describe('UserProfile', () => {
   });
 });
 
+describe('UserProfile — data-st contract (WS7)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockProfileData = mockProfile;
+    mockIsLoading = false;
+    mockError = undefined;
+    mockCurrentUser = { id: 99, username: 'bob' };
+    mockHasAnyPermission = false;
+    window.confirm = jest.fn(() => true);
+  });
+
+  it('paints the public profile from panel/colhead/prose/meta Roles', () => {
+    const { container } = renderWithProviders(<UserProfile />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="colhead"]')).toBeInTheDocument();
+    // Username header is strong prose; muted stat labels decompose to meta.
+    expect(
+      container.querySelector('[data-st="prose"][data-st-strong]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-st="meta"]')).toBeInTheDocument();
+  });
+
+  it('paints staff status actions and ticket status from the WS7 status hooks', () => {
+    mockHasAnyPermission = true;
+    mockProfileData = {
+      ...mockProfile,
+      staffPmOverview: {
+        total: 1,
+        unresolved: 1,
+        recentConversations: [
+          {
+            id: 301,
+            subject: 'Open Ticket',
+            createdAt: '2026-01-01T00:00:00Z',
+            status: 'Open',
+            viewerCanOpen: true,
+            replyCount: 1,
+            assignedStaff: null
+          }
+        ]
+      }
+    } as never;
+    const { container } = renderWithProviders(<UserProfile />);
+    // Warn is a filled warning control; the staff tables use the grid variant.
+    expect(
+      container.querySelector(
+        'button[data-st="control"][data-st-primary][data-st-warning]'
+      )
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    // The ticket status renders as an info-hued status chip.
+    expect(
+      container.querySelector('[data-st="chip"][data-st-info]')
+    ).toBeInTheDocument();
+  });
+});
+
 describe('UserProfile — reputation & community block (#80)', () => {
   beforeEach(() => {
     jest.clearAllMocks();

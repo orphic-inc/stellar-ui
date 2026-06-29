@@ -118,7 +118,11 @@ Role vs Part).
   (scoped, justified): `edition-*` `coverart-*`. Boolean modifiers are bare
   `data-st-*` attributes (`data-st-lead`, `data-st-num`, `data-st-strong`,
   `data-st-primary`, `data-st-danger`, …); `bar` reads `--st-w` (0–100) via
-  inline style.
+  inline style. **Status modifiers** (`-warning` `-success` `-info`; `-danger`)
+  paint `chip` and `control` from the `--st-warning/success/info/danger` status
+  tokens — a `chip` carries the hue (ticket status, account state), and a
+  filled `control -primary` swaps its fill to the status hue (Warn / Enable /
+  Disable). Added in WS7 (UserProfile proof); no new tokens.
 - **Tables reuse `colhead`/`row`** (ADR-0006): a genuine data `<table>` keeps its
   markup and gets `data-st="grid"` on the `<table>`, `data-st="colhead"` on the
   `<thead>`, `data-st="row"` on each `<tr>`; tag-qualified CSS swaps flex→table
@@ -142,7 +146,9 @@ the existing suite stays green. Worked examples: `CollageDetail`,
 variant) + `NewTopicForm` (`field`), `ReleaseBrowsePage` (filter form + results
 table in one surface — first to migrate native checkboxes/radios, which carry
 `field` for its `accent-color`; the box rules are inert on an `appearance:auto`
-control).
+control), `UserProfile` (the public profile + staff panel — proved the WS7
+`chip`/`control` status modifiers; the donor-presentation block keeps its pink
+brand flair by design, not migrated).
 
 ## Types
 

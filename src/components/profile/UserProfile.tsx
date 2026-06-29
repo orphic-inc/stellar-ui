@@ -70,10 +70,12 @@ const formatByteStat = (value: number | string | null | undefined) => {
 const formatPercentile = (percentile: number) =>
   `${ordinalSuffix(percentile)} percentile`;
 
-const STAFF_PM_STATUS_CLASS: Record<string, string> = {
-  Unanswered: 'bg-yellow-900/40 text-yellow-300 border border-yellow-800/50',
-  Open: 'bg-blue-900/40 text-blue-300 border border-blue-800/50',
-  Resolved: 'bg-gray-800 text-gray-300 border border-gray-700'
+// Ticket status → status-chip modifier (WS7). Resolved / unknown stay a neutral
+// chip; the chip Role paints the box, the modifier only sets the hue.
+const staffPmStatusMod = (status: string): Record<string, string> => {
+  if (status === 'Unanswered') return { 'data-st-warning': '' };
+  if (status === 'Open') return { 'data-st-info': '' };
+  return {};
 };
 
 const WarnModal = ({
@@ -106,15 +108,14 @@ const WarnModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-md p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-white">Warn User</h3>
+    <div className="fixed inset-0 bg-[var(--st-backdrop)] flex items-center justify-center z-50 p-4">
+      <div data-st="panel" className="w-full max-w-md p-6 space-y-4">
+        <h3 data-st="prose" data-st-strong className="text-lg">
+          Warn User
+        </h3>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label
-              htmlFor="warn-reason"
-              className="block text-sm text-gray-300 mb-1"
-            >
+            <label htmlFor="warn-reason" data-st="meta" className="block mb-1">
               Reason
             </label>
             <textarea
@@ -123,14 +124,12 @@ const WarnModal = ({
               onChange={(e) => setReason(e.target.value)}
               required
               rows={3}
-              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              data-st="field"
+              className="w-full"
             />
           </div>
           <div>
-            <label
-              htmlFor="warn-expires"
-              className="block text-sm text-gray-300 mb-1"
-            >
+            <label htmlFor="warn-expires" data-st="meta" className="block mb-1">
               Expires at (optional)
             </label>
             <input
@@ -138,21 +137,26 @@ const WarnModal = ({
               type="datetime-local"
               value={expiresAt}
               onChange={(e) => setExpiresAt(e.target.value)}
-              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              data-st="field"
+              className="w-full"
             />
           </div>
           <div className="flex gap-2 justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+              data-st="control"
+              className="text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-white text-sm rounded-lg transition-colors"
+              data-st="control"
+              data-st-primary
+              data-st-warning
+              className="text-sm"
             >
               {isLoading ? 'Issuing…' : 'Issue Warning'}
             </button>
@@ -197,10 +201,8 @@ const StaffBioEditor = ({
   };
 
   return (
-    <div className="border border-gray-700 rounded-lg overflow-hidden">
-      <div className="bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-700">
-        Staff Bio
-      </div>
+    <div data-st="panel">
+      <div data-st="colhead">Staff Bio</div>
       <form onSubmit={handleSetStaffBio} className="px-4 py-3 space-y-2">
         <textarea
           value={staffBioValue}
@@ -208,16 +210,19 @@ const StaffBioEditor = ({
           maxLength={500}
           rows={3}
           placeholder="Staff bio (BBCode supported, max 500 chars). Leave empty to clear."
-          className="w-full rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+          data-st="field"
+          className="w-full resize-none"
         />
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-600">
+          <span data-st="meta" className="text-xs">
             {staffBioValue.length}/500
           </span>
           <button
             type="submit"
             disabled={isSettingBio}
-            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-xs"
           >
             {isSettingBio ? 'Saving…' : 'Save Bio'}
           </button>
@@ -438,9 +443,9 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     }
   };
 
-  const sectionClass = 'border border-gray-700 rounded-lg overflow-hidden';
-  const headClass =
-    'bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-700';
+  // Section chrome decomposes to Roles: wrapper → `panel`, header → `colhead`
+  // (a clickable `<button>` colhead for the collapsible sections). Only the
+  // body padding stays a layout utility.
   const bodyClass = 'px-4 py-3';
 
   return (
@@ -449,112 +454,122 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
         <WarnModal userId={profileId} onClose={() => setShowWarnModal(false)} />
       )}
 
-      <div className="bg-gray-900 border border-amber-800/40 rounded-lg overflow-hidden">
-        <div className="bg-amber-900/20 border-b border-amber-800/40 px-4 py-2">
-          <h3 className="text-sm font-semibold text-amber-300">
-            Staff Actions
-          </h3>
-        </div>
+      <div data-st="panel">
+        <div data-st="colhead">Staff Actions</div>
         <div className="p-4 space-y-4">
-          {/* Quick actions */}
+          {/* Quick actions — colour encodes severity via the WS7 status fills. */}
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setShowWarnModal(true)}
-              className="px-3 py-1.5 bg-yellow-700 hover:bg-yellow-600 text-white text-xs rounded transition-colors"
+              data-st="control"
+              data-st-primary
+              data-st-warning
+              className="text-xs"
             >
               Warn User
             </button>
             <button
               onClick={handleDisableToggle}
               disabled={isDisabling || isEnabling}
-              className={`px-3 py-1.5 text-white text-xs rounded transition-colors disabled:opacity-50 ${
-                isDisabled
-                  ? 'bg-green-700 hover:bg-green-600'
-                  : 'bg-red-700 hover:bg-red-600'
-              }`}
+              data-st="control"
+              data-st-primary
+              data-st-success={isDisabled ? '' : undefined}
+              data-st-danger={isDisabled ? undefined : ''}
+              className="text-xs"
             >
               {isDisabled ? 'Enable Account' : 'Disable Account'}
             </button>
             <button
               onClick={handleTriggerRecovery}
               disabled={isSendingRecovery}
-              className="px-3 py-1.5 bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 text-white text-xs rounded transition-colors"
+              data-st="control"
+              data-st-primary
+              className="text-xs"
             >
               {isSendingRecovery ? 'Sending…' : 'Send Recovery Email'}
             </button>
           </div>
 
           {staffPmOverview && (
-            <div className={sectionClass}>
-              <div className={headClass}>Support Tickets</div>
+            <div data-st="panel">
+              <div data-st="colhead">Support Tickets</div>
               <div className={`${bodyClass} space-y-3`}>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="rounded border border-gray-800 bg-gray-950 px-3 py-2 text-xs">
-                    <div className="text-gray-500 uppercase tracking-wide">
+                  <div data-st="panel" className="px-3 py-2 text-xs">
+                    <div data-st="meta" className="uppercase tracking-wide">
                       Total
                     </div>
-                    <div className="mt-1 text-base text-white">
+                    <div
+                      data-st="prose"
+                      data-st-strong
+                      className="mt-1 text-base"
+                    >
                       {staffPmOverview.total}
                     </div>
                   </div>
-                  <div className="rounded border border-yellow-900/40 bg-yellow-950/20 px-3 py-2 text-xs">
-                    <div className="text-yellow-300 uppercase tracking-wide">
+                  <div data-st="panel" className="px-3 py-2 text-xs">
+                    <span
+                      data-st="chip"
+                      data-st-warning
+                      className="uppercase tracking-wide"
+                    >
                       Unresolved
-                    </div>
-                    <div className="mt-1 text-base text-white">
+                    </span>
+                    <div
+                      data-st="prose"
+                      data-st-strong
+                      className="mt-1 text-base"
+                    >
                       {staffPmOverview.unresolved}
                     </div>
                   </div>
                 </div>
 
                 {staffPmOverview.recentConversations.length > 0 ? (
-                  <table className="w-full text-xs text-gray-300">
-                    <thead>
-                      <tr className="text-gray-500">
-                        <th className="pb-1 text-left">Subject</th>
-                        <th className="pb-1 text-left">Date</th>
-                        <th className="pb-1 text-left">Assigned</th>
-                        <th className="pb-1 text-left">Replies</th>
-                        <th className="pb-1 text-left">Status</th>
+                  <table data-st="grid" className="text-xs">
+                    <thead data-st="colhead">
+                      <tr>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Assigned</th>
+                        <th data-st-num>Replies</th>
+                        <th>Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {staffPmOverview.recentConversations.map(
                         (conversation) => (
-                          <tr
-                            key={conversation.id}
-                            className="border-t border-gray-800"
-                          >
-                            <td className="py-1 pr-3">
+                          <tr key={conversation.id} data-st="row">
+                            <td>
                               {conversation.viewerCanOpen ? (
                                 <Link
                                   to={`/private/messages/tickets/${conversation.id}`}
-                                  className="text-indigo-400 hover:text-indigo-300"
+                                  data-st="title"
                                 >
                                   {conversation.subject}
                                 </Link>
                               ) : (
-                                <span className="text-gray-200">
+                                <span data-st="prose" data-st-strong>
                                   {conversation.subject}
                                 </span>
                               )}
                             </td>
-                            <td className="py-1 pr-3 text-gray-500">
-                              <Time date={conversation.createdAt} />
+                            <td>
+                              <span data-st="meta">
+                                <Time date={conversation.createdAt} />
+                              </span>
                             </td>
-                            <td className="py-1 pr-3 text-gray-400">
-                              {conversation.assignedStaff?.username ??
-                                'Class / unassigned'}
+                            <td>
+                              <span data-st="meta">
+                                {conversation.assignedStaff?.username ??
+                                  'Class / unassigned'}
+                              </span>
                             </td>
-                            <td className="py-1 pr-3 text-gray-400">
-                              {conversation.replyCount}
-                            </td>
-                            <td className="py-1">
+                            <td data-st-num>{conversation.replyCount}</td>
+                            <td>
                               <span
-                                className={`rounded px-2 py-0.5 text-[11px] ${
-                                  STAFF_PM_STATUS_CLASS[conversation.status] ??
-                                  STAFF_PM_STATUS_CLASS.Resolved
-                                }`}
+                                data-st="chip"
+                                {...staffPmStatusMod(conversation.status)}
                               >
                                 {conversation.status}
                               </span>
@@ -565,7 +580,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                     </tbody>
                   </table>
                 ) : (
-                  <p className="text-xs text-gray-500">
+                  <p data-st="prose" data-st-muted className="text-xs">
                     No staff PMs for this user.
                   </p>
                 )}
@@ -573,8 +588,8 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             </div>
           )}
 
-          <div className={sectionClass}>
-            <div className={headClass}>Change Rank</div>
+          <div data-st="panel">
+            <div data-st="colhead">Change Rank</div>
             <div className={`${bodyClass} space-y-3`}>
               <div className="flex gap-2">
                 <select
@@ -584,7 +599,8 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                       e.target.value ? Number(e.target.value) : ''
                     )
                   }
-                  className="flex-1 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  data-st="field"
+                  className="flex-1"
                 >
                   <option value="">Select rank…</option>
                   {primaryRanks.map((rank) => (
@@ -596,14 +612,19 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                 <button
                   onClick={handleSetRank}
                   disabled={!selectedRankId || isSettingRank}
-                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded transition-colors"
+                  data-st="control"
+                  data-st-primary
+                  className="text-xs"
                 >
                   {isSettingRank ? 'Saving…' : 'Save'}
                 </button>
               </div>
               {secondaryRanks.length > 0 ? (
-                <div className="rounded border border-gray-800 bg-gray-950/60 p-3 space-y-2">
-                  <div className="text-xs uppercase tracking-wide text-gray-500">
+                <div data-st="panel" className="p-3 space-y-2">
+                  <div
+                    data-st="meta"
+                    className="text-xs uppercase tracking-wide"
+                  >
                     Secondary Classes
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2">
@@ -611,19 +632,20 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                       <label
                         key={rank.id}
                         aria-label={rank.name}
-                        className="flex items-start gap-3 rounded border border-gray-800 px-3 py-2 cursor-pointer hover:border-gray-700"
+                        className="flex items-start gap-3 rounded border border-[var(--st-border)] px-3 py-2 cursor-pointer hover:border-[var(--st-border-strong)]"
                       >
                         <input
                           type="checkbox"
                           checked={selectedSecondaryRankIds.includes(rank.id)}
                           onChange={() => handleToggleSecondaryRank(rank.id)}
-                          className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
+                          data-st="field"
+                          className="mt-0.5"
                         />
                         <span className="min-w-0">
-                          <span className="block text-sm text-gray-200">
+                          <span data-st="prose" className="block text-sm">
                             {rank.name}
                           </span>
-                          <span className="block text-xs text-gray-500">
+                          <span data-st="meta" className="block text-xs">
                             Level {rank.level}
                           </span>
                         </span>
@@ -634,18 +656,21 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
               ) : null}
               <label
                 aria-label="Lock rank"
-                className="flex items-start gap-3 rounded border border-gray-800 px-3 py-2 cursor-pointer hover:border-gray-700"
+                className="flex items-start gap-3 rounded border border-[var(--st-border)] px-3 py-2 cursor-pointer hover:border-[var(--st-border-strong)]"
               >
                 <input
                   type="checkbox"
                   checked={rankLocked}
                   disabled={isTogglingLock}
                   onChange={handleToggleRankLock}
-                  className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 disabled:opacity-50"
+                  data-st="field"
+                  className="mt-0.5"
                 />
                 <span className="min-w-0">
-                  <span className="block text-sm text-gray-200">Lock rank</span>
-                  <span className="block text-xs text-gray-500">
+                  <span data-st="prose" className="block text-sm">
+                    Lock rank
+                  </span>
+                  <span data-st="meta" className="block text-xs">
                     Freeze this user from automatic class progression. Manual
                     rank changes above still apply.
                   </span>
@@ -655,8 +680,8 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
           </div>
 
           {/* Donor status */}
-          <div className={sectionClass}>
-            <div className={headClass}>Donor Status</div>
+          <div data-st="panel">
+            <div data-st="colhead">Donor Status</div>
             <div className={`${bodyClass} space-y-2`}>
               <div className="flex gap-2">
                 <select
@@ -664,7 +689,8 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                   onChange={(e) =>
                     setDonorRankId(e.target.value ? Number(e.target.value) : '')
                   }
-                  className="flex-1 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  data-st="field"
+                  className="flex-1"
                 >
                   <option value="">Select donor rank…</option>
                   {donorRanks?.map((rank) => (
@@ -678,12 +704,15 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                   value={donorExpiry}
                   onChange={(e) => setDonorExpiry(e.target.value)}
                   title="Expires at (optional)"
-                  className="w-44 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-xs focus:outline-none"
+                  data-st="field"
+                  className="w-44 text-xs"
                 />
                 <button
                   onClick={handleGrantDonor}
                   disabled={!donorRankId || isGrantingDonor}
-                  className="px-3 py-1.5 bg-pink-700 hover:bg-pink-600 disabled:opacity-50 text-white text-xs rounded transition-colors"
+                  data-st="control"
+                  data-st-primary
+                  className="text-xs"
                 >
                   {isGrantingDonor ? 'Granting…' : 'Grant'}
                 </button>
@@ -692,7 +721,9 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                 <button
                   onClick={handleRevokeDonor}
                   disabled={isRevokingDonor}
-                  className="text-xs text-red-500 hover:text-red-400 disabled:opacity-50"
+                  data-st="control"
+                  data-st-danger
+                  className="text-xs"
                 >
                   Revoke donor status
                 </button>
@@ -700,9 +731,10 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             </div>
           </div>
           {/* Snatch list */}
-          <div className={sectionClass}>
+          <div data-st="panel">
             <button
-              className={`${headClass} w-full text-left flex items-center justify-between`}
+              data-st="colhead"
+              className="w-full text-left"
               onClick={() => setShowSnatchList((v) => !v)}
             >
               <span>Snatch List</span>
@@ -711,46 +743,53 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             {showSnatchList && (
               <div className={bodyClass}>
                 {snatchList && snatchList.length > 0 ? (
-                  <table className="w-full text-xs text-gray-300">
-                    <thead>
-                      <tr className="text-gray-500">
-                        <th className="text-left pb-1">Release</th>
-                        <th className="text-left pb-1">Artist</th>
-                        <th className="text-left pb-1">Downloaded</th>
+                  <table data-st="grid" className="text-xs">
+                    <thead data-st="colhead">
+                      <tr>
+                        <th>Release</th>
+                        <th>Artist</th>
+                        <th>Downloaded</th>
                       </tr>
                     </thead>
                     <tbody>
                       {snatchList.map((item) => (
-                        <tr key={item.id} className="border-t border-gray-800">
+                        <tr key={item.id} data-st="row">
                           <td className="py-1">
                             <Link
                               to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
-                              className="text-indigo-400 hover:text-indigo-300"
+                              data-st="control"
                             >
                               {item.release.title}
                             </Link>
                           </td>
-                          <td className="py-1 text-gray-400">
-                            {item.artist?.name ?? '—'}
+                          <td>
+                            <span data-st="meta">
+                              {item.artist?.name ?? '—'}
+                            </span>
                           </td>
-                          <td className="py-1 text-gray-500">
-                            {new Date(item.downloadedAt).toLocaleDateString()}
+                          <td>
+                            <span data-st="meta">
+                              {new Date(item.downloadedAt).toLocaleDateString()}
+                            </span>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
-                  <p className="text-xs text-gray-500">No snatches.</p>
+                  <p data-st="prose" data-st-muted className="text-xs">
+                    No snatches.
+                  </p>
                 )}
               </div>
             )}
           </div>
 
           {/* IP History */}
-          <div className={sectionClass}>
+          <div data-st="panel">
             <button
-              className={`${headClass} w-full text-left flex items-center justify-between`}
+              data-st="colhead"
+              className="w-full text-left"
               onClick={() => setShowIpHistory((v) => !v)}
             >
               <span>IP History</span>
@@ -759,35 +798,40 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             {showIpHistory && (
               <div className={bodyClass}>
                 {ipHistory && ipHistory.length > 0 ? (
-                  <table className="w-full text-xs text-gray-300">
-                    <thead>
-                      <tr className="text-gray-500">
-                        <th className="text-left pb-1">IP</th>
-                        <th className="text-left pb-1">Last Seen</th>
+                  <table data-st="grid" className="text-xs">
+                    <thead data-st="colhead">
+                      <tr>
+                        <th>IP</th>
+                        <th>Last Seen</th>
                       </tr>
                     </thead>
                     <tbody>
                       {ipHistory.map((row, i) => (
-                        <tr key={i} className="border-t border-gray-800">
-                          <td className="py-1 font-mono">{row.ip}</td>
-                          <td className="py-1 text-gray-500">
-                            {new Date(row.seenAt).toLocaleString()}
+                        <tr key={i} data-st="row">
+                          <td className="font-mono">{row.ip}</td>
+                          <td>
+                            <span data-st="meta">
+                              {new Date(row.seenAt).toLocaleString()}
+                            </span>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
-                  <p className="text-xs text-gray-500">No IP history.</p>
+                  <p data-st="prose" data-st-muted className="text-xs">
+                    No IP history.
+                  </p>
                 )}
               </div>
             )}
           </div>
 
           {/* Email History */}
-          <div className={sectionClass}>
+          <div data-st="panel">
             <button
-              className={`${headClass} w-full text-left flex items-center justify-between`}
+              data-st="colhead"
+              className="w-full text-left"
               onClick={() => setShowEmailHistory((v) => !v)}
             >
               <span>Email History</span>
@@ -796,35 +840,40 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             {showEmailHistory && (
               <div className={bodyClass}>
                 {emailHistory && emailHistory.length > 0 ? (
-                  <table className="w-full text-xs text-gray-300">
-                    <thead>
-                      <tr className="text-gray-500">
-                        <th className="text-left pb-1">Email</th>
-                        <th className="text-left pb-1">Changed At</th>
+                  <table data-st="grid" className="text-xs">
+                    <thead data-st="colhead">
+                      <tr>
+                        <th>Email</th>
+                        <th>Changed At</th>
                       </tr>
                     </thead>
                     <tbody>
                       {emailHistory.map((row, i) => (
-                        <tr key={i} className="border-t border-gray-800">
-                          <td className="py-1">{row.email}</td>
-                          <td className="py-1 text-gray-500">
-                            {new Date(row.changedAt).toLocaleString()}
+                        <tr key={i} data-st="row">
+                          <td>{row.email}</td>
+                          <td>
+                            <span data-st="meta">
+                              {new Date(row.changedAt).toLocaleString()}
+                            </span>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
-                  <p className="text-xs text-gray-500">No email history.</p>
+                  <p data-st="prose" data-st-muted className="text-xs">
+                    No email history.
+                  </p>
                 )}
               </div>
             )}
           </div>
 
           {/* Moderation Notes */}
-          <div className={sectionClass}>
+          <div data-st="panel">
             <button
-              className={`${headClass} w-full text-left flex items-center justify-between`}
+              data-st="colhead"
+              className="w-full text-left"
               onClick={() => setShowNotes((v) => !v)}
             >
               <span>Moderation Notes</span>
@@ -837,18 +886,22 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                     {notes.map((note) => (
                       <div
                         key={note.id}
-                        className="p-2 bg-gray-800 rounded flex items-start justify-between gap-2"
+                        className="p-2 bg-[var(--st-raised)] rounded flex items-start justify-between gap-2"
                       >
                         <div>
-                          <p className="text-xs text-gray-300">{note.body}</p>
-                          <p className="text-[10px] text-gray-500 mt-0.5">
+                          <p data-st="prose" className="text-xs">
+                            {note.body}
+                          </p>
+                          <p data-st="meta" className="text-[10px] mt-0.5">
                             By {note.author?.username ?? 'Unknown'} ·{' '}
                             {new Date(note.createdAt).toLocaleString()}
                           </p>
                         </div>
                         <button
                           onClick={() => handleDeleteNote(note.id)}
-                          className="text-gray-600 hover:text-red-400 text-xs shrink-0"
+                          data-st="control"
+                          data-st-danger
+                          className="text-xs shrink-0"
                         >
                           ✕
                         </button>
@@ -856,7 +909,9 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-500">No notes.</p>
+                  <p data-st="prose" data-st-muted className="text-xs">
+                    No notes.
+                  </p>
                 )}
                 <form onSubmit={handleAddNote} className="flex gap-2">
                   <input
@@ -864,12 +919,15 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
                     placeholder="Add a note…"
-                    className="flex-1 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    data-st="field"
+                    className="flex-1 text-xs"
                   />
                   <button
                     type="submit"
                     disabled={!newNote.trim() || isAddingNote}
-                    className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded transition-colors"
+                    data-st="control"
+                    data-st-primary
+                    className="text-xs"
                   >
                     Add
                   </button>
@@ -879,9 +937,10 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
           </div>
 
           {/* Warnings */}
-          <div className={sectionClass}>
+          <div data-st="panel">
             <button
-              className={`${headClass} w-full text-left flex items-center justify-between`}
+              data-st="colhead"
+              className="w-full text-left"
               onClick={() => setShowWarnings((v) => !v)}
             >
               <span>Warnings</span>
@@ -894,11 +953,11 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                     {warnings.map((w) => (
                       <div
                         key={w.id}
-                        className="p-2 bg-gray-800 rounded flex items-start justify-between gap-2"
+                        className="p-2 bg-[var(--st-raised)] rounded flex items-start justify-between gap-2"
                       >
                         <div className="text-xs">
-                          <p className="text-gray-300">{w.reason}</p>
-                          <p className="text-gray-500 mt-0.5">
+                          <p data-st="prose">{w.reason}</p>
+                          <p data-st="meta" className="mt-0.5">
                             By {w.warnedBy?.username ?? 'Unknown'} ·{' '}
                             {new Date(w.createdAt).toLocaleString()}
                             {w.expiresAt &&
@@ -909,7 +968,9 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                         </div>
                         <button
                           onClick={() => handleRemoveWarning(w.id)}
-                          className="text-gray-600 hover:text-red-400 text-xs shrink-0"
+                          data-st="control"
+                          data-st-danger
+                          className="text-xs shrink-0"
                         >
                           ✕
                         </button>
@@ -917,7 +978,9 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-500">No warnings.</p>
+                  <p data-st="prose" data-st-muted className="text-xs">
+                    No warnings.
+                  </p>
                 )}
               </div>
             )}
@@ -935,11 +998,11 @@ const SnatchListSection = () => {
   if (!snatchList?.length) return null;
 
   return (
-    <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-      <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-        <span className="text-sm font-semibold text-gray-200">Snatch List</span>
+    <div data-st="panel">
+      <div data-st="colhead" data-st-title>
+        <span>Snatch List</span>
       </div>
-      <div className="divide-y divide-gray-800">
+      <div className="divide-y divide-[var(--st-border-subtle)]">
         {snatchList.map((item) => (
           <div
             key={item.id}
@@ -948,17 +1011,17 @@ const SnatchListSection = () => {
             <div>
               <Link
                 to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
-                className="text-indigo-400 hover:text-indigo-300"
+                data-st="control"
               >
                 {item.release.title}
               </Link>
               {item.artist && (
-                <span className="text-gray-500 ml-2 text-xs">
+                <span className="text-[var(--st-text-muted)] ml-2 text-xs">
                   {item.artist.name}
                 </span>
               )}
             </div>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-[var(--st-text-muted)]">
               {new Date(item.downloadedAt).toLocaleDateString()}
             </span>
           </div>
@@ -1037,9 +1100,11 @@ const UserProfile = () => {
     <div>
       {/* Page header */}
       <div className="mb-6 flex items-center gap-3 flex-wrap">
-        <h1 className="text-2xl font-bold text-white">{profile.username}</h1>
+        <h1 data-st="prose" data-st-strong className="text-2xl">
+          {profile.username}
+        </h1>
         {profile.profile?.profileTitle && (
-          <span className="text-sm text-gray-400">
+          <span data-st="meta" className="text-sm">
             {profile.profile.profileTitle}
           </span>
         )}
@@ -1050,18 +1115,12 @@ const UserProfile = () => {
         />
         <div className="flex items-center gap-3 ml-auto text-sm">
           {isOwnProfile && (
-            <Link
-              to={`/private/user/edit/${profile.id}`}
-              className="text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
+            <Link to={`/private/user/edit/${profile.id}`} data-st="control">
               Settings
             </Link>
           )}
           {(isOwnProfile || isStaff) && (
-            <Link
-              to={`/private/user/${profile.id}/stats`}
-              className="text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
+            <Link to={`/private/user/${profile.id}/stats`} data-st="control">
               Stats
             </Link>
           )}
@@ -1069,7 +1128,7 @@ const UserProfile = () => {
             <>
               <Link
                 to={`/private/messages/new?to=${profile.username}`}
-                className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                data-st="control"
               >
                 Send Message
               </Link>
@@ -1093,7 +1152,7 @@ const UserProfile = () => {
                       );
                     }
                   }}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                  data-st="control"
                 >
                   Remove Friend
                 </button>
@@ -1118,12 +1177,13 @@ const UserProfile = () => {
                       );
                     }
                   }}
-                  className="text-green-400 hover:text-green-300 transition-colors"
+                  data-st="control"
+                  data-st-success
                 >
                   Accept Friend Request
                 </button>
               ) : friendStatus?.status === 'pending_sent' ? (
-                <span className="text-gray-500">Friend Request Sent</span>
+                <span data-st="meta">Friend Request Sent</span>
               ) : (
                 <button
                   onClick={async () => {
@@ -1144,14 +1204,14 @@ const UserProfile = () => {
                       );
                     }
                   }}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                  data-st="control"
                 >
                   Add to Friends
                 </button>
               )}
               <Link
                 to={`/private/reports/new?targetType=User&targetId=${profile.id}`}
-                className="text-gray-500 hover:text-gray-300 transition-colors"
+                data-st="control"
               >
                 Report
               </Link>
@@ -1164,14 +1224,13 @@ const UserProfile = () => {
         {/* Main content (left) */}
         <div className="flex-1 space-y-4 min-w-0">
           {profile.profile?.profileInfo && (
-            <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-                <span className="text-sm font-semibold text-gray-200">
-                  Profile
-                </span>
+            <div data-st="panel">
+              <div data-st="colhead" data-st-title>
+                <span>Profile</span>
               </div>
               <div
-                className="p-4 text-sm text-gray-300"
+                data-st="prose"
+                className="p-4 text-sm"
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(profile.profile.profileInfo)
                 }}
@@ -1250,9 +1309,9 @@ const UserProfile = () => {
                 )}
 
                 {donorPresentation.rank && (
-                  <div className="text-sm text-gray-300">
+                  <div className="text-sm text-[var(--st-text)]">
                     Granted{' '}
-                    <span className="text-white">
+                    <span className="text-[var(--st-text-strong)]">
                       {new Date(
                         donorPresentation.rank.grantedAt
                       ).toLocaleDateString()}
@@ -1261,7 +1320,7 @@ const UserProfile = () => {
                       <>
                         {' '}
                         · Expires{' '}
-                        <span className="text-white">
+                        <span className="text-[var(--st-text-strong)]">
                           {new Date(
                             donorPresentation.rank.expiresAt
                           ).toLocaleDateString()}
@@ -1283,7 +1342,7 @@ const UserProfile = () => {
                             {block.title}
                           </div>
                         )}
-                        <div className="text-sm text-gray-300 whitespace-pre-wrap">
+                        <div className="text-sm text-[var(--st-text)] whitespace-pre-wrap">
                           {block.body}
                         </div>
                       </div>
@@ -1297,20 +1356,18 @@ const UserProfile = () => {
           {(featuredShelves.length > 0 || publicShelves.length > 0) && (
             <div className="space-y-4">
               {featuredShelves.length > 0 && (
-                <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-                  <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-                    <span className="text-sm font-semibold text-gray-200">
-                      Featured Shelves
-                    </span>
+                <div data-st="panel">
+                  <div data-st="colhead" data-st-title>
+                    <span>Featured Shelves</span>
                   </div>
                   <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
                     {featuredShelves.map((collage) => (
                       <Link
                         key={collage.id}
                         to={`/private/collages/${collage.id}`}
-                        className="rounded border border-gray-700 bg-gray-950 hover:border-indigo-500 transition-colors overflow-hidden"
+                        className="rounded border border-[var(--st-border)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors overflow-hidden"
                       >
-                        <div className="grid grid-cols-2 gap-px bg-gray-800">
+                        <div className="grid grid-cols-2 gap-px bg-[var(--st-border)]">
                           {collage.coverImages.length > 0 ? (
                             collage.coverImages
                               .slice(0, 4)
@@ -1323,14 +1380,14 @@ const UserProfile = () => {
                                 />
                               ))
                           ) : (
-                            <div className="col-span-2 aspect-[2/1] bg-gray-900" />
+                            <div className="col-span-2 aspect-[2/1] bg-[var(--st-base)]" />
                           )}
                         </div>
                         <div className="p-3">
-                          <div className="text-sm font-medium text-white">
+                          <div className="text-sm font-medium text-[var(--st-text-strong)]">
                             {collage.name}
                           </div>
-                          <div className="mt-1 text-xs text-gray-500">
+                          <div className="mt-1 text-xs text-[var(--st-text-muted)]">
                             {collage.numEntries} entries
                           </div>
                         </div>
@@ -1341,20 +1398,18 @@ const UserProfile = () => {
               )}
 
               {publicShelves.length > 0 && (
-                <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-                  <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-                    <span className="text-sm font-semibold text-gray-200">
-                      Public Collages
-                    </span>
+                <div data-st="panel">
+                  <div data-st="colhead" data-st-title>
+                    <span>Public Collages</span>
                   </div>
-                  <div className="divide-y divide-gray-800">
+                  <div className="divide-y divide-[var(--st-border-subtle)]">
                     {publicShelves.map((collage) => (
                       <Link
                         key={collage.id}
                         to={`/private/collages/${collage.id}`}
-                        className="flex items-center gap-4 px-4 py-3 hover:bg-gray-800/30 transition-colors"
+                        className="flex items-center gap-4 px-4 py-3 hover:bg-[var(--st-border)]/30 transition-colors"
                       >
-                        <div className="grid h-16 w-20 shrink-0 grid-cols-2 gap-px overflow-hidden rounded bg-gray-800">
+                        <div className="grid h-16 w-20 shrink-0 grid-cols-2 gap-px overflow-hidden rounded bg-[var(--st-border)]">
                           {collage.coverImages.length > 0 ? (
                             collage.coverImages
                               .slice(0, 4)
@@ -1367,20 +1422,20 @@ const UserProfile = () => {
                                 />
                               ))
                           ) : (
-                            <div className="col-span-2 h-full w-full bg-gray-900" />
+                            <div className="col-span-2 h-full w-full bg-[var(--st-base)]" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="text-sm font-medium text-white">
+                          <div className="text-sm font-medium text-[var(--st-text-strong)]">
                             {collage.name}
                           </div>
-                          <div className="mt-1 text-xs text-gray-500">
+                          <div className="mt-1 text-xs text-[var(--st-text-muted)]">
                             {COLLAGE_CATEGORY_LABELS[collage.categoryId] ??
                               'Collage'}{' '}
                             · {collage.numEntries} entries
                           </div>
                         </div>
-                        <div className="shrink-0 text-xs text-gray-500">
+                        <div className="shrink-0 text-xs text-[var(--st-text-muted)]">
                           {new Date(collage.updatedAt).toLocaleDateString()}
                         </div>
                       </Link>
@@ -1391,11 +1446,9 @@ const UserProfile = () => {
             </div>
           )}
 
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-              <span className="text-sm font-semibold text-gray-200">
-                Recent Contributions
-              </span>
+          <div data-st="panel">
+            <div data-st="colhead" data-st-title>
+              <span>Recent Contributions</span>
             </div>
             {profile.recentContributions.length ? (
               <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-5">
@@ -1403,9 +1456,9 @@ const UserProfile = () => {
                   <Link
                     key={item.id}
                     to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
-                    className="overflow-hidden rounded border border-gray-800 bg-gray-950 hover:border-indigo-500 transition-colors"
+                    className="overflow-hidden rounded border border-[var(--st-border-subtle)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors"
                   >
-                    <div className="aspect-square bg-gray-900">
+                    <div className="aspect-square bg-[var(--st-base)]">
                       {item.release.image ? (
                         <img
                           src={item.release.image}
@@ -1415,15 +1468,15 @@ const UserProfile = () => {
                       ) : null}
                     </div>
                     <div className="p-3">
-                      <div className="truncate text-sm font-medium text-white">
+                      <div className="truncate text-sm font-medium text-[var(--st-text-strong)]">
                         {item.release.title}
                       </div>
                       {item.release.artist && (
-                        <div className="mt-1 truncate text-xs text-gray-500">
+                        <div className="mt-1 truncate text-xs text-[var(--st-text-muted)]">
                           {item.release.artist.name}
                         </div>
                       )}
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-[var(--st-text-muted)]">
                         <Time date={item.createdAt} />
                       </div>
                     </div>
@@ -1431,20 +1484,18 @@ const UserProfile = () => {
                 ))}
               </div>
             ) : (
-              <div className="px-4 py-3 text-sm text-gray-500">
+              <div className="px-4 py-3 text-sm text-[var(--st-text-muted)]">
                 No recent contributions.
               </div>
             )}
           </div>
 
           {profile.recentSnatches.length > 0 && (
-            <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-                <span className="text-sm font-semibold text-gray-200">
-                  Recent Snatches
-                </span>
+            <div data-st="panel">
+              <div data-st="colhead" data-st-title>
+                <span>Recent Snatches</span>
               </div>
-              <div className="divide-y divide-gray-800">
+              <div className="divide-y divide-[var(--st-border-subtle)]">
                 {profile.recentSnatches.map((item) => (
                   <div
                     key={item.id}
@@ -1453,17 +1504,17 @@ const UserProfile = () => {
                     <div className="min-w-0">
                       <Link
                         to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
-                        className="text-indigo-400 hover:text-indigo-300"
+                        data-st="control"
                       >
                         {item.release.title}
                       </Link>
                       {item.artist && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-[var(--st-text-muted)]">
                           {item.artist.name}
                         </div>
                       )}
                     </div>
-                    <span className="shrink-0 text-xs text-gray-500">
+                    <span className="shrink-0 text-xs text-[var(--st-text-muted)]">
                       <Time date={item.downloadedAt} />
                     </span>
                   </div>
@@ -1488,11 +1539,9 @@ const UserProfile = () => {
 
         {/* Sidebar (right) */}
         <div className="w-44 shrink-0 space-y-4">
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Avatar
-              </span>
+          <div data-st="panel">
+            <div data-st="colhead">
+              <span>Avatar</span>
             </div>
             <div className="p-3 flex justify-center">
               <img
@@ -1505,33 +1554,31 @@ const UserProfile = () => {
             </div>
           </div>
 
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Statistics
-              </span>
+          <div data-st="panel">
+            <div data-st="colhead">
+              <span>Statistics</span>
             </div>
-            <ul className="px-3 py-2 space-y-1 text-xs text-gray-300">
+            <ul className="px-3 py-2 space-y-1 text-xs text-[var(--st-text)]">
               {profile.dateRegistered && (
                 <li>
-                  <span className="text-gray-500">Joined:</span>{' '}
+                  <span data-st="meta">Joined:</span>{' '}
                   <Time date={profile.dateRegistered} />
                 </li>
               )}
               {profile.lastSeen && (
                 <li>
-                  <span className="text-gray-500">Last seen:</span>{' '}
+                  <span data-st="meta">Last seen:</span>{' '}
                   <Time date={profile.lastSeen} />
                 </li>
               )}
               {profile.email && (
                 <li className="break-all">
-                  <span className="text-gray-500">Email:</span> {profile.email}
+                  <span data-st="meta">Email:</span> {profile.email}
                 </li>
               )}
               {profile.userRank && (
                 <li>
-                  <span className="text-gray-500">Class:</span>{' '}
+                  <span data-st="meta">Class:</span>{' '}
                   <span style={{ color: profile.userRank.color }}>
                     {profile.userRank.badge ? `${profile.userRank.badge} ` : ''}
                     {profile.userRank.name}
@@ -1541,42 +1588,38 @@ const UserProfile = () => {
               {profile.inviteCount !== null &&
                 profile.inviteCount !== undefined && (
                   <li>
-                    <span className="text-gray-500">Invites:</span>{' '}
-                    {profile.inviteCount}
+                    <span data-st="meta">Invites:</span> {profile.inviteCount}
                   </li>
                 )}
               {profileIsDonor && <li className="text-pink-400">Donor ♥</li>}
               <li>
-                <span className="text-gray-500">Contributed:</span>{' '}
+                <span data-st="meta">Contributed:</span>{' '}
                 {formatByteStat(profileStats.contributed)}
               </li>
               <li>
-                <span className="text-gray-500">Consumed:</span>{' '}
+                <span data-st="meta">Consumed:</span>{' '}
                 {formatByteStat(profileStats.consumed)}
               </li>
               <li>
-                <span className="text-gray-500">Ratio:</span>{' '}
+                <span data-st="meta">Ratio:</span>{' '}
                 {profileStats.ratio ?? 'Hidden'}
               </li>
               <li>
-                <span className="text-gray-500">Buffer:</span>{' '}
+                <span data-st="meta">Buffer:</span>{' '}
                 {formatByteStat(profileStats.buffer)}
               </li>
               {isOwnProfile && myRatioStats && (
                 <>
                   <li>
-                    <span className="text-gray-500">Required ratio:</span>{' '}
+                    <span data-st="meta">Required ratio:</span>{' '}
                     {myRatioStats.requiredRatio.toFixed(3)}
                   </li>
                   <li>
-                    <span className="text-gray-500">Bracket:</span>{' '}
+                    <span data-st="meta">Bracket:</span>{' '}
                     {myRatioStats.bracket.label}
                   </li>
                   <li>
-                    <Link
-                      to="/private/ratio"
-                      className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                    >
+                    <Link to="/private/ratio" data-st="control">
                       Ratio rules →
                     </Link>
                   </li>
@@ -1586,53 +1629,65 @@ const UserProfile = () => {
           </div>
 
           {communityStats && (
-            <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  Reputation
-                </span>
+            <div data-st="panel">
+              <div data-st="colhead">
+                <span>Reputation</span>
               </div>
-              <div className="px-3 py-2 border-b border-gray-800">
-                <div className="text-gray-500 text-xs uppercase tracking-wide">
+              <div className="px-3 py-2 border-b border-[var(--st-border-subtle)]">
+                <div className="text-[var(--st-text-muted)] text-xs uppercase tracking-wide">
                   Community Reputation Score
                 </div>
-                <div className="mt-0.5 text-lg font-semibold text-indigo-300">
+                <div
+                  data-st="prose"
+                  data-st-strong
+                  className="mt-0.5 text-lg font-semibold text-[var(--st-link)]"
+                >
                   {communityStats.reputation.score.toFixed(2)}
                 </div>
               </div>
-              <ul className="divide-y divide-gray-800 text-xs">
+              <ul className="divide-y divide-[var(--st-border-subtle)] text-xs">
                 {communityStats.reputation.dimensions.map((dim) => (
                   <li
                     key={dim.name}
                     className="flex items-center justify-between px-3 py-1.5"
                   >
-                    <span className="capitalize text-gray-400">{dim.name}</span>
-                    <span className="text-gray-300">
+                    <span className="capitalize text-[var(--st-text-muted)]">
+                      {dim.name}
+                    </span>
+                    <span className="text-[var(--st-text)]">
                       {dim.subScore.toFixed(2)}
-                      <span className="text-gray-600 ml-1">
+                      <span className="text-[var(--st-text-faint)] ml-1">
                         (×wt {dim.weighted.toFixed(2)})
                       </span>
                     </span>
                   </li>
                 ))}
               </ul>
-              <div className="grid gap-px bg-gray-800 grid-cols-2 border-t border-gray-800">
-                <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
-                  <div className="text-gray-500 uppercase tracking-wide">
+              <div className="grid gap-px bg-[var(--st-border)] grid-cols-2 border-t border-[var(--st-border-subtle)]">
+                <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
+                  <div data-st="meta" className="uppercase tracking-wide">
                     Friends
                   </div>
-                  <div className="mt-0.5 text-sm text-white">
+                  <div
+                    data-st="prose"
+                    data-st-strong
+                    className="mt-0.5 text-sm"
+                  >
                     {communityStats.friends}
                   </div>
                 </div>
-                <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
-                  <div className="text-gray-500 uppercase tracking-wide">
+                <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
+                  <div data-st="meta" className="uppercase tracking-wide">
                     Invites
                   </div>
-                  <div className="mt-0.5 text-sm text-white">
+                  <div
+                    data-st="prose"
+                    data-st-strong
+                    className="mt-0.5 text-sm"
+                  >
                     {communityStats.invites.direct} direct /{' '}
                     {communityStats.invites.total} total
-                    <span className="text-gray-500">
+                    <span data-st="meta">
                       {' '}
                       (depth {communityStats.invites.depth})
                     </span>
@@ -1642,74 +1697,77 @@ const UserProfile = () => {
             </div>
           )}
 
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Activity
-              </span>
+          <div data-st="panel">
+            <div data-st="colhead">
+              <span>Activity</span>
             </div>
-            <div className="grid gap-px bg-gray-800 grid-cols-1">
-              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
-                <div className="text-gray-500 uppercase tracking-wide">
+            <div className="grid gap-px bg-[var(--st-border)] grid-cols-1">
+              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
+                <div data-st="meta" className="uppercase tracking-wide">
                   Contributions
                 </div>
-                <div className="mt-0.5 text-sm text-white">
+                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
                   {activitySummary.contributions}
                 </div>
               </div>
-              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
-                <div className="text-gray-500 uppercase tracking-wide">
+              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
+                <div data-st="meta" className="uppercase tracking-wide">
                   Requests
                 </div>
-                <div className="mt-0.5 text-sm text-white">
+                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
                   {activitySummary.requestsCreated} created /{' '}
                   {activitySummary.requestsFilled} filled
                 </div>
               </div>
-              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
-                <div className="text-gray-500 uppercase tracking-wide">
+              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
+                <div data-st="meta" className="uppercase tracking-wide">
                   Forums
                 </div>
-                <div className="mt-0.5 text-sm text-white">
+                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
                   {activitySummary.forumTopics} topics /{' '}
                   {activitySummary.forumPosts} posts
                 </div>
               </div>
-              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
-                <div className="text-gray-500 uppercase tracking-wide">
+              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
+                <div data-st="meta" className="uppercase tracking-wide">
                   Collections
                 </div>
-                <div className="mt-0.5 text-sm text-white">
+                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
                   {activitySummary.collagesStarted} collages
                 </div>
               </div>
-              <div className="bg-gray-900 px-3 py-2 text-xs text-gray-300">
-                <div className="text-gray-500 uppercase tracking-wide">
+              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
+                <div data-st="meta" className="uppercase tracking-wide">
                   Comments
                 </div>
-                <div className="mt-0.5 text-sm text-white">
+                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
                   {activitySummary.comments}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Percentile Rankings
-              </span>
+          <div data-st="panel">
+            <div data-st="colhead">
+              <span>Percentile Rankings</span>
             </div>
-            <div className="grid gap-px bg-gray-800 grid-cols-1">
+            <div className="grid gap-px bg-[var(--st-border)] grid-cols-1">
               {percentileItems.map(({ label, value }) => (
-                <div key={label} className="bg-gray-900 px-3 py-2">
-                  <div className="text-xs uppercase tracking-wide text-gray-500">
+                <div key={label} className="bg-[var(--st-panel)] px-3 py-2">
+                  <div
+                    data-st="meta"
+                    className="text-xs uppercase tracking-wide"
+                  >
                     {label}
                   </div>
-                  <div className="mt-0.5 text-sm font-semibold text-white">
+                  <div
+                    data-st="prose"
+                    data-st-strong
+                    className="mt-0.5 text-sm font-semibold"
+                  >
                     {formatPercentile(value.percentile)}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div data-st="meta" className="text-xs">
                     #{value.rank} of {value.total}
                   </div>
                 </div>
