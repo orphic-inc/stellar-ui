@@ -148,7 +148,10 @@ table in one surface — first to migrate native checkboxes/radios, which carry
 `field` for its `accent-color`; the box rules are inert on an `appearance:auto`
 control), `UserProfile` (the public profile + staff panel — proved the WS7
 `chip`/`control` status modifiers; the donor-presentation block keeps its pink
-brand flair by design, not migrated).
+brand flair by design, not migrated), the **settings forms** (`Settings` +
+`DonorSettingsTab` + `IrcNickSettings` — tabbed `panel`/`field`/`control`/`meta`
+forms; tab buttons paint from token utilities, not a Role; locked donor perks
+stay `field`/`meta` and just dim via `opacity`).
 
 ## Types
 

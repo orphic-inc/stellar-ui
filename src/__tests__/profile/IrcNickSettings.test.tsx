@@ -53,4 +53,18 @@ describe('IrcNickSettings', () => {
     renderWithProviders(<IrcNickSettings userId={42} />);
     expect(screen.getByRole('button', { name: 'Link nick' })).toBeDisabled();
   });
+
+  it('paints from the data-st panel/field/control contract', () => {
+    const { container } = renderWithProviders(<IrcNickSettings userId={42} />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('label[data-st="meta"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
 });

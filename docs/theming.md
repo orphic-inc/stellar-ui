@@ -75,6 +75,8 @@ The learnable core. Each means the same thing on every page; styling it once re-
 
 > **Added in WS7 (user profile + staff panel):** **status modifiers** on `chip` and `control` — `-warning` / `-success` / `-info` (and `-danger`, which `control` already had as a text-link hue). They paint from the existing `--st-warning/success/info/danger` status tokens, so **no new tokens** were minted; the growth is two Roles gaining modifiers, justified like prose/control in WS4 by a real surface that encodes meaning in colour. A `chip` carries the hue for a ticket status / account state; a filled `control -primary` swaps its fill to the status hue (Warn = warning, Enable = success, Disable = danger) via a `--st-fill` var the modifier retargets — the `-primary` base rules still paint, so the model stays compositional. The `-danger` text-link rule is now `:not([data-st-primary])` so a filled danger button keeps its strong label. `UserProfile` migrated end-to-end on this (panel/colhead/row/grid/field/control/chip/prose/meta); its **donor-presentation block keeps its pink brand flair** unmigrated by design (user-customised flair, not app chrome). `global.css` matches this.
 
+> **Applied in WS8 (settings forms):** `Settings` + `DonorSettingsTab` + `IrcNickSettings` migrated with **no new Roles or tokens** — three tabbed forms built from `panel`/`field`/`control`(`-primary`/`-danger`)/`meta`/`prose`. Two patterns worth recording: (1) the **tab strip** is not a Role — its active/inactive border + text paint from token utilities (`border-[var(--st-accent)]`, `text-[var(--st-text-muted)]`, …) keyed off `activeTab`, the same leaf-color escape hatch §3.2 allows where no Role spans the element; using `control` would fight the Role's own color. (2) DonorSettingsTab's **locked perks** keep `field`/`meta` (so they theme) and signal the locked state with `opacity`/`cursor-not-allowed` layout utilities, not a dimmer color — the shared `inputClass`/`labelClass`/`lockedClass` consts were reduced to layout-only and the paint moved to per-site `data-st` hooks. The IRC verification callout decomposes to a neutral `panel` (it carried an indigo info tint that doesn't theme).
+
 ### 3.3 Tier-2 Parts — scoped inside a Role, must earn their place
 
 A Part is justified **only** when no composition of Tier-1 Roles expresses the structure. Each Part names the Role it lives in.
@@ -144,7 +146,7 @@ Each is independently grabbable; clear context between them.
 
 1. **Collage** (WS2 pilot — validate the contract).
 2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.) _Done: `ReleaseBrowsePage` (the release listing) — WS6; `RandomLinks` is the only other `search/` surface._
-3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings / invite / ratio surfaces remain._
+3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings forms (`Settings` + `DonorSettingsTab` + `IrcNickSettings`) — WS8; invite / ratio surfaces remain._
 4. **App chrome** — Navbar, Sidebar, UserMenu.
 5. **Long tail** — admin/staff pages last (least theme-facing).
 

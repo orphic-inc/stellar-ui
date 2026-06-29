@@ -48,11 +48,15 @@ const IrcNickSettings = ({ userId }: { userId: number }) => {
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 p-5">
-      <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider mb-2">
+    <div data-st="panel" className="p-5">
+      <h3
+        data-st="prose"
+        data-st-strong
+        className="text-sm uppercase tracking-wider mb-2"
+      >
         IRC Nick
       </h3>
-      <p className="text-sm text-gray-400 mb-4">
+      <p data-st="meta" className="text-sm mb-4">
         Link a verified IRC nick. Setting a nick issues a one-time code you
         prove from that nick on IRC — it does not bind the nick until you
         verify.
@@ -61,7 +65,8 @@ const IrcNickSettings = ({ userId }: { userId: number }) => {
         <div>
           <label
             htmlFor="irc-nick"
-            className="block text-sm text-gray-300 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             IRC nick
           </label>
@@ -72,14 +77,17 @@ const IrcNickSettings = ({ userId }: { userId: number }) => {
             onChange={(e) => setNick(e.target.value)}
             maxLength={30}
             placeholder="your_irc_nick"
-            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            data-st="field"
+            className="w-full"
           />
         </div>
         <div className="flex gap-2">
           <button
             type="submit"
             disabled={isLoading || !nick.trim()}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm rounded-lg transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             {isLoading ? 'Linking…' : 'Link nick'}
           </button>
@@ -87,14 +95,15 @@ const IrcNickSettings = ({ userId }: { userId: number }) => {
             type="button"
             onClick={handleClear}
             disabled={isLoading}
-            className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+            data-st="control"
+            className="text-sm"
           >
             Clear IRC nick
           </button>
         </div>
       </form>
       {instructions && (
-        <div className="mt-4 rounded border border-indigo-700/50 bg-indigo-950/30 p-3 text-sm text-indigo-200">
+        <div data-st="panel" className="mt-4 p-3 text-sm text-[var(--st-text)]">
           {instructions}
         </div>
       )}

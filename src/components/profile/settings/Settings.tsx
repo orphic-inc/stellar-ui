@@ -163,24 +163,27 @@ const Settings = () => {
   const tabClass = (tab: Tab) =>
     `px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
       activeTab === tab
-        ? 'border-indigo-500 text-white'
-        : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
+        ? 'border-[var(--st-accent)] text-[var(--st-text-strong)]'
+        : 'border-transparent text-[var(--st-text-muted)] hover:text-[var(--st-text)] hover:border-[var(--st-border-strong)]'
     }`;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-white">Settings</h2>
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          Settings
+        </h2>
         <Link
           to={`/private/user/${currentUser?.id}`}
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+          data-st="control"
+          className="text-sm"
         >
           View profile
         </Link>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-700 mb-6 flex">
+      <div className="border-b border-[var(--st-border)] mb-6 flex">
         <button
           className={tabClass('appearance')}
           onClick={() => setActiveTab('appearance')}
@@ -212,15 +215,20 @@ const Settings = () => {
       {/* Appearance tab */}
       {activeTab === 'appearance' && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider">
+          <div data-st="panel" className="p-5 space-y-4">
+            <h3
+              data-st="prose"
+              data-st-strong
+              className="text-sm uppercase tracking-wider"
+            >
               Appearance
             </h3>
 
             <div>
               <label
                 htmlFor="settings-avatar"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Avatar URL
               </label>
@@ -228,14 +236,16 @@ const Settings = () => {
                 id="settings-avatar"
                 type="text"
                 {...register('avatar')}
-                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                data-st="field"
+                className="w-full"
               />
             </div>
 
             <div>
               <label
                 htmlFor="settings-avatar-mouseover"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Avatar mouseover text
               </label>
@@ -243,14 +253,16 @@ const Settings = () => {
                 id="settings-avatar-mouseover"
                 type="text"
                 {...register('avatarMouseoverText')}
-                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                data-st="field"
+                className="w-full"
               />
             </div>
 
             <div>
               <label
                 htmlFor="settings-profile-title"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Profile title
               </label>
@@ -258,14 +270,16 @@ const Settings = () => {
                 id="settings-profile-title"
                 type="text"
                 {...register('profileTitle')}
-                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                data-st="field"
+                className="w-full"
               />
             </div>
 
             <div>
               <label
                 htmlFor="settings-profile-info"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Profile bio
               </label>
@@ -273,21 +287,24 @@ const Settings = () => {
                 id="settings-profile-info"
                 rows={8}
                 {...register('profileInfo')}
-                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                data-st="field"
+                className="w-full"
               />
             </div>
 
             <div>
               <label
                 htmlFor="settings-site-appearance"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Stylesheet
               </label>
               <select
                 id="settings-site-appearance"
                 {...register('siteAppearance')}
-                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                data-st="field"
+                className="w-full"
               >
                 {stylesheets?.map((s) => (
                   <option key={s.name} value={s.name}>
@@ -303,7 +320,8 @@ const Settings = () => {
             <div>
               <label
                 htmlFor="settings-stylesheet"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Custom stylesheet URL
               </label>
@@ -311,9 +329,10 @@ const Settings = () => {
                 id="settings-stylesheet"
                 type="text"
                 {...register('externalStylesheet')}
-                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                data-st="field"
+                className="w-full"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p data-st="meta" className="text-xs mt-1">
                 If set, this URL overrides the selected stylesheet above.
               </p>
             </div>
@@ -323,9 +342,13 @@ const Settings = () => {
                 type="checkbox"
                 id="styledTooltips"
                 {...register('styledTooltips')}
-                className="accent-indigo-500"
+                data-st="field"
               />
-              <label htmlFor="styledTooltips" className="text-sm text-gray-300">
+              <label
+                htmlFor="styledTooltips"
+                data-st="meta"
+                className="text-sm"
+              >
                 Styled tooltips
               </label>
             </div>
@@ -334,7 +357,9 @@ const Settings = () => {
           <button
             type="submit"
             disabled={isSaving}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+            data-st="control"
+            data-st-primary
+            className="w-full text-sm"
           >
             {isSaving ? 'Saving…' : 'Save settings'}
           </button>
@@ -344,13 +369,19 @@ const Settings = () => {
       {/* Privacy tab */}
       {activeTab === 'privacy' && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 space-y-5">
-            <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider">
+          <div data-st="panel" className="p-5 space-y-5">
+            <h3
+              data-st="prose"
+              data-st-strong
+              className="text-sm uppercase tracking-wider"
+            >
               Privacy
             </h3>
 
             <div>
-              <p className="block text-sm text-gray-300 mb-2">Paranoia level</p>
+              <p data-st="meta" className="block text-sm mb-2">
+                Paranoia level
+              </p>
               <div className="space-y-2">
                 {([0, 1, 2, 3] as const).map((level) => (
                   <label
@@ -362,10 +393,11 @@ const Settings = () => {
                       value={String(level)}
                       checked={paranoiaValue === level}
                       onChange={() => setValue('paranoia', level)}
-                      className="mt-0.5 accent-indigo-500"
+                      data-st="field"
+                      className="mt-0.5"
                     />
-                    <span className="text-sm text-gray-300">
-                      <span className="font-medium text-white mr-1">
+                    <span data-st="prose" className="text-sm">
+                      <span data-st="prose" data-st-strong className="mr-1">
                         Level {level}:
                       </span>
                       {PARANOIA_LABELS[level]}
@@ -373,7 +405,7 @@ const Settings = () => {
                   </label>
                 ))}
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p data-st="meta" className="text-xs mt-2">
                 Current: Level {paranoiaValue} —{' '}
                 {PARANOIA_LABELS[paranoiaValue] ?? ''}
               </p>
@@ -382,14 +414,16 @@ const Settings = () => {
             <div>
               <label
                 htmlFor="notificationMethod"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Notification method
               </label>
               <select
                 id="notificationMethod"
                 {...register('notificationMethod')}
-                className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                data-st="field"
+                className="w-full"
               >
                 {NOTIFICATION_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -397,7 +431,7 @@ const Settings = () => {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-600 mt-1">
+              <p data-st="meta" className="text-xs mt-1">
                 Controls how account notifications are delivered. Defaults to
                 Traditional (on-site notifications list).
               </p>
@@ -407,7 +441,9 @@ const Settings = () => {
           <button
             type="submit"
             disabled={isSaving}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+            data-st="control"
+            data-st-primary
+            className="w-full text-sm"
           >
             {isSaving ? 'Saving…' : 'Save settings'}
           </button>
@@ -422,15 +458,20 @@ const Settings = () => {
         <div className="space-y-6">
           {currentUser && <IrcNickSettings userId={currentUser.id} />}
           {/* Change password */}
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-5">
-            <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider mb-4">
+          <div data-st="panel" className="p-5">
+            <h3
+              data-st="prose"
+              data-st-strong
+              className="text-sm uppercase tracking-wider mb-4"
+            >
               Change Password
             </h3>
             <form onSubmit={handlePasswordChange} className="space-y-3">
               <div>
                 <label
                   htmlFor="pw-current"
-                  className="block text-sm text-gray-300 mb-1"
+                  data-st="meta"
+                  className="block text-sm mb-1"
                 >
                   Current password
                 </label>
@@ -445,13 +486,15 @@ const Settings = () => {
                     }))
                   }
                   required
-                  className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
+                  className="w-full"
                 />
               </div>
               <div>
                 <label
                   htmlFor="pw-new"
-                  className="block text-sm text-gray-300 mb-1"
+                  data-st="meta"
+                  className="block text-sm mb-1"
                 >
                   New password
                 </label>
@@ -464,13 +507,15 @@ const Settings = () => {
                   }
                   required
                   minLength={8}
-                  className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
+                  className="w-full"
                 />
               </div>
               <div>
                 <label
                   htmlFor="pw-confirm"
-                  className="block text-sm text-gray-300 mb-1"
+                  data-st="meta"
+                  className="block text-sm mb-1"
                 >
                   Confirm new password
                 </label>
@@ -486,13 +531,16 @@ const Settings = () => {
                   }
                   required
                   minLength={8}
-                  className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
+                  className="w-full"
                 />
               </div>
               <button
                 type="submit"
                 disabled={isChangingPw}
-                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                data-st="control"
+                data-st-primary
+                className="text-sm"
               >
                 {isChangingPw ? 'Saving…' : 'Change Password'}
               </button>
@@ -500,15 +548,20 @@ const Settings = () => {
           </div>
 
           {/* Change email */}
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-5">
-            <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider mb-4">
+          <div data-st="panel" className="p-5">
+            <h3
+              data-st="prose"
+              data-st-strong
+              className="text-sm uppercase tracking-wider mb-4"
+            >
               Change Email
             </h3>
             <form onSubmit={handleEmailChange} className="space-y-3">
               <div>
                 <label
                   htmlFor="email-new"
-                  className="block text-sm text-gray-300 mb-1"
+                  data-st="meta"
+                  className="block text-sm mb-1"
                 >
                   New email address
                 </label>
@@ -520,13 +573,15 @@ const Settings = () => {
                     setEmailForm((f) => ({ ...f, newEmail: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
+                  className="w-full"
                 />
               </div>
               <div>
                 <label
                   htmlFor="email-pw-confirm"
-                  className="block text-sm text-gray-300 mb-1"
+                  data-st="meta"
+                  className="block text-sm mb-1"
                 >
                   Current password (to confirm)
                 </label>
@@ -538,13 +593,16 @@ const Settings = () => {
                     setEmailForm((f) => ({ ...f, password: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
+                  className="w-full"
                 />
               </div>
               <button
                 type="submit"
                 disabled={isChangingEmail}
-                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+                data-st="control"
+                data-st-primary
+                className="text-sm"
               >
                 {isChangingEmail ? 'Saving…' : 'Change Email'}
               </button>
@@ -552,8 +610,12 @@ const Settings = () => {
           </div>
 
           {/* Active sessions */}
-          <div className="bg-gray-800 rounded-lg border border-gray-700 p-5">
-            <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider mb-4">
+          <div data-st="panel" className="p-5">
+            <h3
+              data-st="prose"
+              data-st-strong
+              className="text-sm uppercase tracking-wider mb-4"
+            >
               Active Sessions
             </h3>
             {sessionsLoading ? (
@@ -563,18 +625,22 @@ const Settings = () => {
                 {sessions.map((session) => (
                   <div
                     key={session.id}
-                    className="flex items-start justify-between gap-4 p-3 bg-gray-900 rounded-lg border border-gray-700"
+                    data-st="panel"
+                    className="flex items-start justify-between gap-4 p-3"
                   >
-                    <div className="text-xs text-gray-300 space-y-0.5 min-w-0">
-                      <div className="font-medium text-gray-200 truncate">
+                    <div
+                      data-st="prose"
+                      className="text-xs space-y-0.5 min-w-0"
+                    >
+                      <div data-st="prose" data-st-strong className="truncate">
                         {session.userAgent}
                         {session.isCurrent && (
-                          <span className="ml-2 text-green-400 font-semibold">
+                          <span className="ml-2 font-semibold text-[var(--st-success)]">
                             (this session)
                           </span>
                         )}
                       </div>
-                      <div className="text-gray-500">
+                      <div data-st="meta">
                         IP: {session.ipAddress} · Last active:{' '}
                         {new Date(session.lastActiveAt).toLocaleString()}
                       </div>
@@ -582,7 +648,9 @@ const Settings = () => {
                     {!session.isCurrent && (
                       <button
                         onClick={() => handleRevokeSession(session.id)}
-                        className="shrink-0 text-xs text-red-500 hover:text-red-400 border border-red-800 hover:border-red-600 px-2 py-1 rounded transition-colors"
+                        data-st="control"
+                        data-st-danger
+                        className="shrink-0 text-xs"
                       >
                         Revoke
                       </button>
@@ -591,7 +659,9 @@ const Settings = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No active sessions found.</p>
+              <p data-st="meta" className="text-sm">
+                No active sessions found.
+              </p>
             )}
           </div>
         </div>

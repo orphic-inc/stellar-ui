@@ -125,6 +125,23 @@ describe('Settings', () => {
     expect(screen.getByLabelText(/profile bio/i)).toBeInTheDocument();
   });
 
+  it('paints the appearance form from the data-st panel/field/control contract', () => {
+    const { container } = renderWithProviders(<Settings />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('label[data-st="meta"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
+
   it('switches to privacy tab and shows paranoia options', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Settings />);

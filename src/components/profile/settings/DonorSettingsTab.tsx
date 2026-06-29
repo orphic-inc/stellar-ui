@@ -9,13 +9,14 @@ import { addAlert } from '../../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
 import Spinner from '../../layout/Spinner';
 
-const inputClass =
-  'w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
-const labelClass = 'block text-sm text-gray-300 mb-1';
-const lockedClass = 'block text-sm text-gray-600 mb-1 cursor-not-allowed';
+// Layout-only now; the paint comes from `data-st="field"` / `data-st="meta"` on
+// each site. Locked variants just dim + flag not-allowed; the token color stays.
+const inputClass = 'w-full';
+const labelClass = 'block text-sm mb-1';
+const lockedClass = 'block text-sm mb-1 cursor-not-allowed opacity-50';
 
 const LockedNote = () => (
-  <p className="text-xs text-gray-600 mt-1">
+  <p data-st="meta" className="text-xs mt-1">
     Not included in your current donor rank.
   </p>
 );
@@ -125,9 +126,14 @@ const DonorSettingsTab = () => {
     <div className="space-y-6">
       <form
         onSubmit={handleSaveRewards}
-        className="bg-gray-800 rounded-lg border border-gray-700 p-5 space-y-5"
+        data-st="panel"
+        className="p-5 space-y-5"
       >
-        <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider">
+        <h3
+          data-st="prose"
+          data-st-strong
+          className="text-sm uppercase tracking-wider"
+        >
           Donor Rewards
         </h3>
 
@@ -136,6 +142,7 @@ const DonorSettingsTab = () => {
           <div>
             <label
               htmlFor="donor-custom-icon"
+              data-st="meta"
               className={perks.customIcon ? labelClass : lockedClass}
             >
               Custom icon URL
@@ -143,6 +150,7 @@ const DonorSettingsTab = () => {
             <input
               id="donor-custom-icon"
               type="text"
+              data-st="field"
               value={customIcon}
               onChange={(e) => setCustomIcon(e.target.value)}
               disabled={!perks.customIcon}
@@ -155,6 +163,7 @@ const DonorSettingsTab = () => {
           <div>
             <label
               htmlFor="donor-custom-icon-link"
+              data-st="meta"
               className={perks.customIconLink ? labelClass : lockedClass}
             >
               Custom icon link URL
@@ -162,6 +171,7 @@ const DonorSettingsTab = () => {
             <input
               id="donor-custom-icon-link"
               type="text"
+              data-st="field"
               value={customIconLink}
               onChange={(e) => setCustomIconLink(e.target.value)}
               disabled={!perks.customIconLink}
@@ -176,6 +186,7 @@ const DonorSettingsTab = () => {
           <div>
             <label
               htmlFor="donor-icon-mouseover"
+              data-st="meta"
               className={perks.iconMouseOverText ? labelClass : lockedClass}
             >
               Icon mouseover text
@@ -183,6 +194,7 @@ const DonorSettingsTab = () => {
             <input
               id="donor-icon-mouseover"
               type="text"
+              data-st="field"
               value={iconMouseOverText}
               onChange={(e) => setIconMouseOverText(e.target.value)}
               disabled={!perks.iconMouseOverText}
@@ -199,6 +211,7 @@ const DonorSettingsTab = () => {
         <div>
           <label
             htmlFor="donor-second-avatar"
+            data-st="meta"
             className={perks.secondAvatar ? labelClass : lockedClass}
           >
             Second (donor) avatar URL
@@ -206,6 +219,7 @@ const DonorSettingsTab = () => {
           <input
             id="donor-second-avatar"
             type="text"
+            data-st="field"
             value={secondAvatar}
             onChange={(e) => setSecondAvatar(e.target.value)}
             disabled={!perks.secondAvatar}
@@ -219,6 +233,7 @@ const DonorSettingsTab = () => {
         <div>
           <label
             htmlFor="donor-avatar-mouseover"
+            data-st="meta"
             className={perks.avatarMouseOverText ? labelClass : lockedClass}
           >
             Avatar mouseover text
@@ -226,6 +241,7 @@ const DonorSettingsTab = () => {
           <input
             id="donor-avatar-mouseover"
             type="text"
+            data-st="field"
             value={avatarMouseOverText}
             onChange={(e) => setAvatarMouseOverText(e.target.value)}
             disabled={!perks.avatarMouseOverText}
@@ -268,15 +284,12 @@ const DonorSettingsTab = () => {
           return (
             <div key={n} className="space-y-2">
               <p
-                className={
-                  locked ? 'text-sm text-gray-600' : 'text-sm text-gray-300'
-                }
+                data-st="meta"
+                className={locked ? 'text-sm opacity-50' : 'text-sm'}
               >
                 Profile info block {n}
                 {locked && (
-                  <span className="ml-2 text-xs text-gray-600">
-                    (not in your rank)
-                  </span>
+                  <span className="ml-2 text-xs">(not in your rank)</span>
                 )}
               </p>
               <input
@@ -286,6 +299,7 @@ const DonorSettingsTab = () => {
                 disabled={locked}
                 placeholder="Title (optional)"
                 maxLength={128}
+                data-st="field"
                 className={inputClass + (locked ? ' opacity-40' : '')}
               />
               <textarea
@@ -295,6 +309,7 @@ const DonorSettingsTab = () => {
                 placeholder="Body…"
                 maxLength={5000}
                 rows={3}
+                data-st="field"
                 className={inputClass + (locked ? ' opacity-40' : '')}
               />
             </div>
@@ -304,7 +319,9 @@ const DonorSettingsTab = () => {
         <button
           type="submit"
           disabled={isSavingRewards}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+          data-st="control"
+          data-st-primary
+          className="w-full text-sm"
         >
           {isSavingRewards ? 'Saving…' : 'Save donor settings'}
         </button>
@@ -313,12 +330,20 @@ const DonorSettingsTab = () => {
       {/* Forum title */}
       <form
         onSubmit={handleSaveTitle}
-        className="bg-gray-800 rounded-lg border border-gray-700 p-5 space-y-4"
+        data-st="panel"
+        className="p-5 space-y-4"
       >
-        <h3 className="text-sm font-semibold text-gray-200 uppercase tracking-wider">
+        <h3
+          data-st="prose"
+          data-st-strong
+          className="text-sm uppercase tracking-wider"
+        >
           Forum Title
           {!perks.forumTitle && (
-            <span className="ml-2 text-xs text-gray-600 font-normal normal-case">
+            <span
+              data-st="meta"
+              className="ml-2 text-xs font-normal normal-case"
+            >
               — not in your current rank
             </span>
           )}
@@ -328,6 +353,7 @@ const DonorSettingsTab = () => {
           <div>
             <label
               htmlFor="donor-title-prefix"
+              data-st="meta"
               className={perks.forumTitle ? labelClass : lockedClass}
             >
               Prefix
@@ -335,6 +361,7 @@ const DonorSettingsTab = () => {
             <input
               id="donor-title-prefix"
               type="text"
+              data-st="field"
               value={titlePrefix}
               onChange={(e) => setTitlePrefix(e.target.value)}
               disabled={!perks.forumTitle}
@@ -345,6 +372,7 @@ const DonorSettingsTab = () => {
           <div>
             <label
               htmlFor="donor-title-suffix"
+              data-st="meta"
               className={perks.forumTitle ? labelClass : lockedClass}
             >
               Suffix
@@ -352,6 +380,7 @@ const DonorSettingsTab = () => {
             <input
               id="donor-title-suffix"
               type="text"
+              data-st="field"
               value={titleSuffix}
               onChange={(e) => setTitleSuffix(e.target.value)}
               disabled={!perks.forumTitle}
@@ -367,12 +396,12 @@ const DonorSettingsTab = () => {
             checked={titleUseComma}
             onChange={(e) => setTitleUseComma(e.target.checked)}
             disabled={!perks.forumTitle}
-            className="accent-indigo-500 disabled:opacity-40"
+            data-st="field"
+            className="disabled:opacity-40"
           />
           <span
-            className={`text-sm ${
-              perks.forumTitle ? 'text-gray-300' : 'text-gray-600'
-            }`}
+            data-st="meta"
+            className={`text-sm ${perks.forumTitle ? '' : 'opacity-50'}`}
           >
             Separate prefix/suffix with comma
           </span>
@@ -381,7 +410,9 @@ const DonorSettingsTab = () => {
         <button
           type="submit"
           disabled={isSavingTitle || !perks.forumTitle}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+          data-st="control"
+          data-st-primary
+          className="w-full text-sm"
         >
           {isSavingTitle ? 'Saving…' : 'Save forum title'}
         </button>
