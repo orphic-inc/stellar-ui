@@ -15,8 +15,8 @@ const PublicLayout = ({ children }: Props) => {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
-      <header className="border-b border-gray-800 bg-gray-900">
+    <div className="min-h-screen bg-[var(--st-backdrop)] text-[var(--st-text)] flex flex-col">
+      <header className="border-b border-[var(--st-border-subtle)] bg-[var(--st-base)]">
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link
             to="/"
@@ -32,15 +32,12 @@ const PublicLayout = ({ children }: Props) => {
           <nav className="flex items-center gap-4 text-sm">
             <Link
               to="/login"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-[var(--st-text-muted)] hover:text-[var(--st-text-strong)] transition-colors"
             >
               Login
             </Link>
             {installStatus?.registrationStatus === 'open' && (
-              <Link
-                to="/register"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors"
-              >
+              <Link to="/register" data-st="control" data-st-primary>
                 Register
               </Link>
             )}
@@ -51,7 +48,7 @@ const PublicLayout = ({ children }: Props) => {
       <main className="flex-1 flex items-center justify-center p-6">
         {children}
       </main>
-      <footer className="text-center text-xs text-gray-600 py-4 border-t border-gray-800">
+      <footer className="text-center text-xs text-[var(--st-text-faint)] py-4 border-t border-[var(--st-border-subtle)]">
         © {new Date().getFullYear()} Stellar
       </footer>
     </div>

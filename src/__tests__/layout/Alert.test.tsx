@@ -54,4 +54,12 @@ describe('Alert', () => {
     renderWithProviders(<Alert />, { store });
     expect(screen.getByText('Unknown type')).toBeInTheDocument();
   });
+
+  it('paints status from the --st-* tokens (data-st contract)', () => {
+    const store = createTestStore();
+    store.dispatch(addAlert('Saved successfully!', 'success'));
+    renderWithProviders(<Alert />, { store });
+    const banner = screen.getByText('Saved successfully!').closest('div');
+    expect(banner?.className).toContain('text-[var(--st-success)]');
+  });
 });

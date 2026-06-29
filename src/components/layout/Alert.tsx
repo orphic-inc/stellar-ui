@@ -2,11 +2,17 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAlerts, removeAlert } from '../../store/slices/alertSlice';
 
+// Status-colour-without-chip (WS10 banner recipe): a toast is a full-width
+// notice, not a chip/control, so it paints straight from the --st-* status
+// tokens via leaf utilities (12% fill / 40% border / solid text) so it themes.
 const TYPE_CLASSES: Record<string, string> = {
-  success: 'bg-green-900/60 border-green-700 text-green-300',
-  danger: 'bg-red-900/60 border-red-700 text-red-300',
-  warning: 'bg-yellow-900/60 border-yellow-700 text-yellow-300',
-  info: 'bg-blue-900/60 border-blue-700 text-blue-300'
+  success:
+    'bg-[color-mix(in_oklch,var(--st-success)_12%,transparent)] border-[color-mix(in_oklch,var(--st-success)_40%,transparent)] text-[var(--st-success)]',
+  danger:
+    'bg-[color-mix(in_oklch,var(--st-danger)_12%,transparent)] border-[color-mix(in_oklch,var(--st-danger)_40%,transparent)] text-[var(--st-danger)]',
+  warning:
+    'bg-[color-mix(in_oklch,var(--st-warning)_12%,transparent)] border-[color-mix(in_oklch,var(--st-warning)_40%,transparent)] text-[var(--st-warning)]',
+  info: 'bg-[color-mix(in_oklch,var(--st-info)_12%,transparent)] border-[color-mix(in_oklch,var(--st-info)_40%,transparent)] text-[var(--st-info)]'
 };
 
 const Alert = () => {

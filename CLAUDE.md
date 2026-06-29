@@ -171,7 +171,14 @@ primary nav reuses the WS8 tab-strip pattern; `UserMenu`'s padded pills rule
 out `control`, which zeroes padding); the notification dropdown is the
 Role-bearing piece (`panel`/`colhead`/`list`/`row` with `data-st-open` for
 unread, "Mark all read" a `control`, quiet ✕ icons left as faint leaf
-utilities), and `QuickSearch` inputs take `field`).
+utilities), and `QuickSearch` inputs take `field`), and the **app-chrome
+shells/footer/banners** (`PublicLayout` + `PrivateLayout` + `PrivateFooter` +
+`GlobalNoticeBanner` + `Alert` — WS12, completes §7 item 4): shells/footer
+repaint via surface/text leaf utilities, `PublicLayout`'s Register CTA is a
+`control -primary` (no padded-pill conflict), and the notice surfaces
+(`GlobalNoticeBanner` warning banner + `Alert` per-type toast) reuse the WS10
+status-colour-without-chip recipe — `color-mix(... 12%/40%, transparent)` fill +
+border and solid `text-[var(--st-status)]`, since notices aren't chips/controls.
 
 **The UI primitive kit (`src/components/ui/`, ADR-0007).** Above the CSS
 contract sits a small React kit that *emits* it: `PageShell` (page wrapper —

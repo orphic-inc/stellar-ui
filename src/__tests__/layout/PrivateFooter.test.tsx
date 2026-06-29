@@ -30,4 +30,12 @@ describe('PrivateFooter', () => {
       screen.getByText('Powered by Stellar v0.0.0-test')
     ).toBeInTheDocument();
   });
+
+  it('paints from the surface tokens (data-st contract)', () => {
+    mockUseGetVersionQuery.mockReturnValue({ data: undefined });
+    const { container } = renderWithProviders(<PrivateFooter />);
+    expect(container.querySelector('footer')?.className).toContain(
+      'bg-[var(--st-backdrop)]'
+    );
+  });
 });

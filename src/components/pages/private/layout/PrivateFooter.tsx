@@ -7,16 +7,19 @@ const PrivateFooter = () => {
   const version = data?.version ?? __APP_VERSION__;
 
   return (
-    <footer className="bg-gray-950 border-t border-gray-800 mt-12">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col items-center gap-1 text-xs text-gray-500">
+    <footer className="bg-[var(--st-backdrop)] border-t border-[var(--st-border-subtle)] mt-12">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col items-center gap-1 text-xs text-[var(--st-text-faint)]">
         <div className="flex items-center gap-2">
-          <a href="/LICENSE" className="hover:text-gray-300 transition-colors">
+          <a
+            href="/LICENSE"
+            className="hover:text-[var(--st-text)] transition-colors"
+          >
             LICENSE
           </a>
           <span>|</span>
           <a
             href="/CHANGELOG.md"
-            className="hover:text-gray-300 transition-colors"
+            className="hover:text-[var(--st-text)] transition-colors"
           >
             CHANGELOG
           </a>

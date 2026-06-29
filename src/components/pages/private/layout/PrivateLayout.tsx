@@ -34,7 +34,7 @@ const PrivateLayout = ({ children }: Props) => {
   if (!user) return <Navigate to="/login" replace />;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
+    <div className="min-h-screen bg-[var(--st-base)] text-[var(--st-text)] flex flex-col">
       <StylesheetInjector />
       <PrivateHeader user={user} />
       <GlobalNoticeBanner />

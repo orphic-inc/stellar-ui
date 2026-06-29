@@ -109,7 +109,7 @@ describe('PrivateLayout', () => {
       })
     );
 
-    renderWithProviders(
+    const { container } = renderWithProviders(
       <PrivateLayout>
         <div>Child content</div>
       </PrivateLayout>,
@@ -120,6 +120,8 @@ describe('PrivateLayout', () => {
     expect(screen.getByText('Child content')).toBeInTheDocument();
     expect(screen.getByTestId('private-footer')).toBeInTheDocument();
     expect(screen.getByTestId('notification-corner')).toBeInTheDocument();
+    // the shell root paints from the surface token (data-st contract)
+    expect(container.querySelector('[class*="st-base"]')).not.toBeNull();
   });
 
   it('redirects after logout even when getMe still has cached user data', () => {

@@ -18,13 +18,13 @@ const GlobalNoticeBanner = () => {
       {unreadNotices.map((n) => (
         <div
           key={n.id}
-          className="flex items-center justify-between gap-4 bg-amber-900/70 border-b border-amber-700 px-4 py-2 text-sm text-amber-100"
+          className="flex items-center justify-between gap-4 border-b border-[color-mix(in_oklch,var(--st-warning)_40%,transparent)] bg-[color-mix(in_oklch,var(--st-warning)_12%,transparent)] px-4 py-2 text-sm text-[var(--st-warning)]"
         >
           <span>
             {n.source?.url ? (
               <a
                 href={n.source.url}
-                className="underline hover:text-white transition-colors"
+                className="underline hover:text-[var(--st-text-strong)] transition-colors"
               >
                 {n.source.title}
               </a>
@@ -35,7 +35,7 @@ const GlobalNoticeBanner = () => {
           <button
             type="button"
             onClick={() => markRead(n.id)}
-            className="shrink-0 text-amber-300 hover:text-white transition-colors text-xs"
+            className="shrink-0 hover:text-[var(--st-text-strong)] transition-colors text-xs"
             aria-label="Dismiss"
           >
             Dismiss

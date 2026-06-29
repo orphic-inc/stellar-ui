@@ -40,6 +40,11 @@ describe('PublicLayout', () => {
       'href',
       '/register'
     );
+    // Register is the filled CTA control (data-st contract)
+    expect(screen.getByRole('link', { name: 'Register' })).toHaveAttribute(
+      'data-st',
+      'control'
+    );
   });
 
   it('hides the register link when registration is not open', () => {
