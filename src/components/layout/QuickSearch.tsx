@@ -21,7 +21,7 @@ const QuickSearch = () => {
     };
 
   return (
-    <div className="bg-gray-900 border-t border-gray-800/60">
+    <div className="bg-[var(--st-base)] border-t border-[var(--st-border-subtle)]">
       <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center gap-3 overflow-x-auto">
         {ENTITY_INPUTS.map(({ label, path }) => (
           <input
@@ -29,7 +29,8 @@ const QuickSearch = () => {
             type="text"
             onKeyDown={handleKey(path)}
             placeholder={label}
-            className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded px-2 py-0.5 w-24 focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder-gray-500 shrink-0"
+            data-st="field"
+            className="text-xs w-24 shrink-0"
           />
         ))}
       </div>

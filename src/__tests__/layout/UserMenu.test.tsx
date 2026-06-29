@@ -80,6 +80,14 @@ describe('UserMenu', () => {
     });
   });
 
+  it('paints actions from the role tokens (data-st contract)', () => {
+    renderWithProviders(<UserMenu user={mockUser} />);
+    // Logout reddens from the danger token rather than a literal red utility.
+    expect(screen.getByRole('button', { name: /logout/i }).className).toContain(
+      'hover:text-[var(--st-danger)]'
+    );
+  });
+
   it('profile link points to /private/user/jazzfan', () => {
     renderWithProviders(<UserMenu user={mockUser} />);
     expect(screen.getByRole('link', { name: 'jazzfan' })).toHaveAttribute(

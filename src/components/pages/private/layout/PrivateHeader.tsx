@@ -71,7 +71,7 @@ const PrivateHeader = ({ user }: Props) => {
   const ratio = user.ratio != null ? user.ratio.toFixed(2) : '∞';
 
   return (
-    <header className="bg-gray-950 border-b border-gray-800 sticky top-0 z-50">
+    <header className="bg-[var(--st-backdrop)] border-b border-[var(--st-border-subtle)] sticky top-0 z-50">
       {/* Brand + user bar */}
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
         <Link
@@ -89,45 +89,50 @@ const PrivateHeader = ({ user }: Props) => {
       </div>
 
       {/* Stats + quicklinks bar */}
-      <div className="bg-gray-900/60 border-t border-gray-800/60">
-        <div className="max-w-7xl mx-auto px-4 py-1 flex items-center justify-between gap-4 text-xs text-gray-500">
+      <div className="bg-[var(--st-base)] border-t border-[var(--st-border-subtle)]">
+        <div className="max-w-7xl mx-auto px-4 py-1 flex items-center justify-between gap-4 text-xs text-[var(--st-text-faint)]">
           {/* Data stats */}
           <div className="flex items-center gap-4">
             <span>
               Contributed:{' '}
-              <span className="text-gray-300 font-medium">{uploaded}</span>
+              <span className="text-[var(--st-text)] font-medium">
+                {uploaded}
+              </span>
             </span>
             <span>
               Consumed:{' '}
-              <span className="text-gray-300 font-medium">{downloaded}</span>
+              <span className="text-[var(--st-text)] font-medium">
+                {downloaded}
+              </span>
             </span>
             <Link
               to="/private/ratio"
-              className="hover:text-gray-300 transition-colors"
+              className="hover:text-[var(--st-text)] transition-colors"
             >
-              Ratio: <span className="text-gray-300 font-medium">{ratio}</span>
+              Ratio:{' '}
+              <span className="text-[var(--st-text)] font-medium">{ratio}</span>
             </Link>
           </div>
           {/* Quicklinks */}
           <div className="flex items-center gap-3">
             <Link
               to="/private/messages"
-              className="hover:text-gray-200 transition-colors"
+              className="hover:text-[var(--st-text)] transition-colors"
             >
               Inbox
               {inboxUnread > 0 && (
-                <span className="ml-1 bg-indigo-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+                <span className="ml-1 bg-[var(--st-accent)] text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                   {inboxUnread}
                 </span>
               )}
             </Link>
             <Link
               to="/private/messages/tickets"
-              className="hover:text-gray-200 transition-colors"
+              className="hover:text-[var(--st-text)] transition-colors"
             >
               Staff Inbox
               {myTicketUnread > 0 && (
-                <span className="ml-1 bg-amber-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+                <span className="ml-1 bg-[var(--st-warning)] text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                   {myTicketUnread}
                 </span>
               )}
@@ -135,11 +140,11 @@ const PrivateHeader = ({ user }: Props) => {
             {showStaffQueue && (
               <Link
                 to="/private/staff/tickets"
-                className="hover:text-gray-200 transition-colors"
+                className="hover:text-[var(--st-text)] transition-colors"
               >
                 Staff Queue
                 {ticketUnread > 0 && (
-                  <span className="ml-1 bg-amber-600 text-white rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+                  <span className="ml-1 bg-[var(--st-warning)] text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                     {ticketUnread}
                   </span>
                 )}
@@ -147,19 +152,19 @@ const PrivateHeader = ({ user }: Props) => {
             )}
             <Link
               to="/private/contribute/list"
-              className="hover:text-gray-200 transition-colors"
+              className="hover:text-[var(--st-text)] transition-colors"
             >
               Contributions
             </Link>
             <Link
               to="/private/bookmarks"
-              className="hover:text-gray-200 transition-colors"
+              className="hover:text-[var(--st-text)] transition-colors"
             >
               Bookmarks
             </Link>
             <Link
               to="/private/friends"
-              className="hover:text-gray-200 transition-colors"
+              className="hover:text-[var(--st-text)] transition-colors"
             >
               Friends
             </Link>
@@ -168,7 +173,7 @@ const PrivateHeader = ({ user }: Props) => {
       </div>
 
       {/* Primary nav */}
-      <nav className="bg-gray-900 border-t border-gray-800">
+      <nav className="bg-[var(--st-base)] border-t border-[var(--st-border-subtle)]">
         <div className="max-w-7xl mx-auto px-4 flex gap-0.5">
           {navLinks.map(({ label, to, end }) => (
             <NavLink
@@ -178,8 +183,8 @@ const PrivateHeader = ({ user }: Props) => {
               className={({ isActive }) =>
                 `px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                   isActive
-                    ? 'border-indigo-500 text-white'
-                    : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
+                    ? 'border-[var(--st-accent)] text-[var(--st-text-strong)]'
+                    : 'border-transparent text-[var(--st-text-muted)] hover:text-[var(--st-text)] hover:border-[var(--st-border-strong)]'
                 }`
               }
             >

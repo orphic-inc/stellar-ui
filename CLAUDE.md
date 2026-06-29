@@ -164,7 +164,14 @@ label rows; `RatioRulesPage` — prose-heavy page with the bracket reference
 table as `grid`/`colhead`/`row` and the active bracket on `data-st-open`;
 status hues come from the `--st-success/warning/danger` tokens via leaf
 utilities, not chip/control, since these are full-width banners and inline
-values, not chips).
+values, not chips), and the **app-chrome header set** (`PrivateHeader` +
+`UserMenu` + `NotificationCorner` + `QuickSearch` — WS11, §7 item 4): mostly
+token leaf utilities since chrome is structural bars + state-keyed nav (the
+primary nav reuses the WS8 tab-strip pattern; `UserMenu`'s padded pills rule
+out `control`, which zeroes padding); the notification dropdown is the
+Role-bearing piece (`panel`/`colhead`/`list`/`row` with `data-st-open` for
+unread, "Mark all read" a `control`, quiet ✕ icons left as faint leaf
+utilities), and `QuickSearch` inputs take `field`).
 
 **The UI primitive kit (`src/components/ui/`, ADR-0007).** Above the CSS
 contract sits a small React kit that *emits* it: `PageShell` (page wrapper —

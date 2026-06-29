@@ -199,11 +199,11 @@ describe('PrivateHeader', () => {
     expect(screen.queryByText('ModBar')).not.toBeInTheDocument();
   });
 
-  it('NavLink className returns active styles when isActive is true', () => {
+  it('NavLink active state paints from the accent token (data-st contract)', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
     const communityLink = screen.getByRole('link', { name: 'Communities' });
     expect(communityLink.getAttribute('data-active-class')).toContain(
-      'border-indigo-500'
+      'border-[var(--st-accent)]'
     );
   });
 

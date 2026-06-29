@@ -88,6 +88,19 @@ describe('NotificationCorner', () => {
     mockPmCount = 0;
   });
 
+  it('paints the open panel from the data-st contract', async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithProviders(<NotificationCorner />);
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="colhead"]')).toBeInTheDocument();
+    expect(container.querySelector('ul[data-st="list"]')).toBeInTheDocument();
+    // the unread notification row carries the open-accent wash
+    expect(
+      container.querySelector('li[data-st="row"][data-st-open]')
+    ).toBeInTheDocument();
+  });
+
   it('returns null when total count is zero', () => {
     mockUnreadCount = 0;
     mockPmCount = 0;
