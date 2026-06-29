@@ -1,12 +1,15 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../testUtils';
+import userEvent from '@testing-library/user-event';
 import {
   Panel,
   PageShell,
   Button,
   Field,
   DataTable,
+  Badge,
+  Pagination,
   type Column
 } from '../../components/ui';
 
@@ -22,6 +25,13 @@ describe('UI kit — data-st contract', () => {
       const btn = screen.getByRole('button', { name: 'Go' });
       expect(btn).toHaveAttribute('data-st', 'control');
       expect(btn).toHaveAttribute('data-st-primary');
+    });
+
+    it('success is a filled affirmative control', () => {
+      renderWithProviders(<Button variant="success">Record</Button>);
+      const btn = screen.getByRole('button', { name: 'Record' });
+      expect(btn).toHaveAttribute('data-st-primary');
+      expect(btn).toHaveAttribute('data-st-success');
     });
 
     it('danger is a filled destructive control', () => {
@@ -179,6 +189,56 @@ describe('UI kit — data-st contract', () => {
         />
       );
       expect(screen.getByText('Nothing here.')).toBeInTheDocument();
+    });
+  });
+
+  describe('Badge', () => {
+    it('renders the neutral chip by default', () => {
+      renderWithProviders(<Badge>New</Badge>);
+      const chip = screen.getByText('New');
+      expect(chip).toHaveAttribute('data-st', 'chip');
+      expect(chip).not.toHaveAttribute('data-st-danger');
+    });
+
+    it('paints the status hue for a variant', () => {
+      renderWithProviders(<Badge variant="danger">Disabled</Badge>);
+      const chip = screen.getByText('Disabled');
+      expect(chip).toHaveAttribute('data-st', 'chip');
+      expect(chip).toHaveAttribute('data-st-danger');
+    });
+
+    it('renders mono codes', () => {
+      renderWithProviders(<Badge mono>FLAC</Badge>);
+      expect(screen.getByText('FLAC')).toHaveAttribute('data-st-mono');
+    });
+  });
+
+  describe('Pagination', () => {
+    it('renders nothing for a single page', () => {
+      const { container } = renderWithProviders(
+        <Pagination page={1} totalPages={1} onChange={() => {}} />
+      );
+      expect(container).toBeEmptyDOMElement();
+    });
+
+    it('disables Prev on the first page and Next on the last', () => {
+      renderWithProviders(
+        <Pagination page={1} totalPages={3} onChange={() => {}} />
+      );
+      expect(screen.getByRole('button', { name: 'Prev' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+    });
+
+    it('steps the page on Prev/Next', async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      renderWithProviders(
+        <Pagination page={2} totalPages={3} onChange={onChange} />
+      );
+      await user.click(screen.getByRole('button', { name: 'Next' }));
+      expect(onChange).toHaveBeenCalledWith(3);
+      await user.click(screen.getByRole('button', { name: 'Prev' }));
+      expect(onChange).toHaveBeenCalledWith(1);
     });
   });
 });

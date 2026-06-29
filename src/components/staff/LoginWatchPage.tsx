@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetSessionsQuery } from '../../store/services/adminApi';
-import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
+import { PageShell, DataTable, Pagination, Button, type Column } from '../ui';
+
+type Session = NonNullable<
+  ReturnType<typeof useGetSessionsQuery>['data']
+>['data'][number];
 
 const LoginWatchPage = () => {
   const [page, setPage] = useState(1);
@@ -26,144 +30,79 @@ const LoginWatchPage = () => {
     setPage(1);
   };
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-6 space-y-4">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
+  const columns: Column<Session>[] = [
+    {
+      header: 'User',
+      cell: (s) => (
+        <Link to={`/private/user/${s.user.id}`} data-st="control">
+          {s.user.username}
         </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">Login Watch</h2>
-      </div>
+      )
+    },
+    {
+      header: 'IP Address',
+      cell: (s) => s.ipAddress,
+      tdClassName: 'font-mono text-xs'
+    },
+    {
+      header: 'User Agent',
+      cell: (s) => (s.userAgent ? s.userAgent.slice(0, 60) : '—'),
+      tdClassName: 'max-w-xs truncate text-xs'
+    },
+    {
+      header: 'First Seen',
+      cell: (s) => <Time date={s.createdAt} />,
+      tdClassName: 'text-xs'
+    },
+    {
+      header: 'Last Active',
+      cell: (s) => <Time date={s.lastActiveAt} />,
+      tdClassName: 'text-xs'
+    },
+    {
+      header: 'Revoked',
+      cell: (s) => (s.revokedAt ? <Time date={s.revokedAt} /> : '—'),
+      tdClassName: 'text-xs'
+    }
+  ];
 
+  return (
+    <PageShell title="Login Watch" width="2xl" backTo="/private/staff/tools">
       <form onSubmit={handleFilter} className="flex gap-2">
         <input
           type="number"
           value={userIdInput}
           onChange={(e) => setUserIdInput(e.target.value)}
           placeholder="Filter by user ID"
-          className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          data-st="field"
         />
-        <button
-          type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-sm"
-        >
+        <Button type="submit" variant="primary">
           Filter
-        </button>
+        </Button>
         {userId && (
-          <button
-            type="button"
-            onClick={clearFilter}
-            className="text-gray-400 hover:text-white text-sm px-2"
-          >
+          <Button variant="link" onClick={clearFilter}>
             Clear
-          </button>
+          </Button>
         )}
       </form>
 
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        {isLoading ? (
-          <div className="p-6">
-            <Spinner />
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
-                <th className="text-left px-4 py-2 font-semibold">User</th>
-                <th className="text-left px-4 py-2 font-semibold">
-                  IP Address
-                </th>
-                <th className="text-left px-4 py-2 font-semibold">
-                  User Agent
-                </th>
-                <th className="text-left px-4 py-2 font-semibold">
-                  First Seen
-                </th>
-                <th className="text-left px-4 py-2 font-semibold">
-                  Last Active
-                </th>
-                <th className="text-left px-4 py-2 font-semibold">Revoked</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {!data?.data?.length ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    {userId
-                      ? 'No sessions found for this user.'
-                      : 'Enter a user ID above to search sessions.'}
-                  </td>
-                </tr>
-              ) : (
-                data.data.map((s) => (
-                  <tr
-                    key={s.id}
-                    className="hover:bg-gray-700/30 transition-colors"
-                  >
-                    <td className="px-4 py-2">
-                      <Link
-                        to={`/private/user/${s.user.id}`}
-                        className="text-indigo-400 hover:text-indigo-300"
-                      >
-                        {s.user.username}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2 text-gray-300 font-mono text-xs">
-                      {s.ipAddress}
-                    </td>
-                    <td
-                      className="px-4 py-2 text-gray-400 text-xs max-w-xs truncate"
-                      title={s.userAgent ?? undefined}
-                    >
-                      {s.userAgent ? s.userAgent.slice(0, 60) : '—'}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs">
-                      <Time date={s.createdAt} />
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs">
-                      <Time date={s.lastActiveAt} />
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs">
-                      {s.revokedAt ? <Time date={s.revokedAt} /> : '—'}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {data?.meta && data.meta.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 text-sm text-gray-400">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-            className="hover:text-white disabled:opacity-40"
-          >
-            Prev
-          </button>
-          <span>
-            {page} / {data.meta.totalPages}
-          </span>
-          <button
-            onClick={() =>
-              setPage((p) => Math.min(data.meta.totalPages, p + 1))
-            }
-            disabled={page === data.meta.totalPages}
-            className="hover:text-white disabled:opacity-40"
-          >
-            Next
-          </button>
-        </div>
-      )}
-    </div>
+      <DataTable
+        columns={columns}
+        rows={data?.data}
+        rowKey={(s) => s.id}
+        isLoading={isLoading}
+        empty={
+          userId
+            ? 'No sessions found for this user.'
+            : 'Enter a user ID above to search sessions.'
+        }
+      />
+      <Pagination
+        page={page}
+        totalPages={data?.meta.totalPages ?? 1}
+        onChange={setPage}
+      />
+    </PageShell>
   );
 };
 
