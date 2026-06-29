@@ -10,6 +10,7 @@ import {
   DataTable,
   Badge,
   Pagination,
+  SectionHeading,
   type Column
 } from '../../components/ui';
 
@@ -239,6 +240,16 @@ describe('UI kit — data-st contract', () => {
       expect(onChange).toHaveBeenCalledWith(3);
       await user.click(screen.getByRole('button', { name: 'Prev' }));
       expect(onChange).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe('SectionHeading', () => {
+    it('renders an uppercase prose -strong heading', () => {
+      renderWithProviders(<SectionHeading>Totals</SectionHeading>);
+      const heading = screen.getByRole('heading', { name: 'Totals' });
+      expect(heading).toHaveAttribute('data-st', 'prose');
+      expect(heading).toHaveAttribute('data-st-strong');
+      expect(heading).toHaveClass('uppercase');
     });
   });
 });
