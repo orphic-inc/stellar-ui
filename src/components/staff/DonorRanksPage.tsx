@@ -9,6 +9,7 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
+import { PageShell, Panel, Button } from '../ui';
 
 const PERK_KEYS = [
   'iconMouseOverText',
@@ -53,6 +54,147 @@ const emptyForm = (): RankForm => ({
   expiresAfterDays: '',
   perks: {}
 });
+
+// The create form and each per-rank inline edit form share this exact field set,
+// so it lives in one place keyed off `idPrefix` (label↔input association must stay
+// unique across the create form and any open edit form). Inputs/checkboxes paint
+// from the `field` Role directly; labels decompose to `meta`.
+const RankFields = ({
+  idPrefix,
+  form,
+  setForm
+}: {
+  idPrefix: string;
+  form: RankForm;
+  setForm: React.Dispatch<React.SetStateAction<RankForm>>;
+}) => {
+  const togglePerk = (key: string) =>
+    setForm((f) => ({ ...f, perks: { ...f.perks, [key]: !f.perks[key] } }));
+
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label
+            htmlFor={`${idPrefix}-name`}
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Name
+          </label>
+          <input
+            id={`${idPrefix}-name`}
+            data-st="field"
+            className="w-full"
+            type="text"
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            required
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-min-donation`}
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Min Donation ($)
+          </label>
+          <input
+            id={`${idPrefix}-min-donation`}
+            data-st="field"
+            className="w-full"
+            type="number"
+            min={0}
+            step={0.01}
+            value={form.minDonation}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, minDonation: e.target.value }))
+            }
+            required
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-badge`}
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Badge (emoji/text)
+          </label>
+          <input
+            id={`${idPrefix}-badge`}
+            data-st="field"
+            className="w-full"
+            type="text"
+            value={form.badge}
+            onChange={(e) => setForm((f) => ({ ...f, badge: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-color`}
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Color (hex)
+          </label>
+          <input
+            id={`${idPrefix}-color`}
+            data-st="field"
+            className="w-full"
+            type="text"
+            value={form.color}
+            onChange={(e) => setForm((f) => ({ ...f, color: e.target.value }))}
+            placeholder="#ff69b4"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor={`${idPrefix}-expires`}
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Expires after (days)
+          </label>
+          <input
+            id={`${idPrefix}-expires`}
+            data-st="field"
+            className="w-full"
+            type="number"
+            min={0}
+            value={form.expiresAfterDays}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, expiresAfterDays: e.target.value }))
+            }
+          />
+        </div>
+      </div>
+      <div>
+        <p data-st="meta" className="text-xs mb-2">
+          Perks
+        </p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {PERK_KEYS.map((key) => (
+            <label
+              key={key}
+              data-st="meta"
+              className="flex items-center gap-2 text-xs cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                data-st="field"
+                checked={!!form.perks[key]}
+                onChange={() => togglePerk(key)}
+              />
+              {PERK_LABELS[key]}
+            </label>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
 
 const DonorRanksPage = () => {
   const dispatch = useDispatch();
@@ -149,181 +291,47 @@ const DonorRanksPage = () => {
     }
   };
 
-  const togglePerk = (
-    key: string,
-    current: Record<string, boolean>,
-    setter: (updater: (f: RankForm) => RankForm) => void
-  ) => {
-    setter((f) => ({
-      ...f,
-      perks: { ...current, [key]: !current[key] }
-    }));
-  };
-
-  const fieldClass =
-    'w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500';
-
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load donor ranks.</div>;
+    return (
+      <p className="p-4 text-[var(--st-danger)]">Failed to load donor ranks.</p>
+    );
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-white">Donor Ranks</h2>
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors"
-        >
+    <PageShell
+      title="Donor Ranks"
+      actions={
+        <Button onClick={() => setShowForm((v) => !v)}>
           {showForm ? 'Cancel' : '+ Create Rank'}
-        </button>
-      </div>
-
+        </Button>
+      }
+    >
       {showForm && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-5 mb-6">
-          <h3 className="text-sm font-semibold text-gray-200 mb-4">
+        <Panel className="p-5 space-y-3">
+          <h3 data-st="prose" data-st-strong className="text-sm font-semibold">
             New Donor Rank
           </h3>
           <form onSubmit={handleCreate} className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label
-                  htmlFor="donor-rank-name"
-                  className="block text-xs text-gray-400 mb-1"
-                >
-                  Name
-                </label>
-                <input
-                  id="donor-rank-name"
-                  type="text"
-                  value={form.name}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, name: e.target.value }))
-                  }
-                  required
-                  className={fieldClass}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="donor-rank-min-donation"
-                  className="block text-xs text-gray-400 mb-1"
-                >
-                  Min Donation ($)
-                </label>
-                <input
-                  id="donor-rank-min-donation"
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  value={form.minDonation}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, minDonation: e.target.value }))
-                  }
-                  required
-                  className={fieldClass}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="donor-rank-badge"
-                  className="block text-xs text-gray-400 mb-1"
-                >
-                  Badge (emoji/text)
-                </label>
-                <input
-                  id="donor-rank-badge"
-                  type="text"
-                  value={form.badge}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, badge: e.target.value }))
-                  }
-                  className={fieldClass}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="donor-rank-color"
-                  className="block text-xs text-gray-400 mb-1"
-                >
-                  Color (hex, optional)
-                </label>
-                <input
-                  id="donor-rank-color"
-                  type="text"
-                  value={form.color}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, color: e.target.value }))
-                  }
-                  placeholder="#ff69b4"
-                  className={fieldClass}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="donor-rank-expires"
-                  className="block text-xs text-gray-400 mb-1"
-                >
-                  Expires after (days, optional)
-                </label>
-                <input
-                  id="donor-rank-expires"
-                  type="number"
-                  min={0}
-                  value={form.expiresAfterDays}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      expiresAfterDays: e.target.value
-                    }))
-                  }
-                  className={fieldClass}
-                />
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 mb-2">Perks</p>
-              <div className="grid grid-cols-2 gap-1.5">
-                {PERK_KEYS.map((key) => (
-                  <label
-                    key={key}
-                    className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={!!form.perks[key]}
-                      onChange={() => togglePerk(key, form.perks, setForm)}
-                      className="accent-indigo-500"
-                    />
-                    {PERK_LABELS[key]}
-                  </label>
-                ))}
-              </div>
-            </div>
+            <RankFields idPrefix="donor-rank" form={form} setForm={setForm} />
             <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={isCreating}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm rounded-lg transition-colors"
-              >
+              <Button type="submit" variant="primary" disabled={isCreating}>
                 {isCreating ? 'Creating…' : 'Create Rank'}
-              </button>
+              </Button>
             </div>
           </form>
-        </div>
+        </Panel>
       )}
 
       {!ranks || ranks.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg px-6 py-10 text-center">
-          <p className="text-gray-500 text-sm">No donor ranks defined yet.</p>
-        </div>
+        <Panel className="px-6 py-10 text-center">
+          <p data-st="meta" className="text-sm">
+            No donor ranks defined yet.
+          </p>
+        </Panel>
       ) : (
         <div className="space-y-2">
           {ranks.map((rank) => (
-            <div
-              key={rank.id}
-              className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden"
-            >
+            <Panel key={rank.id} className="overflow-hidden">
               <div className="px-4 py-3 flex items-center gap-3">
                 <div className="flex-1 min-w-0">
                   <span
@@ -333,179 +341,58 @@ const DonorRanksPage = () => {
                     <span className="mr-1">{rank.badge ?? '—'}</span>
                     {rank.name}
                   </span>
-                  <span className="ml-3 text-xs text-gray-500">
+                  <span className="ml-3 text-xs text-[var(--st-text-faint)]">
                     ${rank.minDonation}
                   </span>
-                  <span className="ml-2 text-xs text-gray-500">
+                  <span className="ml-2 text-xs text-[var(--st-text-faint)]">
                     {rank.expiresAfterDays != null
                       ? `${rank.expiresAfterDays} days`
                       : 'Never'}
                   </span>
                 </div>
-                <button
+                <Button
+                  variant="link"
                   onClick={() =>
                     editingId === rank.id
                       ? setEditingId(null)
                       : handleStartEdit(rank)
                   }
-                  className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
                 >
                   {editingId === rank.id ? 'Cancel' : 'Edit'}
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="link-danger"
                   onClick={() => handleDelete(rank.id, rank.name)}
-                  className="text-xs text-red-500 hover:text-red-400 transition-colors"
                 >
                   Delete
-                </button>
+                </Button>
               </div>
 
               {editingId === rank.id && (
-                <div className="border-t border-gray-700 px-4 py-3 bg-gray-950">
+                <div className="border-t border-[var(--st-border-subtle)] bg-[var(--st-raised)] px-4 py-3">
                   <form onSubmit={handleUpdate} className="space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label
-                          htmlFor={`edit-rank-name-${rank.id}`}
-                          className="block text-xs text-gray-400 mb-1"
-                        >
-                          Name
-                        </label>
-                        <input
-                          id={`edit-rank-name-${rank.id}`}
-                          type="text"
-                          value={editForm.name}
-                          onChange={(e) =>
-                            setEditForm((f) => ({ ...f, name: e.target.value }))
-                          }
-                          required
-                          className={fieldClass}
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor={`edit-rank-min-${rank.id}`}
-                          className="block text-xs text-gray-400 mb-1"
-                        >
-                          Min Donation ($)
-                        </label>
-                        <input
-                          id={`edit-rank-min-${rank.id}`}
-                          type="number"
-                          min={0}
-                          step={0.01}
-                          value={editForm.minDonation}
-                          onChange={(e) =>
-                            setEditForm((f) => ({
-                              ...f,
-                              minDonation: e.target.value
-                            }))
-                          }
-                          required
-                          className={fieldClass}
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor={`edit-rank-badge-${rank.id}`}
-                          className="block text-xs text-gray-400 mb-1"
-                        >
-                          Badge
-                        </label>
-                        <input
-                          id={`edit-rank-badge-${rank.id}`}
-                          type="text"
-                          value={editForm.badge}
-                          onChange={(e) =>
-                            setEditForm((f) => ({
-                              ...f,
-                              badge: e.target.value
-                            }))
-                          }
-                          className={fieldClass}
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor={`edit-rank-color-${rank.id}`}
-                          className="block text-xs text-gray-400 mb-1"
-                        >
-                          Color (hex)
-                        </label>
-                        <input
-                          id={`edit-rank-color-${rank.id}`}
-                          type="text"
-                          value={editForm.color}
-                          onChange={(e) =>
-                            setEditForm((f) => ({
-                              ...f,
-                              color: e.target.value
-                            }))
-                          }
-                          placeholder="#ff69b4"
-                          className={fieldClass}
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor={`edit-rank-expires-${rank.id}`}
-                          className="block text-xs text-gray-400 mb-1"
-                        >
-                          Expires after (days)
-                        </label>
-                        <input
-                          id={`edit-rank-expires-${rank.id}`}
-                          type="number"
-                          min={0}
-                          value={editForm.expiresAfterDays}
-                          onChange={(e) =>
-                            setEditForm((f) => ({
-                              ...f,
-                              expiresAfterDays: e.target.value
-                            }))
-                          }
-                          className={fieldClass}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400 mb-2">Perks</p>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {PERK_KEYS.map((key) => (
-                          <label
-                            key={key}
-                            className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={!!editForm.perks[key]}
-                              onChange={() =>
-                                togglePerk(key, editForm.perks, setEditForm)
-                              }
-                              className="accent-indigo-500"
-                            />
-                            {PERK_LABELS[key]}
-                          </label>
-                        ))}
-                      </div>
-                    </div>
+                    <RankFields
+                      idPrefix={`edit-rank-${rank.id}`}
+                      form={editForm}
+                      setForm={setEditForm}
+                    />
                     <div className="flex justify-end">
-                      <button
+                      <Button
                         type="submit"
+                        variant="primary"
                         disabled={isUpdating}
-                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm rounded-lg transition-colors"
                       >
                         {isUpdating ? 'Saving…' : 'Save Changes'}
-                      </button>
+                      </Button>
                     </div>
                   </form>
                 </div>
               )}
-            </div>
+            </Panel>
           ))}
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };
 

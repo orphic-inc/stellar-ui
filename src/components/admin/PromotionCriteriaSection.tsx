@@ -8,6 +8,7 @@ import {
   useUpdatePromotionRuleMutation
 } from '../../store/services/userApi';
 import { addAlert } from '../../store/slices/alertSlice';
+import { Panel, Button, SectionHeading } from '../ui';
 
 interface PromotionFormValues {
   toRankId: number | '';
@@ -19,9 +20,10 @@ interface PromotionFormValues {
   enabled: boolean;
 }
 
-const inputClass =
-  'w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm';
-const labelClass = 'block text-sm font-medium text-gray-300 mb-1';
+// `field`-direct inputs, not the kit's <Field>: react-hook-form's register()
+// hands the control a ref, and Field is a plain function component that doesn't
+// forward one. Labels decompose to `meta`.
+const labelClass = 'block text-sm mb-1';
 
 // Edits the auto-class promotion rule whose `fromRankId` is the rank being
 // edited (the outgoing rung). Creates one when none exists yet. Its own <form>
@@ -86,26 +88,29 @@ const PromotionCriteriaSection = ({ fromRankId }: { fromRankId: number }) => {
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-      <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-          Promotion Criteria
-        </h3>
+    <Panel className="overflow-hidden">
+      <div className="bg-[var(--st-raised)] px-4 py-2 border-b border-[var(--st-border-subtle)]">
+        <SectionHeading>Promotion Criteria</SectionHeading>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-4">
-        <p className="text-sm text-gray-400">
+        <p data-st="meta" className="text-sm">
           Thresholds a member must clear to be auto-promoted out of this class.
           Contributed bytes are link-health-eligible (ADR-0006).
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <div>
-            <label htmlFor="promo-to-rank" className={labelClass}>
+            <label
+              htmlFor="promo-to-rank"
+              data-st="meta"
+              className={labelClass}
+            >
               Promotes to
             </label>
             <select
               id="promo-to-rank"
+              data-st="field"
+              className="w-full"
               {...register('toRankId', { valueAsNumber: true })}
-              className={inputClass}
             >
               <option value="">— Select class —</option>
               {ranks
@@ -118,19 +123,28 @@ const PromotionCriteriaSection = ({ fromRankId }: { fromRankId: number }) => {
             </select>
           </div>
           <div>
-            <label htmlFor="promo-min-contributed" className={labelClass}>
+            <label
+              htmlFor="promo-min-contributed"
+              data-st="meta"
+              className={labelClass}
+            >
               Min contributed (bytes)
             </label>
             <input
               id="promo-min-contributed"
               type="text"
               inputMode="numeric"
+              data-st="field"
+              className="w-full"
               {...register('minContributed')}
-              className={inputClass}
             />
           </div>
           <div>
-            <label htmlFor="promo-min-ratio" className={labelClass}>
+            <label
+              htmlFor="promo-min-ratio"
+              data-st="meta"
+              className={labelClass}
+            >
               Min ratio
             </label>
             <input
@@ -138,42 +152,54 @@ const PromotionCriteriaSection = ({ fromRankId }: { fromRankId: number }) => {
               type="number"
               step="0.01"
               min={0}
+              data-st="field"
+              className="w-full"
               {...register('minRatio', { valueAsNumber: true })}
-              className={inputClass}
             />
           </div>
           <div>
-            <label htmlFor="promo-min-contributions" className={labelClass}>
+            <label
+              htmlFor="promo-min-contributions"
+              data-st="meta"
+              className={labelClass}
+            >
               Min contributions
             </label>
             <input
               id="promo-min-contributions"
               type="number"
               min={0}
+              data-st="field"
+              className="w-full"
               {...register('minContributions', { valueAsNumber: true })}
-              className={inputClass}
             />
           </div>
           <div>
-            <label htmlFor="promo-min-age" className={labelClass}>
+            <label
+              htmlFor="promo-min-age"
+              data-st="meta"
+              className={labelClass}
+            >
               Min account age (days)
             </label>
             <input
               id="promo-min-age"
               type="number"
               min={0}
+              data-st="field"
+              className="w-full"
               {...register('minAccountAgeDays', { valueAsNumber: true })}
-              className={inputClass}
             />
           </div>
           <div>
-            <label htmlFor="promo-extra" className={labelClass}>
+            <label htmlFor="promo-extra" data-st="meta" className={labelClass}>
               Extra requirement
             </label>
             <select
               id="promo-extra"
+              data-st="field"
+              className="w-full"
               {...register('extra')}
-              className={inputClass}
             >
               <option value="">— None —</option>
               <option value="DISTINCT_RELEASES_500">
@@ -186,23 +212,16 @@ const PromotionCriteriaSection = ({ fromRankId }: { fromRankId: number }) => {
           </div>
         </div>
         <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            {...register('enabled')}
-            className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
-          />
-          <span className="text-sm text-gray-300">Rule enabled</span>
+          <input type="checkbox" data-st="field" {...register('enabled')} />
+          <span data-st="meta">Rule enabled</span>
         </label>
         <div className="flex justify-end">
-          <button
-            type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-          >
+          <Button type="submit" variant="primary">
             Save Promotion Criteria
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </Panel>
   );
 };
 

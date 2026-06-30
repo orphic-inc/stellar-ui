@@ -86,6 +86,16 @@ describe('DonorRanksPage', () => {
     expect(screen.getAllByText('365 days').length).toBe(2);
   });
 
+  it('paints rank cards with the panel Role (kit hooks present)', () => {
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [makeRank(1)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    expect(document.querySelector('[data-st="panel"]')).toBeInTheDocument();
+  });
+
   it('shows Never when expiresAfterDays is null', () => {
     mockGetDonorRanksQuery.mockReturnValue({
       data: [{ ...makeRank(1), expiresAfterDays: null }],

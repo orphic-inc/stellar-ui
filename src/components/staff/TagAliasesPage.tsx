@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   useGetTagAliasesQuery,
   useCreateTagAliasMutation,
@@ -8,6 +7,7 @@ import {
 } from '../../store/services/tagAliasApi';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
+import { PageShell, Panel, Button, Pagination } from '../ui';
 
 const TagAliasesPage = () => {
   const [page, setPage] = useState(1);
@@ -56,122 +56,104 @@ const TagAliasesPage = () => {
     setEditingId(null);
   };
 
-  const inputClass =
-    'rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
-
   return (
-    <div className="space-y-4 max-w-4xl">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
-        </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">Tag Aliases</h2>
-        <p className="text-sm text-gray-400 mt-1">
-          Maps misspelled or non-canonical tag names to the correct tag. Applied
-          automatically on new submissions.
-        </p>
-      </div>
+    <PageShell title="Tag Aliases" backTo="/private/staff/tools" width="lg">
+      <p data-st="meta" className="text-sm">
+        Maps misspelled or non-canonical tag names to the correct tag. Applied
+        automatically on new submissions.
+      </p>
 
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+      <Panel className="overflow-hidden">
         {isLoading ? (
           <div className="p-6">
             <Spinner />
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="text-left px-4 py-2 text-gray-400 font-medium w-1/3">
-                  Bad tag (rename from)
-                </th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium w-1/3">
-                  Canonical tag (rename to)
-                </th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">
-                  Added
-                </th>
-                <th className="px-4 py-2" />
+          <table data-st="grid">
+            <thead data-st="colhead">
+              <tr>
+                <th className="w-1/3">Bad tag (rename from)</th>
+                <th className="w-1/3">Canonical tag (rename to)</th>
+                <th>Added</th>
+                <th />
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700/50">
+            <tbody>
               {aliases.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={4}
-                    className="px-4 py-6 text-gray-500 text-center"
-                  >
+                <tr data-st="row">
+                  <td colSpan={4} className="text-center">
                     No aliases defined.
                   </td>
                 </tr>
               ) : (
                 aliases.map((a) =>
                   editingId === a.id ? (
-                    <tr key={a.id} className="bg-gray-700/30">
-                      <td className="px-4 py-2">
+                    <tr key={a.id} data-st="row" data-st-open>
+                      <td>
                         <input
-                          className={inputClass}
+                          data-st="field"
+                          className="w-full"
                           value={editBadTag}
                           onChange={(e) => setEditBadTag(e.target.value)}
                         />
                       </td>
-                      <td className="px-4 py-2">
+                      <td>
                         <input
-                          className={inputClass}
+                          data-st="field"
+                          className="w-full"
                           value={editGoodTag}
                           onChange={(e) => setEditGoodTag(e.target.value)}
                         />
                       </td>
-                      <td className="px-4 py-2 text-gray-400">
+                      <td>
                         <Time date={a.createdAt} />
                       </td>
-                      <td className="px-4 py-2 text-right space-x-2">
+                      <td className="text-right space-x-2">
                         <button
                           type="button"
                           onClick={() => handleSaveEdit(a.id)}
-                          className="text-green-400 hover:text-green-300 text-sm transition-colors"
+                          className="text-sm text-[var(--st-success)] transition-colors"
                         >
                           Save
                         </button>
-                        <button
-                          type="button"
+                        <Button
+                          variant="link"
                           onClick={() => setEditingId(null)}
-                          className="text-gray-400 hover:text-white text-sm transition-colors"
                         >
                           Cancel
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ) : (
-                    <tr key={a.id} className="hover:bg-gray-700/30">
-                      <td className="px-4 py-2 text-red-300 font-mono">
-                        {a.badTag}
+                    <tr key={a.id} data-st="row">
+                      <td>
+                        <span className="font-mono text-[var(--st-danger)]">
+                          {a.badTag}
+                        </span>
                       </td>
-                      <td className="px-4 py-2 text-green-300 font-mono">
-                        {a.goodTag.name}
+                      <td>
+                        <span className="font-mono text-[var(--st-success)]">
+                          {a.goodTag.name}
+                        </span>
                       </td>
-                      <td className="px-4 py-2 text-gray-400">
+                      <td>
                         <Time date={a.createdAt} />
                       </td>
-                      <td className="px-4 py-2 text-right space-x-3">
-                        <button
-                          type="button"
+                      <td className="text-right space-x-3">
+                        <Button
+                          variant="link"
                           onClick={() =>
                             startEdit(a.id, a.badTag, a.goodTag.name)
                           }
-                          className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
                         >
                           Edit
-                        </button>
-                        <button
-                          type="button"
+                        </Button>
+                        <Button
+                          variant="link-danger"
                           onClick={() => deleteTagAlias(a.id)}
-                          className="text-red-400 hover:text-red-300 text-sm transition-colors"
                         >
                           Delete
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   )
@@ -179,66 +161,53 @@ const TagAliasesPage = () => {
               )}
 
               {/* Create row */}
-              <tr className="bg-gray-700/20">
-                <td className="px-4 py-2">
+              <tr data-st="row">
+                <td>
                   <input
-                    className={`${inputClass} w-full`}
+                    data-st="field"
+                    className="w-full"
                     placeholder="e.g. hip-hop"
                     value={newBadTag}
                     onChange={(e) => setNewBadTag(e.target.value)}
                   />
                 </td>
-                <td className="px-4 py-2">
+                <td>
                   <input
-                    className={`${inputClass} w-full`}
+                    data-st="field"
+                    className="w-full"
                     placeholder="e.g. hip.hop"
                     value={newGoodTag}
                     onChange={(e) => setNewGoodTag(e.target.value)}
                   />
                 </td>
-                <td className="px-4 py-2 text-gray-500 text-xs">
-                  Canonical tag must exist
+                <td>
+                  <span className="text-xs text-[var(--st-text-faint)]">
+                    Canonical tag must exist
+                  </span>
                 </td>
-                <td className="px-4 py-2 text-right">
-                  <button
-                    type="button"
+                <td className="text-right">
+                  <Button
+                    variant="primary"
                     disabled={creating || !newBadTag || !newGoodTag}
                     onClick={handleCreate}
-                    className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
                   >
                     {creating ? 'Adding…' : 'Add alias'}
-                  </button>
+                  </Button>
                 </td>
               </tr>
             </tbody>
           </table>
         )}
-      </div>
+      </Panel>
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {error && <p className="text-sm text-[var(--st-danger)]">{error}</p>}
 
-      {meta && meta.totalPages > 1 && (
-        <div className="flex items-center gap-2 text-sm">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white transition-colors"
-          >
-            Prev
-          </button>
-          <span className="text-gray-400">
-            Page {meta.page} of {meta.totalPages}
-          </span>
-          <button
-            disabled={page >= meta.totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white transition-colors"
-          >
-            Next
-          </button>
-        </div>
-      )}
-    </div>
+      <Pagination
+        page={meta?.page ?? 1}
+        totalPages={meta?.totalPages ?? 1}
+        onChange={setPage}
+      />
+    </PageShell>
   );
 };
 
