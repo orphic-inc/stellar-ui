@@ -95,6 +95,8 @@ describe('SiteHistoryPage', () => {
     expect(screen.getByText('Body of entry 1')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /edit/i }).length).toBe(2);
     expect(screen.getAllByRole('button', { name: /delete/i }).length).toBe(2);
+    // Entries render as kit panels.
+    expect(document.querySelector('[data-st="panel"]')).toBeInTheDocument();
   });
 
   it('opens new entry modal on + Add Entry click', async () => {

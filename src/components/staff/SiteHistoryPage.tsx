@@ -10,6 +10,7 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
+import { PageShell, Panel, Button, Field } from '../ui';
 
 interface EntryModalProps {
   entry?: SiteHistoryEntry;
@@ -45,61 +46,47 @@ const EntryModal = ({ entry, onClose }: EntryModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-lg p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-white">
+      <Panel className="w-full max-w-lg p-6 space-y-4">
+        <h3 data-st="prose" data-st-strong className="text-lg font-semibold">
           {entry ? 'Edit Entry' : 'New Entry'}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label
-              htmlFor="history-title"
-              className="block text-sm text-gray-300 mb-1"
-            >
-              Title
-            </label>
-            <input
-              id="history-title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
+          <Field
+            id="history-title"
+            label="Title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
           <div>
             <label
               htmlFor="history-body"
-              className="block text-sm text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-xs mb-1"
             >
               Body
             </label>
             <textarea
               id="history-body"
+              data-st="field"
               value={body}
               onChange={(e) => setBody(e.target.value)}
               required
               rows={6}
-              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             />
           </div>
           <div className="flex gap-2 justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
-            >
+            <Button variant="link" onClick={onClose}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm rounded-lg transition-colors"
-            >
+            </Button>
+            <Button variant="primary" type="submit" disabled={isLoading}>
               {isLoading ? 'Saving…' : 'Save'}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
+      </Panel>
     </div>
   );
 };
@@ -127,7 +114,11 @@ const SiteHistoryPage = () => {
 
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load site history.</div>;
+    return (
+      <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load site history.
+      </p>
+    );
 
   return (
     <>
@@ -138,58 +129,55 @@ const SiteHistoryPage = () => {
         />
       )}
 
-      <div className="max-w-3xl mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Site History</h2>
-          <button
-            onClick={() => setModalEntry(null)}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors"
-          >
+      <PageShell
+        title="Site History"
+        width="md"
+        actions={
+          <Button variant="primary" onClick={() => setModalEntry(null)}>
             + Add Entry
-          </button>
-        </div>
-
+          </Button>
+        }
+      >
         {!entries || entries.length === 0 ? (
-          <div className="bg-gray-900 border border-gray-700 rounded-lg px-6 py-10 text-center">
-            <p className="text-gray-500 text-sm">No site history entries.</p>
-          </div>
+          <Panel className="px-6 py-10 text-center">
+            <p data-st="meta" className="text-sm">
+              No site history entries.
+            </p>
+          </Panel>
         ) : (
           <div className="space-y-4">
             {entries.map((entry) => (
-              <div
-                key={entry.id}
-                className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden"
-              >
-                <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-200">
+              <Panel key={entry.id} className="overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--st-border)]">
+                  <span data-st="prose" data-st-strong className="text-sm">
                     {entry.title}
                   </span>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span>
+                  <div className="flex items-center gap-3">
+                    <span data-st="meta" className="text-xs">
                       {new Date(entry.createdAt).toLocaleDateString()}
                     </span>
-                    <button
-                      onClick={() => setModalEntry(entry)}
-                      className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                    >
+                    <Button variant="link" onClick={() => setModalEntry(entry)}>
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="link-danger"
                       onClick={() => handleDelete(entry.id)}
-                      className="text-red-500 hover:text-red-400 transition-colors"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
-                <div className="px-4 py-3 text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+                <div
+                  data-st="prose"
+                  className="px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed"
+                >
                   {entry.body}
                 </div>
-              </div>
+              </Panel>
             ))}
           </div>
         )}
-      </div>
+      </PageShell>
     </>
   );
 };
