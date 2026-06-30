@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   useGetForumCategoriesAdminQuery,
   useCreateForumCategoryMutation,
@@ -8,6 +7,7 @@ import {
 } from '../../store/services/forumApi';
 import Spinner from '../layout/Spinner';
 import type { ForumCategory } from '../../types';
+import { PageShell, Panel, Button, SectionHeading } from '../ui';
 
 const CategoryRow = ({ category }: { category: ForumCategory }) => {
   const [updateCategory] = useUpdateForumCategoryMutation();
@@ -24,56 +24,53 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
 
   if (editing) {
     return (
-      <tr className="bg-indigo-950/30">
-        <td className="px-4 py-2" colSpan={3}>
+      <tr data-st="row" data-st-open>
+        <td colSpan={3} className="p-0">
           <form
             onSubmit={handleSave}
-            className="flex gap-2 items-end flex-wrap"
+            className="p-4 flex gap-2 items-end flex-wrap"
           >
             <div>
               <label
                 htmlFor={`edit-fc-sort-${category.id}`}
-                className="block text-xs text-gray-400 mb-1"
+                data-st="meta"
+                className="block mb-1"
               >
                 Sort
               </label>
               <input
                 id={`edit-fc-sort-${category.id}`}
+                data-st="field"
                 type="number"
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="w-16 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-16"
               />
             </div>
             <div>
               <label
                 htmlFor={`edit-fc-name-${category.id}`}
-                className="block text-xs text-gray-400 mb-1"
+                data-st="meta"
+                className="block mb-1"
               >
                 Name
               </label>
               <input
                 id={`edit-fc-name-${category.id}`}
+                data-st="field"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 w-52"
+                className="w-52"
               />
             </div>
-            <button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm"
-            >
+            <Button variant="primary" type="submit">
               Save
-            </button>
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-sm"
-            >
+            </Button>
+            <Button variant="link" onClick={() => setEditing(false)}>
               Cancel
-            </button>
+            </Button>
           </form>
         </td>
       </tr>
@@ -81,29 +78,22 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
   }
 
   return (
-    <tr className="hover:bg-gray-700/30 transition-colors">
-      <td className="px-4 py-2 text-gray-400 text-sm">{category.sort}</td>
-      <td className="px-4 py-2 text-gray-200 font-medium text-sm">
-        {category.name}
-      </td>
-      <td className="px-4 py-2 flex gap-3 justify-end">
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
-        >
+    <tr data-st="row">
+      <td>{category.sort}</td>
+      <td className="font-medium">{category.name}</td>
+      <td className="text-right space-x-3 whitespace-nowrap">
+        <Button variant="link" onClick={() => setEditing(true)}>
           Edit
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="link-danger"
           onClick={() =>
             window.confirm('Delete this category?') &&
             deleteCategory(category.id)
           }
-          className="text-red-400 hover:text-red-300 text-sm transition-colors"
         >
           Delete
-        </button>
+        </Button>
       </td>
     </tr>
   );
@@ -128,110 +118,92 @@ const ForumCategoryControlPanel = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
-        </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">
-          Forum Category Manager
-        </h2>
-      </div>
-
-      {/* Category list */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Categories
-          </h3>
-        </div>
-        {isLoading ? (
-          <Spinner />
-        ) : error ? (
-          <p className="p-4 text-sm text-red-400">Failed to load categories.</p>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
-                <th className="text-left px-4 py-2 font-semibold w-16">Sort</th>
-                <th className="text-left px-4 py-2 font-semibold">Name</th>
-                <th className="px-4 py-2 font-semibold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {!categories?.length ? (
+    <PageShell title="Forum Category Manager" width="sm">
+      <section className="space-y-3">
+        <SectionHeading>Categories</SectionHeading>
+        <Panel className="overflow-hidden">
+          {isLoading ? (
+            <div className="p-6">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+              Failed to load categories.
+            </p>
+          ) : (
+            <table data-st="grid">
+              <thead data-st="colhead">
                 <tr>
-                  <td
-                    colSpan={3}
-                    className="px-4 py-6 text-center text-gray-500 text-sm"
-                  >
-                    No categories yet.
-                  </td>
+                  <th className="w-16">Sort</th>
+                  <th>Name</th>
+                  <th />
                 </tr>
-              ) : (
-                categories.map((c) => <CategoryRow key={c.id} category={c} />)
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {!categories?.length ? (
+                  <tr data-st="row">
+                    <td colSpan={3} className="text-center">
+                      No categories yet.
+                    </td>
+                  </tr>
+                ) : (
+                  categories.map((c) => <CategoryRow key={c.id} category={c} />)
+                )}
+              </tbody>
+            </table>
+          )}
+        </Panel>
+      </section>
 
-      {/* Create new */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Create Category
-          </h3>
-        </div>
-        <form
+      <section className="space-y-3">
+        <SectionHeading>Create Category</SectionHeading>
+        <Panel
+          as="form"
           onSubmit={handleCreate}
           className="p-4 flex gap-4 items-end flex-wrap"
         >
           <div>
             <label
               htmlFor="fc-sort"
-              className="block text-sm font-medium text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm font-medium mb-1"
             >
               Sort order
             </label>
             <input
               id="fc-sort"
+              data-st="field"
               type="number"
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="w-20 rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-20"
             />
           </div>
           <div className="flex-1 min-w-48">
             <label
               htmlFor="fc-name"
-              className="block text-sm font-medium text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm font-medium mb-1"
             >
-              Name <span className="text-red-400">*</span>
+              Name <span className="text-[var(--st-danger)]">*</span>
             </label>
             <input
               id="fc-name"
+              data-st="field"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               placeholder="Category name"
-              className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             />
           </div>
-          <button
-            type="submit"
-            disabled={isCreating}
-            className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-          >
+          <Button variant="primary" type="submit" disabled={isCreating}>
             {isCreating ? 'Creating…' : 'Create'}
-          </button>
-        </form>
-      </div>
-    </div>
+          </Button>
+        </Panel>
+      </section>
+    </PageShell>
   );
 };
 

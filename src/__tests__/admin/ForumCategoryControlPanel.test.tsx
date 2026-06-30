@@ -81,6 +81,25 @@ describe('ForumCategoryControlPanel', () => {
     expect(screen.getByText('Category 2')).toBeInTheDocument();
   });
 
+  it('emits the data-st contract via the kit (table grid + field)', () => {
+    mockGetForumCategoriesAdminQuery.mockReturnValue({
+      data: [makeCategory(1)],
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<ForumCategoryControlPanel />);
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+  });
+
   it('creates a new category on form submit', async () => {
     const user = userEvent.setup();
     mockGetForumCategoriesAdminQuery.mockReturnValue({
