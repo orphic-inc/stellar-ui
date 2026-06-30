@@ -207,6 +207,18 @@ describe('ReleasePage', () => {
     expect(screen.getByText('Lossless rip')).toBeInTheDocument();
   });
 
+  it('carries the data-st theming hooks (grid contributions table + format chip)', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    // The format code renders from the chip Role via the kit Badge.
+    expect(screen.getByText('FLAC')).toHaveAttribute('data-st', 'chip');
+  });
+
   it('shows "No contributions yet" when no contributions', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
       data: makeRelease({ contributions: [] }),
@@ -721,9 +733,9 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    const ratingEl = document.querySelector(
-      '.text-xs.text-gray-500.text-center'
-    );
+    const ratingEl = Array.from(
+      document.querySelectorAll('p[data-st="meta"]')
+    ).find((el) => /positive/.test(el.textContent ?? ''));
     expect(ratingEl?.textContent).toMatch(/1 vote(?!s)/);
   });
 

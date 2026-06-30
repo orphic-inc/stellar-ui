@@ -17,6 +17,7 @@ import ReportContributionModal from './ReportContributionModal';
 import { formatSize } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
 import { useReleaseWorkbench } from './useReleaseWorkbench';
+import { Badge } from '../ui';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -138,62 +139,56 @@ const ReleasePage = () => {
   return (
     <div>
       {/* Breadcrumb */}
-      <nav className="text-sm text-gray-500 mb-4">
-        <Link to="/private/communities" className="hover:text-gray-300">
+      <nav data-st="meta" className="text-sm mb-4">
+        <Link to="/private/communities" data-st="control">
           Communities
         </Link>
         {' › '}
-        <Link
-          to={`/private/communities/${communityId}`}
-          className="hover:text-gray-300"
-        >
+        <Link to={`/private/communities/${communityId}`} data-st="control">
           {community?.name ?? 'Community'}
         </Link>
         {' › '}
-        <strong className="text-gray-200">{release.title}</strong>
+        <strong data-st="prose" data-st-strong>
+          {release.title}
+        </strong>
       </nav>
 
       {/* Page title */}
-      <h1 className="text-xl font-bold text-white mb-1">
-        {release.artist && (
-          <span className="text-gray-300">{release.artist.name} — </span>
-        )}
+      <h1 data-st="prose" data-st-strong className="text-xl font-bold mb-1">
+        {release.artist && <span>{release.artist.name} — </span>}
         {release.title}
         {release.year && (
-          <span className="text-gray-400 font-normal text-base ml-2">
+          <span data-st="meta" className="font-normal text-base ml-2">
             [{release.year}]
           </span>
         )}
       </h1>
 
       {/* Action links */}
-      <div className="flex gap-3 text-xs text-indigo-400 mb-6">
+      <div className="flex gap-3 text-xs mb-6">
         <button
           type="button"
+          data-st="control"
           onClick={() =>
             navigate(
               `/private/communities/${communityId}/releases/${releaseId}/contribute`
             )
           }
-          className="hover:text-indigo-300 transition-colors"
         >
           [Add format]
         </button>
         {canEdit && (
-          <button
-            type="button"
-            onClick={handleEditOpen}
-            className="hover:text-indigo-300 transition-colors"
-          >
+          <button type="button" data-st="control" onClick={handleEditOpen}>
             [Edit release]
           </button>
         )}
         {user && (
           <button
             type="button"
+            data-st="control"
             onClick={handleBookmark}
             disabled={bookmarking}
-            className="hover:text-yellow-300 transition-colors disabled:opacity-50"
+            className="disabled:opacity-50"
           >
             [🔖 Bookmark]
           </button>
@@ -201,16 +196,17 @@ const ReleasePage = () => {
         {user && (
           <button
             type="button"
+            data-st="control"
             onClick={handleCommentSubscribe}
             disabled={subscribingComments}
-            className="hover:text-indigo-300 transition-colors disabled:opacity-50"
+            className="disabled:opacity-50"
           >
             {isSubscribedToComments ? '[Unsubscribe]' : '[Subscribe]'}
           </button>
         )}
         <Link
           to={`/private/reports/new?targetType=Release&targetId=${rId}`}
-          className="hover:text-indigo-300 transition-colors"
+          data-st="control"
         >
           [Report release]
         </Link>
@@ -221,16 +217,18 @@ const ReleasePage = () => {
         {/* Main content */}
         <div className="flex-1 min-w-0 space-y-4">
           {/* Contributions table */}
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200">
+          <div data-st="panel" className="overflow-hidden">
+            <div data-st="colhead" className="px-4 py-2 text-sm font-semibold">
               Contributions
             </div>
             {release.contributions && release.contributions.length > 0 ? (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-700 text-left text-gray-400 text-xs">
+              <table data-st="grid" className="w-full text-sm">
+                <thead data-st="colhead">
+                  <tr className="text-xs">
                     <th className="px-4 py-2 font-medium">Format</th>
-                    <th className="px-4 py-2 font-medium">Size</th>
+                    <th className="px-4 py-2 font-medium" data-st-num>
+                      Size
+                    </th>
                     <th className="px-4 py-2 font-medium">Contributor</th>
                     <th className="px-4 py-2 font-medium">Notes</th>
                     <th className="px-4 py-2 font-medium">Status</th>
@@ -242,28 +240,33 @@ const ReleasePage = () => {
                     const linkStatus = ((c as { linkStatus?: string })
                       .linkStatus ?? 'UNKNOWN') as LinkHealthStatus;
                     return (
-                      <tr
-                        key={c.id}
-                        className="border-b border-gray-800 hover:bg-gray-800/30"
-                      >
-                        <td className="px-4 py-2 text-gray-300 text-xs font-medium">
-                          {c.type}
+                      <tr key={c.id} data-st="row">
+                        <td className="px-4 py-2 text-xs">
+                          <Badge mono>{c.type}</Badge>
                         </td>
-                        <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
-                          {c.sizeInBytes
-                            ? formatSize(Number(c.sizeInBytes))
-                            : '—'}
+                        <td
+                          className="px-4 py-2 text-xs whitespace-nowrap"
+                          data-st-num
+                        >
+                          <span data-st="meta">
+                            {c.sizeInBytes
+                              ? formatSize(Number(c.sizeInBytes))
+                              : '—'}
+                          </span>
                         </td>
                         <td className="px-4 py-2">
                           <Link
                             to={`/private/user/${c.user.username}`}
-                            className="text-indigo-400 hover:text-indigo-300 text-xs"
+                            data-st="control"
+                            className="text-xs"
                           >
                             {c.user.username}
                           </Link>
                         </td>
-                        <td className="px-4 py-2 text-gray-500 text-xs">
-                          {c.releaseDescription ?? '—'}
+                        <td className="px-4 py-2 text-xs">
+                          <span data-st="meta">
+                            {c.releaseDescription ?? '—'}
+                          </span>
                         </td>
                         <td className="px-4 py-2">
                           <LinkStatusBadge status={linkStatus} />
@@ -276,7 +279,7 @@ const ReleasePage = () => {
                             />
                             <button
                               type="button"
-                              className="text-gray-600 hover:text-gray-400 transition-colors"
+                              data-st="control"
                               title="Report dead or misleading link"
                               onClick={() => setReportingId(c.id)}
                             >
@@ -290,11 +293,11 @@ const ReleasePage = () => {
                 </tbody>
               </table>
             ) : (
-              <div className="px-4 py-4 text-sm text-gray-500">
+              <div data-st="meta" className="px-4 py-4 text-sm">
                 No contributions yet.{' '}
                 <button
                   type="button"
-                  className="text-indigo-400 hover:text-indigo-300"
+                  data-st="control"
                   onClick={() =>
                     navigate(
                       `/private/communities/${communityId}/releases/${releaseId}/contribute`
@@ -309,20 +312,27 @@ const ReleasePage = () => {
 
           {/* Description */}
           {release.description && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <div data-st="panel" className="overflow-hidden">
+              <div
+                data-st="colhead"
+                className="px-4 py-2 text-xs font-semibold uppercase tracking-wider"
+              >
                 Album Info
               </div>
-              <div className="px-4 py-3 text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+              <div
+                data-st="prose"
+                className="px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed"
+              >
                 {release.description}
               </div>
             </div>
           )}
 
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+          <div data-st="panel" className="overflow-hidden">
             <button
               onClick={() => setHistoryOpen((o) => !o)}
-              className="w-full bg-gray-800 border-b border-gray-700 px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-200 flex items-center justify-between"
+              data-st="colhead"
+              className="w-full px-4 py-2 text-left text-xs font-semibold uppercase tracking-wider flex items-center justify-between"
             >
               <span>History</span>
               <span>{historyOpen ? '▲' : '▼'}</span>
@@ -334,7 +344,7 @@ const ReleasePage = () => {
                     <Spinner />
                   </div>
                 ) : historyEntries.length > 0 ? (
-                  <div className="divide-y divide-gray-800">
+                  <div data-st="list">
                     {historyEntries.map((entry) => {
                       const beforeSnap = entry.before as
                         | Record<string, unknown>
@@ -351,29 +361,35 @@ const ReleasePage = () => {
                         entry.changedFields.length > 0;
                       const isReverting = revertingId === entry.id;
                       return (
-                        <div key={entry.id} className="px-4 py-3 text-sm">
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-300">
-                            <span>{entry.summary}</span>
-                            <span className="text-gray-600">by</span>
+                        <div
+                          key={entry.id}
+                          data-st="row"
+                          className="flex-col items-stretch px-4 py-3 text-sm"
+                        >
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span data-st="prose">{entry.summary}</span>
+                            <span data-st="meta">by</span>
                             <Link
                               to={`/private/user/${entry.actor.username}`}
-                              className="text-indigo-400 hover:text-indigo-300"
+                              data-st="control"
                             >
                               {entry.actor.username}
                             </Link>
-                            <span className="text-gray-600">
+                            <span data-st="meta">
                               <Time date={entry.createdAt} />
                             </span>
                             {canManageTags && entry.action === 'edit' && (
                               <span className="ml-auto flex items-center gap-1">
                                 {isReverting ? (
                                   <>
-                                    <span className="text-gray-400 text-xs">
+                                    <span data-st="meta" className="text-xs">
                                       Confirm?
                                     </span>
                                     <button
                                       type="button"
-                                      className="text-xs text-red-400 hover:text-red-300"
+                                      data-st="control"
+                                      data-st-danger
+                                      className="text-xs"
                                       onClick={() =>
                                         void handleRevertHistory(entry.id)
                                       }
@@ -382,7 +398,8 @@ const ReleasePage = () => {
                                     </button>
                                     <button
                                       type="button"
-                                      className="text-xs text-gray-400 hover:text-gray-300"
+                                      data-st="control"
+                                      className="text-xs"
                                       onClick={() => setRevertingId(null)}
                                     >
                                       Cancel
@@ -391,7 +408,8 @@ const ReleasePage = () => {
                                 ) : (
                                   <button
                                     type="button"
-                                    className="text-xs text-gray-500 hover:text-gray-300"
+                                    data-st="control"
+                                    className="text-xs"
                                     onClick={() => setRevertingId(entry.id)}
                                   >
                                     Revert
@@ -401,30 +419,36 @@ const ReleasePage = () => {
                             )}
                           </div>
                           {showDiff && (
-                            <table className="mt-2 w-full text-xs border-collapse">
+                            <table
+                              data-st="grid"
+                              className="mt-2 w-full text-xs"
+                            >
                               <tbody>
                                 {entry.changedFields.map((field) => (
-                                  <tr
-                                    key={field}
-                                    className="border-t border-gray-800"
-                                  >
-                                    <td className="py-1 pr-3 text-gray-500 whitespace-nowrap">
-                                      {FIELD_LABELS[field] ?? field}
+                                  <tr key={field} data-st="row">
+                                    <td className="py-1 pr-3 whitespace-nowrap">
+                                      <span data-st="meta">
+                                        {FIELD_LABELS[field] ?? field}
+                                      </span>
                                     </td>
-                                    <td className="py-1 pr-2 text-gray-400 max-w-xs break-words">
-                                      {formatFieldValue(
-                                        field,
-                                        beforeSnap[field]
-                                      )}
+                                    <td className="py-1 pr-2 max-w-xs break-words">
+                                      <span data-st="meta">
+                                        {formatFieldValue(
+                                          field,
+                                          beforeSnap[field]
+                                        )}
+                                      </span>
                                     </td>
-                                    <td className="py-1 pr-2 text-gray-500">
-                                      →
+                                    <td className="py-1 pr-2">
+                                      <span data-st="meta">→</span>
                                     </td>
-                                    <td className="py-1 text-gray-200 max-w-xs break-words">
-                                      {formatFieldValue(
-                                        field,
-                                        afterSnap[field]
-                                      )}
+                                    <td className="py-1 max-w-xs break-words">
+                                      <span data-st="prose">
+                                        {formatFieldValue(
+                                          field,
+                                          afterSnap[field]
+                                        )}
+                                      </span>
                                     </td>
                                   </tr>
                                 ))}
@@ -436,7 +460,7 @@ const ReleasePage = () => {
                     })}
                   </div>
                 ) : (
-                  <div className="px-4 py-4 text-sm text-gray-500">
+                  <div data-st="meta" className="px-4 py-4 text-sm">
                     No release history yet.
                   </div>
                 )}
@@ -455,8 +479,11 @@ const ReleasePage = () => {
         <div className="w-56 shrink-0 space-y-4">
           {/* Cover art */}
           {release.image && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <div data-st="panel" className="overflow-hidden">
+              <div
+                data-st="colhead"
+                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
+              >
                 Cover
               </div>
               <img
@@ -468,8 +495,11 @@ const ReleasePage = () => {
           )}
 
           {/* Votes */}
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <div data-st="panel" className="overflow-hidden">
+            <div
+              data-st="colhead"
+              className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
+            >
               Rating
             </div>
             <div className="px-3 py-3 flex flex-col gap-2">
@@ -479,10 +509,11 @@ const ReleasePage = () => {
                   aria-label="Vote up"
                   disabled={voting || unvoting}
                   onClick={() => handleVote(true)}
-                  className={`flex-1 py-1.5 text-sm rounded border transition-colors disabled:opacity-50 ${
-                    myVote === 'up'
-                      ? 'bg-green-700 border-green-600 text-white'
-                      : 'bg-gray-800 border-gray-700 text-green-400 hover:bg-green-900/40'
+                  data-st="control"
+                  data-st-primary
+                  data-st-success
+                  className={`flex-1 text-sm disabled:opacity-50 ${
+                    myVote === 'up' ? '' : 'opacity-60'
                   }`}
                 >
                   ▲{agg ? ` ${agg.ups}` : ''}
@@ -492,23 +523,24 @@ const ReleasePage = () => {
                   aria-label="Vote down"
                   disabled={voting || unvoting}
                   onClick={() => handleVote(false)}
-                  className={`flex-1 py-1.5 text-sm rounded border transition-colors disabled:opacity-50 ${
-                    myVote === 'down'
-                      ? 'bg-red-800 border-red-700 text-white'
-                      : 'bg-gray-800 border-gray-700 text-red-400 hover:bg-red-900/40'
+                  data-st="control"
+                  data-st-primary
+                  data-st-danger
+                  className={`flex-1 text-sm disabled:opacity-50 ${
+                    myVote === 'down' ? '' : 'opacity-60'
                   }`}
                 >
                   ▼{agg ? ` ${agg.total - agg.ups}` : ''}
                 </button>
               </div>
               {agg && agg.total > 0 && (
-                <p className="text-xs text-gray-500 text-center">
+                <p data-st="meta" className="text-xs text-center">
                   {Math.round((agg.ups / agg.total) * 100)}% positive ·{' '}
                   {agg.total} vote{agg.total !== 1 ? 's' : ''}
                 </p>
               )}
               {agg && agg.total > 0 && (
-                <p className="text-xs text-gray-500 text-center">
+                <p data-st="meta" className="text-xs text-center">
                   Score: {(agg.score * 100).toFixed(1)}
                 </p>
               )}
@@ -517,14 +549,17 @@ const ReleasePage = () => {
 
           {/* Artist */}
           {release.artist && (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <div data-st="panel" className="overflow-hidden">
+              <div
+                data-st="colhead"
+                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
+              >
                 Artist
               </div>
               <div className="px-3 py-2 text-sm">
                 <Link
                   to={`/private/artists/${release.artist.id}`}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                  data-st="control"
                 >
                   {release.artist.name}
                 </Link>
@@ -533,8 +568,11 @@ const ReleasePage = () => {
           )}
 
           {/* Tags */}
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <div data-st="panel" className="overflow-hidden">
+            <div
+              data-st="colhead"
+              className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
+            >
               Tags
             </div>
             <div className="px-3 py-2 space-y-2">
@@ -543,13 +581,15 @@ const ReleasePage = () => {
                   {tags.map((t) => (
                     <div
                       key={t.id}
-                      className="flex items-center justify-between gap-2 rounded border border-gray-700 bg-gray-800 px-2 py-1.5 text-xs"
+                      data-st="chip"
+                      className="flex items-center justify-between gap-2 px-2 py-1.5 text-xs"
                     >
                       <Link
                         to={`/private/releases?tags=${encodeURIComponent(
                           t.name
                         )}`}
-                        className="min-w-0 truncate text-indigo-300 hover:text-indigo-200"
+                        data-st="control"
+                        className="min-w-0 truncate"
                       >
                         {t.name}
                       </Link>
@@ -560,15 +600,16 @@ const ReleasePage = () => {
                           aria-label={`Vote tag ${t.name} up`}
                           disabled={votingTag || t.myVotes?.up}
                           onClick={() => handleVoteTag(t.tagId, 'up')}
-                          className={`rounded border px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
-                            t.myVotes?.up
-                              ? 'border-green-600 bg-green-700/60 text-white'
-                              : 'border-gray-600 text-green-400 hover:bg-green-900/40'
+                          data-st="control"
+                          data-st-primary
+                          data-st-success
+                          className={`disabled:opacity-50 ${
+                            t.myVotes?.up ? '' : 'opacity-60'
                           }`}
                         >
                           ▲
                         </button>
-                        <span className="min-w-8 text-center text-gray-300">
+                        <span data-st="meta" className="min-w-8 text-center">
                           {t.score}
                         </span>
                         <button
@@ -577,10 +618,11 @@ const ReleasePage = () => {
                           aria-label={`Vote tag ${t.name} down`}
                           disabled={votingTag || t.myVotes?.down}
                           onClick={() => handleVoteTag(t.tagId, 'down')}
-                          className={`rounded border px-1.5 py-0.5 transition-colors disabled:opacity-50 ${
-                            t.myVotes?.down
-                              ? 'border-red-700 bg-red-800/60 text-white'
-                              : 'border-gray-600 text-red-400 hover:bg-red-900/40'
+                          data-st="control"
+                          data-st-primary
+                          data-st-danger
+                          className={`disabled:opacity-50 ${
+                            t.myVotes?.down ? '' : 'opacity-60'
                           }`}
                         >
                           ▼
@@ -591,7 +633,9 @@ const ReleasePage = () => {
                             title="Remove tag"
                             onClick={() => handleRemoveTag(t.tagId)}
                             disabled={removingTag}
-                            className="ml-1 text-gray-500 transition-colors hover:text-red-400 disabled:opacity-50"
+                            data-st="control"
+                            data-st-danger
+                            className="ml-1 disabled:opacity-50"
                           >
                             ×
                           </button>
@@ -601,24 +645,29 @@ const ReleasePage = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-gray-600">No tags yet.</p>
+                <p data-st="meta" className="text-xs">
+                  No tags yet.
+                </p>
               )}
               <div className="flex gap-1">
                 <input
                   type="text"
+                  data-st="field"
                   value={pendingTag}
                   onChange={(e) => setPendingTag(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleAddTag();
                   }}
                   placeholder="Add tag…"
-                  className="flex-1 min-w-0 bg-gray-800 border border-gray-700 text-gray-200 text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="flex-1 min-w-0 text-xs rounded px-2 py-1"
                 />
                 <button
                   type="button"
                   disabled={addingTag || !pendingTag.trim()}
                   onClick={handleAddTag}
-                  className="px-2 py-1 bg-indigo-700 hover:bg-indigo-600 text-white text-xs rounded disabled:opacity-50 transition-colors"
+                  data-st="control"
+                  data-st-primary
+                  className="text-xs disabled:opacity-50"
                 >
                   +
                 </button>
@@ -627,21 +676,24 @@ const ReleasePage = () => {
           </div>
 
           {/* Metadata */}
-          <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-            <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <div data-st="panel" className="overflow-hidden">
+            <div
+              data-st="colhead"
+              className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
+            >
               Info
             </div>
-            <ul className="divide-y divide-gray-800 text-xs">
+            <ul data-st="list" className="text-xs">
               {release.type && (
-                <li className="flex justify-between px-3 py-1.5">
-                  <span className="text-gray-500">Type</span>
-                  <span className="text-gray-300">{release.type}</span>
+                <li data-st="row" className="flex justify-between px-3 py-1.5">
+                  <span data-st="meta">Type</span>
+                  <span data-st="prose">{release.type}</span>
                 </li>
               )}
               {release.year && (
-                <li className="flex justify-between px-3 py-1.5">
-                  <span className="text-gray-500">Year</span>
-                  <span className="text-gray-300">{release.year}</span>
+                <li data-st="row" className="flex justify-between px-3 py-1.5">
+                  <span data-st="meta">Year</span>
+                  <span data-st="prose">{release.year}</span>
                 </li>
               )}
             </ul>
@@ -658,49 +710,64 @@ const ReleasePage = () => {
 
       {editOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-lg mx-4 shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-700">
-              <h2 className="text-sm font-semibold text-gray-100">
+          <div data-st="panel" className="w-full max-w-lg mx-4 shadow-2xl">
+            <div
+              data-st="colhead"
+              className="flex items-center justify-between px-5 py-4"
+            >
+              <h2
+                data-st="prose"
+                data-st-strong
+                className="text-sm font-semibold"
+              >
                 Edit release
               </h2>
               <button
                 type="button"
+                data-st="control"
                 onClick={() => setEditOpen(false)}
-                className="text-gray-500 hover:text-gray-300 text-lg leading-none"
+                className="text-lg leading-none"
               >
                 ×
               </button>
             </div>
             <div className="px-5 py-4 space-y-4">
               <label className="block">
-                <span className="text-xs text-gray-400 block mb-1">Title</span>
+                <span data-st="meta" className="text-xs block mb-1">
+                  Title
+                </span>
                 <input
                   type="text"
+                  data-st="field"
                   value={editForm.title}
                   onChange={(e) =>
                     setEditForm((f) => ({ ...f, title: e.target.value }))
                   }
-                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded px-3 py-1.5 text-sm"
                 />
               </label>
               <label className="block">
-                <span className="text-xs text-gray-400 block mb-1">
+                <span data-st="meta" className="text-xs block mb-1">
                   Description
                 </span>
                 <textarea
+                  data-st="field"
                   value={editForm.description}
                   rows={5}
                   onChange={(e) =>
                     setEditForm((f) => ({ ...f, description: e.target.value }))
                   }
-                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-y"
+                  className="w-full rounded px-3 py-1.5 text-sm resize-y"
                 />
               </label>
               <div className="flex gap-3">
                 <label className="block flex-1">
-                  <span className="text-xs text-gray-400 block mb-1">Year</span>
+                  <span data-st="meta" className="text-xs block mb-1">
+                    Year
+                  </span>
                   <input
                     type="number"
+                    data-st="field"
                     min={1900}
                     max={2100}
                     value={editForm.year}
@@ -710,29 +777,32 @@ const ReleasePage = () => {
                         year: parseInt(e.target.value) || 0
                       }))
                     }
-                    className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full rounded px-3 py-1.5 text-sm"
                   />
                 </label>
               </div>
               <label className="block">
-                <span className="text-xs text-gray-400 block mb-1">
+                <span data-st="meta" className="text-xs block mb-1">
                   Cover image URL
                 </span>
                 <div className="flex gap-2">
                   <input
                     type="url"
+                    data-st="field"
                     value={editForm.image}
                     onChange={(e) =>
                       setEditForm((f) => ({ ...f, image: e.target.value }))
                     }
                     placeholder="https://…"
-                    className="flex-1 bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="flex-1 rounded px-3 py-1.5 text-sm"
                   />
                   {editForm.image && (
                     <button
                       type="button"
+                      data-st="control"
+                      data-st-danger
                       onClick={() => setEditForm((f) => ({ ...f, image: '' }))}
-                      className="text-xs text-gray-500 hover:text-red-400 px-2"
+                      className="text-xs px-2"
                     >
                       Clear
                     </button>
@@ -740,35 +810,39 @@ const ReleasePage = () => {
                 </div>
               </label>
               <label className="block">
-                <span className="text-xs text-gray-400 block mb-1">
-                  Edit summary <span className="text-gray-600">(optional)</span>
+                <span data-st="meta" className="text-xs block mb-1">
+                  Edit summary <span data-st="meta">(optional)</span>
                 </span>
                 <input
                   type="text"
+                  data-st="field"
                   value={editForm.editSummary}
                   maxLength={255}
                   onChange={(e) =>
                     setEditForm((f) => ({ ...f, editSummary: e.target.value }))
                   }
                   placeholder="Brief description of changes…"
-                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-1.5 text-sm text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full rounded px-3 py-1.5 text-sm"
                 />
               </label>
               {editError && <p className="text-xs text-red-400">{editError}</p>}
             </div>
-            <div className="flex justify-end gap-2 px-5 py-3 border-t border-gray-700">
+            <div data-st="colhead" className="flex justify-end gap-2 px-5 py-3">
               <button
                 type="button"
+                data-st="control"
                 onClick={() => setEditOpen(false)}
-                className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+                className="text-xs"
               >
                 Cancel
               </button>
               <button
                 type="button"
+                data-st="control"
+                data-st-primary
                 disabled={saving}
                 onClick={handleEditSave}
-                className="px-4 py-1.5 bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 text-white text-xs rounded transition-colors"
+                className="text-xs disabled:opacity-50"
               >
                 {saving ? 'Saving…' : 'Save'}
               </button>
