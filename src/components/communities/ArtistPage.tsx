@@ -11,6 +11,7 @@ import { addAlert } from '../../store/slices/alertSlice';
 import { useAppDispatch } from '../../store/hooks';
 import Spinner from '../layout/Spinner';
 import CommentsSection from '../layout/CommentsSection';
+import { Badge } from '../ui';
 
 const ArtistPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,35 +71,35 @@ const ArtistPage = () => {
   return (
     <div>
       {/* Breadcrumb */}
-      <nav className="text-sm text-gray-500 mb-4">
-        <Link to="/private/communities" className="hover:text-gray-300">
+      <nav data-st="meta" className="text-sm mb-4">
+        <Link to="/private/communities" data-st="control">
           Artists
         </Link>
         {' › '}
-        <strong className="text-gray-200">{artist.name}</strong>
+        <strong data-st="prose" data-st-strong>
+          {artist.name}
+        </strong>
       </nav>
 
       {/* Artist header */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 flex items-center gap-2">
-          <span className="text-sm font-semibold text-gray-200">
+      <div data-st="panel" className="overflow-hidden mb-4">
+        <div data-st="colhead" className="px-4 py-2 flex items-center gap-2">
+          <span
+            data-st="prose"
+            data-st-strong
+            className="text-sm font-semibold"
+          >
             {artist.name}
           </span>
-          {artist.vanityHouse && (
-            <span className="text-xs px-1.5 py-0.5 bg-indigo-900 text-indigo-300 rounded border border-indigo-700 font-medium">
-              Vanity House
-            </span>
-          )}
+          {artist.vanityHouse && <Badge variant="info">Vanity House</Badge>}
           {user && (
             <div className="ml-auto flex items-center gap-2">
               <button
                 onClick={handleSubscribe}
                 disabled={subscribing || unsubscribing}
-                className={`text-xs px-2 py-0.5 rounded border transition-colors disabled:opacity-50 ${
-                  isSubscribed
-                    ? 'border-indigo-600 text-indigo-400 hover:border-red-500 hover:text-red-400'
-                    : 'border-gray-600 text-gray-400 hover:border-indigo-500 hover:text-indigo-400'
-                }`}
+                data-st="control"
+                {...(isSubscribed ? { 'data-st-danger': '' } : {})}
+                className="text-xs disabled:opacity-50"
               >
                 {isSubscribed ? 'Subscribed' : 'Subscribe'}
               </button>
@@ -106,7 +107,8 @@ const ArtistPage = () => {
                 onClick={handleBookmark}
                 disabled={bookmarking}
                 title="Bookmark artist"
-                className="text-gray-500 hover:text-yellow-300 text-sm transition-colors disabled:opacity-50"
+                data-st="control"
+                className="text-sm disabled:opacity-50"
               >
                 🔖
               </button>
@@ -114,68 +116,80 @@ const ArtistPage = () => {
           )}
         </div>
         {artist.description && (
-          <div className="px-4 py-3 text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
+          <div
+            data-st="prose"
+            className="px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed"
+          >
             {artist.description}
           </div>
         )}
       </div>
 
       {/* Tags */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+      <div data-st="panel" className="overflow-hidden mb-4">
+        <div
+          data-st="colhead"
+          className="px-4 py-2 text-xs font-semibold uppercase tracking-wider"
+        >
           Tags
         </div>
-        <div className="px-4 py-2 text-sm text-gray-300">
+        <div className="px-4 py-2 text-sm">
           {tags.length > 0 ? (
             tags.map((t, i) => (
               <span key={t.tag.id}>
-                {i > 0 && <span className="text-gray-600">{', '}</span>}
-                <span className="text-indigo-400">{t.tag.name}</span>
+                {i > 0 && <span data-st="meta">{', '}</span>}
+                <span data-st="control">{t.tag.name}</span>
               </span>
             ))
           ) : (
-            <span className="text-gray-600">No tags.</span>
+            <span data-st="meta">No tags.</span>
           )}
         </div>
       </div>
 
       {/* Similar artists */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+      <div data-st="panel" className="overflow-hidden mb-4">
+        <div
+          data-st="colhead"
+          className="px-4 py-2 text-xs font-semibold uppercase tracking-wider"
+        >
           Similar Artists
         </div>
-        <div className="px-4 py-2 text-sm text-gray-300">
+        <div className="px-4 py-2 text-sm">
           {similar.length > 0 ? (
             similar.map((s, i) => (
               <span key={s.similarArtist.id}>
-                {i > 0 && <span className="text-gray-600">{', '}</span>}
+                {i > 0 && <span data-st="meta">{', '}</span>}
                 <Link
                   to={`/private/artists/${s.similarArtist.id}`}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                  data-st="control"
                 >
                   {s.similarArtist.name}
                 </Link>
               </span>
             ))
           ) : (
-            <span className="text-gray-600">No similar artists.</span>
+            <span data-st="meta">No similar artists.</span>
           )}
         </div>
       </div>
 
       {/* Aliases */}
       {aliases.length > 0 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden mb-4">
-          <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <div data-st="panel" className="overflow-hidden mb-4">
+          <div
+            data-st="colhead"
+            className="px-4 py-2 text-xs font-semibold uppercase tracking-wider"
+          >
             Also Known As
           </div>
-          <div className="px-4 py-2 text-sm text-gray-300">
+          <div className="px-4 py-2 text-sm">
             {aliases.map((a, i) => (
               <span key={a.redirect.id}>
-                {i > 0 && <span className="text-gray-600">{', '}</span>}
+                {i > 0 && <span data-st="meta">{', '}</span>}
                 <Link
                   to={`/private/artists/${a.redirect.id}`}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                  data-st="control"
                 >
                   {a.redirect.name}
                 </Link>
@@ -186,18 +200,18 @@ const ArtistPage = () => {
       )}
 
       {/* Discography */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-        <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 text-sm font-semibold text-gray-200">
+      <div data-st="panel" className="overflow-hidden">
+        <div data-st="colhead" className="px-4 py-2 text-sm font-semibold">
           Discography
         </div>
         {releases.length === 0 ? (
-          <div className="px-4 py-6 text-sm text-gray-500 text-center">
+          <div data-st="meta" className="px-4 py-6 text-sm text-center">
             No accessible releases.
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-700 text-left text-gray-400 text-xs">
+          <table data-st="grid" className="w-full text-sm">
+            <thead data-st="colhead">
+              <tr className="text-xs">
                 <th className="px-4 py-2 font-medium w-16">Year</th>
                 <th className="px-4 py-2 font-medium">Title</th>
                 <th className="px-4 py-2 font-medium">Community</th>
@@ -213,41 +227,40 @@ const ArtistPage = () => {
                 return (
                   <tr
                     key={release.id}
-                    className="border-b border-gray-800 hover:bg-gray-800/30 transition-colors"
+                    data-st="row"
+                    className="transition-colors"
                   >
-                    <td className="px-4 py-2 text-gray-400 text-xs font-medium whitespace-nowrap">
-                      {isFirstInYear ? (
-                        yearLabel
-                      ) : (
-                        <span className="text-gray-700">—</span>
-                      )}
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <span data-st="meta" className="text-xs font-medium">
+                        {isFirstInYear ? yearLabel : '—'}
+                      </span>
                     </td>
                     <td className="px-4 py-2">
                       {release.communityId ? (
                         <Link
                           to={`/private/communities/${release.communityId}/releases/${release.id}`}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                          data-st="control"
                         >
                           {release.title}
                         </Link>
                       ) : (
-                        <span className="text-gray-300">{release.title}</span>
+                        <span data-st="prose">{release.title}</span>
                       )}
                     </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs">
+                    <td className="px-4 py-2 text-xs">
                       {release.community ? (
                         <Link
                           to={`/private/communities/${release.community.id}`}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                          data-st="control"
                         >
                           {release.community.name}
                         </Link>
                       ) : (
-                        <span className="text-gray-700">—</span>
+                        <span data-st="meta">—</span>
                       )}
                     </td>
-                    <td className="px-4 py-2 text-gray-500 text-xs">
-                      {release.type ?? '—'}
+                    <td className="px-4 py-2 text-xs">
+                      <span data-st="meta">{release.type ?? '—'}</span>
                     </td>
                   </tr>
                 );

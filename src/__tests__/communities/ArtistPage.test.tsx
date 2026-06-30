@@ -139,6 +139,21 @@ describe('ArtistPage', () => {
     expect(screen.getByText(/vanity house/i)).toBeInTheDocument();
   });
 
+  it('carries the data-st theming hooks (grid discography + vanity chip)', () => {
+    mockUseGetArtistByIdQuery.mockReturnValue({
+      data: makeArtist({ vanityHouse: true }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ArtistPage />);
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    // The Vanity House pill paints from the chip Role via the kit Badge.
+    expect(screen.getByText(/vanity house/i)).toHaveAttribute(
+      'data-st',
+      'chip'
+    );
+  });
+
   it('shows no releases message when discography is empty', () => {
     mockUseGetArtistByIdQuery.mockReturnValue({
       data: makeArtist({ releases: [] }),
