@@ -101,6 +101,25 @@ describe('CommunityManager', () => {
     ).toBeInTheDocument();
   });
 
+  it('emits the data-st contract via the kit (table grid + field)', () => {
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(1)] },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<CommunityManager />);
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+  });
+
   it('creates a community and dispatches success alert', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({

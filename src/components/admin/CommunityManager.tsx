@@ -10,6 +10,7 @@ import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import type { Community, CommunityType, RegistrationStatus } from '../../types';
+import { PageShell, Panel, Button, SectionHeading } from '../ui';
 
 const COMMUNITY_TYPES: CommunityType[] = [
   'Music',
@@ -36,9 +37,6 @@ const isRegistrationStatus = (v: unknown): v is RegistrationStatus =>
 const toRegistrationStatus = (
   v: string | null | undefined
 ): RegistrationStatus => (isRegistrationStatus(v) ? v : 'open');
-
-const selectClass =
-  'rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
 
 const EditRow = ({
   community,
@@ -89,55 +87,59 @@ const EditRow = ({
   };
 
   return (
-    <tr className="bg-indigo-950/30">
-      <td className="px-4 py-2" colSpan={5}>
-        <form onSubmit={handleSave} className="space-y-3">
+    <tr data-st="row" data-st-open>
+      <td className="p-0" colSpan={5}>
+        <form onSubmit={handleSave} className="p-4 space-y-3">
           <div className="flex flex-wrap gap-2 items-end">
             <div>
               <label
                 htmlFor={`edit-cm-name-${community.id}`}
-                className="block text-xs text-gray-400 mb-1"
+                data-st="meta"
+                className="block mb-1"
               >
                 Name
               </label>
               <input
                 id={`edit-cm-name-${community.id}`}
+                data-st="field"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
               />
             </div>
             <div className="flex-1 min-w-40">
               <label
                 htmlFor={`edit-cm-desc-${community.id}`}
-                className="block text-xs text-gray-400 mb-1"
+                data-st="meta"
+                className="block mb-1"
               >
                 Description
               </label>
               <input
                 id={`edit-cm-desc-${community.id}`}
+                data-st="field"
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-full"
               />
             </div>
             <div>
               <label
                 htmlFor={`edit-cm-status-${community.id}`}
-                className="block text-xs text-gray-400 mb-1"
+                data-st="meta"
+                className="block mb-1"
               >
                 Registration
               </label>
               <select
                 id={`edit-cm-status-${community.id}`}
+                data-st="field"
                 value={registrationStatus}
                 onChange={(e) =>
                   setRegistrationStatus(e.target.value as RegistrationStatus)
                 }
-                className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
               >
                 {REGISTRATION_STATUSES.map(({ value, label }) => (
                   <option key={value} value={value}>
@@ -149,31 +151,34 @@ const EditRow = ({
             <div>
               <label
                 htmlFor={`edit-cm-leader-${community.id}`}
-                className="block text-xs text-gray-400 mb-1"
+                data-st="meta"
+                className="block mb-1"
               >
                 Leader (User ID)
               </label>
               <input
                 id={`edit-cm-leader-${community.id}`}
+                data-st="field"
                 type="number"
                 min={1}
                 value={leaderId}
                 onChange={(e) => setLeaderId(e.target.value)}
                 placeholder="—"
-                className="w-24 rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="w-24"
               />
             </div>
             <div className="flex items-center gap-2 self-end pb-1">
               <input
                 id={`edit-cm-dupeformats-${community.id}`}
+                data-st="field"
                 type="checkbox"
                 checked={allowDuplicateFormats}
                 onChange={(e) => setAllowDuplicateFormats(e.target.checked)}
-                className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
               />
               <label
                 htmlFor={`edit-cm-dupeformats-${community.id}`}
-                className="text-xs text-gray-400 whitespace-nowrap"
+                data-st="meta"
+                className="whitespace-nowrap"
               >
                 Allow duplicate formats
               </label>
@@ -181,66 +186,63 @@ const EditRow = ({
           </div>
 
           {/* Staff management */}
-          <div className="border border-gray-700 rounded p-3 space-y-2">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <div className="border border-[var(--st-border)] rounded p-3 space-y-2">
+            <p
+              data-st="meta"
+              className="text-xs font-semibold uppercase tracking-wider"
+            >
               Community Staff
             </p>
             <div className="flex flex-wrap gap-1.5">
               {staffMembers.length === 0 && (
-                <span className="text-xs text-gray-600">
+                <span data-st="meta" className="text-xs">
                   No staff assigned.
                 </span>
               )}
               {staffMembers.map((s) => (
                 <span
                   key={s.id}
-                  className="inline-flex items-center gap-1 text-xs bg-gray-700 text-gray-200 rounded px-2 py-0.5"
+                  data-st="chip"
+                  className="inline-flex items-center gap-1 text-xs"
                 >
                   {s.username}
-                  <button
-                    type="button"
+                  <Button
+                    variant="link-danger"
                     onClick={() => handleRemoveStaff(s.id)}
-                    className="text-gray-500 hover:text-red-400 ml-0.5"
+                    className="ml-0.5"
                   >
                     ×
-                  </button>
+                  </Button>
                 </span>
               ))}
             </div>
             <div className="flex gap-2">
               <input
+                data-st="field"
                 type="number"
                 min={1}
                 value={newStaffUserId}
                 onChange={(e) => setNewStaffUserId(e.target.value)}
                 placeholder="User ID"
-                className="rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 w-24"
+                className="w-24"
               />
-              <button
-                type="button"
+              <Button
+                variant="primary"
                 onClick={handleAddStaff}
                 disabled={!newStaffUserId}
-                className="text-xs bg-gray-600 hover:bg-gray-500 disabled:opacity-40 text-white px-2 py-1 rounded"
               >
                 Add Staff
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className="flex gap-2">
-            <button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-sm"
-            >
+            <Button variant="primary" type="submit">
               Save
-            </button>
-            <button
-              type="button"
-              onClick={onDone}
-              className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-sm"
-            >
+            </Button>
+            <Button variant="link" onClick={onDone}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </td>
@@ -292,145 +294,114 @@ const CommunityManager = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center gap-4 flex-wrap">
-        <div>
-          <Link
-            to="/private/staff/tools"
-            className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-          >
-            ← Toolbox
-          </Link>
-          <h2 className="mt-1 text-2xl font-bold text-white">
-            Community Manager
-          </h2>
-        </div>
-      </div>
-
-      {/* Existing communities */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Communities
-          </h3>
-        </div>
-        {isLoading ? (
-          <Spinner />
-        ) : error ? (
-          <p className="p-4 text-sm text-red-400">
-            Failed to load communities.
-          </p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
-                <th className="text-left px-4 py-2 font-semibold">Name</th>
-                <th className="text-left px-4 py-2 font-semibold">Type</th>
-                <th className="text-left px-4 py-2 font-semibold">
-                  Description
-                </th>
-                <th className="text-right px-4 py-2 font-semibold">Releases</th>
-                <th className="px-4 py-2 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {!communities?.data?.length ? (
+    <PageShell title="Community Manager" width="lg">
+      <section className="space-y-3">
+        <SectionHeading>Communities</SectionHeading>
+        <Panel className="overflow-hidden">
+          {isLoading ? (
+            <div className="p-6">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+              Failed to load communities.
+            </p>
+          ) : (
+            <table data-st="grid">
+              <thead data-st="colhead">
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    No communities yet.
-                  </td>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th data-st-num>Releases</th>
+                  <th />
                 </tr>
-              ) : (
-                communities.data.map((c) =>
-                  editingId === c.id ? (
-                    <EditRow
-                      key={c.id}
-                      community={c}
-                      onDone={() => setEditingId(null)}
-                    />
-                  ) : (
-                    <tr
-                      key={c.id}
-                      className="hover:bg-gray-700/30 transition-colors"
-                    >
-                      <td className="px-4 py-2 text-gray-200 font-medium">
-                        <Link
-                          to={`/private/communities/${c.id}`}
-                          className="hover:text-indigo-300 transition-colors"
-                        >
-                          {c.name}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-2 text-gray-400">
-                        {c.type ?? '—'}
-                      </td>
-                      <td className="px-4 py-2 text-gray-400">
-                        {c.description ?? '—'}
-                      </td>
-                      <td className="px-4 py-2 text-gray-400 text-right">
-                        {c._count?.releases ?? 0}
-                      </td>
-                      <td className="px-4 py-2 text-center">
-                        <button
-                          type="button"
-                          onClick={() => setEditingId(c.id)}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm"
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
+              </thead>
+              <tbody>
+                {!communities?.data?.length ? (
+                  <tr data-st="row">
+                    <td colSpan={5} className="text-center">
+                      No communities yet.
+                    </td>
+                  </tr>
+                ) : (
+                  communities.data.map((c) =>
+                    editingId === c.id ? (
+                      <EditRow
+                        key={c.id}
+                        community={c}
+                        onDone={() => setEditingId(null)}
+                      />
+                    ) : (
+                      <tr key={c.id} data-st="row">
+                        <td className="font-medium">
+                          <Link
+                            to={`/private/communities/${c.id}`}
+                            data-st="control"
+                          >
+                            {c.name}
+                          </Link>
+                        </td>
+                        <td>{c.type ?? '—'}</td>
+                        <td>{c.description ?? '—'}</td>
+                        <td data-st-num>{c._count?.releases ?? 0}</td>
+                        <td className="text-center">
+                          <Button
+                            variant="link"
+                            onClick={() => setEditingId(c.id)}
+                          >
+                            Edit
+                          </Button>
+                        </td>
+                      </tr>
+                    )
                   )
-                )
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
+                )}
+              </tbody>
+            </table>
+          )}
+        </Panel>
+      </section>
 
-      {/* Create new community */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Create New Community
-          </h3>
-        </div>
-        <form
+      <section className="space-y-3">
+        <SectionHeading>Create New Community</SectionHeading>
+        <Panel
+          as="form"
           onSubmit={handleCreate}
           className="p-4 flex flex-wrap gap-4 items-end"
         >
           <div>
             <label
               htmlFor="cm-name"
-              className="block text-sm font-medium text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm font-medium mb-1"
             >
-              Name <span className="text-red-400">*</span>
+              Name <span className="text-[var(--st-danger)]">*</span>
             </label>
             <input
               id="cm-name"
+              data-st="field"
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               required
               placeholder="Community name"
-              className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-52"
+              className="w-52"
             />
           </div>
           <div>
             <label
               htmlFor="cm-type"
-              className="block text-sm font-medium text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm font-medium mb-1"
             >
-              Type <span className="text-red-400">*</span>
+              Type <span className="text-[var(--st-danger)]">*</span>
             </label>
             <select
               id="cm-type"
+              data-st="field"
               value={newType}
               onChange={(e) => setNewType(e.target.value as CommunityType)}
-              className={selectClass}
             >
               {COMMUNITY_TYPES.map((t) => (
                 <option key={t} value={t}>
@@ -442,17 +413,18 @@ const CommunityManager = () => {
           <div>
             <label
               htmlFor="cm-status"
-              className="block text-sm font-medium text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm font-medium mb-1"
             >
-              Registration <span className="text-red-400">*</span>
+              Registration <span className="text-[var(--st-danger)]">*</span>
             </label>
             <select
               id="cm-status"
+              data-st="field"
               value={newStatus}
               onChange={(e) =>
                 setNewStatus(e.target.value as RegistrationStatus)
               }
-              className={selectClass}
             >
               {REGISTRATION_STATUSES.map(({ value, label }) => (
                 <option key={value} value={value}>
@@ -464,64 +436,66 @@ const CommunityManager = () => {
           <div className="flex-1 min-w-48">
             <label
               htmlFor="cm-description"
-              className="block text-sm font-medium text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm font-medium mb-1"
             >
               Description
             </label>
             <input
               id="cm-description"
+              data-st="field"
               type="text"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder="Optional description"
-              className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full"
             />
           </div>
           {newStatus !== 'open' && (
             <div>
               <label
                 htmlFor="cm-leader-id"
-                className="block text-sm font-medium text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm font-medium mb-1"
               >
-                Leader User ID <span className="text-red-400">*</span>
+                Leader User ID{' '}
+                <span className="text-[var(--st-danger)]">*</span>
               </label>
               <input
                 id="cm-leader-id"
+                data-st="field"
                 type="number"
                 min={1}
                 value={newLeaderId}
                 onChange={(e) => setNewLeaderId(e.target.value)}
                 required
                 placeholder="User ID"
-                className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-28"
+                className="w-28"
               />
             </div>
           )}
           <div className="flex items-center gap-2 self-end pb-2.5">
             <input
               id="cm-allow-duplicate-formats"
+              data-st="field"
               type="checkbox"
               checked={newAllowDuplicateFormats}
               onChange={(e) => setNewAllowDuplicateFormats(e.target.checked)}
-              className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500"
             />
             <label
               htmlFor="cm-allow-duplicate-formats"
-              className="text-sm text-gray-300 whitespace-nowrap"
+              data-st="meta"
+              className="whitespace-nowrap"
             >
               Allow duplicate formats
             </label>
           </div>
-          <button
-            type="submit"
-            disabled={isCreating}
-            className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-          >
+          <Button variant="primary" type="submit" disabled={isCreating}>
             {isCreating ? 'Creating…' : 'Create Community'}
-          </button>
-        </form>
-      </div>
-    </div>
+          </Button>
+        </Panel>
+      </section>
+    </PageShell>
   );
 };
 
