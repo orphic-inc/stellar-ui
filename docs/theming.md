@@ -154,11 +154,17 @@ Each is independently grabbable; clear context between them.
 
 ## 7. Migration order (per surface)
 
+This is the **stable migration order** — the cluster sequence and its rationale.
+It is **not** a status tracker: do not annotate it with per-surface "Done: WSx…"
+notes in feature PRs (that rewrites the same lines on every branch and makes this
+section a serial merge-conflict magnet). **Per-surface progress lives in the
+rolling handoff, not here.**
+
 1. **Collage** (WS2 pilot — validate the contract).
-2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.) _Done: `ReleaseBrowsePage` (the release listing) — WS6; `RandomLinks` is the only other `search/` surface._
-3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings forms (`Settings` + `DonorSettingsTab` + `IrcNickSettings`) — WS8; invite surfaces (`InviteForm` + `InviteTree`) — WS9; ratio surfaces (`RatioStats` + `RatioRulesPage`) — WS10. **Profile section complete.**_
-4. **App chrome** — Navbar, Sidebar, UserMenu. _Done: the visible header + dropdowns (`PrivateHeader` + `UserMenu` + `NotificationCorner` + `QuickSearch`) — WS11; the shells, footer, and notice banners (`PublicLayout` + `PrivateLayout` + `PrivateFooter` + `GlobalNoticeBanner` + `Alert`) — WS12. **App-chrome section complete.**_
-5. **Long tail** — admin/staff pages last (least theme-facing). _Done via the UI primitive kit (ADR-0007): the staff/admin Toolbox adopts `src/components/ui/`, so each log/stat/queue/CRUD/read-only page emits the contract through the primitives. The three heavyweight managers (`CommunityManager`, `ForumControlPanel`, `ForumCategoryControlPanel`) are kit-adopted too; only `GenerateTestDataPage` (a dev-only utility) stays on its own markup by design._
+2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.)
+3. **Profile** surfaces.
+4. **App chrome** — Navbar, Sidebar, UserMenu.
+5. **Long tail** — admin/staff pages last (least theme-facing), via the UI primitive kit (ADR-0007).
 
 ---
 

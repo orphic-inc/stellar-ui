@@ -144,7 +144,10 @@ buttons/links use **`control`** (`-primary` CTA, `-danger` destructive), and for
 inputs use **`field`** — all paint from tokens, so don't leave them as inline
 gray utilities, which go illegible on a light theme. Add a hooks-present test
 assertion per migrated surface, and keep rendered text/links/controls intact so
-the existing suite stays green. Worked examples: `CollageDetail`,
+the existing suite stays green. **Don't tick off progress in `docs/theming.md`
+§7** — that section is the stable migration *order*, not a status tracker;
+editing its per-surface notes per-PR made it a serial merge-conflict magnet.
+Record per-surface progress in the rolling handoff instead. Worked examples: `CollageDetail`,
 `CommunityPage`, `LogBrowsePage`, `ForumPage`, `ForumTopicPage` +
 `ForumTopicPost` (established `prose`/`control`), `ForumCategoryPage` (table
 variant) + `NewTopicForm` (`field`), `ReleaseBrowsePage` (filter form + results
@@ -293,6 +296,20 @@ Run every step before committing. All must pass clean on new/changed files.
 5. Commit with descriptive message following existing log style
 
 > Order matters: format before lint (Prettier violations are ESLint errors), and lint before type-check.
+
+### Branch / merge discipline (rebase-only repo)
+
+Upstream `orphic-inc/stellar-ui` allows **rebase-and-merge only** (no merge or
+squash). Two rules follow:
+
+- **Update a feature branch with `git rebase upstream/main`, never `git merge
+  main`.** A merge commit in the branch makes GitHub **refuse to rebase-and-merge
+  it** ("this branch can't be rebased") — and the admin bypass only waives the
+  *review* requirement, not rebase feasibility. If a branch already has a merge
+  commit, rebase it onto `upstream/main` (dropping the merge), re-run the gate,
+  and `git push --force-with-lease`.
+- **Rebase right before requesting the merge** so a moving `main` doesn't surprise
+  you mid-merge.
 
 ## Testing
 
