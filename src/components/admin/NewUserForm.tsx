@@ -35,12 +35,7 @@ const NewUserForm = () => {
   };
 
   return (
-    <PageShell
-      title="Create a User"
-      backTo="/private/staff/tools"
-      backLabel="← Back to Toolbox"
-      width="sm"
-    >
+    <PageShell title="Create a User" width="sm">
       <Panel as="form" onSubmit={onSubmit} className="p-6 space-y-5">
         <Field
           id="new-username"

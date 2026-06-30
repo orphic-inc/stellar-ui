@@ -44,7 +44,7 @@ describe('NewUserForm', () => {
   it('shows back link to Toolbox', () => {
     renderWithProviders(<NewUserForm />);
     expect(
-      screen.getByRole('link', { name: /back to toolbox/i })
+      screen.getByRole('link', { name: /← toolbox/i })
     ).toBeInTheDocument();
   });
 

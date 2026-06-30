@@ -94,8 +94,20 @@ describe('UI kit — data-st contract', () => {
       expect(heading).toHaveAttribute('data-st-strong');
     });
 
-    it('renders no back-link by default', () => {
+    it('renders the Toolbox back-link by default', () => {
       renderWithProviders(<PageShell title="A">body</PageShell>);
+      expect(screen.getByRole('link', { name: '← Toolbox' })).toHaveAttribute(
+        'href',
+        '/private/staff/tools'
+      );
+    });
+
+    it('omits the back-link when backTo is null', () => {
+      renderWithProviders(
+        <PageShell title="A" backTo={null}>
+          body
+        </PageShell>
+      );
       expect(screen.queryByRole('link')).not.toBeInTheDocument();
     });
 

@@ -56,7 +56,7 @@ const RegistrationLogPage = () => {
       />
       <Pagination
         page={page}
-        totalPages={data?.meta.totalPages ?? 1}
+        totalPages={data?.meta?.totalPages ?? 1}
         onChange={setPage}
       />
     </PageShell>

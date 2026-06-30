@@ -16,8 +16,12 @@ type PageShellProps = {
   title: ReactNode;
   /** Right-aligned header slot — typically an add/toggle `Button`. */
   actions?: ReactNode;
-  /** When set, renders a back-link above the title. */
-  backTo?: string;
+  /**
+   * Back-link target above the title. Defaults to the staff Toolbox so every
+   * tool page carries the same return affordance — pass a different path to
+   * retarget, or `null` to omit the link entirely (non-tool pages).
+   */
+  backTo?: string | null;
   backLabel?: ReactNode;
   width?: PageWidth;
   className?: string;
@@ -26,14 +30,16 @@ type PageShellProps = {
 
 /**
  * The standard page wrapper for staff/admin tools: centered column at a chosen
- * width, the title as `prose -strong`, an optional "← Toolbox" back-link, and a
- * header actions slot. Replaces the per-page hand-rolled shell (which drifted
- * across five different max-widths) so every tool page reads the same.
+ * width, the title as `prose -strong`, a "← Toolbox" back-link (on by default so
+ * the return affordance is consistent and can't be forgotten), and a header
+ * actions slot. Replaces the per-page hand-rolled shell (which drifted across
+ * five different max-widths and an inconsistent back-link) so every tool page
+ * reads the same.
  */
 const PageShell = ({
   title,
   actions,
-  backTo,
+  backTo = '/private/staff/tools',
   backLabel = '← Toolbox',
   width = 'md',
   className,
