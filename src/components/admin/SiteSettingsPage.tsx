@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import {
@@ -7,6 +6,7 @@ import {
   useUpdateSiteSettingsMutation
 } from '../../store/services/siteApi';
 import Spinner from '../layout/Spinner';
+import { PageShell, Panel, Button, Field } from '../ui';
 
 const SiteSettingsPage = () => {
   const dispatch = useAppDispatch();
@@ -53,35 +53,26 @@ const SiteSettingsPage = () => {
   if (isLoading) return <Spinner />;
 
   return (
-    <div className="thin">
-      <div className="mb-4">
-        <Link
-          to="/private/staff/tools"
-          className="text-blue-400 text-sm hover:underline"
-        >
-          ← Toolbox
-        </Link>
-      </div>
-
-      <h2 className="text-xl font-semibold mb-4">Site Settings</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <PageShell title="Site Settings" width="sm">
+      <Panel as="form" onSubmit={handleSubmit} className="p-4 space-y-6">
         <div>
           <label
             htmlFor="registration-status"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-xs mb-1"
           >
             Registration
           </label>
           <select
             id="registration-status"
+            data-st="field"
             value={registrationStatus}
             onChange={(e) =>
               setRegistrationStatus(
                 e.target.value as 'open' | 'invite' | 'closed'
               )
             }
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+            className="w-full"
           >
             <option value="open">Open — anyone can register</option>
             <option value="invite">Invite only — requires an invite key</option>
@@ -90,21 +81,15 @@ const SiteSettingsPage = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="max-users"
-            className="block text-sm text-gray-400 mb-1"
-          >
-            Maximum users
-          </label>
-          <input
+          <Field
             id="max-users"
+            label="Maximum users"
             type="number"
             min={1}
             value={maxUsers}
             onChange={(e) => setMaxUsers(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p data-st="meta" className="text-xs mt-1">
             Registration is blocked once this limit is reached. Default: 7000.
           </p>
         </div>
@@ -112,33 +97,31 @@ const SiteSettingsPage = () => {
         <div>
           <label
             htmlFor="approved-domains"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-xs mb-1"
           >
             Approved contribution link domains{' '}
-            <span className="text-gray-600 text-xs">(optional)</span>
+            <span className="text-[var(--st-text-faint)]">(optional)</span>
           </label>
           <textarea
             id="approved-domains"
+            data-st="field"
             value={domainsText}
             onChange={(e) => setDomainsText(e.target.value)}
             rows={6}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm font-mono focus:outline-none focus:border-blue-500 resize-y"
+            className="w-full font-mono resize-y"
             placeholder={'example.com\ncdn.example.org'}
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p data-st="meta" className="text-xs mt-1">
             One hostname per line. If empty, all domains are permitted.
           </p>
         </div>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
-        >
+        <Button variant="primary" type="submit" disabled={saving}>
           {saving ? 'Saving…' : 'Save settings'}
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Panel>
+    </PageShell>
   );
 };
 

@@ -49,6 +49,14 @@ describe('SiteSettingsPage', () => {
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
+  it('renders the form on kit hooks', () => {
+    renderWithProviders(<SiteSettingsPage />);
+    expect(document.querySelector('form[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      document.querySelectorAll('[data-st="field"]').length
+    ).toBeGreaterThanOrEqual(3);
+  });
+
   it('pre-fills form with existing settings', () => {
     renderWithProviders(<SiteSettingsPage />);
     const select = screen.getByRole('combobox', {

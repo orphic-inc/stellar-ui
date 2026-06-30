@@ -60,6 +60,17 @@ describe('NewsManager', () => {
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
+  it('renders both lists on grid tables (kit hooks present)', () => {
+    mockGetAnnouncementsQuery.mockReturnValue({
+      data: emptyData,
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<NewsManager />);
+    expect(document.querySelectorAll('table[data-st="grid"]')).toHaveLength(2);
+    expect(document.querySelector('form[data-st="panel"]')).toBeInTheDocument();
+  });
+
   it('shows error messages on failure', () => {
     mockGetAnnouncementsQuery.mockReturnValue({
       data: undefined,

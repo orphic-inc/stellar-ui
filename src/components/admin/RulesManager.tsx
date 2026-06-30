@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   useGetRulesIndexQuery,
@@ -11,9 +11,7 @@ import { useDispatch } from 'react-redux';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
-
-const inputClass =
-  'rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500';
+import { PageShell, Panel, Button, Field, SectionHeading } from '../ui';
 
 const MainPageEditor = ({ page }: { page: RulesPage | null }) => {
   const dispatch = useDispatch();
@@ -42,31 +40,28 @@ const MainPageEditor = ({ page }: { page: RulesPage | null }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <input
+    <Panel as="form" onSubmit={handleSubmit} className="p-4 space-y-3">
+      <Field
+        label="Page title"
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Page title"
         required
-        className={`${inputClass} w-full`}
       />
       <textarea
+        data-st="field"
         value={body}
         onChange={(e) => setBody(e.target.value)}
         placeholder="Body (HTML supported: p, b, i, a, ul, li, code, blockquote…)"
         rows={12}
         required
-        className={`${inputClass} w-full font-mono`}
+        className="w-full font-mono"
       />
-      <button
-        type="submit"
-        disabled={saving}
-        className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-      >
+      <Button variant="primary" type="submit" disabled={saving}>
         {saving ? 'Saving…' : page ? 'Save Changes' : 'Create Main Page'}
-      </button>
-    </form>
+      </Button>
+    </Panel>
   );
 };
 
@@ -99,58 +94,51 @@ const SubPageEditForm = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 border-t border-gray-700 space-y-3 bg-indigo-950/20"
+      className="p-4 border-t border-[var(--st-border)] space-y-3"
     >
-      <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-        Edit: {page.title}
-      </h4>
-      <input
+      <SectionHeading className="text-xs">Edit: {page.title}</SectionHeading>
+      <Field
+        label="Title"
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Title"
         required
-        className={`${inputClass} w-full`}
       />
       <textarea
+        data-st="field"
         value={body}
         onChange={(e) => setBody(e.target.value)}
         placeholder="Body"
         rows={8}
         required
-        className={`${inputClass} w-full font-mono`}
+        className="w-full font-mono"
       />
       <div className="flex items-center gap-3">
         <label
           htmlFor={`spe-sort-${page.id}`}
-          className="text-sm text-gray-400 whitespace-nowrap"
+          data-st="meta"
+          className="whitespace-nowrap"
         >
           Sort order
         </label>
         <input
           id={`spe-sort-${page.id}`}
+          data-st="field"
           type="number"
           min={0}
           value={sortOrder}
           onChange={(e) => setSortOrder(Number(e.target.value))}
-          className={`${inputClass} w-24`}
+          className="w-24"
         />
       </div>
       <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-        >
+        <Button variant="primary" type="submit" disabled={isLoading}>
           {isLoading ? 'Saving…' : 'Save Changes'}
-        </button>
-        <button
-          type="button"
-          onClick={onDone}
-          className="text-gray-400 hover:text-gray-200 px-4 py-2 rounded text-sm transition-colors"
-        >
+        </Button>
+        <Button variant="link" onClick={onDone}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -183,58 +171,51 @@ const SubPageForm = ({ onDone }: { onDone: () => void }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 border-t border-gray-700 space-y-3"
+      className="p-4 border-t border-[var(--st-border)] space-y-3"
     >
-      <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-        New Sub-page
-      </h4>
-      <input
+      <SectionHeading className="text-xs">New Sub-page</SectionHeading>
+      <Field
+        label="Title"
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Title (slug auto-generated)"
         required
-        className={`${inputClass} w-full`}
       />
       <textarea
+        data-st="field"
         value={body}
         onChange={(e) => setBody(e.target.value)}
         placeholder="Body (HTML supported: p, b, i, a, ul, li, code, blockquote…)"
         rows={8}
         required
-        className={`${inputClass} w-full font-mono`}
+        className="w-full font-mono"
       />
       <div className="flex items-center gap-3">
         <label
           htmlFor="subpage-sort-order"
-          className="text-sm text-gray-400 whitespace-nowrap"
+          data-st="meta"
+          className="whitespace-nowrap"
         >
           Sort order
         </label>
         <input
           id="subpage-sort-order"
+          data-st="field"
           type="number"
           min={0}
           value={sortOrder}
           onChange={(e) => setSortOrder(Number(e.target.value))}
-          className={`${inputClass} w-24`}
+          className="w-24"
         />
       </div>
       <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-        >
+        <Button variant="primary" type="submit" disabled={isLoading}>
           {isLoading ? 'Creating…' : 'Create Sub-page'}
-        </button>
-        <button
-          type="button"
-          onClick={onDone}
-          className="text-gray-400 hover:text-gray-200 px-4 py-2 rounded text-sm transition-colors"
-        >
+        </Button>
+        <Button variant="link" onClick={onDone}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -260,138 +241,116 @@ const RulesManager = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
-        </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">Rules Manager</h2>
-      </div>
-
+    <PageShell title="Rules Manager" width="lg">
       {/* Main rules page editor */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Main Rules Page
-          </h3>
-        </div>
-        <div className="p-4">
-          {isLoading ? (
+      <section className="space-y-3">
+        <SectionHeading>Main Rules Page</SectionHeading>
+        {isLoading ? (
+          <Panel className="p-6">
             <Spinner />
-          ) : error ? (
-            <p className="text-sm text-red-400">Failed to load.</p>
-          ) : (
-            <MainPageEditor page={data?.main ?? null} />
-          )}
-        </div>
-      </div>
+          </Panel>
+        ) : error ? (
+          <Panel className="p-4">
+            <p data-st="prose" className="text-sm text-[var(--st-danger)]">
+              Failed to load.
+            </p>
+          </Panel>
+        ) : (
+          <MainPageEditor page={data?.main ?? null} />
+        )}
+      </section>
 
       {/* Sub-pages */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Sub-pages
-          </h3>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <SectionHeading>Sub-pages</SectionHeading>
           {!showNewForm && (
-            <button
-              type="button"
-              onClick={() => setShowNewForm(true)}
-              className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-            >
+            <Button variant="link" onClick={() => setShowNewForm(true)}>
               + New sub-page
-            </button>
+            </Button>
           )}
         </div>
 
-        {isLoading ? (
-          <Spinner />
-        ) : error ? (
-          <p className="p-4 text-sm text-red-400">Failed to load sub-pages.</p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
-                <th className="text-left px-4 py-2 font-semibold">Title</th>
-                <th className="text-left px-4 py-2 font-semibold">Slug</th>
-                <th className="text-left px-4 py-2 font-semibold">Order</th>
-                <th className="px-4 py-2 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {!data?.pages.length ? (
+        <Panel className="overflow-hidden">
+          {isLoading ? (
+            <div className="p-6">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+              Failed to load sub-pages.
+            </p>
+          ) : (
+            <table data-st="grid">
+              <thead data-st="colhead">
                 <tr>
-                  <td
-                    colSpan={4}
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    No sub-pages yet.
-                  </td>
+                  <th>Title</th>
+                  <th>Slug</th>
+                  <th>Order</th>
+                  <th />
                 </tr>
-              ) : (
-                data.pages.map((page) => (
-                  <>
-                    <tr
-                      key={page.id}
-                      className="hover:bg-gray-700/30 transition-colors"
-                    >
-                      <td className="px-4 py-2 text-gray-200 font-medium">
-                        <Link
-                          to={`/private/rules/${page.slug}`}
-                          className="hover:text-indigo-400 transition-colors"
-                        >
-                          {page.title}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-2 text-gray-400 font-mono text-xs">
-                        {page.slug}
-                      </td>
-                      <td className="px-4 py-2 text-gray-400">
-                        {page.sortOrder}
-                      </td>
-                      <td className="px-4 py-2 text-right whitespace-nowrap">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditingPageId(
-                              editingPageId === page.id ? null : page.id
-                            )
-                          }
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm mr-3"
-                        >
-                          {editingPageId === page.id ? 'Cancel' : 'Edit'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(page.id, page.title)}
-                          className="text-red-400 hover:text-red-300 transition-colors text-sm"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                    {editingPageId === page.id && (
-                      <tr key={`edit-${page.id}`}>
-                        <td colSpan={4} className="p-0">
-                          <SubPageEditForm
-                            page={page}
-                            onDone={() => setEditingPageId(null)}
-                          />
+              </thead>
+              <tbody>
+                {!data?.pages.length ? (
+                  <tr data-st="row">
+                    <td colSpan={4} className="text-center">
+                      No sub-pages yet.
+                    </td>
+                  </tr>
+                ) : (
+                  data.pages.map((page) => (
+                    <Fragment key={page.id}>
+                      <tr data-st="row">
+                        <td className="font-medium">
+                          <Link
+                            to={`/private/rules/${page.slug}`}
+                            data-st="control"
+                          >
+                            {page.title}
+                          </Link>
+                        </td>
+                        <td className="font-mono text-xs">{page.slug}</td>
+                        <td>{page.sortOrder}</td>
+                        <td className="text-right space-x-3 whitespace-nowrap">
+                          <Button
+                            variant="link"
+                            onClick={() =>
+                              setEditingPageId(
+                                editingPageId === page.id ? null : page.id
+                              )
+                            }
+                          >
+                            {editingPageId === page.id ? 'Cancel' : 'Edit'}
+                          </Button>
+                          <Button
+                            variant="link-danger"
+                            onClick={() => handleDelete(page.id, page.title)}
+                          >
+                            Delete
+                          </Button>
                         </td>
                       </tr>
-                    )}
-                  </>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
+                      {editingPageId === page.id && (
+                        <tr data-st="row" data-st-open>
+                          <td colSpan={4} className="p-0">
+                            <SubPageEditForm
+                              page={page}
+                              onDone={() => setEditingPageId(null)}
+                            />
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
 
-        {showNewForm && <SubPageForm onDone={() => setShowNewForm(false)} />}
-      </div>
-    </div>
+          {showNewForm && <SubPageForm onDone={() => setShowNewForm(false)} />}
+        </Panel>
+      </section>
+    </PageShell>
   );
 };
 

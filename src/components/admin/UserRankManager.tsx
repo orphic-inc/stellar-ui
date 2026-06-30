@@ -5,6 +5,12 @@ import {
   type UserRankRecord
 } from '../../store/services/userApi';
 import Spinner from '../layout/Spinner';
+import { PageShell, Panel, Button, DataTable, type Column } from '../ui';
+
+const permissionCount = (rank: UserRankRecord) =>
+  Object.values(
+    (rank as { permissions?: Record<string, boolean> | null }).permissions ?? {}
+  ).filter(Boolean).length;
 
 const UserRankManager = () => {
   const { data: userRanks, isLoading, error } = useGetUserRanksQuery();
@@ -16,121 +22,76 @@ const UserRankManager = () => {
     }
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">User Ranks</h2>
-        <div className="flex gap-3 text-sm">
+  const columns: Column<UserRankRecord>[] = [
+    {
+      header: 'Name',
+      cell: (r) => <span className="font-medium">{r.name}</span>
+    },
+    { header: 'Level', cell: (r) => r.level, numeric: true },
+    { header: 'Type', cell: (r) => (r.secondary ? 'Secondary' : 'Primary') },
+    { header: 'Users', cell: (r) => r.userCount ?? 0, numeric: true },
+    { header: 'Permissions', cell: permissionCount, numeric: true },
+    {
+      header: 'Forum Overrides',
+      cell: (r) => r.permittedForumIds?.length ?? 0,
+      numeric: true
+    },
+    {
+      header: 'Collage Limit',
+      cell: (r) =>
+        r.personalCollageLimit === 0 ? '∞' : (r.personalCollageLimit ?? '∞'),
+      numeric: true
+    },
+    {
+      header: 'Actions',
+      cell: (r) => (
+        <span className="flex gap-3">
           <Link
-            to="/private/staff/tools/user-ranks/new"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors"
+            to={`/private/staff/tools/user-ranks/${r.id}/edit`}
+            data-st="control"
           >
-            + New User Rank
+            Edit
           </Link>
-          <Link
-            to="/private/staff/tools"
-            className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1.5 rounded transition-colors"
-          >
-            ← Toolbox
-          </Link>
-        </div>
-      </div>
+          <Button variant="link-danger" onClick={() => handleDelete(r.id)}>
+            Delete
+          </Button>
+        </span>
+      )
+    }
+  ];
 
+  return (
+    <PageShell
+      title="User Ranks"
+      width="2xl"
+      actions={
+        <Link
+          to="/private/staff/tools/user-ranks/new"
+          data-st="control"
+          data-st-primary
+          className="text-sm"
+        >
+          + New User Rank
+        </Link>
+      }
+    >
       {isLoading ? (
         <Spinner />
       ) : error ? (
-        <div className="bg-red-900/40 border border-red-800 text-red-300 rounded-lg p-4 text-sm">
-          Failed to load user ranks.
-        </div>
+        <Panel className="p-4">
+          <p data-st="prose" className="text-sm text-[var(--st-danger)]">
+            Failed to load user ranks.
+          </p>
+        </Panel>
       ) : (
-        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-700/60 text-gray-300 text-xs uppercase tracking-wider">
-                <th className="text-left px-4 py-3 font-semibold">Name</th>
-                <th className="text-left px-4 py-3 font-semibold">Level</th>
-                <th className="text-left px-4 py-3 font-semibold">Type</th>
-                <th className="text-left px-4 py-3 font-semibold">Users</th>
-                <th className="text-left px-4 py-3 font-semibold">
-                  Permissions
-                </th>
-                <th className="text-left px-4 py-3 font-semibold">
-                  Forum Overrides
-                </th>
-                <th className="text-left px-4 py-3 font-semibold">
-                  Collage Limit
-                </th>
-                <th className="text-left px-4 py-3 font-semibold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {!userRanks?.length ? (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    No user ranks defined yet.
-                  </td>
-                </tr>
-              ) : (
-                userRanks.map((rank: UserRankRecord) => (
-                  <tr
-                    key={rank.id}
-                    className="hover:bg-gray-700/30 transition-colors"
-                  >
-                    <td className="px-4 py-3 text-gray-200 font-medium">
-                      {rank.name}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">{rank.level}</td>
-                    <td className="px-4 py-3 text-gray-400">
-                      {rank.secondary ? 'Secondary' : 'Primary'}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">
-                      {rank.userCount ?? 0}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">
-                      {
-                        Object.values(
-                          (
-                            rank as {
-                              permissions?: Record<string, boolean> | null;
-                            }
-                          ).permissions ?? {}
-                        ).filter(Boolean).length
-                      }
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">
-                      {rank.permittedForumIds?.length ?? 0}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">
-                      {rank.personalCollageLimit === 0
-                        ? '∞'
-                        : (rank.personalCollageLimit ?? '∞')}
-                    </td>
-                    <td className="px-4 py-3 flex gap-2">
-                      <Link
-                        to={`/private/staff/tools/user-ranks/${rank.id}/edit`}
-                        className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(rank.id)}
-                        className="text-red-400 hover:text-red-300 transition-colors"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          rows={userRanks}
+          rowKey={(r) => r.id}
+          empty="No user ranks defined yet."
+        />
       )}
-    </div>
+    </PageShell>
   );
 };
 

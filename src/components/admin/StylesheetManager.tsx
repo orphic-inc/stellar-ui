@@ -7,6 +7,11 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
+import { PageShell, Button, Badge, DataTable, type Column } from '../ui';
+
+type StylesheetRow = NonNullable<
+  ReturnType<typeof useGetStylesheetsQuery>['data']
+>[number];
 
 const StylesheetManager = () => {
   const dispatch = useDispatch();
@@ -34,84 +39,63 @@ const StylesheetManager = () => {
     }
   };
 
+  const columns: Column<StylesheetRow>[] = [
+    {
+      header: 'Name',
+      cell: (s) => <span className="font-medium">{s.name}</span>
+    },
+    { header: 'Description', cell: (s) => s.description || '—' },
+    {
+      header: 'CSS URL',
+      tdClassName: 'break-all',
+      cell: (s) => (
+        <span className="font-mono text-xs text-[var(--st-text-muted)]">
+          {s.cssUrl}
+        </span>
+      )
+    },
+    {
+      header: 'Users',
+      numeric: true,
+      cell: (s) => userCountById[s.id] ?? 0
+    },
+    {
+      header: 'Status',
+      thClassName: 'text-center',
+      tdClassName: 'text-center',
+      cell: (s) => (s.isDefault ? <Badge variant="info">Default</Badge> : null)
+    },
+    {
+      header: '',
+      tdClassName: 'text-right',
+      cell: (s) =>
+        s.isDefault ? null : (
+          <Button
+            variant="link"
+            disabled={isSaving}
+            onClick={() => handleSetDefault(s.id, s.name)}
+          >
+            Set default
+          </Button>
+        )
+    }
+  ];
+
   if (listLoading || statsLoading) return <Spinner />;
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Stylesheets</h2>
-
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-gray-700/60 border-b border-gray-700">
-              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">
-                Name
-              </th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">
-                Description
-              </th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">
-                CSS URL
-              </th>
-              <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wider text-gray-300">
-                Users
-              </th>
-              <th className="px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-wider text-gray-300">
-                Status
-              </th>
-              <th className="px-4 py-2.5" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-700/40">
-            {stylesheets?.map((s) => (
-              <tr key={s.id} className="hover:bg-gray-700/40 transition-colors">
-                <td className="px-4 py-3 font-medium text-gray-200">
-                  {s.name}
-                </td>
-                <td className="px-4 py-3 text-gray-400">
-                  {s.description || '—'}
-                </td>
-                <td className="px-4 py-3 text-gray-500 font-mono text-xs break-all">
-                  {s.cssUrl}
-                </td>
-                <td className="px-4 py-3 text-right text-gray-400">
-                  {userCountById[s.id] ?? 0}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {s.isDefault ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-900/30 text-indigo-300 border border-indigo-700">
-                      Default
-                    </span>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {!s.isDefault && (
-                    <button
-                      onClick={() => handleSetDefault(s.id, s.name)}
-                      disabled={isSaving}
-                      className="text-xs text-indigo-400 hover:text-indigo-300 border border-indigo-700 hover:border-indigo-600 px-2 py-1 rounded transition-colors disabled:opacity-50"
-                    >
-                      Set default
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {!stylesheets?.length && (
-              <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-gray-500">
-                  No stylesheets found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <p className="text-xs text-gray-600">
+    <PageShell title="Stylesheets" width="lg">
+      <DataTable
+        columns={columns}
+        rows={stylesheets}
+        rowKey={(s) => s.id}
+        empty="No stylesheets found."
+      />
+      <p data-st="meta" className="text-xs">
         User counts reflect stored stylesheet selections and may differ from
         active rendering when an external stylesheet URL is set.
       </p>
-    </div>
+    </PageShell>
   );
 };
 

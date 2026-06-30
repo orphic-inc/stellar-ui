@@ -71,6 +71,16 @@ describe('UserRankManager', () => {
     ).toBeInTheDocument();
   });
 
+  it('renders ranks on the grid table (kit hooks present)', () => {
+    mockUseGetUserRanksQuery.mockReturnValue({
+      data: [makeRank(1, 'Member', 100)],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserRankManager />);
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+  });
+
   it('calls deleteUserRank after confirm', async () => {
     mockDeleteUserRank.mockResolvedValue({});
     mockUseGetUserRanksQuery.mockReturnValue({
