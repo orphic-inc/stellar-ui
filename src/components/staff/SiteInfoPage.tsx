@@ -1,9 +1,9 @@
-import { Link } from 'react-router-dom';
 import {
   useGetSiteInfoQuery,
   type SiteInfoData
 } from '../../store/services/adminApi';
 import Spinner from '../layout/Spinner';
+import { PageShell, Panel } from '../ui';
 
 const STAT_LABELS: { key: keyof SiteInfoData; label: string }[] = [
   { key: 'totalUsers', label: 'Total Users' },
@@ -31,31 +31,20 @@ const SiteInfoPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
-        </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">Site Info</h2>
-      </div>
-
+    <PageShell title="Site Info" width="lg">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {STAT_LABELS.map(({ key, label }) => (
-          <div
-            key={key}
-            className="bg-gray-800 border border-gray-700 rounded-lg p-4 text-center"
-          >
-            <div className="text-2xl font-bold text-white">
+          <Panel key={key} className="p-4 text-center">
+            <div data-st="prose" data-st-strong className="text-2xl font-bold">
               {data?.[key] != null ? Number(data[key]).toLocaleString() : '—'}
             </div>
-            <div className="text-xs text-gray-400 mt-1">{label}</div>
-          </div>
+            <div data-st="meta" className="text-xs mt-1">
+              {label}
+            </div>
+          </Panel>
         ))}
       </div>
-    </div>
+    </PageShell>
   );
 };
 

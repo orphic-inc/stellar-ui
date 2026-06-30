@@ -4,6 +4,65 @@ import { parseBBCode } from '../../utils/bbcode';
 import { useGetStaffQuery } from '../../store/services/staffApi';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
+import { PageShell, DataTable, SectionHeading, type Column } from '../ui';
+
+type StaffMember = {
+  userId: number;
+  username: string;
+  rankName: string;
+  rankColor?: string | null;
+  lastSeen?: string | null;
+  staffBio?: string | null;
+};
+
+const memberColumns: Column<StaffMember>[] = [
+  {
+    header: 'Username',
+    cell: (m) => (
+      <Link to={`/private/user/${m.userId}`} data-st="control">
+        {m.username}
+      </Link>
+    )
+  },
+  {
+    header: 'Rank',
+    cell: (m) => (
+      <span
+        className="text-xs whitespace-nowrap"
+        style={{ color: m.rankColor || undefined }}
+      >
+        {m.rankName}
+      </span>
+    )
+  },
+  {
+    header: 'Last Seen',
+    cell: (m) =>
+      m.lastSeen ? (
+        <span className="text-xs">
+          <Time date={m.lastSeen} />
+        </span>
+      ) : (
+        <span className="text-xs text-[var(--st-text-faint)]">Never</span>
+      )
+  },
+  {
+    header: 'Bio',
+    cell: (m) =>
+      m.staffBio ? (
+        <span
+          className="text-xs bbcode-content"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(parseBBCode(m.staffBio), {
+              ALLOWED_TAGS: ['b', 'i', 'u', 's', 'a', 'br']
+            })
+          }}
+        />
+      ) : (
+        <span className="text-[var(--st-text-faint)]">—</span>
+      )
+  }
+];
 
 const StaffPage = () => {
   const { data, isLoading, isError } = useGetStaffQuery();
@@ -17,90 +76,46 @@ const StaffPage = () => {
 
   if (isError)
     return (
-      <div className="text-sm text-red-400">Failed to load staff list.</div>
+      <p data-st="prose" className="text-sm text-[var(--st-danger)]">
+        Failed to load staff list.
+      </p>
     );
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Staff</h2>
+    <PageShell
+      title="Staff"
+      backTo={null}
+      actions={
         <Link
           to="/private/messages/tickets/new"
-          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors"
+          data-st="control"
+          data-st-primary
+          className="text-sm"
         >
           Contact Staff
         </Link>
-      </div>
-
+      }
+    >
       {data?.groups.length === 0 && (
-        <p className="text-sm text-gray-500">No staff groups configured.</p>
+        <p data-st="meta" className="text-sm">
+          No staff groups configured.
+        </p>
       )}
 
       {data?.groups.map((group) => (
-        <section key={group.id ?? 'ungrouped'}>
-          <h3
-            className={`text-base font-semibold mb-3 pb-1 border-b border-gray-700 ${
-              group.id === null ? 'text-gray-500 italic' : 'text-gray-200'
-            }`}
-          >
+        <section key={group.id ?? 'ungrouped'} className="space-y-3">
+          <SectionHeading className={group.id === null ? 'italic' : undefined}>
             {group.name}
-          </h3>
-
-          {group.members.length === 0 ? (
-            <p className="text-xs text-gray-600 pl-1">No members.</p>
-          ) : (
-            <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-              <div className="bg-gray-800 border-b border-gray-700 px-4 py-2 grid grid-cols-[1fr_auto_auto_2fr] gap-4 text-xs font-semibold uppercase tracking-wider text-gray-400">
-                <span>Username</span>
-                <span>Rank</span>
-                <span>Last Seen</span>
-                <span>Bio</span>
-              </div>
-              <div className="divide-y divide-gray-700/40">
-                {group.members.map((m) => (
-                  <div
-                    key={m.userId}
-                    className="px-4 py-2 grid grid-cols-[1fr_auto_auto_2fr] gap-4 items-start text-sm"
-                  >
-                    <Link
-                      to={`/private/user/${m.userId}`}
-                      className="text-indigo-400 hover:text-indigo-300 font-medium"
-                    >
-                      {m.username}
-                    </Link>
-                    <span
-                      className="text-xs whitespace-nowrap"
-                      style={{ color: m.rankColor || undefined }}
-                    >
-                      {m.rankName}
-                    </span>
-                    <span className="text-xs text-gray-500 whitespace-nowrap">
-                      {m.lastSeen ? (
-                        <Time date={m.lastSeen} />
-                      ) : (
-                        <span className="text-gray-600">Never</span>
-                      )}
-                    </span>
-                    {m.staffBio ? (
-                      <span
-                        className="text-xs text-gray-400 bbcode-content"
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(parseBBCode(m.staffBio), {
-                            ALLOWED_TAGS: ['b', 'i', 'u', 's', 'a', 'br']
-                          })
-                        }}
-                      />
-                    ) : (
-                      <span className="text-gray-600">—</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          </SectionHeading>
+          <DataTable
+            columns={memberColumns}
+            rows={group.members as StaffMember[]}
+            rowKey={(m) => m.userId}
+            empty="No members."
+          />
         </section>
       ))}
-    </div>
+    </PageShell>
   );
 };
 

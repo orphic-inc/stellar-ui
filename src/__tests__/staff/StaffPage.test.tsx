@@ -59,6 +59,8 @@ describe('StaffPage', () => {
     expect(
       screen.getByRole('link', { name: /contact staff/i })
     ).toHaveAttribute('href', '/private/messages/tickets/new');
+    // Members render on the kit grid table.
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
   });
 
   it('shows an empty message when no groups are configured', () => {
