@@ -62,4 +62,11 @@ describe('CommunitiesTable', () => {
     expect(screen.getByText('120')).toBeInTheDocument();
     expect(screen.getByText('15')).toBeInTheDocument();
   });
+
+  it('carries the data-st theming hooks (grid table + type chip)', () => {
+    renderWithProviders(<CommunitiesTable communities={mockCommunities} />);
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    // The Badge paints the community type from the chip Role.
+    expect(screen.getByText('Music')).toHaveAttribute('data-st', 'chip');
+  });
 });

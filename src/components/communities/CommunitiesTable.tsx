@@ -6,18 +6,22 @@ interface Props {
 }
 
 const CommunitiesTable = ({ communities }: Props) => (
-  <table className="w-full text-sm">
-    <thead>
-      <tr className="border-b border-gray-700 text-left text-gray-400">
+  <table data-st="grid" className="w-full text-sm">
+    <thead data-st="colhead">
+      <tr>
         <th className="pb-2 pr-3 font-medium" style={{ width: '100%' }}>
           Name
         </th>
         <th className="pb-2 pr-3 font-medium whitespace-nowrap">Type</th>
-        <th className="pb-2 pr-3 font-medium whitespace-nowrap">Releases</th>
-        <th className="pb-2 pr-3 font-medium whitespace-nowrap">
+        <th data-st-num className="pb-2 pr-3 font-medium whitespace-nowrap">
+          Releases
+        </th>
+        <th data-st-num className="pb-2 pr-3 font-medium whitespace-nowrap">
           Contributors
         </th>
-        <th className="pb-2 font-medium whitespace-nowrap">Consumers</th>
+        <th data-st-num className="pb-2 font-medium whitespace-nowrap">
+          Consumers
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -27,7 +31,7 @@ const CommunitiesTable = ({ communities }: Props) => (
         ))
       ) : (
         <tr>
-          <td colSpan={5} className="py-4 text-gray-500 text-center">
+          <td colSpan={5} data-st="meta" className="py-4 text-center">
             No communities to display.
           </td>
         </tr>
