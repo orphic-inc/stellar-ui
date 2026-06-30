@@ -6,6 +6,12 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **Golden Rules tree** on `/private/rules` — the 6 Golden Rules + sub-rules render read-only above the prose pages, consuming `GET /api/rules/tree`; rule bodies do `${...}` token substitution, with link-vs-text decided by the resolved value's shape plus a small markdown subset [#98] (PRD-09 / ADR-0020)
+- **Community Leader** surfaced on the community header and editable in `CommunityManager` (`leaderId` on create + update; the stale `ownerId` field retired, which also fixes create for restricted communities) [#101] (ADR-0021)
+- **Lock rank** toggle on the staff "Change Rank" panel — `setUserRankLock` → `PUT /users/:id/rank-lock`, optimistic with revert-on-failure, freezing auto class-progression while manual rank changes still apply; completes the per-user `rankLocked` half of [#83] (the promotion-rule-editor half stays blocked on stellar-api #170)
+
 ### Changed
 
 - Pinned Prettier to an exact `3.5.3` (was `^3.0.0`, resolving to 3.0.0) and reformatted to match — closes the version skew with Codacy's newer Prettier, whose `(x ?? y)` parenthesization and nested-ternary indentation the old local 3.0.0 kept stripping back
