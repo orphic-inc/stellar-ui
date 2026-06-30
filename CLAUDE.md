@@ -192,11 +192,13 @@ migration** (no separate per-file `data-st` pass). The **staff/admin long tail
 is now kit-adopted** (logs, stats, queues, CRUD clean-fit + inline-edit forms,
 read-only pages; the IP-ban/email-blacklist twins collapsed to one
 `staff/Blacklist.tsx`). The recurring recipes are the **CRUD form**, the
-**card-list**, and the **modal**. **Stays bespoke** (own markup; migrate leaf
-colors to tokens only if you're already editing them): `GenerateTestDataPage`
-(dev-only), `CommunityManager`, and the forum control panels — heavyweight and
-idiosyncratic; don't force the kit. New tools compose the kit; they don't
-re-roll a page wrapper, table, or back-link.
+**card-list**, and the **modal**. The three heavyweight admin managers
+(`CommunityManager`, `ForumControlPanel`, `ForumCategoryControlPanel`) are
+**also kit-adopted** (the same list + inline-edit + create-form shape as
+`RulesManager`). **Stays bespoke** (own markup; migrate leaf colors to tokens
+only if you're already editing them): only `GenerateTestDataPage` (dev-only),
+a developer utility rather than a tool page. New tools compose the kit; they
+don't re-roll a page wrapper, table, or back-link.
 
 - **Kit gotchas.** `control -primary` carries its own padding — don't add
   `px/py` to filled `Button`s; `link`/`link-danger` are unpadded. `Field`/

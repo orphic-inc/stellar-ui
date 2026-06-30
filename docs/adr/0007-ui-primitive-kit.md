@@ -79,15 +79,22 @@ the staff/admin tools are its first proving ground.
 
 ## Scope — what adopts the kit, what stays bespoke
 
-- **Adopts the kit:** the log/stats/queue tables, the CRUD forms, and the simple
-  read-only list pages — the bulk of the Toolbox. Proven across the migration on
-  `Blacklist`, the logs, stats, queues, CRUD forms (clean-fit + inline-edit), and
-  the admin managers.
+> **Amended 2026-06-30.** The three heavyweight admin managers
+> (`CommunityManager`, `ForumControlPanel`, `ForumCategoryControlPanel`) — first
+> parked as "stays bespoke" below — were migrated after all. On inspection they
+> are the same list + inline-edit + create-form shape already proven on
+> `RulesManager`/`TagAliases`, just larger; the "would distort the kit" concern
+> didn't hold. `GenerateTestDataPage` (dev-only) is now the sole bespoke
+> exception. The list below is updated to match.
+
+- **Adopts the kit:** the log/stats/queue tables, the CRUD forms, the simple
+  read-only list pages, and the admin managers — effectively the whole Toolbox.
+  Proven across the migration on `Blacklist`, the logs, stats, queues, CRUD forms
+  (clean-fit + inline-edit), the admin managers, and the three heavyweight
+  managers (`CommunityManager`, `ForumControlPanel`, `ForumCategoryControlPanel`).
 - **Stays bespoke** (own markup; migrate leaf colors to tokens only if touched):
-  `GenerateTestDataPage` (dev-only), `CommunityManager`, and the forum control
-  panels. These are heavyweight and idiosyncratic; forcing the kit would distort
-  it. They keep their own hand-rolled back-link for now (a known exception per
-  D-6); it unifies only if/when they adopt `PageShell`.
+  `GenerateTestDataPage` (dev-only) — a one-off developer utility, not a tool
+  page, so it keeps its own hand-rolled markup and back-link.
 - **Candidate primitives, not yet minted:** `Tabs` (and `FormRow`). Extract only
   on **real recurrence** (≥2 adopters) — see Consequences.
 
