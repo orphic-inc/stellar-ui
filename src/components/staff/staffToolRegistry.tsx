@@ -47,16 +47,12 @@ import type { AuthUser } from '../../types';
 
 export type StaffToolSection =
   | 'Administration'
-  | 'User Management'
-  | 'Content'
-  | 'Announcements'
-  | 'Community'
-  | 'Managers'
   | 'Users'
   | 'Moderation'
-  | 'Finances'
-  | 'Site Information'
-  | 'Development';
+  | 'Content'
+  | 'Announcements'
+  | 'Finance'
+  | 'Insights';
 
 export type StaffToolDefinition = {
   id: string;
@@ -83,7 +79,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Create user',
     permissions: ['users_edit'],
     element: <NewUserForm />,
-    section: 'User Management'
+    section: 'Users'
   },
   {
     id: 'user-ranks-new',
@@ -115,7 +111,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Category manager',
     permissions: ['forums_manage'],
     element: <ForumCategoryControlPanel />,
-    section: 'Community'
+    section: 'Content'
   },
   {
     id: 'forums',
@@ -123,7 +119,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Forum manager',
     permissions: ['forums_manage'],
     element: <ForumControlPanel />,
-    section: 'Community'
+    section: 'Content'
   },
   {
     id: 'community-manager',
@@ -131,7 +127,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Community manager',
     permissions: ['communities_manage'],
     element: <CommunityManager />,
-    section: 'Community'
+    section: 'Content'
   },
   {
     id: 'news-manager',
@@ -187,7 +183,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Donor ranks',
     permissions: ['donor_ranks_manage'],
     element: <DonorRanksPage />,
-    section: 'Finances'
+    section: 'Finance'
   },
   {
     id: 'recovery-queue',
@@ -195,7 +191,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Recovery queue',
     permissions: ['recovery_manage'],
     element: <RecoveryQueuePage />,
-    section: 'User Management'
+    section: 'Users'
   },
   {
     id: 'ip-bans',
@@ -219,7 +215,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Donation log',
     permissions: ['donation_log_view'],
     element: <DonationLogPage />,
-    section: 'Finances'
+    section: 'Finance'
   },
   {
     id: 'duplicate-ips',
@@ -227,7 +223,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Duplicate IPs',
     permissions: ['duplicate_ips_view'],
     element: <DuplicateIpsPage />,
-    section: 'Managers'
+    section: 'Users'
   },
   {
     id: 'registration-log',
@@ -235,7 +231,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Registration log',
     permissions: ['registration_log_view'],
     element: <RegistrationLogPage />,
-    section: 'User Management'
+    section: 'Users'
   },
   {
     id: 'user-warnings',
@@ -251,7 +247,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Tag aliases',
     permissions: ['tags_manage'],
     element: <TagAliasesPage />,
-    section: 'Community'
+    section: 'Content'
   },
   {
     id: 'global-notices',
@@ -291,7 +287,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'User flow',
     permissions: ['admin'],
     element: <UserFlowPage />,
-    section: 'User Management'
+    section: 'Users'
   },
   {
     id: 'invite-pool',
@@ -299,7 +295,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Invite pool',
     permissions: ['invites_manage'],
     element: <InvitePoolPage />,
-    section: 'User Management'
+    section: 'Users'
   },
   {
     id: 'invite-tree',
@@ -307,7 +303,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Invite tree',
     permissions: ['invites_manage'],
     element: <InviteTreePage />,
-    section: 'User Management'
+    section: 'Users'
   },
   {
     id: 'dnc',
@@ -315,7 +311,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Do Not Contribute list',
     permissions: ['dnc_manage'],
     element: <DncPage />,
-    section: 'Managers'
+    section: 'Moderation'
   },
   {
     id: 'collage-recovery',
@@ -323,7 +319,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Collage recovery',
     permissions: ['collages_moderate'],
     element: <CollageRecoveryPage />,
-    section: 'Managers'
+    section: 'Moderation'
   },
   {
     id: 'economic-stats',
@@ -331,7 +327,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Economic stats',
     permissions: ['admin'],
     element: <EconomicStatsPage />,
-    section: 'Site Information'
+    section: 'Insights'
   },
   {
     id: 'release-stats',
@@ -339,7 +335,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Release stats',
     permissions: ['admin'],
     element: <ReleaseStatsPage />,
-    section: 'Site Information'
+    section: 'Insights'
   },
   {
     id: 'ratio-watch',
@@ -347,7 +343,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Ratio watch',
     permissions: ['admin'],
     element: <RatioWatchPage />,
-    section: 'Site Information'
+    section: 'Insights'
   },
   {
     id: 'client-stats',
@@ -355,7 +351,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'OS & Browser usage',
     permissions: ['admin'],
     element: <ClientStatsPage />,
-    section: 'Site Information'
+    section: 'Insights'
   },
   {
     id: 'site-info',
@@ -363,7 +359,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Site info',
     permissions: ['admin'],
     element: <SiteInfoPage />,
-    section: 'Development'
+    section: 'Administration'
   },
   {
     id: 'generate-test-data',
@@ -371,7 +367,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Generate test data',
     permissions: ['admin'],
     element: <GenerateTestDataPage />,
-    section: 'Development'
+    section: 'Administration'
   },
   {
     id: 'ticket-queue',
@@ -379,7 +375,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Ticket queue',
     permissions: ['staff_inbox_manage'],
     element: <TicketQueuePage />,
-    section: 'Managers'
+    section: 'Moderation'
   },
   {
     id: 'ticket-detail',
@@ -395,7 +391,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Canned responses',
     permissions: ['staff_inbox_manage'],
     element: <CannedResponsesPage />,
-    section: 'Managers'
+    section: 'Moderation'
   },
   {
     id: 'reports-queue',
@@ -403,7 +399,7 @@ export const staffTools: StaffToolDefinition[] = [
     label: 'Reports queue',
     permissions: ['reports_manage'],
     element: <ReportsQueuePage />,
-    section: 'Managers'
+    section: 'Moderation'
   },
   {
     id: 'report-detail',
@@ -425,16 +421,12 @@ export const staffTools: StaffToolDefinition[] = [
 
 export const staffToolSections: StaffToolSection[] = [
   'Administration',
-  'User Management',
-  'Content',
-  'Announcements',
-  'Community',
-  'Managers',
   'Users',
   'Moderation',
-  'Finances',
-  'Site Information',
-  'Development'
+  'Content',
+  'Announcements',
+  'Finance',
+  'Insights'
 ];
 
 export const toolboxStaffTools = staffTools.filter(

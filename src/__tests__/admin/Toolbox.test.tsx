@@ -129,4 +129,34 @@ describe('Toolbox', () => {
       '/private/staff/tools/user-ranks'
     );
   });
+
+  it('renders the collapsed 7-section taxonomy for an admin', () => {
+    mockUseAppSelector.mockReturnValue(adminUser);
+    renderWithProviders(<Toolbox />);
+    const headings = screen
+      .getAllByRole('heading', { level: 3 })
+      .map((h) => h.textContent);
+    expect(headings).toEqual([
+      'Administration',
+      'Users',
+      'Moderation',
+      'Content',
+      'Announcements',
+      'Finance',
+      'Insights'
+    ]);
+    // The pre-collapse grab-bag/overlap sections are gone.
+    for (const stale of [
+      'User Management',
+      'Managers',
+      'Community',
+      'Site Information',
+      'Development',
+      'Finances'
+    ]) {
+      expect(
+        screen.queryByRole('heading', { level: 3, name: stale })
+      ).not.toBeInTheDocument();
+    }
+  });
 });
