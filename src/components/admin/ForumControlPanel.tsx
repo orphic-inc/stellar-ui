@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   useGetForumCategoriesQuery,
@@ -9,9 +9,7 @@ import {
 } from '../../store/services/forumApi';
 import type { Forum } from '../../types';
 import Spinner from '../layout/Spinner';
-
-const inputCls =
-  'rounded bg-gray-700 border border-gray-600 text-white px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500';
+import { PageShell, Panel, Button, SectionHeading } from '../ui';
 
 interface EditRowProps {
   forum: Forum;
@@ -42,117 +40,121 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
   };
 
   return (
-    <tr className="bg-indigo-950/30 border-t border-indigo-800/40">
-      <td colSpan={6} className="px-4 py-3">
-        <form onSubmit={handleSave} className="space-y-3">
+    <tr data-st="row" data-st-open>
+      <td colSpan={6} className="p-0">
+        <form onSubmit={handleSave} className="p-4 space-y-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div className="sm:col-span-2">
               <label
                 htmlFor={`fe-name-${forum.id}`}
-                className="block text-xs text-gray-400 mb-0.5"
+                data-st="meta"
+                className="block mb-0.5"
               >
                 Name *
               </label>
               <input
                 id={`fe-name-${forum.id}`}
+                data-st="field"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className={`${inputCls} w-full`}
+                className="w-full"
               />
             </div>
             <div>
               <label
                 htmlFor={`fe-sort-${forum.id}`}
-                className="block text-xs text-gray-400 mb-0.5"
+                data-st="meta"
+                className="block mb-0.5"
               >
                 Sort
               </label>
               <input
                 id={`fe-sort-${forum.id}`}
+                data-st="field"
                 type="number"
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className={`${inputCls} w-full`}
+                className="w-full"
               />
             </div>
             <div>
               <label
                 htmlFor={`fe-minread-${forum.id}`}
-                className="block text-xs text-gray-400 mb-0.5"
+                data-st="meta"
+                className="block mb-0.5"
               >
                 Min read
               </label>
               <input
                 id={`fe-minread-${forum.id}`}
+                data-st="field"
                 type="number"
                 value={minRead}
                 onChange={(e) => setMinRead(e.target.value)}
-                className={`${inputCls} w-full`}
+                className="w-full"
               />
             </div>
             <div className="sm:col-span-2">
               <label
                 htmlFor={`fe-desc-${forum.id}`}
-                className="block text-xs text-gray-400 mb-0.5"
+                data-st="meta"
+                className="block mb-0.5"
               >
                 Description
               </label>
               <input
                 id={`fe-desc-${forum.id}`}
+                data-st="field"
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className={`${inputCls} w-full`}
+                className="w-full"
               />
             </div>
             <div>
               <label
                 htmlFor={`fe-minwrite-${forum.id}`}
-                className="block text-xs text-gray-400 mb-0.5"
+                data-st="meta"
+                className="block mb-0.5"
               >
                 Min write
               </label>
               <input
                 id={`fe-minwrite-${forum.id}`}
+                data-st="field"
                 type="number"
                 value={minWrite}
                 onChange={(e) => setMinWrite(e.target.value)}
-                className={`${inputCls} w-full`}
+                className="w-full"
               />
             </div>
             <div>
               <label
                 htmlFor={`fe-mincreate-${forum.id}`}
-                className="block text-xs text-gray-400 mb-0.5"
+                data-st="meta"
+                className="block mb-0.5"
               >
                 Min create topics
               </label>
               <input
                 id={`fe-mincreate-${forum.id}`}
+                data-st="field"
                 type="number"
                 value={minCreate}
                 onChange={(e) => setMinCreate(e.target.value)}
-                className={`${inputCls} w-full`}
+                className="w-full"
               />
             </div>
           </div>
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs rounded"
-            >
+            <Button variant="primary" type="submit" disabled={isLoading}>
               {isLoading ? 'Saving…' : 'Save'}
-            </button>
-            <button
-              type="button"
-              onClick={onDone}
-              className="px-3 py-1 text-gray-400 hover:text-white text-xs"
-            >
+            </Button>
+            <Button variant="link" onClick={onDone}>
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       </td>
@@ -210,133 +212,104 @@ const ForumControlPanel = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
-        </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">Forum Manager</h2>
-      </div>
-
-      {/* Existing forums */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Existing Forums
-          </h3>
-        </div>
-        {loadingCategories || loadingForums ? (
-          <Spinner />
-        ) : categoriesError || forumsError ? (
-          <p className="p-4 text-sm text-red-400">Failed to load forums.</p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
-                <th className="text-left px-4 py-2 font-semibold">Name</th>
-                <th className="text-left px-4 py-2 font-semibold">Category</th>
-                <th className="text-right px-4 py-2 font-semibold">Sort</th>
-                <th className="text-right px-4 py-2 font-semibold">Topics</th>
-                <th className="text-right px-4 py-2 font-semibold">Posts</th>
-                <th className="px-4 py-2 font-semibold"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {!forums?.length ? (
+    <PageShell title="Forum Manager" width="md">
+      <section className="space-y-3">
+        <SectionHeading>Existing Forums</SectionHeading>
+        <Panel className="overflow-hidden">
+          {loadingCategories || loadingForums ? (
+            <div className="p-6">
+              <Spinner />
+            </div>
+          ) : categoriesError || forumsError ? (
+            <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+              Failed to load forums.
+            </p>
+          ) : (
+            <table data-st="grid">
+              <thead data-st="colhead">
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    No forums yet.
-                  </td>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th data-st-num>Sort</th>
+                  <th data-st-num>Topics</th>
+                  <th data-st-num>Posts</th>
+                  <th />
                 </tr>
-              ) : (
-                forums.map((f) => (
-                  <>
-                    <tr
-                      key={f.id}
-                      className="hover:bg-gray-700/30 transition-colors"
-                    >
-                      <td className="px-4 py-2 text-gray-200 font-medium">
-                        <Link
-                          to={`/private/forums/${f.id}`}
-                          className="hover:text-indigo-300 transition-colors"
-                        >
-                          {f.name}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-2 text-gray-400">
-                        {f.forumCategory?.name ?? '—'}
-                      </td>
-                      <td className="px-4 py-2 text-gray-400 text-right">
-                        {f.sort}
-                      </td>
-                      <td className="px-4 py-2 text-gray-400 text-right">
-                        {f.numTopics}
-                      </td>
-                      <td className="px-4 py-2 text-gray-400 text-right">
-                        {f.numPosts}
-                      </td>
-                      <td className="px-4 py-2 text-right whitespace-nowrap">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setEditingId(editingId === f.id ? null : f.id)
-                          }
-                          className="text-xs text-indigo-400 hover:text-indigo-300 mr-3"
-                        >
-                          {editingId === f.id ? 'Cancel' : 'Edit'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(f.id, f.name)}
-                          className="text-xs text-red-400 hover:text-red-300"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                    {editingId === f.id && (
-                      <ForumEditRow
-                        key={`edit-${f.id}`}
-                        forum={f}
-                        onDone={() => setEditingId(null)}
-                      />
-                    )}
-                  </>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
+              </thead>
+              <tbody>
+                {!forums?.length ? (
+                  <tr data-st="row">
+                    <td colSpan={6} className="text-center">
+                      No forums yet.
+                    </td>
+                  </tr>
+                ) : (
+                  forums.map((f) => (
+                    <Fragment key={f.id}>
+                      <tr data-st="row">
+                        <td className="font-medium">
+                          <Link
+                            to={`/private/forums/${f.id}`}
+                            data-st="control"
+                          >
+                            {f.name}
+                          </Link>
+                        </td>
+                        <td>{f.forumCategory?.name ?? '—'}</td>
+                        <td data-st-num>{f.sort}</td>
+                        <td data-st-num>{f.numTopics}</td>
+                        <td data-st-num>{f.numPosts}</td>
+                        <td className="text-right space-x-3 whitespace-nowrap">
+                          <Button
+                            variant="link"
+                            onClick={() =>
+                              setEditingId(editingId === f.id ? null : f.id)
+                            }
+                          >
+                            {editingId === f.id ? 'Cancel' : 'Edit'}
+                          </Button>
+                          <Button
+                            variant="link-danger"
+                            onClick={() => handleDelete(f.id, f.name)}
+                          >
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                      {editingId === f.id && (
+                        <ForumEditRow
+                          forum={f}
+                          onDone={() => setEditingId(null)}
+                        />
+                      )}
+                    </Fragment>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+        </Panel>
+      </section>
 
-      {/* Create new forum */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="bg-gray-700/60 px-4 py-2 border-b border-gray-700">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-            Create Forum
-          </h3>
-        </div>
-        <form onSubmit={handleCreate} className="p-4 space-y-4">
+      <section className="space-y-3">
+        <SectionHeading>Create Forum</SectionHeading>
+        <Panel as="form" onSubmit={handleCreate} className="p-4 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="ff-category"
-                className="block text-sm font-medium text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm font-medium mb-1"
               >
-                Category <span className="text-red-400">*</span>
+                Category <span className="text-[var(--st-danger)]">*</span>
               </label>
               <select
                 id="ff-category"
+                data-st="field"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 required
-                className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full"
               >
                 <option value="">Select a category</option>
                 {categories?.map((c) => (
@@ -349,118 +322,118 @@ const ForumControlPanel = () => {
             <div>
               <label
                 htmlFor="ff-sort"
-                className="block text-sm font-medium text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm font-medium mb-1"
               >
                 Sort order
               </label>
               <input
                 id="ff-sort"
+                data-st="field"
                 type="number"
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full"
               />
             </div>
             <div className="sm:col-span-2">
               <label
                 htmlFor="ff-name"
-                className="block text-sm font-medium text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm font-medium mb-1"
               >
-                Name <span className="text-red-400">*</span>
+                Name <span className="text-[var(--st-danger)]">*</span>
               </label>
               <input
                 id="ff-name"
+                data-st="field"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Forum name"
-                className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full"
               />
             </div>
             <div className="sm:col-span-2">
               <label
                 htmlFor="ff-description"
-                className="block text-sm font-medium text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm font-medium mb-1"
               >
                 Description
               </label>
               <input
                 id="ff-description"
+                data-st="field"
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Optional description"
-                className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full"
               />
             </div>
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-300 mb-2">
+            <p data-st="prose" className="text-sm font-medium mb-2">
               Minimum class to…
             </p>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label
-                  htmlFor="ff-read"
-                  className="block text-xs text-gray-400 mb-1"
-                >
+                <label htmlFor="ff-read" data-st="meta" className="block mb-1">
                   Read
                 </label>
                 <input
                   id="ff-read"
+                  data-st="field"
                   type="number"
                   value={minClassRead}
                   onChange={(e) => setMinClassRead(e.target.value)}
-                  className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full"
                 />
               </div>
               <div>
-                <label
-                  htmlFor="ff-write"
-                  className="block text-xs text-gray-400 mb-1"
-                >
+                <label htmlFor="ff-write" data-st="meta" className="block mb-1">
                   Write
                 </label>
                 <input
                   id="ff-write"
+                  data-st="field"
                   type="number"
                   value={minClassWrite}
                   onChange={(e) => setMinClassWrite(e.target.value)}
-                  className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full"
                 />
               </div>
               <div>
                 <label
                   htmlFor="ff-create"
-                  className="block text-xs text-gray-400 mb-1"
+                  data-st="meta"
+                  className="block mb-1"
                 >
                   Create topics
                 </label>
                 <input
                   id="ff-create"
+                  data-st="field"
                   type="number"
                   value={minClassCreate}
                   onChange={(e) => setMinClassCreate(e.target.value)}
-                  className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full"
                 />
               </div>
             </div>
           </div>
 
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isCreating}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-            >
+            <Button variant="primary" type="submit" disabled={isCreating}>
               {isCreating ? 'Creating…' : 'Create Forum'}
-            </button>
+            </Button>
           </div>
-        </form>
-      </div>
-    </div>
+        </Panel>
+      </section>
+    </PageShell>
   );
 };
 

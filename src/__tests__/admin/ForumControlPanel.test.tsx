@@ -83,6 +83,20 @@ describe('ForumControlPanel', () => {
     expect(screen.getAllByText('General').length).toBeGreaterThan(0);
   });
 
+  it('emits the data-st contract via the kit (table grid + field)', () => {
+    const { container } = renderWithProviders(<ForumControlPanel />);
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+  });
+
   it('shows "no forums yet" empty state', () => {
     mockGetForumsQuery.mockReturnValue({
       data: [],
