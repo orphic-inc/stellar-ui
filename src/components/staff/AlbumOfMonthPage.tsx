@@ -1,12 +1,18 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   useGetAlbumOfMonthQuery,
   useCreateAlbumOfMonthMutation,
   useDeleteAlbumOfMonthMutation
 } from '../../store/services/adminApi';
-import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
+import {
+  PageShell,
+  Panel,
+  Button,
+  DataTable,
+  SectionHeading,
+  type Column
+} from '../ui';
 
 const AlbumOfMonthPage = () => {
   const [groupId, setGroupId] = useState('');
@@ -55,154 +61,124 @@ const AlbumOfMonthPage = () => {
     }
   };
 
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
-        </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">
-          Album of the Month
-        </h2>
-      </div>
+  type Album = NonNullable<typeof data>[number];
+  const columns: Column<Album>[] = [
+    { header: 'Title', cell: (a) => a.title },
+    {
+      header: 'Group',
+      tdClassName: 'font-mono text-xs',
+      cell: (a) => a.groupId
+    },
+    {
+      header: 'Thread',
+      tdClassName: 'font-mono text-xs',
+      cell: (a) => a.threadId
+    },
+    {
+      header: 'Started',
+      tdClassName: 'text-xs',
+      cell: (a) => <Time date={a.started} />
+    },
+    {
+      header: 'Ended',
+      tdClassName: 'text-xs',
+      cell: (a) => <Time date={a.ended} />
+    },
+    {
+      header: '',
+      tdClassName: 'text-right',
+      cell: (a) => (
+        <Button variant="link-danger" onClick={() => deleteAlbum(a.id)}>
+          Delete
+        </Button>
+      )
+    }
+  ];
 
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 space-y-3">
-        <h3 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
-          Add Entry
-        </h3>
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-3">
+  return (
+    <PageShell
+      title="Album of the Month"
+      backTo="/private/staff/tools"
+      width="xl"
+    >
+      <Panel as="form" onSubmit={handleSubmit} className="p-4 space-y-3">
+        <SectionHeading>Add Entry</SectionHeading>
+        <div className="grid grid-cols-2 gap-3">
           <input
             type="number"
+            data-st="field"
             value={groupId}
             onChange={(e) => setGroupId(e.target.value)}
             placeholder="Group ID"
-            className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
             type="number"
+            data-st="field"
             value={threadId}
             onChange={(e) => setThreadId(e.target.value)}
             placeholder="Thread ID"
-            className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
             type="text"
+            data-st="field"
+            className="col-span-2"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title"
-            className="col-span-2 rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
             type="url"
+            data-st="field"
+            className="col-span-2"
             value={image}
             onChange={(e) => setImage(e.target.value)}
             placeholder="Cover image URL (optional — overrides release image)"
-            className="col-span-2 rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <div className="flex flex-col gap-1">
-            <label htmlFor="aom-started" className="text-xs text-gray-400">
+            <label htmlFor="aom-started" data-st="meta" className="text-xs">
               Started
             </label>
             <input
               id="aom-started"
               type="datetime-local"
+              data-st="field"
               value={started}
               onChange={(e) => setStarted(e.target.value)}
-              className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="aom-ended" className="text-xs text-gray-400">
+            <label htmlFor="aom-ended" data-st="meta" className="text-xs">
               Ended
             </label>
             <input
               id="aom-ended"
               type="datetime-local"
+              data-st="field"
               value={ended}
               onChange={(e) => setEnded(e.target.value)}
-              className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           {formError && (
-            <p className="col-span-2 text-red-400 text-xs">{formError}</p>
+            <p className="col-span-2 text-xs text-[var(--st-danger)]">
+              {formError}
+            </p>
           )}
           <div className="col-span-2">
-            <button
-              type="submit"
-              disabled={isCreating}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-1.5 rounded text-sm"
-            >
+            <Button type="submit" variant="primary" disabled={isCreating}>
               Add
-            </button>
+            </Button>
           </div>
-        </form>
-      </div>
+        </div>
+      </Panel>
 
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        {isLoading ? (
-          <div className="p-6">
-            <Spinner />
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-700/40 text-xs uppercase tracking-wider text-gray-400">
-                <th className="text-left px-4 py-2 font-semibold">Title</th>
-                <th className="text-left px-4 py-2 font-semibold">Group</th>
-                <th className="text-left px-4 py-2 font-semibold">Thread</th>
-                <th className="text-left px-4 py-2 font-semibold">Started</th>
-                <th className="text-left px-4 py-2 font-semibold">Ended</th>
-                <th className="px-4 py-2 font-semibold"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {!data?.length ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-4 py-6 text-center text-gray-500"
-                  >
-                    No albums on record.
-                  </td>
-                </tr>
-              ) : (
-                data.map((a) => (
-                  <tr
-                    key={a.id}
-                    className="hover:bg-gray-700/30 transition-colors"
-                  >
-                    <td className="px-4 py-2 text-white">{a.title}</td>
-                    <td className="px-4 py-2 text-gray-400 text-xs font-mono">
-                      {a.groupId}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs font-mono">
-                      {a.threadId}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs">
-                      <Time date={a.started} />
-                    </td>
-                    <td className="px-4 py-2 text-gray-400 text-xs">
-                      <Time date={a.ended} />
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      <button
-                        onClick={() => deleteAlbum(a.id)}
-                        className="text-red-400 hover:text-red-300 text-xs"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
+      <DataTable
+        columns={columns}
+        rows={data}
+        rowKey={(a) => a.id}
+        isLoading={isLoading}
+        empty="No albums on record."
+      />
+    </PageShell>
   );
 };
 

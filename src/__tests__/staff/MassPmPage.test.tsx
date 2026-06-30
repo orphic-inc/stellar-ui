@@ -49,6 +49,16 @@ describe('MassPmPage', () => {
     expect(screen.getByRole('option', { name: 'Member' })).toBeInTheDocument();
   });
 
+  it('paints the form controls with the field Role (kit hooks present)', () => {
+    renderWithProviders(<MassPmPage />);
+    expect(
+      document.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('textarea[data-st="field"]')
+    ).toBeInTheDocument();
+  });
+
   it('shows warning about mass send', () => {
     renderWithProviders(<MassPmPage />);
     expect(screen.getByText(/warning:/i)).toBeInTheDocument();

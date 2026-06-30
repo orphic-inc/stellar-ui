@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCreateUserMutation } from '../../store/services/userApi';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { PageShell, Panel, Field, Button } from '../ui';
 
 interface FormState {
   username: string;
@@ -34,91 +35,58 @@ const NewUserForm = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto py-8 px-4">
-      <div className="mb-6">
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300"
-        >
-          &larr; Back to Toolbox
-        </Link>
-        <h2 className="mt-2 text-2xl font-bold text-white">Create a User</h2>
-      </div>
-
-      <form
-        onSubmit={onSubmit}
-        className="bg-gray-800 rounded-lg p-6 space-y-5 border border-gray-700"
-      >
-        <div>
-          <label
-            htmlFor="new-username"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Username
-          </label>
-          <input
-            id="new-username"
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={onChange}
-            required
-            className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="new-email"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Email
-          </label>
-          <input
-            id="new-email"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={onChange}
-            required
-            className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="new-password"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Password
-          </label>
-          <input
-            id="new-password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={onChange}
-            minLength={6}
-            required
-            className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
+    <PageShell
+      title="Create a User"
+      backTo="/private/staff/tools"
+      backLabel="← Back to Toolbox"
+      width="sm"
+    >
+      <Panel as="form" onSubmit={onSubmit} className="p-6 space-y-5">
+        <Field
+          id="new-username"
+          label="Username"
+          type="text"
+          name="username"
+          value={formData.username}
+          onChange={onChange}
+          required
+        />
+        <Field
+          id="new-email"
+          label="Email"
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={onChange}
+          required
+        />
+        <Field
+          id="new-password"
+          label="Password"
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={onChange}
+          minLength={6}
+          required
+        />
 
         {error && (
-          <div className="bg-red-900/50 border border-red-700 text-red-300 rounded px-3 py-2 text-sm">
+          <p data-st="meta" className="text-sm text-[var(--st-danger)]">
             {error}
-          </div>
+          </p>
         )}
 
-        <button
+        <Button
           type="submit"
+          variant="primary"
           disabled={isLoading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2 px-4 rounded transition-colors"
+          className="w-full"
         >
           {isLoading ? 'Creating…' : 'Create User'}
-        </button>
-      </form>
-    </div>
+        </Button>
+      </Panel>
+    </PageShell>
   );
 };
 

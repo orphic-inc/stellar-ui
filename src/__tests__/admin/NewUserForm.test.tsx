@@ -36,6 +36,11 @@ describe('NewUserForm', () => {
     ).toBeInTheDocument();
   });
 
+  it('paints inputs with the field Role (kit hooks present)', () => {
+    renderWithProviders(<NewUserForm />);
+    expect(document.querySelectorAll('input[data-st="field"]').length).toBe(3);
+  });
+
   it('shows back link to Toolbox', () => {
     renderWithProviders(<NewUserForm />);
     expect(

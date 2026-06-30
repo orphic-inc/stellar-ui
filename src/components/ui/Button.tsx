@@ -4,6 +4,8 @@ import cn from 'classnames';
 /**
  * - `primary` — filled accent CTA (`control -primary`; carries its own padding).
  * - `success` — filled affirmative CTA (`control -primary -success`).
+ * - `warning` — filled cautionary CTA (`control -primary -warning`; e.g. a
+ *   broadcast-to-all "Send" that wants the amber hue, not red or indigo).
  * - `danger` — filled destructive CTA (`control -primary -danger`).
  * - `link` — text-link button (plain `control`; the contract zeroes padding).
  * - `link-danger` — destructive text-link (`control -danger`, red on hover).
@@ -14,6 +16,7 @@ import cn from 'classnames';
 export type ButtonVariant =
   | 'primary'
   | 'success'
+  | 'warning'
   | 'danger'
   | 'link'
   | 'link-danger';
@@ -28,6 +31,11 @@ const variantHooks: Record<ButtonVariant, Record<string, string>> = {
     'data-st': 'control',
     'data-st-primary': '',
     'data-st-success': ''
+  },
+  warning: {
+    'data-st': 'control',
+    'data-st-primary': '',
+    'data-st-warning': ''
   },
   danger: { 'data-st': 'control', 'data-st-primary': '', 'data-st-danger': '' },
   link: { 'data-st': 'control' },
