@@ -70,7 +70,7 @@ describe('CommunitiesPage', () => {
     });
     renderWithProviders(<CommunitiesPage />);
     expect(
-      screen.queryByRole('button', { name: /previous/i })
+      screen.queryByRole('button', { name: /prev/i })
     ).not.toBeInTheDocument();
   });
 
@@ -83,7 +83,7 @@ describe('CommunitiesPage', () => {
     renderWithProviders(<CommunitiesPage />);
     expect(screen.getByText('Communities')).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /previous/i })
+      screen.queryByRole('button', { name: /prev/i })
     ).not.toBeInTheDocument();
   });
 
@@ -99,15 +99,17 @@ describe('CommunitiesPage', () => {
     });
     renderWithProviders(<CommunitiesPage />);
     expect(screen.getByText('1 / 2')).toBeInTheDocument();
-    const prevBtn = screen.getByRole('button', { name: /previous/i });
+    const prevBtn = screen.getByRole('button', { name: /prev/i });
     expect(prevBtn).toBeDisabled();
+    // The kit Pagination emits the data-st control hook (theming contract).
+    expect(prevBtn).toHaveAttribute('data-st', 'control');
     const nextBtn = screen.getByRole('button', { name: /next/i });
     expect(nextBtn).not.toBeDisabled();
 
     await user.click(nextBtn);
     expect(mockUseGetCommunitiesQuery).toHaveBeenLastCalledWith(2);
 
-    await user.click(screen.getByRole('button', { name: /previous/i }));
+    await user.click(screen.getByRole('button', { name: /prev/i }));
     expect(mockUseGetCommunitiesQuery).toHaveBeenLastCalledWith(1);
   });
 });

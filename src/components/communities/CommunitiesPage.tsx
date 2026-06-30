@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useGetCommunitiesQuery } from '../../store/services/communityApi';
 import Spinner from '../layout/Spinner';
+import { Pagination } from '../ui';
 import CommunitiesTable from './CommunitiesTable';
 
 const CommunitiesPage = () => {
@@ -18,30 +19,17 @@ const CommunitiesPage = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-100 mb-4">Communities</h2>
+      <h2 data-st="prose" data-st-strong className="text-xl font-semibold mb-4">
+        Communities
+      </h2>
       <CommunitiesTable communities={communities} />
 
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-4 text-sm">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
-          >
-            Previous
-          </button>
-          <span className="px-3 py-1 text-gray-400">
-            {page} / {totalPages}
-          </span>
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onChange={setPage}
+        className="mt-4"
+      />
     </div>
   );
 };
