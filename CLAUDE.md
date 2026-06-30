@@ -85,6 +85,10 @@ src/
     proton/                   # Light theme
     sublime/                  # Default/baseline — injects nothing; bundled Tailwind IS Sublime (seeds the --st-* token defaults)
   components/
+    ui/                       # Site-wide primitive kit (ADR-0007): PageShell/Panel/Button/
+                              # Field/DataTable/Badge/Pagination/SectionHeading (barrel index.ts)
+                              # Each primitive owns its data-st hooks — adopting one completes
+                              # that surface's ADR-0005/0006 theming migration (no separate pass)
     admin/                    # User rank manager, forum/community controls, news, stylesheet manager
     staff/                    # Staff pages + registry
       staffToolRegistry.tsx   # Central registry of all staff tool routes + permission gates
@@ -161,6 +165,35 @@ table as `grid`/`colhead`/`row` and the active bracket on `data-st-open`;
 status hues come from the `--st-success/warning/danger` tokens via leaf
 utilities, not chip/control, since these are full-width banners and inline
 values, not chips).
+
+**The UI primitive kit (`src/components/ui/`, ADR-0007).** Above the CSS
+contract sits a small React kit that *emits* it: `PageShell` (page wrapper —
+`prose -strong` title, the default-on "← Toolbox" back-link, an actions slot,
+one width scale `sm…2xl`), `Panel`, `Button` (`control` + `primary`/`success`/
+`warning`/`danger`/`link`/`link-danger`), `Field` (labeled input → `field` +
+`meta`), `DataTable` (`grid`/`colhead`/`row`), `Badge` (`chip` + status),
+`Pagination`, `SectionHeading`. The hooks land **once per primitive, not once
+per page** — so **adopting a primitive *completes* that surface's ADR-0005/0006
+migration** (no separate per-file `data-st` pass). The **staff/admin long tail
+is now kit-adopted** (logs, stats, queues, CRUD clean-fit + inline-edit forms,
+read-only pages; the IP-ban/email-blacklist twins collapsed to one
+`staff/Blacklist.tsx`). The recurring recipes are the **CRUD form**, the
+**card-list**, and the **modal**. **Stays bespoke** (own markup; migrate leaf
+colors to tokens only if you're already editing them): `GenerateTestDataPage`
+(dev-only), `CommunityManager`, and the forum control panels — heavyweight and
+idiosyncratic; don't force the kit. New tools compose the kit; they don't
+re-roll a page wrapper, table, or back-link.
+
+- **Kit gotchas.** `control -primary` carries its own padding — don't add
+  `px/py` to filled `Button`s; `link`/`link-danger` are unpadded. `Field`/
+  `Button` **don't forward refs**, so `<select>`/`<textarea>`/react-hook-form
+  `register()` use the **`field` Role direct**, not the component. Paginated meta
+  is optional → read `data?.meta?.totalPages ?? 1` (the kit `Pagination` already
+  guards). Don't set cell text color via `DataTable`'s `tdClassName` — the
+  `tr[data-st=row]>td` rule wins; wrap the value in a token-colored span. Tests
+  assert **hooks-present** against a real primitive (`table[data-st="grid"]` or a
+  `data-st` Role on a real button/div/table, **not** a mocked `<Link>`); mirror
+  `src/__tests__/ui/kit.test.tsx`.
 
 ## Types
 

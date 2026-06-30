@@ -23,6 +23,8 @@ The progression is continuous: the dabbler's tokens and the power user's role ov
 
 A themeable surface emits a `data-st` **hook** and (almost) no inline utilities; the contract CSS (`src/stylesheets/common/global.css`) paints that hook from `--st-*` **role tokens**. **Sublime is just the default token values.** A Theme = redefined token values + optional role/part overrides. The contract CSS is **unlayered**, so hooks win over any stray Tailwind utility. Hooks come in **two tiers**: a small fixed set of app-wide **Roles**, and **Parts** scoped inside a Role that must _earn their place_.
 
+> **React layer (ADR-0007).** A surface need not emit the hooks by hand. A small primitive kit in `src/components/ui/` (`PageShell`/`Panel`/`Button`/`Field`/`DataTable`/`Badge`/`Pagination`/`SectionHeading`) **owns the hooks**, so the contract lands **once per primitive, not once per page** — adopting a primitive *completes* that surface's migration. The CSS contract below is unchanged; the kit is purely the React layer that emits it.
+
 ---
 
 ## 3. Inventory
@@ -152,7 +154,7 @@ Each is independently grabbable; clear context between them.
 2. **High-reuse listings** — Community release listing, Search results, Forum topic/post lists. (Max leverage: they share `panel`/`list`/`row`/`colhead`.) _Done: `ReleaseBrowsePage` (the release listing) — WS6; `RandomLinks` is the only other `search/` surface._
 3. **Profile** surfaces. _In progress: `UserProfile` (public profile + staff panel) — WS7; settings forms (`Settings` + `DonorSettingsTab` + `IrcNickSettings`) — WS8; invite surfaces (`InviteForm` + `InviteTree`) — WS9; ratio surfaces (`RatioStats` + `RatioRulesPage`) — WS10. **Profile section complete.**_
 4. **App chrome** — Navbar, Sidebar, UserMenu.
-5. **Long tail** — admin/staff pages last (least theme-facing).
+5. **Long tail** — admin/staff pages last (least theme-facing). _Done via the UI primitive kit (ADR-0007): the staff/admin Toolbox adopts `src/components/ui/`, so each log/stat/queue/CRUD/read-only page emits the contract through the primitives. Bespoke heavyweights (`GenerateTestDataPage`, `CommunityManager`, the forum control panels) stay on their own markup by design._
 
 ---
 
