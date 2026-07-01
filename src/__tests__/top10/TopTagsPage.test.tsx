@@ -104,4 +104,25 @@ describe('TopTagsPage', () => {
     const link = screen.getByRole('link', { name: 'jazz' });
     expect(link.getAttribute('href')).toContain('jazz');
   });
+
+  it('paints the controls + table from the data-st contract (ADR-0006)', () => {
+    mockUseGetTopTagsQuery.mockReturnValue({
+      data: { items: [makeTagItem(1, 'jazz')] },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<TopTagsPage />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+  });
 });

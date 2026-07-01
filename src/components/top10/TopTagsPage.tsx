@@ -9,9 +9,6 @@ import Spinner from '../layout/Spinner';
 type TagType = NonNullable<TagsParams['type']>;
 type LimitValue = 10 | 100 | 250;
 
-const selectCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-
 const TopTagsPage = () => {
   const [type, setType] = useState<TagType>('used');
   const [limit, setLimit] = useState<LimitValue>(10);
@@ -22,17 +19,14 @@ const TopTagsPage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex flex-wrap gap-4 items-end">
+      <div data-st="panel" className="p-4 flex flex-wrap gap-4 items-end">
         <div>
-          <label
-            htmlFor="tags-view"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="tags-view" data-st="meta" className="block mb-1">
             View
           </label>
           <select
             id="tags-view"
-            className={selectCls}
+            data-st="field"
             value={type}
             onChange={(e) => setType(e.target.value as TagType)}
           >
@@ -41,15 +35,12 @@ const TopTagsPage = () => {
           </select>
         </div>
         <div>
-          <label
-            htmlFor="tags-limit"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="tags-limit" data-st="meta" className="block mb-1">
             Limit
           </label>
           <select
             id="tags-limit"
-            className={selectCls}
+            data-st="field"
             value={limit}
             onChange={(e) => setLimit(Number(e.target.value) as LimitValue)}
           >
@@ -68,59 +59,57 @@ const TopTagsPage = () => {
       )}
       {data && (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-gray-300">
-            <thead>
-              <tr className="text-left text-xs text-gray-500 uppercase tracking-wide border-b border-gray-700">
-                <th className="pb-2 pr-3 w-8">#</th>
-                <th className="pb-2 pr-3">Tag</th>
-                <th className="pb-2 pr-3 text-right">Uses</th>
+          {/* Columnar data keeps its <table>; the grid/colhead/row variant
+              (ADR-0006) carries the token paint. */}
+          <table data-st="grid" className="text-sm">
+            <thead data-st="colhead">
+              <tr>
+                <th className="w-8">#</th>
+                <th>Tag</th>
+                <th data-st-num>Uses</th>
                 {showVotes && (
                   <>
-                    <th className="pb-2 pr-3 text-right text-green-500">
-                      Positive
-                    </th>
-                    <th className="pb-2 text-right text-red-500">Negative</th>
+                    <th data-st-num>Positive</th>
+                    <th data-st-num>Negative</th>
                   </>
                 )}
               </tr>
             </thead>
             <tbody>
               {data.items.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={showVotes ? 5 : 3}
-                    className="py-8 text-center text-gray-500"
-                  >
-                    No tags found.
+                <tr data-st="row">
+                  <td colSpan={showVotes ? 5 : 3} className="text-center">
+                    <span data-st="meta">No tags found.</span>
                   </td>
                 </tr>
               )}
               {data.items.map((item) => (
-                <tr
-                  key={item.tagId}
-                  className="border-t border-gray-800 hover:bg-gray-800/40"
-                >
-                  <td className="py-2 pr-3 text-gray-500">{item.rank}</td>
-                  <td className="py-2 pr-3">
+                <tr key={item.tagId} data-st="row">
+                  <td>
+                    <span data-st="meta">{item.rank}</span>
+                  </td>
+                  <td>
                     <Link
                       to={`/private/releases?tags=${encodeURIComponent(
                         item.name
                       )}`}
-                      className="text-indigo-400 hover:text-indigo-300"
+                      data-st="title"
                     >
                       {item.name}
                     </Link>
                   </td>
-                  <td className="py-2 pr-3 text-right tabular-nums">
-                    {item.uses.toLocaleString()}
-                  </td>
+                  <td data-st-num>{item.uses.toLocaleString()}</td>
                   {showVotes && (
                     <>
-                      <td className="py-2 pr-3 text-right tabular-nums text-green-400">
-                        +{item.positiveVotes.toLocaleString()}
+                      <td data-st-num>
+                        <span className="text-[var(--st-success)]">
+                          +{item.positiveVotes.toLocaleString()}
+                        </span>
                       </td>
-                      <td className="py-2 text-right tabular-nums text-red-400">
-                        −{item.negativeVotes.toLocaleString()}
+                      <td data-st-num>
+                        <span className="text-[var(--st-danger)]">
+                          −{item.negativeVotes.toLocaleString()}
+                        </span>
                       </td>
                     </>
                   )}
