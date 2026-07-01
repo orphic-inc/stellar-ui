@@ -34,9 +34,6 @@ const FORMAT_OPTIONS = [
   'epub'
 ];
 
-const selectCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-
 const TopReleasesPage = () => {
   const [type, setType] = useState<NonNullable<ReleaseType>>('overall');
   const [limit, setLimit] = useState<LimitValue>(10);
@@ -54,17 +51,14 @@ const TopReleasesPage = () => {
   return (
     <div className="space-y-4">
       {/* Controls */}
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex flex-wrap gap-4 items-end">
+      <div data-st="panel" className="p-4 flex flex-wrap gap-4 items-end">
         <div>
-          <label
-            htmlFor="releases-type"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="releases-type" data-st="meta" className="block mb-1">
             Period / Type
           </label>
           <select
             id="releases-type"
-            className={selectCls}
+            data-st="field"
             value={type}
             onChange={(e) =>
               setType(e.target.value as NonNullable<ReleaseType>)
@@ -79,15 +73,12 @@ const TopReleasesPage = () => {
         </div>
 
         <div>
-          <label
-            htmlFor="releases-limit"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="releases-limit" data-st="meta" className="block mb-1">
             Limit
           </label>
           <select
             id="releases-limit"
-            className={selectCls}
+            data-st="field"
             value={limit}
             onChange={(e) => setLimit(Number(e.target.value) as LimitValue)}
           >
@@ -102,13 +93,14 @@ const TopReleasesPage = () => {
         <div>
           <label
             htmlFor="releases-format"
-            className="block text-xs font-medium text-gray-400 mb-1"
+            data-st="meta"
+            className="block mb-1"
           >
             Format
           </label>
           <select
             id="releases-format"
-            className={selectCls}
+            data-st="field"
             value={format}
             onChange={(e) => setFormat(e.target.value)}
           >
@@ -123,7 +115,8 @@ const TopReleasesPage = () => {
         <div className="flex-1 min-w-48">
           <label
             htmlFor="releases-exclude-tags"
-            className="block text-xs font-medium text-gray-400 mb-1"
+            data-st="meta"
+            className="block mb-1"
           >
             Exclude Tags (comma-separated)
           </label>
@@ -131,7 +124,8 @@ const TopReleasesPage = () => {
             <input
               id="releases-exclude-tags"
               type="text"
-              className="flex-1 bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              data-st="field"
+              className="flex-1"
               value={pendingExclude}
               placeholder="e.g. pop, rock"
               onChange={(e) => setPendingExclude(e.target.value)}
@@ -140,7 +134,8 @@ const TopReleasesPage = () => {
               }}
             />
             <button
-              className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded"
+              data-st="control"
+              data-st-primary
               onClick={() => setExcludeTags(pendingExclude)}
             >
               Apply
@@ -156,60 +151,56 @@ const TopReleasesPage = () => {
       )}
       {data && (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-gray-300">
-            <thead>
-              <tr className="text-left text-xs text-gray-500 uppercase tracking-wide border-b border-gray-700">
-                <th className="pb-2 pr-3 w-8">#</th>
-                <th className="pb-2 pr-3">Release</th>
-                <th className="pb-2 pr-3 text-right">Consumers</th>
-                <th className="pb-2 pr-3 text-right">Data</th>
-                <th className="pb-2 text-right">Contributions</th>
+          {/* Columnar data keeps its <table>; the grid/colhead/row variant
+              (ADR-0006) carries the token paint. */}
+          <table data-st="grid" className="text-sm">
+            <thead data-st="colhead">
+              <tr>
+                <th className="w-8">#</th>
+                <th>Release</th>
+                <th data-st-num>Consumers</th>
+                <th data-st-num>Data</th>
+                <th data-st-num>Contributions</th>
               </tr>
             </thead>
             <tbody>
               {data.items.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-8 text-center text-gray-500">
-                    No data for this period.
+                <tr data-st="row">
+                  <td colSpan={5} className="text-center">
+                    <span data-st="meta">No data for this period.</span>
                   </td>
                 </tr>
               )}
               {data.items.map((item) => (
-                <tr
-                  key={item.releaseId}
-                  className="border-t border-gray-800 hover:bg-gray-800/40"
-                >
-                  <td className="py-2 pr-3 text-gray-500">{item.rank}</td>
-                  <td className="py-2 pr-3">
+                <tr key={item.releaseId} data-st="row">
+                  <td>
+                    <span data-st="meta">{item.rank}</span>
+                  </td>
+                  <td>
                     <Link
                       to={`/private/releases/${item.releaseId}`}
-                      className="text-indigo-400 hover:text-indigo-300 font-medium"
+                      data-st="title"
                     >
                       {item.artistName} – {item.title}
                     </Link>
-                    <span className="text-gray-500 ml-2">[{item.year}]</span>
+                    <span data-st="meta" className="ml-2">
+                      [{item.year}]
+                    </span>
                     {item.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-0.5">
                         {item.tags.map((t) => (
-                          <span
-                            key={t.id}
-                            className="text-[10px] bg-gray-700 text-gray-400 rounded px-1.5 py-0.5"
-                          >
+                          <span key={t.id} data-st="chip">
                             {t.name}
                           </span>
                         ))}
                       </div>
                     )}
                   </td>
-                  <td className="py-2 pr-3 text-right tabular-nums">
-                    {item.consumerCount.toLocaleString()}
-                  </td>
-                  <td className="py-2 pr-3 text-right tabular-nums">
+                  <td data-st-num>{item.consumerCount.toLocaleString()}</td>
+                  <td data-st-num>
                     {formatBytes(Number(item.totalBytesConsumed))}
                   </td>
-                  <td className="py-2 text-right tabular-nums">
-                    {item.contributionCount}
-                  </td>
+                  <td data-st-num>{item.contributionCount}</td>
                 </tr>
               ))}
             </tbody>

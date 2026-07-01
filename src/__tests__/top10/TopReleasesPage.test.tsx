@@ -137,4 +137,29 @@ describe('TopReleasesPage', () => {
       expect.objectContaining({ excludeTags: 'metal' })
     );
   });
+
+  it('paints the controls + table from the data-st contract (ADR-0006)', () => {
+    mockUseGetTopReleasesQuery.mockReturnValue({
+      data: { items: [makeItem(1)] },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<TopReleasesPage />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="chip"]')).toBeInTheDocument();
+  });
 });
