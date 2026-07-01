@@ -371,4 +371,37 @@ describe('UserBrowsePage', () => {
     )?.[0] as URLSearchParams;
     expect(params.get('disabled')).toBe('true');
   });
+
+  it('paints the filter form + results table from the data-st contract', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 2, userRank: { permissions: { staff: true } } }
+    });
+    mockUseSearchUsersQuery.mockReturnValue({
+      data: { data: [makeUser(1)], meta: { total: 1, totalPages: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<UserBrowsePage />);
+    // Form is a bounded panel; inputs/selects paint from `field`, the CTA is a
+    // primary control.
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+    // Columnar results keep the <table>; grid/colhead/row + title paint it.
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+  });
 });

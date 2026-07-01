@@ -4,9 +4,10 @@ import { useGetMeQuery } from '../../store/services/authApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 
-const inputCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full';
-const labelCls = 'block text-xs font-medium text-gray-400 mb-1';
+// Layout-only class strings; paint comes from the `field`/`meta` Roles below.
+// See ReleaseBrowsePage / global.css §2a.
+const inputCls = 'w-full';
+const labelCls = 'block text-xs font-medium mb-1';
 const UserBrowsePage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: user } = useGetMeQuery();
@@ -61,21 +62,24 @@ const UserBrowsePage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold text-white">Users</h1>
+      <h1 data-st="prose" data-st-strong className="text-2xl">
+        Users
+      </h1>
 
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+      <div data-st="panel" className="p-4">
         <form
           onSubmit={handleSubmit}
           className="flex flex-wrap items-end gap-3"
         >
           <div className="flex-1 min-w-48">
-            <label htmlFor="user-q" className={labelCls}>
+            <label htmlFor="user-q" data-st="meta" className={labelCls}>
               Username{isPrivileged ? ' or email' : ''}
             </label>
             <input
               id="user-q"
               name="q"
               defaultValue={q}
+              data-st="field"
               className={inputCls}
               placeholder="Search users…"
             />
@@ -83,14 +87,18 @@ const UserBrowsePage = () => {
           {isPrivileged && (
             <>
               <div>
-                <label htmlFor="user-orderBy" className={labelCls}>
+                <label
+                  htmlFor="user-orderBy"
+                  data-st="meta"
+                  className={labelCls}
+                >
                   Order by
                 </label>
                 <select
                   id="user-orderBy"
                   name="orderBy"
                   defaultValue={orderBy}
-                  className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
                 >
                   <option value="username">Username</option>
                   <option value="createdAt">Joined</option>
@@ -98,28 +106,32 @@ const UserBrowsePage = () => {
                 </select>
               </div>
               <div>
-                <label htmlFor="user-order" className={labelCls}>
+                <label htmlFor="user-order" data-st="meta" className={labelCls}>
                   Direction
                 </label>
                 <select
                   id="user-order"
                   name="order"
                   defaultValue={order}
-                  className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
                 >
                   <option value="asc">Asc</option>
                   <option value="desc">Desc</option>
                 </select>
               </div>
               <div>
-                <label htmlFor="user-disabled" className={labelCls}>
+                <label
+                  htmlFor="user-disabled"
+                  data-st="meta"
+                  className={labelCls}
+                >
                   Status
                 </label>
                 <select
                   id="user-disabled"
                   name="disabled"
                   defaultValue={disabled != null ? String(disabled) : ''}
-                  className="bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
                 >
                   <option value="">All</option>
                   <option value="false">Active</option>
@@ -130,14 +142,17 @@ const UserBrowsePage = () => {
           )}
           <button
             type="submit"
-            className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             Search
           </button>
           <button
             type="button"
             onClick={() => setSearchParams(new URLSearchParams())}
-            className="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm rounded transition-colors"
+            data-st="control"
+            className="text-sm"
           >
             Reset
           </button>
@@ -148,43 +163,43 @@ const UserBrowsePage = () => {
       {error && <p className="text-red-400 text-sm">Failed to load results.</p>}
       {data && (
         <>
-          <p className="text-xs text-gray-500">
+          <p data-st="prose" data-st-muted className="text-xs">
             {data.meta.total} user{data.meta.total !== 1 ? 's' : ''}
           </p>
           {data.data.length === 0 ? (
-            <p className="text-gray-400 text-sm">No users found.</p>
+            <p data-st="prose" data-st-muted className="text-sm">
+              No users found.
+            </p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-xs text-gray-500 border-b border-gray-800">
-                    <th className="pb-2 font-medium">Username</th>
-                    <th className="pb-2 font-medium">Rank</th>
-                    <th className="pb-2 font-medium">Joined</th>
+              {/* Columnar data keeps its <table>; the grid/colhead/row variant
+                  (ADR-0006) carries the token paint. */}
+              <table data-st="grid" className="text-sm">
+                <thead data-st="colhead">
+                  <tr>
+                    <th>Username</th>
+                    <th>Rank</th>
+                    <th>Joined</th>
                     {isPrivileged && (
                       <>
-                        <th className="pb-2 font-medium">Last login</th>
-                        <th className="pb-2 font-medium">Ratio</th>
-                        <th className="pb-2 font-medium">Status</th>
+                        <th>Last login</th>
+                        <th data-st-num>Ratio</th>
+                        <th>Status</th>
                       </>
                     )}
                   </tr>
                 </thead>
                 <tbody>
                   {data.data.map((u) => (
-                    <tr
-                      key={u.id}
-                      className="border-b border-gray-800/50 hover:bg-gray-900/30"
-                    >
-                      <td className="py-2 pr-4">
-                        <Link
-                          to={`/private/user/${u.id}`}
-                          className="text-indigo-400 hover:text-indigo-300 font-medium"
-                        >
+                    <tr key={u.id} data-st="row">
+                      <td>
+                        <Link to={`/private/user/${u.id}`} data-st="title">
                           {u.username}
                         </Link>
                       </td>
-                      <td className="py-2 pr-4">
+                      <td>
+                        {/* Rank colour is data-driven (per-rank), not a theme
+                            token — keep the inline style. */}
                         <span
                           style={{ color: u.userRank.color ?? undefined }}
                           className="text-sm"
@@ -192,24 +207,32 @@ const UserBrowsePage = () => {
                           {u.userRank.name}
                         </span>
                       </td>
-                      <td className="py-2 pr-4 text-gray-400 text-xs">
-                        {new Date(u.createdAt).toLocaleDateString()}
+                      <td>
+                        <span data-st="meta" className="text-xs">
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </span>
                       </td>
                       {isPrivileged && (
                         <>
-                          <td className="py-2 pr-4 text-gray-400 text-xs">
-                            {u.lastLogin
-                              ? new Date(u.lastLogin).toLocaleDateString()
-                              : '—'}
+                          <td>
+                            <span data-st="meta" className="text-xs">
+                              {u.lastLogin
+                                ? new Date(u.lastLogin).toLocaleDateString()
+                                : '—'}
+                            </span>
                           </td>
-                          <td className="py-2 pr-4 text-gray-400 text-xs">
+                          <td data-st-num className="text-xs">
                             {u.ratio != null ? Number(u.ratio).toFixed(2) : '∞'}
                           </td>
-                          <td className="py-2 text-xs">
+                          <td className="text-xs">
                             {u.disabled ? (
-                              <span className="text-red-400">Disabled</span>
+                              <span className="text-[var(--st-danger)]">
+                                Disabled
+                              </span>
                             ) : (
-                              <span className="text-green-400">Active</span>
+                              <span className="text-[var(--st-success)]">
+                                Active
+                              </span>
                             )}
                           </td>
                         </>
@@ -229,11 +252,9 @@ const UserBrowsePage = () => {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`px-2.5 py-1 text-xs rounded ${
-                    p === page
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                  }`}
+                  data-st="control"
+                  data-st-primary={p === page ? '' : undefined}
+                  className="px-2.5 py-1 text-xs"
                 >
                   {p}
                 </button>
