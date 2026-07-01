@@ -76,6 +76,42 @@ describe('RequestDetailPage', () => {
     });
   });
 
+  it('emits the data-st theming hooks', () => {
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: {} }
+      } as never)
+    );
+    mockUseGetRequestQuery.mockReturnValue({
+      data: {
+        id: 12,
+        userId: 7,
+        title: 'Need this album',
+        description: 'Detailed request',
+        type: 'Music',
+        status: 'open',
+        totalBounty: '104857600',
+        filledContributionId: null,
+        community: { id: 2, name: 'Jazz' },
+        user: { id: 7, username: 'alice' },
+        bounties: []
+      },
+      isLoading: false,
+      error: undefined
+    });
+
+    const { container } = renderWithProviders(<RequestDetailPage />, { store });
+    expect(container.querySelector('[data-st="panel"]')).toBeTruthy();
+    expect(container.querySelector('[data-st="chip"]')).toBeTruthy();
+    expect(container.querySelector('input[data-st="field"]')).toBeTruthy();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeTruthy();
+  });
+
   it('lets the owner vote, bookmark, add bounty, fill, inspect history, and delete an open request', async () => {
     const user = userEvent.setup();
     const store = createTestStore();

@@ -17,6 +17,13 @@ import CommentsSection from '../layout/CommentsSection';
 import { addAlert } from '../../store/slices/alertSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { canUseRequestModeration } from '../staff/staffAffordances';
+import { Badge } from '../ui';
+import type { BadgeVariant } from '../ui';
+
+const STATUS_TONE: Record<string, BadgeVariant> = {
+  open: 'info',
+  filled: 'success'
+};
 
 const RequestDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -133,7 +140,11 @@ const RequestDetailPage = () => {
 
   if (isLoading) return <Spinner />;
   if (error || !req)
-    return <div className="p-4 text-red-400">Request not found.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Request not found.
+      </div>
+    );
 
   const totalBountyDisplay = formatBytes(req.totalBounty);
   const canDelete = (isOwner && req.status === 'open') || canModerateRequest;
@@ -144,40 +155,37 @@ const RequestDetailPage = () => {
     <div className="thin space-y-6">
       <div>
         <div className="flex items-start justify-between gap-4">
-          <h2 className="text-xl font-semibold">{req.title}</h2>
+          <h2 data-st="prose" data-st-strong className="text-xl">
+            {req.title}
+          </h2>
           <div className="flex items-center gap-2 shrink-0">
             {user && (
               <button
                 onClick={handleBookmark}
                 disabled={bookmarking}
                 title="Bookmark"
-                className="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-sm text-gray-400 hover:text-yellow-300 transition-colors disabled:opacity-50"
+                data-st="control"
+                className="px-2.5 py-1 rounded border border-[var(--st-border)] text-sm disabled:opacity-50"
               >
                 🔖
               </button>
             )}
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${
-                req.status === 'filled'
-                  ? 'bg-green-900/40 text-green-400'
-                  : 'bg-gray-800 text-gray-300'
-              }`}
-            >
+            <Badge variant={STATUS_TONE[req.status] ?? 'default'}>
               {req.status}
-            </span>
+            </Badge>
           </div>
         </div>
-        <div className="text-sm text-gray-400 mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+        <div
+          data-st="meta"
+          className="text-sm mt-1 flex flex-wrap items-center gap-x-4 gap-y-1"
+        >
           <span>Type: {req.type}</span>
           {req.year && <span>Year: {req.year}</span>}
           {req.community && <span>Community: {req.community.name}</span>}
           {req.user && (
             <span>
               By{' '}
-              <Link
-                to={`/private/user/${req.user.username}`}
-                className="text-blue-400 hover:underline"
-              >
+              <Link to={`/private/user/${req.user.username}`} data-st="control">
                 {req.user.username}
               </Link>
             </span>
@@ -186,7 +194,8 @@ const RequestDetailPage = () => {
             <button
               onClick={handleVote}
               disabled={voting}
-              className="flex items-center gap-1 text-gray-400 hover:text-indigo-300 transition-colors disabled:opacity-50"
+              data-st="control"
+              className="flex items-center gap-1 disabled:opacity-50"
             >
               {' '}
               <span>
@@ -198,33 +207,35 @@ const RequestDetailPage = () => {
       </div>
 
       {req.description && (
-        <p className="text-gray-300 text-sm whitespace-pre-wrap">
+        <p data-st="prose" className="text-sm whitespace-pre-wrap">
           {req.description}
         </p>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded p-4">
-        <div className="text-2xl font-mono font-bold text-yellow-400">
+      <div data-st="panel" className="rounded p-4">
+        <div className="text-2xl font-mono font-bold text-[var(--st-warning)]">
           {totalBountyDisplay}
         </div>
-        <div className="text-xs text-gray-500 mt-1">Total bounty</div>
+        <div data-st="meta" className="text-xs mt-1">
+          Total bounty
+        </div>
 
         {req.bounties && req.bounties.length > 0 && (
-          <table className="w-full text-xs mt-3">
-            <thead>
-              <tr className="text-left text-gray-500">
+          <table data-st="grid" className="w-full text-xs mt-3">
+            <thead data-st="colhead">
+              <tr>
                 <th className="pb-1">Contributor</th>
                 <th className="pb-1 text-right">Amount</th>
               </tr>
             </thead>
             <tbody>
               {req.bounties.map((b) => (
-                <tr key={b.id} className="border-t border-gray-800/50">
+                <tr key={b.id} data-st="row">
                   <td className="py-1">
                     {b.user ? (
                       <Link
                         to={`/private/user/${b.user.username}`}
-                        className="text-blue-400 hover:underline"
+                        data-st="control"
                       >
                         {b.user.username}
                       </Link>
@@ -232,8 +243,10 @@ const RequestDetailPage = () => {
                       `User #${b.userId}`
                     )}
                   </td>
-                  <td className="py-1 text-right font-mono text-yellow-300">
-                    {formatBytes(b.amount)}
+                  <td className="py-1 text-right font-mono" data-st-num>
+                    <span className="text-[var(--st-warning)]">
+                      {formatBytes(b.amount)}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -248,12 +261,15 @@ const RequestDetailPage = () => {
               value={bountyInput}
               onChange={(e) => setBountyInput(e.target.value)}
               placeholder="Bytes (e.g. 104857600)"
-              className="flex-1 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm"
+              data-st="field"
+              className="flex-1 px-2 py-1 rounded text-sm"
             />
             <button
               onClick={handleAddBounty}
               disabled={addingBounty || !bountyInput}
-              className="px-3 py-1 bg-yellow-700 hover:bg-yellow-600 text-white text-sm rounded disabled:opacity-40"
+              data-st="control"
+              data-st-primary
+              className="text-sm"
             >
               Add Bounty
             </button>
@@ -262,14 +278,19 @@ const RequestDetailPage = () => {
       </div>
 
       {req.status === 'filled' && req.filledContributionId && (
-        <div className="bg-green-950/30 border border-green-800/40 rounded p-4 text-sm">
-          <div className="text-green-400 font-medium mb-1">Filled</div>
-          <div className="text-gray-300">
+        <div
+          data-st="panel"
+          className="rounded p-4 text-sm border-[var(--st-success)] bg-[color-mix(in_srgb,var(--st-success)_12%,transparent)]"
+        >
+          <div className="text-[var(--st-success)] font-medium mb-1">
+            Filled
+          </div>
+          <div data-st="prose">
             Filled by{' '}
             {req.filler ? (
               <Link
                 to={`/private/user/${req.filler.username}`}
-                className="text-blue-400 hover:underline"
+                data-st="control"
               >
                 {req.filler.username}
               </Link>
@@ -281,11 +302,11 @@ const RequestDetailPage = () => {
       )}
 
       {canFill && (
-        <div className="border border-gray-800 rounded p-4 space-y-2">
-          <h3 className="text-sm font-medium text-gray-300">
+        <div data-st="panel" className="rounded p-4 space-y-2">
+          <h3 data-st="prose" data-st-strong className="text-sm">
             Fill this request
           </h3>
-          <p className="text-xs text-gray-500">
+          <p data-st="meta" className="text-xs">
             Enter the ID of your contribution that fulfills this request.
           </p>
           <div className="flex gap-2">
@@ -294,12 +315,16 @@ const RequestDetailPage = () => {
               value={fillContribId}
               onChange={(e) => setFillContribId(e.target.value)}
               placeholder="Contribution ID"
-              className="w-40 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm"
+              data-st="field"
+              className="w-40 px-2 py-1 rounded text-sm"
             />
             <button
               onClick={handleFill}
               disabled={filling || !fillContribId}
-              className="px-3 py-1 bg-green-700 hover:bg-green-600 text-white text-sm rounded disabled:opacity-40"
+              data-st="control"
+              data-st-primary
+              data-st-success
+              className="text-sm"
             >
               Fill Request
             </button>
@@ -308,8 +333,11 @@ const RequestDetailPage = () => {
       )}
 
       {canUnfill && (
-        <div className="border border-orange-800/40 rounded p-4 space-y-2">
-          <h3 className="text-sm font-medium text-orange-300">
+        <div
+          data-st="panel"
+          className="rounded p-4 space-y-2 border-[var(--st-warning)]"
+        >
+          <h3 className="text-sm font-medium text-[var(--st-warning)]">
             Unfill (Staff)
           </h3>
           <div className="flex gap-2">
@@ -318,12 +346,16 @@ const RequestDetailPage = () => {
               value={unfillReason}
               onChange={(e) => setUnfillReason(e.target.value)}
               placeholder="Reason (optional)"
-              className="flex-1 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm"
+              data-st="field"
+              className="flex-1 px-2 py-1 rounded text-sm"
             />
             <button
               onClick={handleUnfill}
               disabled={unfilling}
-              className="px-3 py-1 bg-orange-800 hover:bg-orange-700 text-white text-sm rounded disabled:opacity-40"
+              data-st="control"
+              data-st-primary
+              data-st-warning
+              className="text-sm"
             >
               Unfill
             </button>
@@ -336,7 +368,9 @@ const RequestDetailPage = () => {
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="text-sm text-red-500 hover:text-red-400 disabled:opacity-40"
+            data-st="control"
+            data-st-danger
+            className="text-sm disabled:opacity-40"
           >
             Delete request
           </button>
@@ -344,10 +378,10 @@ const RequestDetailPage = () => {
       )}
 
       {/* Bounty History */}
-      <div className="border border-gray-800 rounded overflow-hidden">
+      <div data-st="panel" className="rounded overflow-hidden">
         <button
           onClick={() => setShowBountyHistory((v) => !v)}
-          className="w-full px-4 py-2 bg-gray-900 text-left text-sm text-gray-400 flex items-center justify-between hover:bg-gray-800 transition-colors"
+          className="w-full px-4 py-2 text-left text-sm flex items-center justify-between text-[var(--st-text-muted)] hover:text-[var(--st-text)] transition-colors"
         >
           <span>Bounty History</span>
           <span>{showBountyHistory ? '▲' : '▼'}</span>
@@ -355,9 +389,9 @@ const RequestDetailPage = () => {
         {showBountyHistory && (
           <div className="px-4 py-3">
             {bountyHistory && bountyHistory.length > 0 ? (
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-left text-gray-500">
+              <table data-st="grid" className="w-full text-xs">
+                <thead data-st="colhead">
+                  <tr>
                     <th className="pb-1">Contributor</th>
                     <th className="pb-1 text-right">Amount</th>
                     <th className="pb-1 text-right">Date</th>
@@ -365,12 +399,12 @@ const RequestDetailPage = () => {
                 </thead>
                 <tbody>
                   {bountyHistory.map((entry) => (
-                    <tr key={entry.id} className="border-t border-gray-800/50">
+                    <tr key={entry.id} data-st="row">
                       <td className="py-1">
                         {entry.user ? (
                           <Link
                             to={`/private/user/${entry.user.id}`}
-                            className="text-blue-400 hover:underline"
+                            data-st="control"
                           >
                             {entry.user.username}
                           </Link>
@@ -378,18 +412,24 @@ const RequestDetailPage = () => {
                           'Anonymous'
                         )}
                       </td>
-                      <td className="py-1 text-right font-mono text-yellow-300">
-                        {formatBytes(entry.amount)}
+                      <td className="py-1 text-right font-mono" data-st-num>
+                        <span className="text-[var(--st-warning)]">
+                          {formatBytes(entry.amount)}
+                        </span>
                       </td>
-                      <td className="py-1 text-right text-gray-500">
-                        {new Date(entry.createdAt).toLocaleDateString()}
+                      <td className="py-1 text-right">
+                        <span data-st="meta">
+                          {new Date(entry.createdAt).toLocaleDateString()}
+                        </span>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <p className="text-sm text-gray-500">No bounty history.</p>
+              <p data-st="prose" data-st-muted className="text-sm">
+                No bounty history.
+              </p>
             )}
           </div>
         )}
