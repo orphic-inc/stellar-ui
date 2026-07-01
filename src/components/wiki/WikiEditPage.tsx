@@ -87,21 +87,23 @@ const WikiEditPage = () => {
       <div className="mb-4">
         <Link
           to={isNew ? '/private/wiki' : `/private/wiki/${pageId}`}
-          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          data-st="control"
+          className="text-xs"
         >
           ← {backLabel}
         </Link>
-        <h1 className="text-xl font-bold text-white mt-1">
+        <h1 data-st="prose" data-st-strong className="text-xl mt-1">
           {isNew ? 'New Wiki Page' : `Edit: ${existing?.title}`}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-5 space-y-4">
+        <div data-st="panel" className="p-5 space-y-4">
           <div>
             <label
               htmlFor="wiki-title"
-              className="block text-sm text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Title
             </label>
@@ -113,7 +115,8 @@ const WikiEditPage = () => {
               required
               minLength={3}
               maxLength={100}
-              className="w-full rounded-lg bg-gray-800 border border-gray-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              data-st="field"
+              className="w-full"
             />
           </div>
 
@@ -121,10 +124,11 @@ const WikiEditPage = () => {
             <div>
               <label
                 htmlFor="wiki-slug"
-                className="block text-sm text-gray-300 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Slug{' '}
-                <span className="text-gray-500 text-xs">
+                <span className="text-xs">
                   (optional — derived from title if blank)
                 </span>
               </label>
@@ -140,7 +144,8 @@ const WikiEditPage = () => {
                 maxLength={50}
                 placeholder="my-page-slug"
                 pattern="[a-z0-9-]*"
-                className="w-full rounded-lg bg-gray-800 border border-gray-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                data-st="field"
+                className="w-full font-mono"
               />
             </div>
           )}
@@ -148,10 +153,11 @@ const WikiEditPage = () => {
           <div>
             <label
               htmlFor="wiki-body"
-              className="block text-sm text-gray-300 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Body{' '}
-              <span className="text-gray-500 text-xs">
+              <span className="text-xs">
                 (HTML supported: b, i, a, ul, code, pre, blockquote…)
               </span>
             </label>
@@ -161,16 +167,18 @@ const WikiEditPage = () => {
               onChange={(e) => setBody(e.target.value)}
               required
               rows={20}
-              className="w-full rounded-lg bg-gray-800 border border-gray-700 text-white px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              data-st="field"
+              className="w-full font-mono"
             />
           </div>
 
           {canManage && (
-            <div className="grid grid-cols-2 gap-4 border-t border-gray-700 pt-4">
+            <div className="grid grid-cols-2 gap-4 border-t border-[var(--st-border)] pt-4">
               <div>
                 <label
                   htmlFor="wiki-min-read"
-                  className="block text-sm text-gray-300 mb-1"
+                  data-st="meta"
+                  className="block text-sm mb-1"
                 >
                   Min rank level to read
                 </label>
@@ -181,13 +189,15 @@ const WikiEditPage = () => {
                   max={1000}
                   value={minReadLevel}
                   onChange={(e) => setMinReadLevel(Number(e.target.value))}
-                  className="w-full rounded-lg bg-gray-800 border border-gray-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
+                  className="w-full"
                 />
               </div>
               <div>
                 <label
                   htmlFor="wiki-min-edit"
-                  className="block text-sm text-gray-300 mb-1"
+                  data-st="meta"
+                  className="block text-sm mb-1"
                 >
                   Min rank level to edit
                 </label>
@@ -198,10 +208,11 @@ const WikiEditPage = () => {
                   max={1000}
                   value={minEditLevel}
                   onChange={(e) => setMinEditLevel(Number(e.target.value))}
-                  className="w-full rounded-lg bg-gray-800 border border-gray-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  data-st="field"
+                  className="w-full"
                 />
               </div>
-              <p className="col-span-2 text-xs text-gray-500">
+              <p data-st="meta" className="col-span-2 text-xs">
                 Set to 0 for no restriction. minEditLevel is automatically
                 clamped to at least minReadLevel.
               </p>
@@ -212,14 +223,17 @@ const WikiEditPage = () => {
         <div className="flex gap-3 justify-end">
           <Link
             to={isNew ? '/private/wiki' : `/private/wiki/${pageId}`}
-            className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+            data-st="control"
+            className="text-sm"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={isSaving}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm rounded-lg transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             {isSaving ? 'Saving…' : isNew ? 'Create Page' : 'Save Changes'}
           </button>

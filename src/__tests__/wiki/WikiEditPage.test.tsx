@@ -289,4 +289,26 @@ describe('WikiEditPage', () => {
       expect(mockNavigate).not.toHaveBeenCalledWith('/private/wiki/12');
     });
   });
+
+  it('paints the form from the data-st contract', () => {
+    mockUseParams.mockReturnValue({});
+    const { container } = renderWithProviders(<WikiEditPage />, {
+      store: createTestStore()
+    });
+    // CRUD form: fields → field, labels → meta, panel surface, Save → primary
+    // control.
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('textarea[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('label[data-st="meta"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
 });
