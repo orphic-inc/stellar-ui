@@ -40,13 +40,32 @@ Introduce a small kit of presentational primitives in **`src/components/ui/`**
 **once per primitive**, not once per page. The kit is the site-wide template;
 the staff/admin tools are its first proving ground.
 
+> **Amended 2026-07-01 — `Modal` primitive.** Added `Modal` to the kit. The
+> theming sweep had been repainting hand-rolled modal *surfaces* (overlay →
+> `panel` + content-title `colhead` + `control` buttons) in place, which is
+> correct paint but left the *behaviour* half — portal, `role="dialog"` +
+> `aria-modal`, focus trap + focus-restore, Esc-to-close, backdrop-click,
+> scroll-lock — copy-pasted and, in practice, mostly absent (an audit found 6
+> hand-rolled `fixed inset-0` modals, **none** with a focus trap or dialog role;
+> one, `UserProfile`'s, even used a `--st-backdrop` token that was undefined on
+> most themes, so its scrim went transparent). `Modal` owns both halves and all
+> six sites now compose it (`ReleasePage`, `ReportContributionModal`,
+> `UserProfile`, `SiteHistoryPage`, `WikiHistoryPage` ×2, `GenerateTestDataPage`
+> ×2 — the dev-only page keeps its bespoke *body* but gets the shell). Mount ===
+> open (no `open` prop); a `headerActions` slot carries header-level buttons
+> (e.g. Rollback); the dark scrim is intentionally theme-agnostic (`bg-black/70`,
+> not a token) so it can never go transparent. Composes the frozen contract — no
+> new Roles or tokens.
+
 1. **Primitives, each emitting the ADR-0005/0006 contract:** `PageShell`
    (page wrapper — `prose -strong` title, the back-link, an actions slot, one
    width scale `sm…2xl`), `Panel` (`panel`), `Button` (`control` + variants
    `primary`/`success`/`warning`/`danger`/`link`/`link-danger`), `Field`
    (labeled input → `field` + `meta` label), `DataTable` (ADR-0006
    `grid`/`colhead`/`row`), `Badge` (`chip` + status variants), `Pagination`
-   (link `control`s), `SectionHeading` (uppercase `prose -strong` label).
+   (link `control`s), `SectionHeading` (uppercase `prose -strong` label),
+   `Modal` (a `panel` dialog in a body portal — content-title `colhead` header,
+   `control` ✕, focus trap, Esc/backdrop close, scroll-lock; see amendment).
 
 2. **Adopting a primitive *completes* that surface's theming migration.** Because
    each primitive emits the hooks, a page that moves onto the kit gets its
