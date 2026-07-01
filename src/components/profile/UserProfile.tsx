@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { formatBytes, ordinalSuffix } from '../../utils';
 import type { components } from '../../types/api';
 import DOMPurify from 'dompurify';
+import { Modal } from '../ui';
 
 type CommunityStats = components['schemas']['CommunityStats'];
 import {
@@ -108,62 +109,62 @@ const WarnModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-[var(--st-backdrop)] flex items-center justify-center z-50 p-4">
-      <div data-st="panel" className="w-full max-w-md p-6 space-y-4">
-        <h3 data-st="prose" data-st-strong className="text-lg">
-          Warn User
-        </h3>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label htmlFor="warn-reason" data-st="meta" className="block mb-1">
-              Reason
-            </label>
-            <textarea
-              id="warn-reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              required
-              rows={3}
-              data-st="field"
-              className="w-full"
-            />
-          </div>
-          <div>
-            <label htmlFor="warn-expires" data-st="meta" className="block mb-1">
-              Expires at (optional)
-            </label>
-            <input
-              id="warn-expires"
-              type="datetime-local"
-              value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
-              data-st="field"
-              className="w-full"
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              data-st="control"
-              className="text-sm"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              data-st="control"
-              data-st-primary
-              data-st-warning
-              className="text-sm"
-            >
-              {isLoading ? 'Issuing…' : 'Issue Warning'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Modal
+      title="Warn User"
+      size="sm"
+      onClose={onClose}
+      dismissable={!isLoading}
+    >
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <label htmlFor="warn-reason" data-st="meta" className="block mb-1">
+            Reason
+          </label>
+          <textarea
+            id="warn-reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            required
+            rows={3}
+            data-st="field"
+            className="w-full"
+          />
+        </div>
+        <div>
+          <label htmlFor="warn-expires" data-st="meta" className="block mb-1">
+            Expires at (optional)
+          </label>
+          <input
+            id="warn-expires"
+            type="datetime-local"
+            value={expiresAt}
+            onChange={(e) => setExpiresAt(e.target.value)}
+            data-st="field"
+            className="w-full"
+          />
+        </div>
+        <div className="flex gap-2 justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            data-st="control"
+            className="text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            data-st="control"
+            data-st-primary
+            data-st-warning
+            className="text-sm"
+          >
+            {isLoading ? 'Issuing…' : 'Issue Warning'}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 };
 

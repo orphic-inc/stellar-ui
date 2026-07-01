@@ -10,7 +10,7 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
-import { PageShell, Panel, Button, Field } from '../ui';
+import { PageShell, Panel, Button, Field, Modal } from '../ui';
 
 interface EntryModalProps {
   entry?: SiteHistoryEntry;
@@ -45,49 +45,48 @@ const EntryModal = ({ entry, onClose }: EntryModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <Panel className="w-full max-w-lg p-6 space-y-4">
-        <h3 data-st="prose" data-st-strong className="text-lg font-semibold">
-          {entry ? 'Edit Entry' : 'New Entry'}
-        </h3>
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <Field
-            id="history-title"
-            label="Title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+    <Modal
+      title={entry ? 'Edit Entry' : 'New Entry'}
+      onClose={onClose}
+      dismissable={!isLoading}
+    >
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <Field
+          id="history-title"
+          label="Title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <div>
+          <label
+            htmlFor="history-body"
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Body
+          </label>
+          <textarea
+            id="history-body"
+            data-st="field"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
             required
+            rows={6}
+            className="w-full"
           />
-          <div>
-            <label
-              htmlFor="history-body"
-              data-st="meta"
-              className="block text-xs mb-1"
-            >
-              Body
-            </label>
-            <textarea
-              id="history-body"
-              data-st="field"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              required
-              rows={6}
-              className="w-full"
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
-            <Button variant="link" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button variant="primary" type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving…' : 'Save'}
-            </Button>
-          </div>
-        </form>
-      </Panel>
-    </div>
+        </div>
+        <div className="flex gap-2 justify-end">
+          <Button variant="link" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit" disabled={isLoading}>
+            {isLoading ? 'Saving…' : 'Save'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 };
 

@@ -16,6 +16,7 @@ import {
 } from '../../store/services/devToolsApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { Modal } from '../ui';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 
@@ -87,13 +88,14 @@ const ConfirmModal = ({
   onCancel,
   isLoading
 }: ConfirmModalProps) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-    <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-xl w-full max-w-md mx-4">
-      <div className="p-5 border-b border-gray-700">
-        <h3 className="text-lg font-semibold text-white">
-          Confirm test data generation
-        </h3>
-      </div>
+  <Modal
+    title="Confirm test data generation"
+    size="sm"
+    onClose={onCancel}
+    dismissable={!isLoading}
+    bodyClassName="p-0"
+  >
+    <>
       <div className="p-5 space-y-4">
         {mode === 'integrated' && (
           <div className="flex gap-2 p-3 bg-amber-900/40 border border-amber-700/60 rounded text-sm text-amber-300">
@@ -166,8 +168,8 @@ const ConfirmModal = ({
           {isLoading ? 'Generating…' : 'Generate test data'}
         </button>
       </div>
-    </div>
-  </div>
+    </>
+  </Modal>
 );
 
 interface CleanupConfirmModalProps {
@@ -185,12 +187,15 @@ const CleanupConfirmModal = ({
   onCancel,
   isLoading
 }: CleanupConfirmModalProps) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-    <div className="bg-gray-800 border border-gray-600 rounded-lg shadow-xl w-full max-w-sm mx-4">
+  <Modal
+    title={isAll ? 'Clean up all runs?' : 'Clean up this run?'}
+    size="sm"
+    onClose={onCancel}
+    dismissable={!isLoading}
+    bodyClassName="p-0"
+  >
+    <>
       <div className="p-5">
-        <h3 className="text-lg font-semibold text-white mb-2">
-          {isAll ? 'Clean up all runs?' : 'Clean up this run?'}
-        </h3>
         <p className="text-sm text-gray-400">
           {isAll ? (
             'All generated seed records will be deleted. This cannot be undone.'
@@ -221,8 +226,8 @@ const CleanupConfirmModal = ({
           {isLoading ? 'Cleaning up…' : 'Clean up'}
         </button>
       </div>
-    </div>
-  </div>
+    </>
+  </Modal>
 );
 
 // ─── Run row ─────────────────────────────────────────────────────────────────

@@ -13,6 +13,7 @@ import { hasAnyPermission } from '../../utils/permissions';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
+import { Modal } from '../ui';
 
 const ALLOWED_WIKI_TAGS = [
   'b',
@@ -101,42 +102,33 @@ const CompareModal = ({
   const lines = data ? diffLines(data.old.body, data.new.body) : [];
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-start justify-center z-50 p-4 overflow-y-auto">
-      <div data-st="panel" className="w-full max-w-3xl my-8">
-        <div data-st="colhead" data-st-title>
-          <h3>
-            Compare r{oldRev} → r{newRev}
-            {data ? ` — ${data.title}` : ''}
-          </h3>
-          <button onClick={onClose} data-st="control" className="text-xs">
-            Close
-          </button>
+    <Modal
+      title={`Compare r${oldRev} → r${newRev}${data ? ` — ${data.title}` : ''}`}
+      size="xl"
+      onClose={onClose}
+      bodyClassName="p-0"
+    >
+      {isLoading && (
+        <div className="p-6">
+          <Spinner />
         </div>
-
-        {isLoading && (
-          <div className="p-6">
-            <Spinner />
-          </div>
-        )}
-        {error && (
-          <div className="p-4 text-red-400 text-sm">
-            Failed to load comparison.
-          </div>
-        )}
-        {data && (
-          <div className="p-5 font-mono text-xs overflow-x-auto">
-            {lines.map((line, i) => (
-              <div key={i} className={DIFF_CLASS[line.type]}>
-                <span className="select-none mr-2">
-                  {DIFF_PREFIX[line.type]}
-                </span>
-                {line.text || ' '}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+      {error && (
+        <div className="p-4 text-red-400 text-sm">
+          Failed to load comparison.
+        </div>
+      )}
+      {data && (
+        <div className="p-5 font-mono text-xs overflow-x-auto">
+          {lines.map((line, i) => (
+            <div key={i} className={DIFF_CLASS[line.type]}>
+              <span className="select-none mr-2">{DIFF_PREFIX[line.type]}</span>
+              {line.text || ' '}
+            </div>
+          ))}
+        </div>
+      )}
+    </Modal>
   );
 };
 
@@ -179,60 +171,53 @@ const RevisionViewer = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-start justify-center z-50 p-4 overflow-y-auto">
-      <div data-st="panel" className="w-full max-w-3xl my-8">
-        <div data-st="colhead" data-st-title>
-          <h3>
-            Revision {rev}
-            {isLoading ? '' : data ? ` — ${data.title}` : ''}
-          </h3>
-          <div className="flex gap-2">
-            {canEdit && data && (
-              <button
-                onClick={handleRollback}
-                disabled={isRollingBack}
-                data-st="control"
-                data-st-primary
-                data-st-warning
-                className="text-xs"
-              >
-                {isRollingBack ? 'Rolling back…' : 'Rollback to this revision'}
-              </button>
-            )}
-            <button onClick={onClose} data-st="control" className="text-xs">
-              Close
-            </button>
-          </div>
+    <Modal
+      title={`Revision ${rev}${isLoading ? '' : data ? ` — ${data.title}` : ''}`}
+      size="xl"
+      onClose={onClose}
+      headerActions={
+        canEdit && data ? (
+          <button
+            onClick={handleRollback}
+            disabled={isRollingBack}
+            data-st="control"
+            data-st-primary
+            data-st-warning
+            className="text-xs"
+          >
+            {isRollingBack ? 'Rolling back…' : 'Rollback to this revision'}
+          </button>
+        ) : undefined
+      }
+      bodyClassName="p-0"
+    >
+      {isLoading && (
+        <div className="p-6">
+          <Spinner />
         </div>
+      )}
 
-        {isLoading && (
-          <div className="p-6">
-            <Spinner />
+      {data && (
+        <>
+          <div
+            data-st="meta"
+            className="px-5 py-2 border-b border-[var(--st-border)] text-xs"
+          >
+            By {data.author.username} on{' '}
+            {new Date(data.createdAt).toLocaleString()}
           </div>
-        )}
-
-        {data && (
-          <>
-            <div
-              data-st="meta"
-              className="px-5 py-2 border-b border-[var(--st-border)] text-xs"
-            >
-              By {data.author.username} on{' '}
-              {new Date(data.createdAt).toLocaleString()}
-            </div>
-            <div
-              className="p-5 text-sm text-[var(--st-text)] prose prose-invert prose-sm max-w-none leading-relaxed"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(data.body, {
-                  ALLOWED_TAGS: ALLOWED_WIKI_TAGS,
-                  ALLOWED_ATTR: ['href', 'class', 'rel', 'target']
-                })
-              }}
-            />
-          </>
-        )}
-      </div>
-    </div>
+          <div
+            className="p-5 text-sm text-[var(--st-text)] prose prose-invert prose-sm max-w-none leading-relaxed"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(data.body, {
+                ALLOWED_TAGS: ALLOWED_WIKI_TAGS,
+                ALLOWED_ATTR: ['href', 'class', 'rel', 'target']
+              })
+            }}
+          />
+        </>
+      )}
+    </Modal>
   );
 };
 

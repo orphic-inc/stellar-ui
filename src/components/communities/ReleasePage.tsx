@@ -18,6 +18,7 @@ import EditionStack from './EditionStack';
 import type { LinkHealthStatus } from '../../types';
 import { useReleaseWorkbench } from './useReleaseWorkbench';
 import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
+import { Modal } from '../ui';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -667,146 +668,129 @@ const ReleasePage = () => {
       )}
 
       {editOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div data-st="panel" className="w-full max-w-lg mx-4 shadow-2xl">
-            <div
-              data-st="colhead"
-              className="flex items-center justify-between px-5 py-4"
-            >
-              <h2
-                data-st="prose"
-                data-st-strong
-                className="text-sm font-semibold"
-              >
-                Edit release
-              </h2>
-              <button
-                type="button"
-                data-st="control"
-                onClick={() => setEditOpen(false)}
-                className="text-lg leading-none"
-              >
-                ×
-              </button>
-            </div>
-            <div className="px-5 py-4 space-y-4">
-              <label className="block">
+        <Modal
+          title="Edit release"
+          onClose={() => setEditOpen(false)}
+          dismissable={!saving}
+          bodyClassName="p-0"
+        >
+          <div className="px-5 py-4 space-y-4">
+            <label className="block">
+              <span data-st="meta" className="text-xs block mb-1">
+                Title
+              </span>
+              <input
+                type="text"
+                data-st="field"
+                value={editForm.title}
+                onChange={(e) =>
+                  setEditForm((f) => ({ ...f, title: e.target.value }))
+                }
+                className="w-full rounded px-3 py-1.5 text-sm"
+              />
+            </label>
+            <label className="block">
+              <span data-st="meta" className="text-xs block mb-1">
+                Description
+              </span>
+              <textarea
+                data-st="field"
+                value={editForm.description}
+                rows={5}
+                onChange={(e) =>
+                  setEditForm((f) => ({ ...f, description: e.target.value }))
+                }
+                className="w-full rounded px-3 py-1.5 text-sm resize-y"
+              />
+            </label>
+            <div className="flex gap-3">
+              <label className="block flex-1">
                 <span data-st="meta" className="text-xs block mb-1">
-                  Title
+                  Year
                 </span>
                 <input
-                  type="text"
+                  type="number"
                   data-st="field"
-                  value={editForm.title}
+                  min={1900}
+                  max={2100}
+                  value={editForm.year}
                   onChange={(e) =>
-                    setEditForm((f) => ({ ...f, title: e.target.value }))
+                    setEditForm((f) => ({
+                      ...f,
+                      year: parseInt(e.target.value) || 0
+                    }))
                   }
                   className="w-full rounded px-3 py-1.5 text-sm"
                 />
               </label>
-              <label className="block">
-                <span data-st="meta" className="text-xs block mb-1">
-                  Description
-                </span>
-                <textarea
+            </div>
+            <label className="block">
+              <span data-st="meta" className="text-xs block mb-1">
+                Cover image URL
+              </span>
+              <div className="flex gap-2">
+                <input
+                  type="url"
                   data-st="field"
-                  value={editForm.description}
-                  rows={5}
+                  value={editForm.image}
                   onChange={(e) =>
-                    setEditForm((f) => ({ ...f, description: e.target.value }))
+                    setEditForm((f) => ({ ...f, image: e.target.value }))
                   }
-                  className="w-full rounded px-3 py-1.5 text-sm resize-y"
+                  placeholder="https://…"
+                  className="flex-1 rounded px-3 py-1.5 text-sm"
                 />
-              </label>
-              <div className="flex gap-3">
-                <label className="block flex-1">
-                  <span data-st="meta" className="text-xs block mb-1">
-                    Year
-                  </span>
-                  <input
-                    type="number"
-                    data-st="field"
-                    min={1900}
-                    max={2100}
-                    value={editForm.year}
-                    onChange={(e) =>
-                      setEditForm((f) => ({
-                        ...f,
-                        year: parseInt(e.target.value) || 0
-                      }))
-                    }
-                    className="w-full rounded px-3 py-1.5 text-sm"
-                  />
-                </label>
+                {editForm.image && (
+                  <button
+                    type="button"
+                    data-st="control"
+                    data-st-danger
+                    onClick={() => setEditForm((f) => ({ ...f, image: '' }))}
+                    className="text-xs px-2"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
-              <label className="block">
-                <span data-st="meta" className="text-xs block mb-1">
-                  Cover image URL
-                </span>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    data-st="field"
-                    value={editForm.image}
-                    onChange={(e) =>
-                      setEditForm((f) => ({ ...f, image: e.target.value }))
-                    }
-                    placeholder="https://…"
-                    className="flex-1 rounded px-3 py-1.5 text-sm"
-                  />
-                  {editForm.image && (
-                    <button
-                      type="button"
-                      data-st="control"
-                      data-st-danger
-                      onClick={() => setEditForm((f) => ({ ...f, image: '' }))}
-                      className="text-xs px-2"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-              </label>
-              <label className="block">
-                <span data-st="meta" className="text-xs block mb-1">
-                  Edit summary <span data-st="meta">(optional)</span>
-                </span>
-                <input
-                  type="text"
-                  data-st="field"
-                  value={editForm.editSummary}
-                  maxLength={255}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, editSummary: e.target.value }))
-                  }
-                  placeholder="Brief description of changes…"
-                  className="w-full rounded px-3 py-1.5 text-sm"
-                />
-              </label>
-              {editError && <p className="text-xs text-red-400">{editError}</p>}
-            </div>
-            <div data-st="colhead" className="flex justify-end gap-2 px-5 py-3">
-              <button
-                type="button"
-                data-st="control"
-                onClick={() => setEditOpen(false)}
-                className="text-xs"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                data-st="control"
-                data-st-primary
-                disabled={saving}
-                onClick={handleEditSave}
-                className="text-xs disabled:opacity-50"
-              >
-                {saving ? 'Saving…' : 'Save'}
-              </button>
-            </div>
+            </label>
+            <label className="block">
+              <span data-st="meta" className="text-xs block mb-1">
+                Edit summary <span data-st="meta">(optional)</span>
+              </span>
+              <input
+                type="text"
+                data-st="field"
+                value={editForm.editSummary}
+                maxLength={255}
+                onChange={(e) =>
+                  setEditForm((f) => ({ ...f, editSummary: e.target.value }))
+                }
+                placeholder="Brief description of changes…"
+                className="w-full rounded px-3 py-1.5 text-sm"
+              />
+            </label>
+            {editError && <p className="text-xs text-red-400">{editError}</p>}
           </div>
-        </div>
+          <div data-st="colhead" className="flex justify-end gap-2 px-5 py-3">
+            <button
+              type="button"
+              data-st="control"
+              onClick={() => setEditOpen(false)}
+              className="text-xs"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              data-st="control"
+              data-st-primary
+              disabled={saving}
+              onClick={handleEditSave}
+              className="text-xs disabled:opacity-50"
+            >
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+          </div>
+        </Modal>
       )}
     </div>
   );
