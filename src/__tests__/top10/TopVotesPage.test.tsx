@@ -115,4 +115,28 @@ describe('TopVotesPage', () => {
       expect.objectContaining({ limit: 100 })
     );
   });
+
+  it('paints the controls + table from the data-st contract (ADR-0006)', () => {
+    mockUseGetTopVotesQuery.mockReturnValue({
+      data: { items: [makeVoteItem(1)] },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<TopVotesPage />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+  });
 });

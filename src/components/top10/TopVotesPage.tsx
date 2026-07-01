@@ -8,21 +8,18 @@ import Spinner from '../layout/Spinner';
 
 type LimitValue = 25 | 100 | 250;
 
-const selectCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-
-const inputCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-
+// Inline positive-percent meter. Not the row-background `bar` Role (that is an
+// absolute full-row weight fill); this is a small standalone widget, so its
+// leaf colors migrate to tokens — success hue for the positive fill.
 const ScoreBar = ({ pct }: { pct: number }) => (
   <div className="flex items-center gap-2">
-    <div className="w-20 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+    <div className="w-20 h-1.5 bg-[var(--st-weight-track)] rounded-full overflow-hidden">
       <div
-        className="h-full bg-green-500 rounded-full"
+        className="h-full bg-[var(--st-success)] rounded-full"
         style={{ width: `${Math.min(pct, 100)}%` }}
       />
     </div>
-    <span className="text-xs tabular-nums text-gray-400">
+    <span data-st="meta" className="text-xs tabular-nums">
       {pct.toFixed(1)}%
     </span>
   </div>
@@ -49,17 +46,14 @@ const TopVotesPage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex flex-wrap gap-4 items-end">
+      <div data-st="panel" className="p-4 flex flex-wrap gap-4 items-end">
         <div>
-          <label
-            htmlFor="votes-limit"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="votes-limit" data-st="meta" className="block mb-1">
             Limit
           </label>
           <select
             id="votes-limit"
-            className={selectCls}
+            data-st="field"
             value={limit}
             onChange={(e) => setLimit(Number(e.target.value) as LimitValue)}
           >
@@ -71,16 +65,13 @@ const TopVotesPage = () => {
           </select>
         </div>
         <div>
-          <label
-            htmlFor="votes-tags"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="votes-tags" data-st="meta" className="block mb-1">
             Tags (comma-separated)
           </label>
           <input
             id="votes-tags"
             type="text"
-            className={inputCls}
+            data-st="field"
             value={pending.tags}
             placeholder="e.g. jazz, blues"
             onChange={(e) =>
@@ -89,16 +80,14 @@ const TopVotesPage = () => {
           />
         </div>
         <div>
-          <label
-            htmlFor="votes-year"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="votes-year" data-st="meta" className="block mb-1">
             Year
           </label>
           <input
             id="votes-year"
             type="number"
-            className={`${inputCls} w-24`}
+            data-st="field"
+            className="w-24"
             value={pending.year}
             placeholder="2020"
             onChange={(e) =>
@@ -106,15 +95,12 @@ const TopVotesPage = () => {
             }
           />
         </div>
-        <button
-          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded"
-          onClick={applyFilters}
-        >
+        <button data-st="control" data-st-primary onClick={applyFilters}>
           Apply
         </button>
       </div>
 
-      <p className="text-xs text-gray-500">
+      <p data-st="prose" data-st-muted className="text-xs">
         Ranked by Binomial Proportion Confidence Interval (90% confidence).
         Requires ≥ 3 votes.
       </p>
@@ -125,54 +111,59 @@ const TopVotesPage = () => {
       )}
       {data && (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-gray-300">
-            <thead>
-              <tr className="text-left text-xs text-gray-500 uppercase tracking-wide border-b border-gray-700">
-                <th className="pb-2 pr-3 w-8">#</th>
-                <th className="pb-2 pr-3">Release</th>
-                <th className="pb-2 pr-3 text-right">+</th>
-                <th className="pb-2 pr-3 text-right">−</th>
-                <th className="pb-2 pr-3 text-right">Total</th>
-                <th className="pb-2 pr-3 text-right">Score</th>
-                <th className="pb-2">Positive</th>
+          {/* Columnar data keeps its <table>; the grid/colhead/row variant
+              (ADR-0006) carries the token paint. */}
+          <table data-st="grid" className="text-sm">
+            <thead data-st="colhead">
+              <tr>
+                <th className="w-8">#</th>
+                <th>Release</th>
+                <th data-st-num>+</th>
+                <th data-st-num>−</th>
+                <th data-st-num>Total</th>
+                <th data-st-num>Score</th>
+                <th>Positive</th>
               </tr>
             </thead>
             <tbody>
               {data.items.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-500">
-                    No voted releases found.
+                <tr data-st="row">
+                  <td colSpan={7} className="text-center">
+                    <span data-st="meta">No voted releases found.</span>
                   </td>
                 </tr>
               )}
               {data.items.map((item) => (
-                <tr
-                  key={item.releaseId}
-                  className="border-t border-gray-800 hover:bg-gray-800/40"
-                >
-                  <td className="py-2 pr-3 text-gray-500">{item.rank}</td>
-                  <td className="py-2 pr-3">
+                <tr key={item.releaseId} data-st="row">
+                  <td>
+                    <span data-st="meta">{item.rank}</span>
+                  </td>
+                  <td>
                     <Link
                       to={`/private/releases/${item.releaseId}`}
-                      className="text-indigo-400 hover:text-indigo-300 font-medium"
+                      data-st="title"
                     >
                       {item.artistName} – {item.title}
                     </Link>
-                    <span className="text-gray-500 ml-2">[{item.year}]</span>
+                    <span data-st="meta" className="ml-2">
+                      [{item.year}]
+                    </span>
                   </td>
-                  <td className="py-2 pr-3 text-right tabular-nums text-green-400">
-                    {item.ups.toLocaleString()}
+                  <td data-st-num>
+                    <span className="text-[var(--st-success)]">
+                      {item.ups.toLocaleString()}
+                    </span>
                   </td>
-                  <td className="py-2 pr-3 text-right tabular-nums text-red-400">
-                    {item.downs.toLocaleString()}
+                  <td data-st-num>
+                    <span className="text-[var(--st-danger)]">
+                      {item.downs.toLocaleString()}
+                    </span>
                   </td>
-                  <td className="py-2 pr-3 text-right tabular-nums text-gray-400">
-                    {item.total.toLocaleString()}
-                  </td>
-                  <td className="py-2 pr-3 text-right tabular-nums font-medium">
+                  <td data-st-num>{item.total.toLocaleString()}</td>
+                  <td data-st-num className="font-medium">
                     {item.score.toFixed(4)}
                   </td>
-                  <td className="py-2">
+                  <td>
                     <ScoreBar pct={item.positivePercent} />
                   </td>
                 </tr>
