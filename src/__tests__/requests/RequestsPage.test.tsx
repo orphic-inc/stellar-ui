@@ -99,6 +99,14 @@ describe('RequestsPage', () => {
     });
   });
 
+  it('emits the data-st theming hooks', () => {
+    const { container } = renderWithProviders(<RequestsPage />);
+    expect(container.querySelector('table[data-st="grid"]')).toBeTruthy();
+    expect(container.querySelector('thead[data-st="colhead"]')).toBeTruthy();
+    expect(container.querySelector('tr[data-st="row"]')).toBeTruthy();
+    expect(container.querySelector('[data-st="chip"]')).toBeTruthy();
+  });
+
   it('clears status filter when All button is clicked (setStatus undefined path)', async () => {
     const user = userEvent.setup();
     renderWithProviders(<RequestsPage />);

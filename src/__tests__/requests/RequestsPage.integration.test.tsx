@@ -175,17 +175,20 @@ describe('RequestsPage RTK Query integration', () => {
     expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows filled status badge (green) for a filled request', async () => {
+  it('shows filled status badge (success chip) for a filled request', async () => {
     setupFetch({ requests: [makeRequest(2, { status: 'filled' })] });
     renderAs(OTHER);
 
     await screen.findByText('Request 2');
-    // The filled badge is a <span> inside the table row; the filter buttons are <button>s
+    // The filled badge is a chip <span> inside the table row; the filter
+    // buttons are <button>s. It paints from the success status token now, so
+    // assert the Role + modifier rather than a literal color class.
     const filledSpan = screen
       .getAllByText('Filled')
       .find((el) => el.tagName === 'SPAN');
     expect(filledSpan).toBeDefined();
-    expect(filledSpan!.className).toContain('green');
+    expect(filledSpan!.getAttribute('data-st')).toBe('chip');
+    expect(filledSpan!.hasAttribute('data-st-success')).toBe(true);
   });
 
   it('shows community dash when request has no community', async () => {
