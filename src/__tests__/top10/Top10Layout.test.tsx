@@ -90,4 +90,15 @@ describe('Top10Layout', () => {
       'releases'
     );
   });
+
+  it('paints the heading from the data-st contract', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      data: { id: 1, userRank: { permissions: {} } }
+    });
+    const { container } = renderWithProviders(<Top10Layout />);
+    // The tab-strip paints from token utilities (no Role); the heading is prose.
+    expect(
+      container.querySelector('[data-st="prose"][data-st-strong]')
+    ).toBeInTheDocument();
+  });
 });

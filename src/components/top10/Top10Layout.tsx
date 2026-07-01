@@ -2,11 +2,13 @@ import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useGetMeQuery } from '../../store/services/authApi';
 import { canSeeTop10History } from '../staff/staffAffordances';
 
+// Tab-strip: token utilities paint the active/idle state directly, no Role
+// (the WS8 tab pattern, as Settings / the primary nav do it).
 const tabCls = (active: boolean) =>
   `px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
     active
-      ? 'border-indigo-500 text-indigo-400'
-      : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-600'
+      ? 'border-[var(--st-accent)] text-[var(--st-text-strong)]'
+      : 'border-transparent text-[var(--st-text-muted)] hover:text-[var(--st-text)] hover:border-[var(--st-border-strong)]'
   }`;
 
 const TABS = [
@@ -27,9 +29,11 @@ const Top10Layout = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold text-white">Top 10</h1>
+      <h1 data-st="prose" data-st-strong className="text-2xl">
+        Top 10
+      </h1>
 
-      <nav className="flex gap-1 border-b border-gray-700">
+      <nav className="flex gap-1 border-b border-[var(--st-border)]">
         {TABS.map(({ path, label }) => (
           <NavLink
             key={path}
