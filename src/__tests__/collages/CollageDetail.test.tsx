@@ -6,6 +6,7 @@ import { setCredentials } from '../../store/slices/authSlice';
 import CollageDetail from '../../components/collages/CollageDetail';
 
 const mockUseGetCollageQuery = jest.fn();
+const mockGetReleaseContributionsQuery = jest.fn();
 const mockDeleteCollage = jest.fn();
 const mockSubscribeCollage = jest.fn();
 const mockBookmarkCollage = jest.fn();
@@ -28,11 +29,50 @@ jest.mock('../../store/services/collageApi', () => ({
   useRemoveCollageEntryMutation: () => [mockRemoveCollageEntry]
 }));
 
+jest.mock('../../store/services/communityApi', () => ({
+  useGetReleaseContributionsQuery: (...args: unknown[]) =>
+    mockGetReleaseContributionsQuery(...args)
+}));
+
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => ({ id: '8' }),
   useNavigate: () => mockNavigate
 }));
+
+const makeContribution = (overrides: Record<string, unknown> = {}) => ({
+  id: 100,
+  userId: 2,
+  releaseId: 55,
+  contributorId: 3,
+  releaseDescription: null,
+  downloadUrl: 'https://example.com/f.torrent',
+  sizeInBytes: 524288000,
+  linkStatus: 'PASS',
+  linkCheckedAt: null,
+  type: 'flac',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  user: { id: 2, username: 'alice' },
+  collaborators: [],
+  releaseFile: {
+    bitrate: 'Lossless',
+    hasLog: true,
+    hasCue: true,
+    isScene: false
+  },
+  edition: {
+    id: 10,
+    media: 'CD',
+    year: null,
+    recordLabel: null,
+    catalogueNumber: null,
+    title: null,
+    isRemaster: false,
+    isUnknownEdition: false
+  },
+  ...overrides
+});
 
 describe('CollageDetail', () => {
   beforeEach(() => {
@@ -87,6 +127,27 @@ describe('CollageDetail', () => {
     mockRemoveCollageEntry.mockReturnValue({
       unwrap: () => Promise.resolve(undefined)
     });
+    mockGetReleaseContributionsQuery.mockReturnValue({
+      data: [makeContribution()],
+      isFetching: false
+    });
+  });
+
+  it('does not show an entry edition stack until it is expanded', () => {
+    renderWithProviders(<CollageDetail />);
+    expect(
+      document.querySelector('[data-st="edition-stack"]')
+    ).not.toBeInTheDocument();
+  });
+
+  it('lazy-loads and renders the edition stack when an entry is expanded', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CollageDetail />);
+    await user.click(screen.getByRole('button', { name: /editions/i }));
+    expect(
+      await screen.findByText('Original Release / CD')
+    ).toBeInTheDocument();
+    expect(screen.getByText('FLAC / Lossless')).toBeInTheDocument();
   });
 
   it('shows spinner while loading', () => {

@@ -36,6 +36,8 @@ type ReleaseHistoryResponse =
   paths['/communities/{communityId}/releases/{releaseId}/history']['get']['responses'][200]['content']['application/json'];
 type ContributionsResponse =
   paths['/contributions']['get']['responses'][200]['content']['application/json'];
+type ReleaseContributionsResponse =
+  paths['/communities/{communityId}/releases/{releaseId}/contributions']['get']['responses'][200]['content']['application/json'];
 type CreateContributionArgs = NonNullable<
   paths['/contributions']['post']['requestBody']
 >['content']['application/json'];
@@ -198,6 +200,19 @@ export const communityApi = api.injectEndpoints({
       query: () => '/contributions',
       providesTags: ['Contribution']
     }),
+    // Release-scoped read carrying rip-quality (releaseFile) + edition identity
+    // — the edition disclosure the release detail view omits (#129).
+    getReleaseContributions: build.query<
+      ReleaseContributionsResponse,
+      ReleaseArgs
+    >({
+      query: ({ communityId, releaseId }) =>
+        `/communities/${communityId}/releases/${releaseId}/contributions`,
+      providesTags: (_, __, { releaseId }) => [
+        { type: 'Release', id: releaseId },
+        'Contribution'
+      ]
+    }),
     createContribution: build.mutation<
       CreateContributionResponse,
       CreateContributionArgs
@@ -338,6 +353,8 @@ export const {
   useUpdateReleaseMutation,
   useDeleteReleaseMutation,
   useGetContributionsQuery,
+  useGetReleaseContributionsQuery,
+  useLazyGetReleaseContributionsQuery,
   useCreateContributionMutation,
   useAddContributionToReleaseMutation,
   useVoteOnReleaseMutation,

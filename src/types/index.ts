@@ -45,6 +45,10 @@ export type RegistrationStatus = 'open' | 'invite' | 'closed';
 export type Community = components['schemas']['Community'];
 export type ReleaseContribution = components['schemas']['ReleaseContribution'];
 export type Contribution = components['schemas']['Contribution'];
+export type ReleaseContributionDetail =
+  components['schemas']['ReleaseContributionDetail'];
+export type ReleaseFileQuality = components['schemas']['ReleaseFileQuality'];
+export type EditionIdentity = components['schemas']['EditionIdentity'];
 export type Release = components['schemas']['Release'];
 
 // ─── Profile ─────────────────────────────────────────────────────────────────

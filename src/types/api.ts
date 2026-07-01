@@ -4365,7 +4365,47 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Release contributions with rip-quality and edition identity */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseContributionDetail'][];
+          };
+        };
+        /** @description Not a member of this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     put?: never;
     post: {
       parameters: {
@@ -12914,6 +12954,70 @@ export interface components {
       }[];
       releaseDescription?: string | null;
       createdAt?: string;
+    };
+    ReleaseFileQuality: {
+      /** @enum {string|null} */
+      bitrate:
+        | 'Lossless'
+        | 'Lossless24'
+        | 'Kbps320'
+        | 'Kbps256'
+        | 'KbpsV0'
+        | 'Kbps192'
+        | 'KbpsV2'
+        | 'Kbps128'
+        | 'Other'
+        | null;
+      hasLog: boolean;
+      hasCue: boolean;
+      isScene: boolean;
+    };
+    EditionIdentity: {
+      id: number;
+      /** @enum {string|null} */
+      media:
+        | 'CD'
+        | 'WEB'
+        | 'Vinyl'
+        | 'SACD'
+        | 'DVD'
+        | 'Cassette'
+        | 'BluRay'
+        | 'DAT'
+        | 'Soundboard'
+        | 'Other'
+        | null;
+      year: number | null;
+      recordLabel: string | null;
+      catalogueNumber: string | null;
+      title: string | null;
+      isRemaster: boolean;
+      isUnknownEdition: boolean;
+    };
+    ReleaseContributionDetail: {
+      id: number;
+      userId: number;
+      releaseId: number;
+      contributorId: number;
+      releaseDescription?: string | null;
+      downloadUrl: string;
+      sizeInBytes: number | null;
+      /** @enum {string|null} */
+      linkStatus: 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL' | null;
+      linkCheckedAt: string | null;
+      type: string;
+      createdAt: string;
+      updatedAt: string;
+      user: {
+        id: number;
+        username: string;
+      } | null;
+      collaborators: {
+        id: number;
+        name: string;
+      }[];
+      releaseFile: components['schemas']['ReleaseFileQuality'] & unknown;
+      edition: components['schemas']['EditionIdentity'];
     };
     ReleaseTagEnriched: {
       id: number;

@@ -417,6 +417,21 @@ tr[data-st='row'] > td[data-st-num] {
   margin: 0.25rem 0 0.5rem 2.75rem; /* indent under the title column */
   border-left: 2px solid var(--st-border);
 }
+[data-st='edition-heading'] {
+  /* Collapsible edition label ("Original Release / CD") over its format rows. */
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  padding: 0.25rem 0.75rem;
+  background: var(--st-base);
+  border-bottom: 1px solid var(--st-border-subtle);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--st-text);
+  text-align: left;
+  cursor: pointer;
+}
 [data-st='edition'] {
   display: grid;
   grid-template-columns: 1fr auto auto auto;

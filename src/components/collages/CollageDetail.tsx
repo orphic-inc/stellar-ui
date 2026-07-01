@@ -10,9 +10,11 @@ import {
   useAddCollageEntryMutation,
   useRemoveCollageEntryMutation
 } from '../../store/services/collageApi';
+import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import CommentsSection from '../layout/CommentsSection';
+import EditionStack from '../communities/EditionStack';
 
 const CATEGORY_LABELS: Record<number, string> = {
   0: 'Personal',
@@ -22,6 +24,38 @@ const CATEGORY_LABELS: Record<number, string> = {
   4: 'Charts',
   5: 'Staff Picks',
   6: 'Other'
+};
+
+// Lazy edition disclosure for one collage entry — fetches the release's
+// contributions only once its row is expanded (this component mounts on
+// expand), then renders the read-only edition stack. Downloads/reports live on
+// the release page, so no actions here.
+const EntryEditions = ({
+  communityId,
+  releaseId
+}: {
+  communityId: number;
+  releaseId: number;
+}) => {
+  const { data, isFetching } = useGetReleaseContributionsQuery({
+    communityId,
+    releaseId
+  });
+  if (isFetching && !data) {
+    return (
+      <div data-st="meta" className="px-3 py-2 text-xs">
+        Loading editions…
+      </div>
+    );
+  }
+  if (!data || data.length === 0) {
+    return (
+      <div data-st="meta" className="px-3 py-2 text-xs">
+        No files contributed yet.
+      </div>
+    );
+  }
+  return <EditionStack contributions={data} />;
 };
 
 const CollageDetail = () => {
@@ -40,6 +74,7 @@ const CollageDetail = () => {
   const [releaseIdInput, setReleaseIdInput] = useState('');
   const [addError, setAddError] = useState('');
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   // Contributor power-law — group entries by the user who added them. The detail
   // payload carries per-entry `user`, so weights derive client-side with no API
@@ -266,58 +301,85 @@ const CollageDetail = () => {
               <p className="px-4 py-4 text-sm text-gray-500">No entries yet.</p>
             ) : (
               <div data-st="list">
-                {collage.entries.map((entry, i) => (
-                  <div
-                    id={`entry-${entry.releaseId}`}
-                    key={entry.id}
-                    data-st="row"
-                    className={
-                      highlightedId === entry.releaseId
-                        ? 'bg-indigo-900/30'
-                        : undefined
-                    }
-                  >
-                    <span className="text-xs text-gray-600 w-6 shrink-0 text-right">
-                      {i + 1}
-                    </span>
-                    {entry.release?.image ? (
-                      <img
-                        src={entry.release.image}
-                        alt=""
-                        className="w-8 h-8 object-cover rounded shrink-0"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 bg-gray-800 rounded shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <Link
-                        to={`/private/communities/${
-                          entry.release?.communityId ?? 0
-                        }/releases/${entry.releaseId}`}
-                        data-st="title"
-                        className="block truncate"
+                {collage.entries.map((entry, i) => {
+                  const communityId = entry.release?.communityId ?? null;
+                  const isExpanded = expandedId === entry.releaseId;
+                  return (
+                    <div key={entry.id}>
+                      <div
+                        id={`entry-${entry.releaseId}`}
+                        data-st="row"
+                        className={
+                          highlightedId === entry.releaseId
+                            ? 'bg-indigo-900/30'
+                            : undefined
+                        }
                       >
-                        {entry.release?.title ?? `Release #${entry.releaseId}`}
-                      </Link>
-                      {entry.release?.artist?.name && (
-                        <div data-st="meta" data-st-em className="text-xs">
-                          {entry.release.artist.name}
+                        <span className="text-xs text-gray-600 w-6 shrink-0 text-right">
+                          {i + 1}
+                        </span>
+                        {communityId != null && (
+                          <button
+                            type="button"
+                            aria-expanded={isExpanded}
+                            aria-label={`${
+                              isExpanded ? 'Hide' : 'Show'
+                            } editions`}
+                            onClick={() =>
+                              setExpandedId(isExpanded ? null : entry.releaseId)
+                            }
+                            className="text-xs text-gray-500 hover:text-gray-300 shrink-0 w-4"
+                          >
+                            {isExpanded ? '−' : '+'}
+                          </button>
+                        )}
+                        {entry.release?.image ? (
+                          <img
+                            src={entry.release.image}
+                            alt=""
+                            className="w-8 h-8 object-cover rounded shrink-0"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gray-800 rounded shrink-0" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            to={`/private/communities/${
+                              communityId ?? 0
+                            }/releases/${entry.releaseId}`}
+                            data-st="title"
+                            className="block truncate"
+                          >
+                            {entry.release?.title ??
+                              `Release #${entry.releaseId}`}
+                          </Link>
+                          {entry.release?.artist?.name && (
+                            <div data-st="meta" data-st-em className="text-xs">
+                              {entry.release.artist.name}
+                            </div>
+                          )}
                         </div>
+                        <span className="text-xs text-gray-600 shrink-0">
+                          added by {entry.user?.username ?? '—'}
+                        </span>
+                        {(isOwner || isStaff || entry.userId === user?.id) && (
+                          <button
+                            onClick={() => handleRemoveEntry(entry.releaseId)}
+                            className="text-xs text-red-600 hover:text-red-400 shrink-0"
+                          >
+                            [X]
+                          </button>
+                        )}
+                      </div>
+                      {isExpanded && communityId != null && (
+                        <EntryEditions
+                          communityId={communityId}
+                          releaseId={entry.releaseId}
+                        />
                       )}
                     </div>
-                    <span className="text-xs text-gray-600 shrink-0">
-                      added by {entry.user?.username ?? '—'}
-                    </span>
-                    {(isOwner || isStaff || entry.userId === user?.id) && (
-                      <button
-                        onClick={() => handleRemoveEntry(entry.releaseId)}
-                        className="text-xs text-red-600 hover:text-red-400 shrink-0"
-                      >
-                        [X]
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

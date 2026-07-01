@@ -12,7 +12,7 @@ npm run lint             # ESLint
 npm run format           # Prettier --write src
 npm test                 # Jest unit tests (--runInBand)
 npm run test:e2e         # Playwright E2E (requires running API + UI — see below)
-npm run api:generate     # Export openapi.json from stellar-api, regenerate src/types/api.ts, run Prettier
+npm run api:sync         # Pull ../stellar-api/openapi.json, then regenerate src/types/api.ts (api:generate alone skips the pull)
 ```
 
 > **Phantom overlay errors:** if the dev server's overlay shows `prettier/prettier`
@@ -353,8 +353,11 @@ Do not add frontend code, OpenAPI paths, or Toolbox links for these until the ba
 
 When stellar-api's OpenAPI spec changes, run from the stellar-ui directory:
 ```bash
-npm run api:generate     # exports openapi.json from ../stellar-api, regenerates src/types/api.ts, runs Prettier
+npm run api:sync         # copies ../stellar-api/openapi.json → src/types/openapi.json, then api:generate
 npm run typecheck        # verify no type regressions
 ```
+`api:generate` alone only regenerates `src/types/api.ts` from the **already-vendored**
+`src/types/openapi.json` (openapi-typescript + Prettier). Use `api:sync` to pull a fresh
+spec from `../stellar-api` first — that's the step that picks up new/changed endpoints.
 
 This is a manual step before every PR that touches API response shapes.

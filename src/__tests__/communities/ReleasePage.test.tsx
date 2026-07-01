@@ -7,6 +7,7 @@ import ReleasePage from '../../components/communities/ReleasePage';
 const mockGetReleaseByIdQuery = jest.fn();
 const mockGetCommunityByIdQuery = jest.fn();
 const mockGetReleaseHistoryQuery = jest.fn();
+const mockGetReleaseContributionsQuery = jest.fn();
 const mockVoteOn = jest.fn();
 const mockRemoveVote = jest.fn();
 const mockToggleBookmark = jest.fn();
@@ -33,6 +34,8 @@ jest.mock('../../store/services/communityApi', () => ({
     mockGetCommunityByIdQuery(...args),
   useGetReleaseHistoryQuery: (...args: unknown[]) =>
     mockGetReleaseHistoryQuery(...args),
+  useGetReleaseContributionsQuery: (...args: unknown[]) =>
+    mockGetReleaseContributionsQuery(...args),
   useVoteOnReleaseMutation: () => [mockVoteOn, { isLoading: false }],
   useRemoveVoteOnReleaseMutation: () => [mockRemoveVote, { isLoading: false }],
   useAddTagToReleaseMutation: () => [mockAddTag, { isLoading: false }],
@@ -137,6 +140,41 @@ const makeRelease = (overrides: Record<string, unknown> = {}) => ({
   ...overrides
 });
 
+// The release-scoped contributions read (#129) — carries rip-quality + edition.
+const makeContribution = (overrides: Record<string, unknown> = {}) => ({
+  id: 100,
+  userId: 2,
+  releaseId: 5,
+  contributorId: 3,
+  releaseDescription: 'Lossless rip',
+  downloadUrl: 'https://example.com/f.torrent',
+  sizeInBytes: 524288000,
+  linkStatus: 'PASS',
+  linkCheckedAt: null,
+  type: 'flac',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  user: { id: 2, username: 'contributor1' },
+  collaborators: [],
+  releaseFile: {
+    bitrate: 'Lossless',
+    hasLog: true,
+    hasCue: true,
+    isScene: false
+  },
+  edition: {
+    id: 10,
+    media: 'CD',
+    year: null,
+    recordLabel: null,
+    catalogueNumber: null,
+    title: null,
+    isRemaster: false,
+    isUnknownEdition: false
+  },
+  ...overrides
+});
+
 describe('ReleasePage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -149,6 +187,9 @@ describe('ReleasePage', () => {
     mockGetReleaseHistoryQuery.mockReturnValue({
       data: undefined,
       isLoading: false
+    });
+    mockGetReleaseContributionsQuery.mockReturnValue({
+      data: [makeContribution()]
     });
     mockVoteOn.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveVote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -193,38 +234,41 @@ describe('ReleasePage', () => {
     expect(screen.getByText('[1959]')).toBeInTheDocument();
   });
 
-  it('renders contributions table with format, size, contributor, and notes', () => {
+  it('renders the edition stack with format, quality, and rip flags', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
       data: makeRelease(),
       isLoading: false,
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    expect(screen.getByText('FLAC')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'contributor1' })
-    ).toBeInTheDocument();
-    expect(screen.getByText('Lossless rip')).toBeInTheDocument();
+    expect(screen.getByText('Original Release / CD')).toBeInTheDocument();
+    expect(screen.getByText('FLAC / Lossless')).toBeInTheDocument();
+    expect(screen.getByText('Log')).toBeInTheDocument();
+    expect(screen.getByText('Cue')).toBeInTheDocument();
   });
 
-  it('carries the data-st theming hooks (grid contributions table + format chip)', () => {
+  it('carries the edition-stack Part hook with lossless emphasis', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
       data: makeRelease(),
       isLoading: false,
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
-    // The format code renders from the chip Role via the kit Badge.
-    expect(screen.getByText('FLAC')).toHaveAttribute('data-st', 'chip');
+    expect(
+      document.querySelector('[data-st="edition-stack"]')
+    ).toBeInTheDocument();
+    expect(document.querySelector('[data-st="edition"]')).toHaveAttribute(
+      'data-st-lossless'
+    );
   });
 
   it('shows "No contributions yet" when no contributions', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ contributions: [] }),
+      data: makeRelease(),
       isLoading: false,
       error: undefined
     });
+    mockGetReleaseContributionsQuery.mockReturnValue({ data: [] });
     renderWithProviders(<ReleasePage />);
     expect(screen.getByText(/no contributions yet/i)).toBeInTheDocument();
   });
@@ -519,10 +563,11 @@ describe('ReleasePage', () => {
   it('navigates to /contribute when clicking "Be the first to contribute" in empty contributions', async () => {
     const user = userEvent.setup();
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ contributions: [] }),
+      data: makeRelease(),
       isLoading: false,
       error: undefined
     });
+    mockGetReleaseContributionsQuery.mockReturnValue({ data: [] });
     renderWithProviders(<ReleasePage />);
     await user.click(
       screen.getByRole('button', { name: /be the first to contribute/i })
@@ -704,26 +749,31 @@ describe('ReleasePage', () => {
     expect(img.src).toContain('cover.jpg');
   });
 
-  it('shows — for missing sizeInBytes and releaseDescription', () => {
+  it('renders a lossy MP3 row without lossless emphasis', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({
-        contributions: [
-          {
-            id: 101,
-            type: 'MP3',
-            sizeInBytes: null,
-            user: { id: 3, username: 'sparse-user' },
-            releaseDescription: null,
-            linkStatus: null
-          }
-        ]
-      }),
+      data: makeRelease(),
       isLoading: false,
       error: undefined
     });
+    mockGetReleaseContributionsQuery.mockReturnValue({
+      data: [
+        makeContribution({
+          id: 101,
+          type: 'mp3',
+          releaseFile: {
+            bitrate: 'Kbps320',
+            hasLog: false,
+            hasCue: false,
+            isScene: false
+          }
+        })
+      ]
+    });
     renderWithProviders(<ReleasePage />);
-    const dashes = screen.getAllByText('—');
-    expect(dashes.length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText('MP3 / 320')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="edition"]')).not.toHaveAttribute(
+      'data-st-lossless'
+    );
   });
 
   it('shows singular vote count when total is 1', () => {

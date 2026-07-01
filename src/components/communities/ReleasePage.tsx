@@ -14,10 +14,10 @@ import Time from '../layout/Time';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
-import { formatSize } from '../../utils';
+import EditionStack from './EditionStack';
 import type { LinkHealthStatus } from '../../types';
 import { useReleaseWorkbench } from './useReleaseWorkbench';
-import { Badge } from '../ui';
+import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -47,6 +47,12 @@ const ReleasePage = () => {
   const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
   const [reportingId, setReportingId] = useState<number | null>(null);
+  // Rip-quality + edition identity, read release-scoped (#129) — the detail
+  // view omits it, so the edition stack loads from its own endpoint.
+  const { data: editionContributions } = useGetReleaseContributionsQuery(
+    { communityId: cId, releaseId: rId },
+    { skip: !cId || !rId }
+  );
   const {
     release,
     community,
@@ -221,77 +227,29 @@ const ReleasePage = () => {
             <div data-st="colhead" className="px-4 py-2 text-sm font-semibold">
               Contributions
             </div>
-            {release.contributions && release.contributions.length > 0 ? (
-              <table data-st="grid" className="w-full text-sm">
-                <thead data-st="colhead">
-                  <tr className="text-xs">
-                    <th className="px-4 py-2 font-medium">Format</th>
-                    <th className="px-4 py-2 font-medium" data-st-num>
-                      Size
-                    </th>
-                    <th className="px-4 py-2 font-medium">Contributor</th>
-                    <th className="px-4 py-2 font-medium">Notes</th>
-                    <th className="px-4 py-2 font-medium">Status</th>
-                    <th className="px-4 py-2 font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {release.contributions.map((c) => {
-                    const linkStatus = ((c as { linkStatus?: string })
-                      .linkStatus ?? 'UNKNOWN') as LinkHealthStatus;
-                    return (
-                      <tr key={c.id} data-st="row">
-                        <td className="px-4 py-2 text-xs">
-                          <Badge mono>{c.type}</Badge>
-                        </td>
-                        <td
-                          className="px-4 py-2 text-xs whitespace-nowrap"
-                          data-st-num
-                        >
-                          <span data-st="meta">
-                            {c.sizeInBytes
-                              ? formatSize(Number(c.sizeInBytes))
-                              : '—'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <Link
-                            to={`/private/user/${c.user.username}`}
-                            data-st="control"
-                            className="text-xs"
-                          >
-                            {c.user.username}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-2 text-xs">
-                          <span data-st="meta">
-                            {c.releaseDescription ?? '—'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <LinkStatusBadge status={linkStatus} />
-                        </td>
-                        <td className="px-4 py-2">
-                          <div className="flex gap-2 items-center text-xs">
-                            <DownloadButton
-                              contributionId={c.id}
-                              canDownload={user?.canDownload ?? false}
-                            />
-                            <button
-                              type="button"
-                              data-st="control"
-                              title="Report dead or misleading link"
-                              onClick={() => setReportingId(c.id)}
-                            >
-                              [Report]
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            {editionContributions && editionContributions.length > 0 ? (
+              <EditionStack
+                contributions={editionContributions}
+                renderActions={(c) => (
+                  <span className="flex gap-2 items-center text-xs">
+                    <LinkStatusBadge
+                      status={(c.linkStatus ?? 'UNKNOWN') as LinkHealthStatus}
+                    />
+                    <DownloadButton
+                      contributionId={c.id}
+                      canDownload={user?.canDownload ?? false}
+                    />
+                    <button
+                      type="button"
+                      data-st="control"
+                      title="Report dead or misleading link"
+                      onClick={() => setReportingId(c.id)}
+                    >
+                      [Report]
+                    </button>
+                  </span>
+                )}
+              />
             ) : (
               <div data-st="meta" className="px-4 py-4 text-sm">
                 No contributions yet.{' '}
