@@ -66,6 +66,12 @@ describe('CannedResponsesPage', () => {
     expect(screen.getByText('Body of response 1')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /edit/i }).length).toBe(2);
     expect(screen.getAllByRole('button', { name: /delete/i }).length).toBe(2);
+
+    // Theming contract: cards are panels, actions are controls.
+    expect(document.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-st="control"][data-st-danger]')
+    ).toBeInTheDocument();
   });
 
   it('opens new response form on New Response button click', async () => {

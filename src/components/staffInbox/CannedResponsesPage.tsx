@@ -66,10 +66,14 @@ const CannedResponsesPage = () => {
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Canned Responses</h2>
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          Canned Responses
+        </h2>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+          data-st="control"
+          data-st-primary
+          className="text-sm"
         >
           {showForm ? 'Cancel' : 'New Response'}
         </button>
@@ -78,15 +82,17 @@ const CannedResponsesPage = () => {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="mb-6 p-4 bg-gray-800 rounded flex flex-col gap-3"
+          data-st="panel"
+          className="mb-6 p-4 flex flex-col gap-3"
         >
-          <h3 className="text-sm font-semibold text-gray-300">
+          <h3 data-st="prose" data-st-strong className="text-sm">
             New Canned Response
           </h3>
           <div>
             <label
               htmlFor="new-resp-name"
-              className="block text-xs text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-xs mb-1"
             >
               Name
             </label>
@@ -97,13 +103,15 @@ const CannedResponsesPage = () => {
               onChange={(e) => setNewName(e.target.value)}
               required
               maxLength={255}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-blue-500"
+              data-st="field"
+              className="w-full px-3 py-2 text-sm"
             />
           </div>
           <div>
             <label
               htmlFor="new-resp-body"
-              className="block text-xs text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-xs mb-1"
             >
               Body
             </label>
@@ -113,12 +121,15 @@ const CannedResponsesPage = () => {
               onChange={(e) => setNewBody(e.target.value)}
               required
               rows={4}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+              data-st="field"
+              className="w-full px-3 py-2 text-sm resize-y"
             />
           </div>
           <button
             type="submit"
-            className="self-start px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+            data-st="control"
+            data-st-primary
+            className="self-start text-sm"
           >
             Create
           </button>
@@ -126,7 +137,9 @@ const CannedResponsesPage = () => {
       )}
 
       {(responses ?? []).length === 0 ? (
-        <p className="text-gray-500 text-sm">No canned responses yet.</p>
+        <p data-st="prose" data-st-muted className="text-sm">
+          No canned responses yet.
+        </p>
       ) : (
         <div className="space-y-4">
           {(responses ?? []).map((resp) =>
@@ -134,12 +147,14 @@ const CannedResponsesPage = () => {
               <form
                 key={resp.id}
                 onSubmit={handleUpdate}
-                className="p-4 bg-gray-800 rounded flex flex-col gap-3"
+                data-st="panel"
+                className="p-4 flex flex-col gap-3"
               >
                 <div>
                   <label
                     htmlFor={`edit-name-${resp.id}`}
-                    className="block text-xs text-gray-400 mb-1"
+                    data-st="meta"
+                    className="block text-xs mb-1"
                   >
                     Name
                   </label>
@@ -152,13 +167,15 @@ const CannedResponsesPage = () => {
                     }
                     required
                     maxLength={255}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-blue-500"
+                    data-st="field"
+                    className="w-full px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor={`edit-body-${resp.id}`}
-                    className="block text-xs text-gray-400 mb-1"
+                    data-st="meta"
+                    className="block text-xs mb-1"
                   >
                     Body
                   </label>
@@ -170,45 +187,54 @@ const CannedResponsesPage = () => {
                     }
                     required
                     rows={4}
-                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+                    data-st="field"
+                    className="w-full px-3 py-2 text-sm resize-y"
                   />
                 </div>
                 <div className="flex gap-2">
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+                    data-st="control"
+                    data-st-primary
+                    className="text-sm"
                   >
                     Save
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditing(null)}
-                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+                    data-st="control"
+                    className="px-4 py-2 rounded border border-[var(--st-border)] text-sm"
                   >
                     Cancel
                   </button>
                 </div>
               </form>
             ) : (
-              <div key={resp.id} className="p-4 bg-gray-800 rounded">
+              <div key={resp.id} data-st="panel" className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-gray-200">{resp.name}</span>
+                  <span data-st="prose" data-st-strong className="font-medium">
+                    {resp.name}
+                  </span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setEditing(resp)}
-                      className="text-blue-400 hover:text-blue-300 text-sm"
+                      data-st="control"
+                      className="text-sm"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(resp.id)}
-                      className="text-red-400 hover:text-red-300 text-sm"
+                      data-st="control"
+                      data-st-danger
+                      className="text-sm"
                     >
                       Delete
                     </button>
                   </div>
                 </div>
-                <p className="text-gray-400 text-sm whitespace-pre-wrap">
+                <p data-st="prose" className="text-sm whitespace-pre-wrap">
                   {resp.body}
                 </p>
               </div>
