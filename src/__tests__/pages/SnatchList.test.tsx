@@ -71,6 +71,13 @@ describe('SnatchList', () => {
     ).toBeInTheDocument();
   });
 
+  it('emits the data-st theming hooks', () => {
+    const { container } = renderWithProviders(<SnatchList />);
+    expect(container.querySelector('table[data-st="grid"]')).toBeTruthy();
+    expect(container.querySelector('thead[data-st="colhead"]')).toBeTruthy();
+    expect(container.querySelector('tr[data-st="row"]')).toBeTruthy();
+  });
+
   it('renders release titles in list', () => {
     renderWithProviders(<SnatchList />);
     expect(screen.getByText('Kind of Blue')).toBeInTheDocument();
