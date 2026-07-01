@@ -57,5 +57,12 @@ describe('MyReportsPage', () => {
       '/private/reports/5'
     );
     expect(screen.getAllByText('Resolved')).toHaveLength(2);
+
+    // Theming contract: table variant + a status chip.
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(document.querySelector('[data-st="chip"]')).toBeInTheDocument();
   });
 });

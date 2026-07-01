@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetMyReportsQuery } from '../../store/services/reportsApi';
 import Spinner from '../layout/Spinner';
+import { Badge } from '../ui';
+import type { BadgeVariant } from '../ui';
 
-const STATUS_BADGE: Record<string, string> = {
-  Open: 'bg-yellow-800 text-yellow-200',
-  Claimed: 'bg-blue-800 text-blue-200',
-  Resolved: 'bg-gray-700 text-gray-400'
+const STATUS_TONE: Record<string, BadgeVariant> = {
+  Open: 'warning',
+  Claimed: 'info',
+  Resolved: 'default'
 };
 
 const MyReportsPage = () => {
@@ -20,28 +22,31 @@ const MyReportsPage = () => {
 
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load your reports.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load your reports.
+      </div>
+    );
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">My Reports</h2>
-        <Link
-          to="/private/reports/new"
-          className="px-3 py-1.5 bg-blue-700 hover:bg-blue-600 text-white text-sm rounded"
-        >
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          My Reports
+        </h2>
+        <Link to="/private/reports/new" data-st="control" data-st-primary>
           File a Report
         </Link>
       </div>
 
       {reports.length === 0 ? (
-        <p className="text-gray-500 text-sm">
+        <p data-st="prose" data-st-muted className="text-sm">
           You haven&apos;t filed any reports yet.
         </p>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-gray-400">
+        <table data-st="grid" className="w-full text-sm">
+          <thead data-st="colhead">
+            <tr>
               <th className="pb-2 pr-3">Type</th>
               <th className="pb-2 pr-3">Category</th>
               <th className="pb-2 pr-3">Status</th>
@@ -51,32 +56,31 @@ const MyReportsPage = () => {
           </thead>
           <tbody>
             {reports.map((report) => (
-              <tr key={report.id} className="border-b border-gray-800">
-                <td className="py-2 pr-3 text-gray-400">{report.targetType}</td>
+              <tr key={report.id} data-st="row">
                 <td className="py-2 pr-3">
-                  <Link
-                    to={`/private/reports/${report.id}`}
-                    className="hover:underline text-blue-400"
-                  >
+                  <span data-st="meta">{report.targetType}</span>
+                </td>
+                <td className="py-2 pr-3">
+                  <Link to={`/private/reports/${report.id}`} data-st="control">
                     {report.category}
                   </Link>
                 </td>
                 <td className="py-2 pr-3">
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded ${
-                      STATUS_BADGE[report.status] ?? 'bg-gray-700 text-gray-400'
-                    }`}
-                  >
+                  <Badge variant={STATUS_TONE[report.status] ?? 'default'}>
                     {report.status}
+                  </Badge>
+                </td>
+                <td className="py-2 pr-3 text-xs whitespace-nowrap">
+                  <span data-st="meta">
+                    {new Date(report.createdAt).toLocaleDateString()}
                   </span>
                 </td>
-                <td className="py-2 pr-3 text-gray-500 text-xs whitespace-nowrap">
-                  {new Date(report.createdAt).toLocaleDateString()}
-                </td>
-                <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
-                  {report.resolvedAt
-                    ? new Date(report.resolvedAt).toLocaleDateString()
-                    : '—'}
+                <td className="py-2 text-xs whitespace-nowrap">
+                  <span data-st="meta">
+                    {report.resolvedAt
+                      ? new Date(report.resolvedAt).toLocaleDateString()
+                      : '—'}
+                  </span>
                 </td>
               </tr>
             ))}
@@ -89,17 +93,19 @@ const MyReportsPage = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Previous
           </button>
-          <span className="px-3 py-1 text-gray-400">
+          <span data-st="meta" className="px-3 py-1">
             {page} / {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Next
           </button>
