@@ -34,6 +34,19 @@ describe('PostBox', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
+  it('carries the data-st contract hooks (panel/field/control)', () => {
+    renderWithProviders(<PostBox forumId="1" topicId="10" />);
+    expect(
+      document.querySelector('#quickpost[data-st="panel"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('textarea[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
+
   it('calls createPost with forumId, topicId, and body on submit', async () => {
     const user = userEvent.setup();
     renderWithProviders(<PostBox forumId="2" topicId="20" />);

@@ -43,18 +43,18 @@ const PostBox = ({ forumId, topicId, quoteText, onQuoteConsumed }: Props) => {
   };
 
   return (
-    <div
-      id="quickpost"
-      className="mt-4 bg-gray-900 border border-gray-700 rounded-lg overflow-hidden"
-    >
-      <div className="bg-gray-800 border-b border-gray-700 px-4 py-2">
-        <span className="text-sm font-semibold text-gray-200">Post Reply</span>
+    <div id="quickpost" data-st="panel" className="mt-4 overflow-hidden">
+      <div data-st="colhead">
+        <span data-st="prose" data-st-strong className="text-sm">
+          Post Reply
+        </span>
       </div>
 
       <form onSubmit={handleSubmit} className="p-3 space-y-2">
         <textarea
           ref={textareaRef}
-          className="w-full bg-gray-800 border border-gray-700 rounded text-sm text-gray-200 px-3 py-2 focus:outline-none focus:border-indigo-500 resize-y placeholder-gray-600"
+          data-st="field"
+          className="w-full text-sm px-3 py-2 resize-y"
           rows={8}
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -64,7 +64,9 @@ const PostBox = ({ forumId, topicId, quoteText, onQuoteConsumed }: Props) => {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-sm font-medium"
             disabled={isLoading || !body.trim()}
           >
             {isLoading ? 'Posting…' : 'Post Reply'}
