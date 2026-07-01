@@ -17,76 +17,78 @@ const ContributionsPage = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-100">
+        <h2 data-st="prose" data-st-strong className="text-xl">
           My Contributions
         </h2>
-        <Link
-          to="/private/contribute"
-          className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded"
-        >
+        <Link to="/private/contribute" data-st="control" data-st-primary>
           + Upload
         </Link>
       </div>
 
       {contributions.length === 0 ? (
-        <p className="text-gray-500 text-sm">
+        <p data-st="prose" data-st-muted className="text-sm">
           No contributions yet.{' '}
-          <Link
-            to="/private/contribute"
-            className="text-indigo-400 hover:text-indigo-300"
-          >
+          <Link to="/private/contribute" data-st="control">
             Upload something!
           </Link>
         </p>
       ) : (
-        <div className="rounded border border-gray-700 bg-gray-900">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-700 text-left text-gray-400">
-                <th className="px-4 py-2 font-medium">Release</th>
-                <th className="px-4 py-2 font-medium">Format</th>
-                <th className="px-4 py-2 font-medium">Size</th>
-                <th className="px-4 py-2 font-medium">Collaborators</th>
-                <th className="px-4 py-2 font-medium">Notes</th>
-                <th className="px-4 py-2 font-medium">Download</th>
+        <div className="overflow-x-auto">
+          {/* Columnar data keeps its <table>; the grid/colhead/row variant
+              (ADR-0006) carries the token paint. */}
+          <table data-st="grid" className="text-sm">
+            <thead data-st="colhead">
+              <tr>
+                <th>Release</th>
+                <th>Format</th>
+                <th data-st-num>Size</th>
+                <th>Collaborators</th>
+                <th>Notes</th>
+                <th>Download</th>
               </tr>
             </thead>
             <tbody>
               {contributions.map((c) => (
-                <tr
-                  key={c.id}
-                  className="border-b border-gray-800 hover:bg-gray-800/30"
-                >
-                  <td className="px-4 py-2">
+                <tr key={c.id} data-st="row">
+                  <td>
                     {c.release.communityId ? (
                       <Link
                         to={`/private/communities/${c.release.communityId}/releases/${c.release.id}`}
-                        className="text-indigo-400 hover:text-indigo-300"
+                        data-st="title"
                       >
                         {c.release.title}
                       </Link>
                     ) : (
-                      <span className="text-gray-300">{c.release.title}</span>
+                      <span data-st="prose" data-st-strong>
+                        {c.release.title}
+                      </span>
                     )}
                   </td>
-                  <td className="px-4 py-2 text-gray-400 text-xs">{c.type}</td>
-                  <td className="px-4 py-2 text-gray-400 text-xs whitespace-nowrap">
+                  <td>
+                    <span data-st="meta" className="text-xs">
+                      {c.type}
+                    </span>
+                  </td>
+                  <td data-st-num className="whitespace-nowrap">
                     {c.sizeInBytes ? formatSize(Number(c.sizeInBytes)) : '—'}
                   </td>
-                  <td className="px-4 py-2 text-gray-400">
-                    {c.collaborators.length
-                      ? c.collaborators.map((a) => a.name).join(', ')
-                      : '—'}
+                  <td>
+                    <span data-st="meta">
+                      {c.collaborators.length
+                        ? c.collaborators.map((a) => a.name).join(', ')
+                        : '—'}
+                    </span>
                   </td>
-                  <td className="px-4 py-2 text-gray-400">
-                    {c.releaseDescription ?? '—'}
+                  <td>
+                    <span data-st="meta">{c.releaseDescription ?? '—'}</span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td>
                     <a
                       href={c.downloadUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-indigo-400 hover:text-indigo-300 text-xs"
+                      data-st="control"
+                      className="text-xs"
                     >
                       Download
                     </a>

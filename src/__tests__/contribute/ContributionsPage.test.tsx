@@ -146,4 +146,26 @@ describe('ContributionsPage', () => {
     renderWithProviders(<ContributionsPage />);
     expect(screen.getByText(/no contributions yet/i)).toBeInTheDocument();
   });
+
+  it('paints the table + controls from the data-st contract (ADR-0006)', () => {
+    mockUseGetContributionsQuery.mockReturnValue({
+      data: { data: [makeContribution(1)] },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<ContributionsPage />);
+    // Columnar data keeps its <table>; the grid/colhead/row variant paints it.
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    // Upload CTA is a filled control; the download link is a plain control.
+    expect(
+      container.querySelector('a[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
 });
