@@ -58,6 +58,15 @@ describe('SentboxPage', () => {
     expect(mockUseGetSentboxQuery).toHaveBeenLastCalledWith({ page: 1 });
   });
 
+  it('carries the data-st table hooks (theming contract)', () => {
+    renderWithProviders(<SentboxPage />);
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(document.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+  });
+
   it('renders spinner while loading', () => {
     mockUseGetSentboxQuery.mockReturnValue({
       data: undefined,

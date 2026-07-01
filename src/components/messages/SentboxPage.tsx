@@ -15,23 +15,25 @@ const SentboxPage = () => {
   if (isLoading) return <Spinner />;
   if (error)
     return (
-      <div className="p-4 text-red-400">Failed to load sent messages.</div>
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load sent messages.
+      </div>
     );
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Sent</h2>
-        <div className="flex gap-2">
-          <Link
-            to="/private/messages/new"
-            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
-          >
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          Sent
+        </h2>
+        <div className="flex gap-2 text-sm">
+          <Link to="/private/messages/new" data-st="control" data-st-primary>
             Compose
           </Link>
           <Link
             to="/private/messages"
-            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
             Inbox
           </Link>
@@ -39,11 +41,13 @@ const SentboxPage = () => {
       </div>
 
       {conversations.length === 0 ? (
-        <p className="text-gray-500 text-sm">No sent messages.</p>
+        <p data-st="prose" data-st-muted className="text-sm">
+          No sent messages.
+        </p>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-gray-400">
+        <table data-st="grid" className="w-full text-sm">
+          <thead data-st="colhead">
+            <tr>
               <th className="pb-2 pr-3">Subject</th>
               <th className="pb-2 pr-3">Last message</th>
               <th className="pb-2">Sent</th>
@@ -54,22 +58,23 @@ const SentboxPage = () => {
               const userPart = conv.participants?.[0];
               const lastMsg = conv.messages?.[0];
               return (
-                <tr key={conv.id} className="border-b border-gray-800">
+                <tr key={conv.id} data-st="row">
                   <td className="py-2 pr-3">
-                    <Link
-                      to={`/private/messages/${conv.id}`}
-                      className="hover:underline text-blue-400"
-                    >
+                    <Link to={`/private/messages/${conv.id}`} data-st="control">
                       {conv.subject}
                     </Link>
                   </td>
-                  <td className="py-2 pr-3 text-gray-400 max-w-xs truncate">
-                    {lastMsg?.body.slice(0, 80) ?? '—'}
+                  <td className="py-2 pr-3 max-w-xs truncate">
+                    <span data-st="meta">
+                      {lastMsg?.body.slice(0, 80) ?? '—'}
+                    </span>
                   </td>
-                  <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
-                    {userPart?.sentAt
-                      ? new Date(userPart.sentAt).toLocaleDateString()
-                      : '—'}
+                  <td className="py-2 text-xs whitespace-nowrap">
+                    <span data-st="meta">
+                      {userPart?.sentAt
+                        ? new Date(userPart.sentAt).toLocaleDateString()
+                        : '—'}
+                    </span>
                   </td>
                 </tr>
               );
@@ -83,17 +88,19 @@ const SentboxPage = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Previous
           </button>
-          <span className="px-3 py-1 text-gray-400">
+          <span data-st="meta" className="px-3 py-1">
             {page} / {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Next
           </button>
