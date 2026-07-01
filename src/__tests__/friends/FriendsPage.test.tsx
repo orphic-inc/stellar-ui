@@ -43,6 +43,27 @@ describe('FriendsPage', () => {
     mockUseGetFriendRequestsQuery.mockReturnValue({ data: { data: [] } });
   });
 
+  it('emits the data-st theming hooks', () => {
+    mockUseGetMyFriendsQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            friend: { id: 3, username: 'carol', avatar: null },
+            comment: 'gig buddy'
+          }
+        ],
+        meta: { total: 1, page: 1, limit: 25, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+
+    const { container } = renderWithProviders(<FriendsPage />);
+    expect(container.querySelector('table[data-st="grid"]')).toBeTruthy();
+    expect(container.querySelector('tr[data-st="row"]')).toBeTruthy();
+    expect(container.querySelector('textarea[data-st="field"]')).toBeTruthy();
+  });
+
   it('shows the empty state when there are no friends', () => {
     mockUseGetMyFriendsQuery.mockReturnValue({
       data: emptyFriends,

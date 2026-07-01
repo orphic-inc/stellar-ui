@@ -88,29 +88,30 @@ const FriendsPage = () => {
   if (isLoading) return <Spinner />;
   if (error)
     return (
-      <p className="p-6 text-red-400 text-sm">Failed to load friends list.</p>
+      <p data-st="prose" className="p-6 text-sm text-[var(--st-danger)]">
+        Failed to load friends list.
+      </p>
     );
 
   return (
     <div className="space-y-4">
       {pendingRequests.length > 0 && (
-        <div className="rounded border border-indigo-700/50 bg-indigo-950/30 overflow-hidden">
-          <h2 className="px-4 py-3 text-sm font-semibold text-indigo-200 border-b border-indigo-700/50">
-            Friend requests ({pendingRequests.length})
-          </h2>
-          <ul className="divide-y divide-gray-800">
+        <div
+          data-st="panel"
+          className="rounded border-[var(--st-accent)] bg-[color-mix(in_srgb,var(--st-accent)_10%,transparent)]"
+        >
+          <h2 data-st="colhead">Friend requests ({pendingRequests.length})</h2>
+          <ul data-st="list">
             {pendingRequests.map((request) => (
-              <li
-                key={request.id}
-                className="flex items-center justify-between px-4 py-3"
-              >
+              <li key={request.id} data-st="row" className="justify-between">
                 <Link
                   to={`/private/user/${request.requester.id}`}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+                  data-st="control"
+                  className="font-medium"
                 >
                   {request.requester.username}
                 </Link>
-                <div className="space-x-3 whitespace-nowrap text-sm">
+                <div className="flex gap-2 whitespace-nowrap text-sm">
                   <button
                     onClick={() =>
                       handleAccept(
@@ -118,7 +119,9 @@ const FriendsPage = () => {
                         request.requester.username
                       )
                     }
-                    className="text-green-400 hover:text-green-300 transition-colors"
+                    data-st="control"
+                    data-st-primary
+                    data-st-success
                   >
                     Accept
                   </button>
@@ -129,7 +132,9 @@ const FriendsPage = () => {
                         request.requester.username
                       )
                     }
-                    className="text-red-500 hover:text-red-400 transition-colors"
+                    data-st="control"
+                    data-st-primary
+                    data-st-danger
                   >
                     Reject
                   </button>
@@ -140,25 +145,27 @@ const FriendsPage = () => {
         </div>
       )}
 
-      <h1 className="text-xl font-semibold text-white">Friends</h1>
+      <h1 data-st="prose" data-st-strong className="text-xl">
+        Friends
+      </h1>
 
       {!data || data.data.length === 0 ? (
-        <div className="rounded border border-gray-700 bg-gray-900 px-6 py-10 text-center">
-          <p className="text-gray-500 text-sm">
+        <div data-st="panel" className="rounded px-6 py-10 text-center">
+          <p data-st="prose" data-st-muted className="text-sm">
             You haven&apos;t added any friends yet.
           </p>
         </div>
       ) : (
-        <div className="rounded border border-gray-700 bg-gray-900 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-700 text-gray-400 text-left">
+        <div data-st="panel" className="rounded">
+          <table data-st="grid" className="w-full text-sm">
+            <thead data-st="colhead">
+              <tr>
                 <th className="px-4 py-3 font-medium">User</th>
                 <th className="px-4 py-3 font-medium">Note</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody>
               {data.data.map((entry) => {
                 const { friend, comment } = entry;
                 const draft =
@@ -168,14 +175,12 @@ const FriendsPage = () => {
                 const isDirty = draft !== comment;
 
                 return (
-                  <tr
-                    key={friend.id}
-                    className="hover:bg-gray-800/30 transition-colors"
-                  >
+                  <tr key={friend.id} data-st="row">
                     <td className="px-4 py-3">
                       <Link
                         to={`/private/user/${friend.id}`}
-                        className="text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+                        data-st="control"
+                        className="font-medium"
                       >
                         {friend.username}
                       </Link>
@@ -191,7 +196,8 @@ const FriendsPage = () => {
                             [friend.id]: e.target.value
                           }))
                         }
-                        className="w-full rounded bg-gray-700 border border-gray-600 text-white text-sm px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-none"
+                        data-st="field"
+                        className="w-full rounded text-sm px-2 py-1 resize-none"
                         placeholder="Private note…"
                       />
                     </td>
@@ -199,20 +205,24 @@ const FriendsPage = () => {
                       {isDirty && (
                         <button
                           onClick={() => handleCommentUpdate(friend.id)}
-                          className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+                          data-st="control"
+                          className="text-sm"
                         >
                           Save
                         </button>
                       )}
                       <Link
                         to={`/private/messages/new?to=${friend.username}`}
-                        className="text-gray-400 hover:text-white text-sm transition-colors"
+                        data-st="control"
+                        className="text-sm"
                       >
                         Message
                       </Link>
                       <button
                         onClick={() => handleRemove(friend.id, friend.username)}
-                        className="text-red-500 hover:text-red-400 text-sm transition-colors"
+                        data-st="control"
+                        data-st-danger
+                        className="text-sm"
                       >
                         Remove
                       </button>
@@ -230,17 +240,19 @@ const FriendsPage = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Previous
           </button>
-          <span className="px-3 py-1 text-gray-400">
+          <span data-st="meta" className="px-3 py-1">
             {page} / {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Next
           </button>
