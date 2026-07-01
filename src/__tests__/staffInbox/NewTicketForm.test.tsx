@@ -39,6 +39,14 @@ describe('NewTicketForm', () => {
       screen.getByRole('button', { name: /submit ticket/i })
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+
+    // Theming contract: field inputs + a primary control.
+    expect(
+      document.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
   });
 
   it('submits ticket and navigates on success', async () => {
