@@ -89,12 +89,7 @@ describe('PrivateHomepage', () => {
     expect(screen.getByText('Site Update')).toBeInTheDocument();
   });
 
-  it('shows empty state when no blog posts', () => {
-    renderWithUser();
-    expect(screen.getByText(/no blog posts/i)).toBeInTheDocument();
-  });
-
-  it('renders blog post title and author', () => {
+  it('no longer renders a Blog section', () => {
     mockUseGetAnnouncementsQuery.mockReturnValue({
       data: {
         announcements: [],
@@ -110,8 +105,18 @@ describe('PrivateHomepage', () => {
       isLoading: false
     });
     renderWithUser();
-    expect(screen.getByText('Jazz Deep Dive')).toBeInTheDocument();
-    expect(screen.getByText(/editor/)).toBeInTheDocument();
+    // Blog is staff-only pending a re-do; it must not surface here.
+    expect(screen.queryByText('Blog')).not.toBeInTheDocument();
+    expect(screen.queryByText('Jazz Deep Dive')).not.toBeInTheDocument();
+  });
+
+  it('emits the data-st theming hooks', () => {
+    const { container } = renderWithUser();
+    expect(container.querySelector('[data-st="panel"]')).toBeTruthy();
+    expect(container.querySelector('[data-st="colhead"]')).toBeTruthy();
+    expect(
+      container.querySelector('[data-st="prose"][data-st-strong]')
+    ).toBeTruthy();
   });
 
   it('renders site stats', () => {
