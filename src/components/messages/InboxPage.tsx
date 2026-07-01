@@ -40,34 +40,40 @@ const InboxPage = () => {
 
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load inbox.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load inbox.
+      </div>
+    );
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Inbox</h2>
-        <div className="flex gap-2">
-          <Link
-            to="/private/messages/new"
-            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
-          >
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          Inbox
+        </h2>
+        <div className="flex gap-2 text-sm">
+          <Link to="/private/messages/new" data-st="control" data-st-primary>
             Compose
           </Link>
           <Link
             to="/private/messages/sent"
-            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
             Sent
           </Link>
           <Link
             to="/private/messages/drafts"
-            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
             Drafts
           </Link>
           <Link
             to="/private/messages/tickets"
-            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
             Support
           </Link>
@@ -75,23 +81,21 @@ const InboxPage = () => {
       </div>
 
       {selected.length > 0 && (
-        <div className="flex gap-2 mb-3 p-2 bg-gray-800 rounded text-sm">
-          <span className="text-gray-400">{selected.length} selected</span>
-          <button
-            onClick={() => handleBulk('markRead')}
-            className="text-blue-400 hover:text-blue-300"
-          >
+        <div
+          data-st="panel"
+          className="flex gap-3 items-center mb-3 p-2 text-sm"
+        >
+          <span data-st="meta">{selected.length} selected</span>
+          <button onClick={() => handleBulk('markRead')} data-st="control">
             Mark read
           </button>
-          <button
-            onClick={() => handleBulk('markUnread')}
-            className="text-blue-400 hover:text-blue-300"
-          >
+          <button onClick={() => handleBulk('markUnread')} data-st="control">
             Mark unread
           </button>
           <button
             onClick={() => handleBulk('delete')}
-            className="text-red-400 hover:text-red-300"
+            data-st="control"
+            data-st-danger
           >
             Delete
           </button>
@@ -99,11 +103,13 @@ const InboxPage = () => {
       )}
 
       {conversations.length === 0 ? (
-        <p className="text-gray-500 text-sm">Your inbox is empty.</p>
+        <p data-st="prose" data-st-muted className="text-sm">
+          Your inbox is empty.
+        </p>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-gray-400">
+        <table data-st="grid" className="w-full text-sm">
+          <thead data-st="colhead">
+            <tr>
               <th className="pb-2 pr-3 w-6">
                 <input
                   type="checkbox"
@@ -112,7 +118,7 @@ const InboxPage = () => {
                     conversations.length > 0
                   }
                   onChange={toggleAll}
-                  className="accent-blue-500"
+                  data-st="field"
                 />
               </th>
               <th className="pb-2 pr-3">Subject</th>
@@ -129,41 +135,45 @@ const InboxPage = () => {
               return (
                 <tr
                   key={conv.id}
-                  className={`border-b border-gray-800 ${
-                    isUnread ? 'font-semibold' : ''
-                  }`}
+                  data-st="row"
+                  className={isUnread ? 'font-semibold' : ''}
                 >
                   <td className="py-2 pr-3">
                     <input
                       type="checkbox"
                       checked={selected.includes(conv.id)}
                       onChange={() => toggleSelect(conv.id)}
-                      className="accent-blue-500"
+                      data-st="field"
                     />
                   </td>
                   <td className="py-2 pr-3">
-                    <Link
-                      to={`/private/messages/${conv.id}`}
-                      className="hover:underline text-blue-400"
-                    >
+                    <Link to={`/private/messages/${conv.id}`} data-st="control">
                       {userPart?.isSticky && (
-                        <span className="mr-1 text-yellow-400 text-xs">★</span>
+                        <span className="mr-1 text-xs text-[var(--st-warning)]">
+                          ★
+                        </span>
                       )}
                       {conv.subject}
                     </Link>
                   </td>
-                  <td className="py-2 pr-3 text-gray-300">
-                    {lastMsg?.sender?.username ?? 'System'}
+                  <td className="py-2 pr-3">
+                    <span data-st="meta">
+                      {lastMsg?.sender?.username ?? 'System'}
+                    </span>
                   </td>
-                  <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
-                    {userPart?.receivedAt
-                      ? new Date(userPart.receivedAt).toLocaleDateString()
-                      : '—'}
+                  <td className="py-2 text-xs whitespace-nowrap">
+                    <span data-st="meta">
+                      {userPart?.receivedAt
+                        ? new Date(userPart.receivedAt).toLocaleDateString()
+                        : '—'}
+                    </span>
                   </td>
                   <td className="py-2">
                     <button
                       onClick={() => deleteConversation(conv.id)}
-                      className="text-gray-600 hover:text-red-400 text-xs"
+                      data-st="control"
+                      data-st-danger
+                      className="text-xs"
                       title="Delete"
                     >
                       ✕
@@ -181,17 +191,19 @@ const InboxPage = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Previous
           </button>
-          <span className="px-3 py-1 text-gray-400">
+          <span data-st="meta" className="px-3 py-1">
             {page} / {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Next
           </button>
