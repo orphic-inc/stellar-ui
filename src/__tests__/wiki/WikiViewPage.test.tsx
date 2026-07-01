@@ -362,4 +362,23 @@ describe('WikiViewPage', () => {
       expect(alerts.some((a) => a.msg === 'Alias already in use')).toBe(true);
     });
   });
+
+  it('paints the page + actions from the data-st contract', () => {
+    const { container } = renderWithProviders(<WikiViewPage />, {
+      store: createTestStore()
+    });
+    // Title → prose -strong; body/aliases → panels; aliases → chip; Edit is a
+    // filled primary control, Delete a filled danger control.
+    expect(
+      container.querySelector('[data-st="prose"][data-st-strong]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="chip"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="control"][data-st-danger]')
+    ).toBeInTheDocument();
+  });
 });
