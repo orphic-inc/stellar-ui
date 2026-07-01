@@ -74,6 +74,13 @@ describe('ReportDetailPage', () => {
     });
   });
 
+  it('carries the data-st contract hooks (panel/chip)', () => {
+    renderWithProviders(<ReportDetailPage />);
+    // Detail cards are panels; the status renders as a chip.
+    expect(document.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="chip"]')).toBeInTheDocument();
+  });
+
   it('lets staff claim, resolve, and add notes to a report', async () => {
     const user = userEvent.setup();
     const store = createTestStore();

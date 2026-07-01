@@ -13,6 +13,8 @@ import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import { canUseReportActions } from '../staff/staffAffordances';
+import { Badge } from '../ui';
+import type { BadgeVariant } from '../ui';
 
 const RESOLUTION_ACTIONS = [
   { value: 'Dismissed', label: 'Dismissed — no action taken' },
@@ -24,10 +26,10 @@ const RESOLUTION_ACTIONS = [
   { value: 'Other', label: 'Other' }
 ];
 
-const STATUS_BADGE: Record<string, string> = {
-  Open: 'bg-yellow-800 text-yellow-200',
-  Claimed: 'bg-blue-800 text-blue-200',
-  Resolved: 'bg-gray-700 text-gray-400'
+const STATUS_TONE: Record<string, BadgeVariant> = {
+  Open: 'warning',
+  Claimed: 'info',
+  Resolved: 'default'
 };
 
 function buildSourceLink(
@@ -114,7 +116,9 @@ const ReportDetailPage = () => {
   if (isLoading) return <Spinner />;
   if (error || !report)
     return (
-      <div className="p-4 text-red-400">Report not found or access denied.</div>
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Report not found or access denied.
+      </div>
     );
 
   const isResolved = report.status === 'Resolved';
@@ -126,14 +130,16 @@ const ReportDetailPage = () => {
         {canModerateReport ? (
           <Link
             to="/private/staff/reports"
-            className="text-blue-400 text-sm hover:underline"
+            data-st="control"
+            className="text-sm"
           >
             ← Reports Queue
           </Link>
         ) : (
           <Link
             to="/private/reports/mine"
-            className="text-blue-400 text-sm hover:underline"
+            data-st="control"
+            className="text-sm"
           >
             ← My Reports
           </Link>
@@ -142,13 +148,18 @@ const ReportDetailPage = () => {
 
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-xl font-semibold">
+          <h2 data-st="prose" data-st-strong className="text-xl">
             {report.targetType} Report — {report.category}
           </h2>
-          <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-400">
+          <div
+            data-st="meta"
+            className="flex flex-wrap items-center gap-3 mt-1 text-sm"
+          >
             <span>
               Filed by{' '}
-              <span className="text-gray-200">{report.reporter.username}</span>
+              <span data-st="prose" data-st-strong>
+                {report.reporter.username}
+              </span>
             </span>
             {(() => {
               const src = buildSourceLink(
@@ -157,24 +168,20 @@ const ReportDetailPage = () => {
                 report.targetId
               );
               return 'href' in src ? (
-                <Link to={src.href} className="text-blue-400 hover:underline">
+                <Link to={src.href} data-st="control">
                   {src.label} →
                 </Link>
               ) : (
-                <span className="text-gray-300">{src.label}</span>
+                <span>{src.label}</span>
               );
             })()}
-            <span
-              className={`text-xs px-2 py-0.5 rounded ${
-                STATUS_BADGE[report.status] ?? 'bg-gray-700 text-gray-400'
-              }`}
-            >
+            <Badge variant={STATUS_TONE[report.status] ?? 'default'}>
               {report.status}
-            </span>
+            </Badge>
             {report.claimedBy && (
               <span>
                 Claimed by{' '}
-                <span className="text-gray-200">
+                <span data-st="prose" data-st-strong>
                   {report.claimedBy.username}
                 </span>
               </span>
@@ -188,7 +195,8 @@ const ReportDetailPage = () => {
               <button
                 onClick={handleClaim}
                 disabled={claiming}
-                className="px-3 py-1.5 bg-blue-700 hover:bg-blue-600 text-white rounded disabled:opacity-50"
+                data-st="control"
+                data-st-primary
               >
                 Claim
               </button>
@@ -197,14 +205,17 @@ const ReportDetailPage = () => {
               <button
                 onClick={handleUnclaim}
                 disabled={unclaiming}
-                className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded disabled:opacity-50"
+                data-st="control"
+                className="px-3 py-1.5 rounded border border-[var(--st-border)] disabled:opacity-50"
               >
                 Unclaim
               </button>
             )}
             <button
               onClick={() => setShowResolveForm((v) => !v)}
-              className="px-3 py-1.5 bg-green-800 hover:bg-green-700 text-white rounded"
+              data-st="control"
+              data-st-primary
+              data-st-success
             >
               Resolve
             </button>
@@ -213,32 +224,42 @@ const ReportDetailPage = () => {
       </div>
 
       <div className="space-y-4 mb-6">
-        <div className="bg-gray-900 border border-gray-700 rounded p-4">
-          <p className="text-xs text-gray-500 uppercase mb-2">Reason</p>
-          <p className="text-gray-200 whitespace-pre-wrap">{report.reason}</p>
+        <div data-st="panel" className="p-4">
+          <p data-st="meta" className="text-xs uppercase mb-2">
+            Reason
+          </p>
+          <p data-st="prose" className="whitespace-pre-wrap">
+            {report.reason}
+          </p>
         </div>
 
         {report.evidence && (
-          <div className="bg-gray-900 border border-gray-700 rounded p-4">
-            <p className="text-xs text-gray-500 uppercase mb-2">Evidence</p>
-            <p className="text-gray-200 whitespace-pre-wrap">
+          <div data-st="panel" className="p-4">
+            <p data-st="meta" className="text-xs uppercase mb-2">
+              Evidence
+            </p>
+            <p data-st="prose" className="whitespace-pre-wrap">
               {report.evidence}
             </p>
           </div>
         )}
 
         {isResolved && (
-          <div className="bg-gray-900 border border-green-900 rounded p-4">
-            <p className="text-xs text-gray-500 uppercase mb-2">Resolution</p>
-            <p className="text-sm text-gray-400 mb-1">
-              Action:{' '}
-              <span className="text-gray-200">{report.resolutionAction}</span>
+          <div data-st="panel" className="p-4">
+            <p data-st="meta" className="text-xs uppercase mb-2">
+              Resolution
             </p>
-            <p className="text-gray-200 whitespace-pre-wrap">
+            <p data-st="meta" className="text-sm mb-1">
+              Action:{' '}
+              <span data-st="prose" data-st-strong>
+                {report.resolutionAction}
+              </span>
+            </p>
+            <p data-st="prose" className="whitespace-pre-wrap">
               {report.resolution}
             </p>
             {report.resolvedBy && (
-              <p className="text-xs text-gray-500 mt-2">
+              <p data-st="meta" className="text-xs mt-2">
                 Resolved by {report.resolvedBy.username} on{' '}
                 {new Date(report.resolvedAt!).toLocaleString()}
               </p>
@@ -250,15 +271,17 @@ const ReportDetailPage = () => {
       {canModerateReport && showResolveForm && !isResolved && (
         <form
           onSubmit={handleResolve}
-          className="mb-6 p-4 bg-gray-800 border border-gray-700 rounded space-y-3"
+          data-st="panel"
+          className="mb-6 p-4 space-y-3"
         >
-          <h3 className="text-sm font-semibold text-gray-300">
+          <h3 data-st="prose" data-st-strong className="text-sm">
             Resolve Report
           </h3>
           <div>
             <label
               htmlFor="resolution-action"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Action taken
             </label>
@@ -266,7 +289,8 @@ const ReportDetailPage = () => {
               id="resolution-action"
               value={resolutionAction}
               onChange={(e) => setResolutionAction(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-blue-500"
+              data-st="field"
+              className="w-full px-3 py-2 text-sm"
             >
               {RESOLUTION_ACTIONS.map((a) => (
                 <option key={a.value} value={a.value}>
@@ -278,7 +302,8 @@ const ReportDetailPage = () => {
           <div>
             <label
               htmlFor="resolution-text"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Resolution notes
             </label>
@@ -288,7 +313,8 @@ const ReportDetailPage = () => {
               onChange={(e) => setResolution(e.target.value)}
               required
               rows={3}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+              data-st="field"
+              className="w-full px-3 py-2 text-sm resize-y"
               placeholder="Describe what was done…"
             />
           </div>
@@ -296,14 +322,18 @@ const ReportDetailPage = () => {
             <button
               type="submit"
               disabled={resolving}
-              className="px-4 py-2 bg-green-700 hover:bg-green-600 text-white text-sm rounded disabled:opacity-50"
+              data-st="control"
+              data-st-primary
+              data-st-success
+              className="text-sm"
             >
               {resolving ? 'Resolving…' : 'Confirm Resolve'}
             </button>
             <button
               type="button"
               onClick={() => setShowResolveForm(false)}
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+              data-st="control"
+              className="px-4 py-2 rounded border border-[var(--st-border)] text-sm"
             >
               Cancel
             </button>
@@ -313,20 +343,22 @@ const ReportDetailPage = () => {
 
       {canModerateReport && report.notes.length > 0 && (
         <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-300 mb-3">
+          <h3 data-st="prose" data-st-strong className="text-sm mb-3">
             Moderator Notes
           </h3>
           <div className="space-y-3">
             {report.notes.map((note) => (
-              <div
-                key={note.id}
-                className="bg-gray-800 border border-gray-700 rounded p-3"
-              >
-                <div className="flex items-center gap-2 mb-1 text-xs text-gray-500">
-                  <span className="text-gray-300">{note.author.username}</span>
+              <div key={note.id} data-st="panel" className="p-3">
+                <div
+                  data-st="meta"
+                  className="flex items-center gap-2 mb-1 text-xs"
+                >
+                  <span data-st="prose" data-st-strong>
+                    {note.author.username}
+                  </span>
                   <span>{new Date(note.createdAt).toLocaleString()}</span>
                 </div>
-                <p className="text-sm text-gray-200 whitespace-pre-wrap">
+                <p data-st="prose" className="text-sm whitespace-pre-wrap">
                   {note.body}
                 </p>
               </div>
@@ -340,7 +372,8 @@ const ReportDetailPage = () => {
           <div>
             <label
               htmlFor="note-body"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Add moderator note
             </label>
@@ -349,14 +382,17 @@ const ReportDetailPage = () => {
               value={noteBody}
               onChange={(e) => setNoteBody(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+              data-st="field"
+              className="w-full px-3 py-2 text-sm resize-y"
               placeholder="Internal note visible to staff only…"
             />
           </div>
           <button
             type="submit"
             disabled={addingNote || !noteBody.trim()}
-            className="self-start px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
+            data-st="control"
+            data-st-primary
+            className="self-start text-sm"
           >
             {addingNote ? 'Adding…' : 'Add Note'}
           </button>
