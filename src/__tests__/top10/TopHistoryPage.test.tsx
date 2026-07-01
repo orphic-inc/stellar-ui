@@ -116,4 +116,28 @@ describe('TopHistoryPage', () => {
       expect.objectContaining({ type: 'Weekly' })
     );
   });
+
+  it('paints the controls + snapshot table from the data-st contract', () => {
+    mockUseGetTop10HistoryQuery.mockReturnValue({
+      data: makeSnapshot('Daily'),
+      isLoading: false,
+      isFetching: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<TopHistoryPage />);
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    // Snapshot header bar is a content-title colhead; the table uses the grid
+    // variant with a title link on the release.
+    expect(
+      container.querySelector('[data-st="colhead"][data-st-title]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+  });
 });

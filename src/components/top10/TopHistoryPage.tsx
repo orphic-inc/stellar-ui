@@ -3,12 +3,6 @@ import { Link } from 'react-router-dom';
 import { useGetTop10HistoryQuery } from '../../store/services/top10Api';
 import Spinner from '../layout/Spinner';
 
-const selectCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-
-const inputCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-
 const today = () => new Date().toISOString().slice(0, 10);
 
 const TopHistoryPage = () => {
@@ -22,17 +16,14 @@ const TopHistoryPage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex flex-wrap gap-4 items-end">
+      <div data-st="panel" className="p-4 flex flex-wrap gap-4 items-end">
         <div>
-          <label
-            htmlFor="history-type"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="history-type" data-st="meta" className="block mb-1">
             Snapshot Type
           </label>
           <select
             id="history-type"
-            className={selectCls}
+            data-st="field"
             value={type}
             onChange={(e) => setType(e.target.value as 'Daily' | 'Weekly')}
           >
@@ -41,16 +32,13 @@ const TopHistoryPage = () => {
           </select>
         </div>
         <div>
-          <label
-            htmlFor="history-date"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="history-date" data-st="meta" className="block mb-1">
             Date
           </label>
           <input
             id="history-date"
             type="date"
-            className={inputCls}
+            data-st="field"
             value={date}
             max={today()}
             onChange={(e) => setDate(e.target.value)}
@@ -61,53 +49,58 @@ const TopHistoryPage = () => {
       {(isLoading || isFetching) && <Spinner />}
 
       {error && (
-        <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 text-center text-gray-400">
-          No snapshot found for {date} ({type}).
+        <div data-st="panel" className="p-6 text-center">
+          <span data-st="prose" data-st-muted>
+            No snapshot found for {date} ({type}).
+          </span>
         </div>
       )}
 
       {data && !isFetching && (
-        <div className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-200">
-              {data.type} snapshot
-            </span>
-            <span className="text-xs text-gray-500">
+        <div data-st="panel">
+          {/* Section header bar carrying a content title (the snapshot label),
+              so colhead -title (not the uppercase structural variant). */}
+          <div data-st="colhead" data-st-title>
+            <span>{data.type} snapshot</span>
+            <span data-st="meta">
               {new Date(data.date).toLocaleDateString()}
             </span>
           </div>
-          <table className="w-full text-sm text-gray-300">
-            <thead>
-              <tr className="text-left text-xs text-gray-500 uppercase tracking-wide border-b border-gray-700">
-                <th className="px-4 py-2 w-8">#</th>
-                <th className="px-4 py-2">Release</th>
-                <th className="px-4 py-2">Tags</th>
+          {/* Columnar data keeps its <table>; the grid/colhead/row variant
+              (ADR-0006) carries the token paint. */}
+          <table data-st="grid" className="text-sm">
+            <thead data-st="colhead">
+              <tr>
+                <th className="w-8">#</th>
+                <th>Release</th>
+                <th>Tags</th>
               </tr>
             </thead>
             <tbody>
               {data.entries.map((entry) => (
-                <tr
-                  key={entry.rank}
-                  className="border-t border-gray-800 hover:bg-gray-800/40"
-                >
-                  <td className="px-4 py-2 text-gray-500">{entry.rank}</td>
-                  <td className="px-4 py-2">
+                <tr key={entry.rank} data-st="row">
+                  <td>
+                    <span data-st="meta">{entry.rank}</span>
+                  </td>
+                  <td>
                     {entry.releaseId && !entry.deleted ? (
                       <Link
                         to={`/private/releases/${entry.releaseId}`}
-                        className="text-indigo-400 hover:text-indigo-300"
+                        data-st="title"
                       >
                         {entry.releaseTitle}
                       </Link>
                     ) : (
-                      <span className="text-gray-500">
+                      <span data-st="meta">
                         {entry.releaseTitle}{' '}
                         <span className="text-xs italic">(deleted)</span>
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-2 text-gray-500 text-xs">
-                    {entry.tagString}
+                  <td>
+                    <span data-st="meta" className="text-xs">
+                      {entry.tagString}
+                    </span>
                   </td>
                 </tr>
               ))}
