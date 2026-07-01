@@ -52,6 +52,13 @@ describe('BookmarksPage', () => {
     expect(screen.getByText('Miles Davis')).toBeInTheDocument();
   });
 
+  it('emits the data-st theming hooks', () => {
+    const { container } = renderWithProviders(<BookmarksPage />);
+    expect(container.querySelector('[data-st="panel"]')).toBeTruthy();
+    expect(container.querySelector('ul[data-st="list"]')).toBeTruthy();
+    expect(container.querySelector('li[data-st="row"]')).toBeTruthy();
+  });
+
   it('shows empty state when no artists bookmarked', () => {
     mockGetArtistBookmarks.mockReturnValue({
       data: [],

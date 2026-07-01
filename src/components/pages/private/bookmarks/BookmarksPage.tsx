@@ -12,29 +12,34 @@ type Tab = 'artists' | 'releases' | 'communities' | 'requests';
 
 const EmptyState = ({ label }: { label: string }) => (
   <div className="px-6 py-10 text-center">
-    <p className="text-gray-500 text-sm">No bookmarked {label} yet.</p>
+    <p data-st="prose" data-st-muted className="text-sm">
+      No bookmarked {label} yet.
+    </p>
   </div>
 );
 
 const ArtistsTab = () => {
   const { data, isLoading, error } = useGetArtistBookmarksQuery();
   if (isLoading) return <Spinner />;
-  if (error) return <p className="p-4 text-red-400 text-sm">Failed to load.</p>;
+  if (error)
+    return (
+      <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load.
+      </p>
+    );
   if (!data || data.length === 0) return <EmptyState label="artists" />;
   return (
-    <ul className="divide-y divide-gray-800">
+    <ul data-st="list">
       {data.map((item) => (
-        <li
-          key={item.artistId}
-          className="px-4 py-3 hover:bg-gray-800/30 transition-colors"
-        >
+        <li key={item.artistId} data-st="row">
           <Link
             to={`/private/artists/${item.artistId}`}
-            className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+            data-st="control"
+            className="text-sm"
           >
             {item.artist.name}
           </Link>
-          <span className="text-gray-600 text-xs ml-2">
+          <span data-st="meta" className="text-xs ml-2">
             {new Date(item.createdAt).toLocaleDateString()}
           </span>
         </li>
@@ -46,26 +51,31 @@ const ArtistsTab = () => {
 const ReleasesTab = () => {
   const { data, isLoading, error } = useGetReleaseBookmarksQuery();
   if (isLoading) return <Spinner />;
-  if (error) return <p className="p-4 text-red-400 text-sm">Failed to load.</p>;
+  if (error)
+    return (
+      <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load.
+      </p>
+    );
   if (!data || data.length === 0) return <EmptyState label="releases" />;
   return (
-    <ul className="divide-y divide-gray-800">
+    <ul data-st="list">
       {data.map((item) => (
-        <li
-          key={item.releaseId}
-          className="px-4 py-3 hover:bg-gray-800/30 transition-colors"
-        >
+        <li key={item.releaseId} data-st="row">
           {item.release.communityId ? (
             <Link
               to={`/private/communities/${item.release.communityId}/releases/${item.releaseId}`}
-              className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+              data-st="control"
+              className="text-sm"
             >
               {item.release.title}
             </Link>
           ) : (
-            <span className="text-gray-300 text-sm">{item.release.title}</span>
+            <span data-st="prose" className="text-sm">
+              {item.release.title}
+            </span>
           )}
-          <span className="text-gray-600 text-xs ml-2">
+          <span data-st="meta" className="text-xs ml-2">
             {new Date(item.createdAt).toLocaleDateString()}
           </span>
         </li>
@@ -77,22 +87,25 @@ const ReleasesTab = () => {
 const CommunitiesTab = () => {
   const { data, isLoading, error } = useGetCommunityBookmarksQuery();
   if (isLoading) return <Spinner />;
-  if (error) return <p className="p-4 text-red-400 text-sm">Failed to load.</p>;
+  if (error)
+    return (
+      <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load.
+      </p>
+    );
   if (!data || data.length === 0) return <EmptyState label="communities" />;
   return (
-    <ul className="divide-y divide-gray-800">
+    <ul data-st="list">
       {data.map((item) => (
-        <li
-          key={item.communityId}
-          className="px-4 py-3 hover:bg-gray-800/30 transition-colors"
-        >
+        <li key={item.communityId} data-st="row">
           <Link
             to={`/private/communities/${item.communityId}`}
-            className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+            data-st="control"
+            className="text-sm"
           >
             {item.community.name}
           </Link>
-          <span className="text-gray-600 text-xs ml-2">
+          <span data-st="meta" className="text-xs ml-2">
             {new Date(item.createdAt).toLocaleDateString()}
           </span>
         </li>
@@ -104,22 +117,25 @@ const CommunitiesTab = () => {
 const RequestsTab = () => {
   const { data, isLoading, error } = useGetRequestBookmarksQuery();
   if (isLoading) return <Spinner />;
-  if (error) return <p className="p-4 text-red-400 text-sm">Failed to load.</p>;
+  if (error)
+    return (
+      <p data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load.
+      </p>
+    );
   if (!data || data.length === 0) return <EmptyState label="requests" />;
   return (
-    <ul className="divide-y divide-gray-800">
+    <ul data-st="list">
       {data.map((item) => (
-        <li
-          key={item.requestId}
-          className="px-4 py-3 hover:bg-gray-800/30 transition-colors"
-        >
+        <li key={item.requestId} data-st="row">
           <Link
             to={`/private/requests/${item.requestId}`}
-            className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
+            data-st="control"
+            className="text-sm"
           >
             {item.request.title}
           </Link>
-          <span className="text-gray-600 text-xs ml-2">
+          <span data-st="meta" className="text-xs ml-2">
             {new Date(item.createdAt).toLocaleDateString()}
           </span>
         </li>
@@ -138,19 +154,22 @@ const TABS: { key: Tab; label: string }[] = [
 const BookmarksPage = () => {
   const [activeTab, setActiveTab] = useState<Tab>('artists');
 
+  // Tab strip: active/idle painted from tokens, not a Role.
   const tabClass = (tab: Tab) =>
     `px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
       activeTab === tab
-        ? 'border-indigo-500 text-white'
-        : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
+        ? 'border-[var(--st-accent)] text-[var(--st-text-strong)]'
+        : 'border-transparent text-[var(--st-text-muted)] hover:text-[var(--st-text)] hover:border-[var(--st-border-strong)]'
     }`;
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-white mb-6">Bookmarks</h2>
+      <h2 data-st="prose" data-st-strong className="text-xl mb-6">
+        Bookmarks
+      </h2>
 
-      <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-        <div className="border-b border-gray-700 flex">
+      <div data-st="panel">
+        <div className="border-b border-[var(--st-border)] flex">
           {TABS.map(({ key, label }) => (
             <button
               key={key}
