@@ -132,4 +132,25 @@ describe('CollageBrowse', () => {
     });
     expect(screen.getByText('Locked')).toBeInTheDocument();
   });
+
+  it('paints the list + controls from the data-st contract', () => {
+    const { container } = renderWithProviders(<CollageBrowse />);
+    // List-shaped data: div panel/list/row (not a table); the title/chip/field
+    // Roles paint the rest, so nothing stays inline gray.
+    expect(
+      container.querySelector(
+        '[data-st="panel"] [data-st="list"] [data-st="row"]'
+      )
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="chip"][data-st-warning]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
 });

@@ -60,11 +60,15 @@ const CollageBrowse = () => {
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Collages</h2>
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          Collages
+        </h2>
         {canCreateCollage && (
           <Link
             to="/private/collages/new"
-            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             New Collage
           </Link>
@@ -77,16 +81,21 @@ const CollageBrowse = () => {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Search collages…"
-          className="flex-1 px-3 py-1.5 bg-gray-900 border border-gray-700 rounded text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500"
+          data-st="field"
+          className="flex-1"
         />
         <button
           type="submit"
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+          data-st="control"
+          data-st-primary
+          className="text-sm"
         >
           Search
         </button>
       </form>
 
+      {/* Category filter — a tab-strip; token utilities paint the active/idle
+          state directly, no Role (the WS8 tab pattern). */}
       <div className="flex gap-2 mb-3 flex-wrap text-sm">
         {CATEGORIES.map(({ id, label }) => (
           <button
@@ -97,8 +106,8 @@ const CollageBrowse = () => {
             }}
             className={`px-3 py-1 rounded border ${
               categoryId === id
-                ? 'border-blue-500 bg-blue-900/30 text-blue-300'
-                : 'border-gray-700 text-gray-400 hover:border-gray-500'
+                ? 'border-[var(--st-accent)] bg-[color-mix(in_oklch,var(--st-accent)_20%,transparent)] text-[var(--st-text-strong)]'
+                : 'border-[var(--st-border)] text-[var(--st-text-muted)] hover:border-[var(--st-border-strong)]'
             }`}
           >
             {label}
@@ -107,14 +116,14 @@ const CollageBrowse = () => {
       </div>
 
       <div className="flex items-center gap-2 mb-4 text-sm">
-        <span className="text-gray-400">Sort:</span>
+        <span data-st="meta">Sort:</span>
         <select
           value={orderBy}
           onChange={(e) => {
             setOrderBy(e.target.value as CollageOrderBy);
             setPage(1);
           }}
-          className="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200 text-sm"
+          data-st="field"
         >
           {ORDER_OPTIONS.map(({ value, label }) => (
             <option key={value} value={value}>
@@ -125,54 +134,58 @@ const CollageBrowse = () => {
       </div>
 
       {collages.length === 0 ? (
-        <p className="text-gray-500 text-sm">No collages found.</p>
+        <p data-st="prose" data-st-muted className="text-sm">
+          No collages found.
+        </p>
       ) : (
-        <div className="space-y-2">
-          {collages.map((c) => (
-            <div
-              key={c.id}
-              className="flex items-start justify-between p-3 bg-gray-900/50 border border-gray-800 rounded hover:border-gray-700"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Link
-                    to={`/private/collages/${c.id}`}
-                    className="text-blue-400 hover:underline font-medium truncate"
-                  >
-                    {c.name}
-                  </Link>
-                  {c.isLocked && (
-                    <span className="text-xs px-1.5 py-0.5 bg-yellow-900/40 text-yellow-400 rounded">
-                      Locked
-                    </span>
+        <div data-st="panel">
+          <div data-st="list">
+            {collages.map((c) => (
+              <div key={c.id} data-st="row" className="items-start">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Link
+                      to={`/private/collages/${c.id}`}
+                      data-st="title"
+                      className="truncate"
+                    >
+                      {c.name}
+                    </Link>
+                    {c.isLocked && (
+                      <span data-st="chip" data-st-warning>
+                        Locked
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    data-st="meta"
+                    className="text-xs line-clamp-2 bbcode-content"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(parseBBCode(c.description))
+                    }}
+                  />
+                  {c.tags.length > 0 && (
+                    <div className="flex gap-1 mt-1 flex-wrap">
+                      {c.tags.map((tag) => (
+                        <span key={tag} data-st="chip">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
-                <div
-                  className="text-xs text-gray-400 line-clamp-2 bbcode-content"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(parseBBCode(c.description))
-                  }}
-                />
-                {c.tags.length > 0 && (
-                  <div className="flex gap-1 mt-1 flex-wrap">
-                    {c.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                <div className="ml-4 text-right text-xs shrink-0 space-y-0.5">
+                  <div data-st="meta" data-st-num>
+                    {c.numEntries} entries
                   </div>
-                )}
+                  <div data-st="meta" data-st-num>
+                    {c.numSubscribers} subscribers
+                  </div>
+                  <div data-st="meta">by {c.user?.username ?? '—'}</div>
+                </div>
               </div>
-              <div className="ml-4 text-right text-xs text-gray-500 shrink-0">
-                <div>{c.numEntries} entries</div>
-                <div>{c.numSubscribers} subscribers</div>
-                <div className="mt-1">by {c.user?.username ?? '—'}</div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
@@ -181,17 +194,19 @@ const CollageBrowse = () => {
           <button
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 border border-gray-700 rounded disabled:opacity-40 hover:border-gray-500"
+            data-st="control"
+            className="px-3 py-1 border border-[var(--st-border)] rounded disabled:opacity-40 hover:border-[var(--st-border-strong)]"
           >
             Prev
           </button>
-          <span className="text-gray-400">
+          <span data-st="meta">
             Page {page} of {meta.totalPages}
           </span>
           <button
             disabled={page >= meta.totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 border border-gray-700 rounded disabled:opacity-40 hover:border-gray-500"
+            data-st="control"
+            className="px-3 py-1 border border-[var(--st-border)] rounded disabled:opacity-40 hover:border-[var(--st-border-strong)]"
           >
             Next
           </button>
