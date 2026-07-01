@@ -62,6 +62,15 @@ describe('ReportsQueuePage', () => {
     });
   });
 
+  it('carries the data-st contract hooks (grid/field/chip)', () => {
+    renderWithProviders(<ReportsQueuePage />);
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(document.querySelector('[data-st="chip"]')).toBeInTheDocument();
+  });
+
   it('applies queue filters and expands inline notes', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ReportsQueuePage />);
