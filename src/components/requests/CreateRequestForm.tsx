@@ -98,13 +98,16 @@ const CreateRequestForm = () => {
 
   return (
     <div className="thin">
-      <h2 className="text-xl font-semibold mb-6">New Request</h2>
+      <h2 data-st="prose" data-st-strong className="text-xl mb-6">
+        New Request
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label
             htmlFor="req-title"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             Title
           </label>
@@ -113,18 +116,22 @@ const CreateRequestForm = () => {
             value={form.title}
             onChange={set('title')}
             maxLength={256}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm"
+            data-st="field"
+            className="w-full px-3 py-2 rounded text-sm"
             placeholder="What are you looking for?"
           />
           {errors.title && (
-            <p className="text-red-400 text-xs mt-1">{errors.title}</p>
+            <p className="text-[var(--st-danger)] text-xs mt-1">
+              {errors.title}
+            </p>
           )}
         </div>
 
         <div>
           <label
             htmlFor="req-description"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             Description
           </label>
@@ -133,11 +140,14 @@ const CreateRequestForm = () => {
             value={form.description}
             onChange={set('description')}
             rows={4}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm resize-y"
+            data-st="field"
+            className="w-full px-3 py-2 rounded text-sm resize-y"
             placeholder="Describe what you're requesting in detail…"
           />
           {errors.description && (
-            <p className="text-red-400 text-xs mt-1">{errors.description}</p>
+            <p className="text-[var(--st-danger)] text-xs mt-1">
+              {errors.description}
+            </p>
           )}
         </div>
 
@@ -145,7 +155,8 @@ const CreateRequestForm = () => {
           <div>
             <label
               htmlFor="req-community"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Community
             </label>
@@ -153,7 +164,8 @@ const CreateRequestForm = () => {
               id="req-community"
               value={form.communityId}
               onChange={set('communityId')}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm"
+              data-st="field"
+              className="w-full px-3 py-2 rounded text-sm"
             >
               <option value="">Select community…</option>
               {communities.map((c) => (
@@ -163,14 +175,17 @@ const CreateRequestForm = () => {
               ))}
             </select>
             {errors.communityId && (
-              <p className="text-red-400 text-xs mt-1">{errors.communityId}</p>
+              <p className="text-[var(--st-danger)] text-xs mt-1">
+                {errors.communityId}
+              </p>
             )}
           </div>
 
           <div>
             <label
               htmlFor="req-type"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Type
             </label>
@@ -178,7 +193,8 @@ const CreateRequestForm = () => {
               id="req-type"
               value={form.type}
               onChange={set('type')}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm"
+              data-st="field"
+              className="w-full px-3 py-2 rounded text-sm"
             >
               {RELEASE_TYPES.map((t) => (
                 <option key={t} value={t}>
@@ -193,7 +209,8 @@ const CreateRequestForm = () => {
           <div>
             <label
               htmlFor="req-year"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Year (optional)
             </label>
@@ -204,21 +221,25 @@ const CreateRequestForm = () => {
               onChange={set('year')}
               min={1900}
               max={2100}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm"
+              data-st="field"
+              className="w-full px-3 py-2 rounded text-sm"
               placeholder="e.g. 2003"
             />
             {errors.year && (
-              <p className="text-red-400 text-xs mt-1">{errors.year}</p>
+              <p className="text-[var(--st-danger)] text-xs mt-1">
+                {errors.year}
+              </p>
             )}
           </div>
 
           <div>
             <label
               htmlFor="req-bounty"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Bounty (bytes){' '}
-              <span className="text-gray-500 text-xs">
+              <span data-st="meta" className="text-xs">
                 min 100 MiB = 104857600
               </span>
             </label>
@@ -228,11 +249,14 @@ const CreateRequestForm = () => {
               value={form.bounty}
               onChange={set('bounty')}
               min={MIN_BOUNTY_BYTES}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm font-mono"
+              data-st="field"
+              className="w-full px-3 py-2 rounded text-sm font-mono"
               placeholder="104857600"
             />
             {errors.bounty && (
-              <p className="text-red-400 text-xs mt-1">{errors.bounty}</p>
+              <p className="text-[var(--st-danger)] text-xs mt-1">
+                {errors.bounty}
+              </p>
             )}
           </div>
         </div>
@@ -240,7 +264,8 @@ const CreateRequestForm = () => {
         <div>
           <label
             htmlFor="req-image"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             Cover image URL (optional)
           </label>
@@ -249,7 +274,8 @@ const CreateRequestForm = () => {
             type="url"
             value={form.image}
             onChange={set('image')}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm"
+            data-st="field"
+            className="w-full px-3 py-2 rounded text-sm"
             placeholder="https://…"
           />
         </div>
@@ -258,14 +284,17 @@ const CreateRequestForm = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-40"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             {isLoading ? 'Creating…' : 'Create Request'}
           </button>
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-4 py-2 text-gray-400 hover:text-gray-200 text-sm"
+            data-st="control"
+            className="px-4 py-2 rounded border border-[var(--st-border)] text-sm"
           >
             Cancel
           </button>

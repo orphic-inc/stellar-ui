@@ -39,6 +39,15 @@ describe('CreateRequestForm', () => {
     });
   });
 
+  it('emits the data-st theming hooks', () => {
+    const { container } = renderWithProviders(<CreateRequestForm />);
+    expect(container.querySelector('input[data-st="field"]')).toBeTruthy();
+    expect(container.querySelector('select[data-st="field"]')).toBeTruthy();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeTruthy();
+  });
+
   it('blocks invalid input before calling the API', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CreateRequestForm />);
