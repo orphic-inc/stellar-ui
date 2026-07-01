@@ -35,10 +35,14 @@ const ALLOWED_WIKI_TAGS = [
   'h3'
 ];
 
+// Diff line paint from the status tokens (danger removed / success added), so
+// the diff recolors with the theme instead of staying fixed red/green washes.
 const DIFF_CLASS: Record<string, string> = {
-  deleted: 'bg-red-900/40 text-red-300',
-  added: 'bg-green-900/40 text-green-300',
-  unchanged: 'text-gray-400'
+  deleted:
+    'bg-[color-mix(in_oklch,var(--st-danger)_22%,transparent)] text-[var(--st-danger)]',
+  added:
+    'bg-[color-mix(in_oklch,var(--st-success)_22%,transparent)] text-[var(--st-success)]',
+  unchanged: 'text-[var(--st-text-muted)]'
 };
 const DIFF_PREFIX: Record<string, string> = {
   deleted: '−',
@@ -98,16 +102,13 @@ const CompareModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-start justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-3xl my-8">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-700">
-          <h3 className="text-sm font-semibold text-white">
+      <div data-st="panel" className="w-full max-w-3xl my-8">
+        <div data-st="colhead" data-st-title>
+          <h3>
             Compare r{oldRev} → r{newRev}
             {data ? ` — ${data.title}` : ''}
           </h3>
-          <button
-            onClick={onClose}
-            className="px-3 py-1 text-xs text-gray-400 hover:text-white transition-colors"
-          >
+          <button onClick={onClose} data-st="control" className="text-xs">
             Close
           </button>
         </div>
@@ -179,9 +180,9 @@ const RevisionViewer = ({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-start justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-3xl my-8">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-700">
-          <h3 className="text-sm font-semibold text-white">
+      <div data-st="panel" className="w-full max-w-3xl my-8">
+        <div data-st="colhead" data-st-title>
+          <h3>
             Revision {rev}
             {isLoading ? '' : data ? ` — ${data.title}` : ''}
           </h3>
@@ -190,15 +191,15 @@ const RevisionViewer = ({
               <button
                 onClick={handleRollback}
                 disabled={isRollingBack}
-                className="px-3 py-1 text-xs bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white rounded transition-colors"
+                data-st="control"
+                data-st-primary
+                data-st-warning
+                className="text-xs"
               >
                 {isRollingBack ? 'Rolling back…' : 'Rollback to this revision'}
               </button>
             )}
-            <button
-              onClick={onClose}
-              className="px-3 py-1 text-xs text-gray-400 hover:text-white transition-colors"
-            >
+            <button onClick={onClose} data-st="control" className="text-xs">
               Close
             </button>
           </div>
@@ -212,12 +213,15 @@ const RevisionViewer = ({
 
         {data && (
           <>
-            <div className="px-5 py-2 border-b border-gray-700 text-xs text-gray-400">
+            <div
+              data-st="meta"
+              className="px-5 py-2 border-b border-[var(--st-border)] text-xs"
+            >
               By {data.author.username} on{' '}
               {new Date(data.createdAt).toLocaleString()}
             </div>
             <div
-              className="p-5 text-sm text-gray-200 prose prose-invert prose-sm max-w-none leading-relaxed"
+              className="p-5 text-sm text-[var(--st-text)] prose prose-invert prose-sm max-w-none leading-relaxed"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(data.body, {
                   ALLOWED_TAGS: ALLOWED_WIKI_TAGS,
@@ -289,20 +293,28 @@ const WikiHistoryPage = () => {
       <div className="mb-4">
         <Link
           to={`/private/wiki/${pageId}`}
-          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          data-st="control"
+          className="text-xs"
         >
           ← Back to page
         </Link>
-        <h1 className="text-xl font-bold text-white mt-1">Revision History</h1>
-        <p className="text-sm text-gray-400">
+        <h1 data-st="prose" data-st-strong className="text-xl mt-1">
+          Revision History
+        </h1>
+        <p data-st="prose" data-st-muted className="text-sm">
           Current revision: {data.currentRevision}
         </p>
       </div>
 
       {/* Compare form */}
       {canEdit && allRevNums.length >= 2 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-4 flex items-center gap-3 flex-wrap">
-          <span className="text-xs text-gray-400">Compare:</span>
+        <div
+          data-st="panel"
+          className="p-4 mb-4 flex items-center gap-3 flex-wrap"
+        >
+          <span data-st="meta" className="text-xs">
+            Compare:
+          </span>
           <select
             value={compareOld ?? ''}
             onChange={(e) =>
@@ -310,7 +322,8 @@ const WikiHistoryPage = () => {
                 e.target.value === '' ? null : Number(e.target.value)
               )
             }
-            className="rounded bg-gray-800 border border-gray-600 text-white text-xs px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            data-st="field"
+            className="text-xs"
           >
             <option value="">Old rev…</option>
             {allRevNums.map((r) => (
@@ -319,7 +332,9 @@ const WikiHistoryPage = () => {
               </option>
             ))}
           </select>
-          <span className="text-gray-500 text-xs">→</span>
+          <span data-st="meta" className="text-xs">
+            →
+          </span>
           <select
             value={compareNew ?? ''}
             onChange={(e) =>
@@ -327,7 +342,8 @@ const WikiHistoryPage = () => {
                 e.target.value === '' ? null : Number(e.target.value)
               )
             }
-            className="rounded bg-gray-800 border border-gray-600 text-white text-xs px-2 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            data-st="field"
+            className="text-xs"
           >
             <option value="">New rev…</option>
             {allRevNums.map((r) => (
@@ -343,7 +359,9 @@ const WikiHistoryPage = () => {
               compareNew === null ||
               compareOld >= compareNew
             }
-            className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-xs"
           >
             Compare
           </button>
@@ -351,53 +369,53 @@ const WikiHistoryPage = () => {
       )}
 
       {data.revisions.length === 0 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg px-6 py-10 text-center">
-          <p className="text-gray-500 text-sm">No prior revisions.</p>
+        <div data-st="panel" className="px-6 py-10 text-center">
+          <p data-st="meta" className="text-sm">
+            No prior revisions.
+          </p>
         </div>
       )}
 
-      <div className="space-y-2">
-        {/* Current revision row */}
-        <div className="bg-gray-900 border border-indigo-700 rounded-lg px-4 py-3 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-semibold text-indigo-400 mr-2">
-              Current (rev {data.currentRevision})
-            </span>
-          </div>
-          <button
-            onClick={() => setViewingRev(data.currentRevision)}
-            className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-          >
-            View
-          </button>
-        </div>
-
-        {data.revisions.map((rev) => (
-          <div
-            key={rev.id}
-            className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 flex items-center justify-between"
-          >
+      <div data-st="panel">
+        <div data-st="list">
+          {/* Current revision row — accent wash marks it as the live one */}
+          <div data-st="row" data-st-open className="justify-between">
             <div>
-              <span className="text-sm text-gray-200">{rev.title}</span>
-              <div className="text-xs text-gray-500 mt-0.5">
-                Rev {rev.revision} · by{' '}
-                <Link
-                  to={`/private/user/${rev.author.id}`}
-                  className="text-indigo-400 hover:text-indigo-300"
-                >
-                  {rev.author.username}
-                </Link>{' '}
-                · {new Date(rev.createdAt).toLocaleString()}
-              </div>
+              <span className="text-xs font-semibold text-[var(--st-accent)] mr-2">
+                Current (rev {data.currentRevision})
+              </span>
             </div>
             <button
-              onClick={() => setViewingRev(rev.revision)}
-              className="text-xs text-gray-400 hover:text-white transition-colors"
+              onClick={() => setViewingRev(data.currentRevision)}
+              data-st="control"
+              className="text-xs"
             >
               View
             </button>
           </div>
-        ))}
+
+          {data.revisions.map((rev) => (
+            <div key={rev.id} data-st="row" className="justify-between">
+              <div>
+                <span data-st="prose">{rev.title}</span>
+                <div data-st="meta" className="text-xs mt-0.5">
+                  Rev {rev.revision} · by{' '}
+                  <Link to={`/private/user/${rev.author.id}`} data-st="control">
+                    {rev.author.username}
+                  </Link>{' '}
+                  · {new Date(rev.createdAt).toLocaleString()}
+                </div>
+              </div>
+              <button
+                onClick={() => setViewingRev(rev.revision)}
+                data-st="control"
+                className="text-xs"
+              >
+                View
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

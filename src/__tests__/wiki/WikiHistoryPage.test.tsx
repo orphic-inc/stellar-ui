@@ -376,4 +376,23 @@ describe('WikiHistoryPage', () => {
       screen.queryByRole('button', { name: /rollback to this revision/i })
     ).not.toBeInTheDocument();
   });
+
+  it('paints the compare form + revision list from the data-st contract', () => {
+    const { container } = renderWithProviders(<WikiHistoryPage />);
+    // Compare form → panel with field selects + primary control; the revision
+    // list is a div panel/list/row with the current row on data-st-open.
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="list"] [data-st="row"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="row"][data-st-open]')
+    ).toBeInTheDocument();
+  });
 });
