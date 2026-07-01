@@ -28,6 +28,19 @@ describe('ReportForm', () => {
     });
   });
 
+  it('carries the data-st contract hooks (field/control)', () => {
+    renderWithProviders(<ReportForm />, { store: createTestStore() });
+    expect(
+      document.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('textarea[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
+
   it('validates missing release category before submission', async () => {
     const user = userEvent.setup();
     const store = createTestStore();

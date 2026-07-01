@@ -173,20 +173,25 @@ const ReportForm = () => {
 
   return (
     <div className="thin">
-      <h2 className="text-xl font-semibold mb-4">File a Report</h2>
+      <h2 data-st="prose" data-st-strong className="text-xl mb-4">
+        File a Report
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {lockedFromUrl ? (
-          <p className="text-sm text-gray-400">
+          <p data-st="meta" className="text-sm">
             Reporting:{' '}
-            <span className="text-gray-200 font-medium">{targetType}</span>
+            <span data-st="prose" data-st-strong className="font-medium">
+              {targetType}
+            </span>
           </p>
         ) : (
           <div className="flex gap-4">
             <div className="flex-1">
               <label
                 htmlFor="target-type"
-                className="block text-sm text-gray-400 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Report type
               </label>
@@ -200,7 +205,8 @@ const ReportForm = () => {
                   setCategory('');
                   setReleaseCategory('');
                 }}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+                data-st="field"
+                className="w-full px-3 py-2 text-sm"
               >
                 {TARGET_TYPES.map((t) => (
                   <option key={t} value={t}>
@@ -213,7 +219,8 @@ const ReportForm = () => {
             <div className="flex-1">
               <label
                 htmlFor="target-id"
-                className="block text-sm text-gray-400 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Target ID
               </label>
@@ -224,7 +231,8 @@ const ReportForm = () => {
                 onChange={(e) => setTargetId(e.target.value)}
                 required
                 min={1}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+                data-st="field"
+                className="w-full px-3 py-2 text-sm"
                 placeholder="e.g. 42"
               />
             </div>
@@ -232,8 +240,8 @@ const ReportForm = () => {
         )}
 
         {GUIDELINES[targetType] && (
-          <p className="text-sm text-gray-500 bg-gray-800/50 border border-gray-700 rounded px-3 py-2">
-            {GUIDELINES[targetType]}
+          <p data-st="panel" className="text-sm px-3 py-2">
+            <span data-st="meta">{GUIDELINES[targetType]}</span>
           </p>
         )}
 
@@ -241,7 +249,8 @@ const ReportForm = () => {
           <div>
             <label
               htmlFor="release-category"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Reason
             </label>
@@ -256,7 +265,8 @@ const ReportForm = () => {
                 )
               }
               required
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+              data-st="field"
+              className="w-full px-3 py-2 text-sm"
             >
               <option value="">— Select a reason —</option>
               {RELEASE_CATEGORIES.map((c) => (
@@ -270,7 +280,8 @@ const ReportForm = () => {
           <div>
             <label
               htmlFor="category"
-              className="block text-sm text-gray-400 mb-1"
+              data-st="meta"
+              className="block text-sm mb-1"
             >
               Category
             </label>
@@ -279,7 +290,8 @@ const ReportForm = () => {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+              data-st="field"
+              className="w-full px-3 py-2 text-sm"
             >
               <option value="">— Select a category —</option>
               {categories.map((c) => (
@@ -292,8 +304,8 @@ const ReportForm = () => {
         )}
 
         <div>
-          <label htmlFor="reason" className="block text-sm text-gray-400 mb-1">
-            Comments <span className="text-red-500">*</span>
+          <label htmlFor="reason" data-st="meta" className="block text-sm mb-1">
+            Comments <span className="text-[var(--st-danger)]">*</span>
           </label>
           <textarea
             id="reason"
@@ -301,7 +313,8 @@ const ReportForm = () => {
             onChange={(e) => setReason(e.target.value)}
             required
             rows={4}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+            data-st="field"
+            className="w-full px-3 py-2 text-sm resize-y"
             placeholder="Explain why you are reporting this content…"
           />
         </div>
@@ -309,12 +322,13 @@ const ReportForm = () => {
         <div>
           <label
             htmlFor="evidence"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             {showEvidenceAsPermalink
               ? 'Permalink to related release(s)'
               : 'Evidence'}{' '}
-            <span className="text-gray-600 text-xs">
+            <span data-st="meta" className="text-xs">
               {showEvidenceAsPermalink ? '(recommended)' : '(optional)'}
             </span>
           </label>
@@ -323,7 +337,8 @@ const ReportForm = () => {
             value={evidence}
             onChange={(e) => setEvidence(e.target.value)}
             rows={2}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+            data-st="field"
+            className="w-full px-3 py-2 text-sm resize-y"
             placeholder={
               showEvidenceAsPermalink
                 ? 'Link(s) to the release(s) this supersedes…'
@@ -336,14 +351,17 @@ const ReportForm = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             {isLoading ? 'Submitting…' : 'Submit Report'}
           </button>
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+            data-st="control"
+            className="px-4 py-2 rounded border border-[var(--st-border)] text-sm"
           >
             Cancel
           </button>
