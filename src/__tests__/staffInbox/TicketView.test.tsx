@@ -75,6 +75,16 @@ describe('TicketView', () => {
     });
   });
 
+  it('carries the data-st contract hooks (panel/chip/field)', () => {
+    renderWithProviders(<TicketView />);
+    // Message bubbles are panels, status is a chip, the reply is a field.
+    expect(document.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="chip"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('textarea[data-st="field"]')
+    ).toBeInTheDocument();
+  });
+
   it('lets staff apply canned responses, reply, resolve, and assign tickets', async () => {
     const user = userEvent.setup();
     const store = createTestStore();

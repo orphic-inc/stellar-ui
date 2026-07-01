@@ -14,11 +14,13 @@ import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import { canUseTicketStaffActions } from '../staff/staffAffordances';
+import { Badge } from '../ui';
+import type { BadgeVariant } from '../ui';
 
-const STATUS_BADGE: Record<string, string> = {
-  Unanswered: 'bg-yellow-800 text-yellow-200',
-  Open: 'bg-blue-800 text-blue-200',
-  Resolved: 'bg-gray-700 text-gray-400'
+const STATUS_TONE: Record<string, BadgeVariant> = {
+  Unanswered: 'warning',
+  Open: 'info',
+  Resolved: 'default'
 };
 
 const TicketView = () => {
@@ -98,7 +100,11 @@ const TicketView = () => {
 
   if (isLoading) return <Spinner />;
   if (error || !ticket)
-    return <div className="p-4 text-red-400">Ticket not found.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Ticket not found.
+      </div>
+    );
 
   const isResolved = ticket.status === 'Resolved';
   const isOwner = ticket.user?.id === currentUser?.id;
@@ -111,34 +117,32 @@ const TicketView = () => {
     <div className="thin">
       <div className="flex items-start justify-between mb-4 gap-4">
         <div>
-          <Link to={backLink} className="text-blue-400 text-sm hover:underline">
+          <Link to={backLink} data-st="control" className="text-sm">
             {backLabel}
           </Link>
           <div className="flex items-center gap-3 mt-1">
-            <h2 className="text-xl font-semibold">{ticket.subject}</h2>
-            <span
-              className={`text-xs px-2 py-0.5 rounded font-medium ${
-                STATUS_BADGE[ticket.status] ?? 'bg-gray-700 text-gray-400'
-              }`}
-            >
+            <h2 data-st="prose" data-st-strong className="text-xl">
+              {ticket.subject}
+            </h2>
+            <Badge variant={STATUS_TONE[ticket.status] ?? 'default'}>
               {ticket.status}
-            </span>
+            </Badge>
           </div>
           {canManageTicket && (
-            <p className="text-sm text-gray-400 mt-0.5">
+            <p data-st="meta" className="text-sm mt-0.5">
               From:{' '}
               <Link
                 to={`/private/user/${ticket.user?.username}`}
-                className="text-blue-400 hover:underline"
+                data-st="control"
               >
                 {ticket.user?.username}
               </Link>
             </p>
           )}
           {ticket.assignedUser && (
-            <p className="text-sm text-gray-400 mt-0.5">
+            <p data-st="meta" className="text-sm mt-0.5">
               Assigned to:{' '}
-              <span className="text-gray-200">
+              <span data-st="prose" data-st-strong>
                 {ticket.assignedUser.username}
               </span>
             </p>
@@ -150,7 +154,9 @@ const TicketView = () => {
             <button
               onClick={handleResolve}
               disabled={resolving}
-              className="px-3 py-1.5 bg-green-800 hover:bg-green-700 text-white rounded disabled:opacity-50"
+              data-st="control"
+              data-st-primary
+              data-st-success
             >
               Resolve
             </button>
@@ -158,7 +164,8 @@ const TicketView = () => {
           {isResolved && canManageTicket && (
             <button
               onClick={handleUnresolve}
-              className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded"
+              data-st="control"
+              className="px-3 py-1.5 rounded border border-[var(--st-border)]"
             >
               Unresolve
             </button>
@@ -169,11 +176,13 @@ const TicketView = () => {
       {canManageTicket && (
         <form
           onSubmit={handleAssign}
-          className="flex gap-2 mb-6 p-3 bg-gray-800 rounded text-sm"
+          data-st="panel"
+          className="flex gap-2 mb-6 p-3 text-sm"
         >
           <label
             htmlFor="assign-user"
-            className="self-center text-gray-400 whitespace-nowrap"
+            data-st="meta"
+            className="self-center whitespace-nowrap"
           >
             Assign to:
           </label>
@@ -183,12 +192,10 @@ const TicketView = () => {
             value={assignUsername}
             onChange={(e) => setAssignUsername(e.target.value)}
             placeholder="Staff username (blank to unassign)"
-            className="flex-1 px-2 py-1 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-blue-500"
+            data-st="field"
+            className="flex-1 px-2 py-1"
           />
-          <button
-            type="submit"
-            className="px-3 py-1 bg-blue-700 hover:bg-blue-600 text-white rounded"
-          >
+          <button type="submit" data-st="control" data-st-primary>
             Assign
           </button>
         </form>
@@ -200,33 +207,29 @@ const TicketView = () => {
           return (
             <div
               key={msg.id}
-              className={`rounded p-3 border ${
-                isStaffMsg
-                  ? 'bg-gray-800 border-blue-900 ml-4'
-                  : 'bg-gray-900 border-gray-700'
-              }`}
+              data-st="panel"
+              className={`p-3 ${isStaffMsg ? 'ml-4' : ''}`}
             >
               <div className="flex items-center gap-2 mb-2 text-sm">
                 {msg.sender ? (
                   <Link
                     to={`/private/user/${msg.sender.username}`}
-                    className="font-medium text-blue-400 hover:underline"
+                    data-st="control"
+                    className="font-medium"
                   >
                     {msg.sender.username}
                   </Link>
                 ) : (
-                  <span className="font-medium text-gray-400">System</span>
-                )}
-                {isStaffMsg && (
-                  <span className="text-xs px-1.5 py-0.5 bg-blue-900 text-blue-300 rounded">
-                    Staff
+                  <span data-st="meta" className="font-medium">
+                    System
                   </span>
                 )}
-                <span className="text-gray-600 text-xs">
+                {isStaffMsg && <Badge variant="info">Staff</Badge>}
+                <span data-st="meta" className="text-xs">
                   {new Date(msg.createdAt).toLocaleString()}
                 </span>
               </div>
-              <p className="text-gray-200 text-sm whitespace-pre-wrap">
+              <p data-st="prose" className="text-sm whitespace-pre-wrap">
                 {msg.body}
               </p>
             </div>
@@ -240,7 +243,8 @@ const TicketView = () => {
             <div>
               <label
                 htmlFor="canned-select"
-                className="block text-sm text-gray-400 mb-1"
+                data-st="meta"
+                className="block text-sm mb-1"
               >
                 Use canned response
               </label>
@@ -248,7 +252,8 @@ const TicketView = () => {
                 id="canned-select"
                 value={selectedCanned}
                 onChange={handleCannedSelect}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+                data-st="field"
+                className="w-full px-3 py-2 text-sm"
               >
                 <option value="">— Select a template —</option>
                 {cannedResponses.map((r) => (
@@ -259,7 +264,7 @@ const TicketView = () => {
               </select>
             </div>
           )}
-          <label htmlFor="ticket-reply" className="text-sm text-gray-400">
+          <label htmlFor="ticket-reply" data-st="meta" className="text-sm">
             Reply
           </label>
           <textarea
@@ -268,13 +273,16 @@ const TicketView = () => {
             onChange={(e) => setReplyBody(e.target.value)}
             rows={5}
             required
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+            data-st="field"
+            className="w-full px-3 py-2 text-sm resize-y"
             placeholder="Write a reply…"
           />
           <button
             type="submit"
             disabled={replying}
-            className="self-start px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
+            data-st="control"
+            data-st-primary
+            className="self-start text-sm"
           >
             {replying ? 'Sending…' : 'Send Reply'}
           </button>
