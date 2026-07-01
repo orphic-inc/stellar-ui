@@ -124,29 +124,31 @@ describe('TopUsersPage RTK Query integration', () => {
     expect(screen.getByText('2020')).toBeInTheDocument();
   });
 
-  it('applies green ratio color for ratio >= 1.0', async () => {
+  // Ratio health now paints from the --st-success/warning/danger status tokens
+  // (WS4 theming), not fixed tailwind hues.
+  it('applies the success ratio color for ratio >= 1.0', async () => {
     setupFetch({ items: [makeItem(1, { ratio: 1.5 })] });
     renderWithProviders(<TopUsersPage />);
 
     await screen.findByText('1.50');
     const cell = screen.getByText('1.50');
-    expect(cell.className).toContain('green');
+    expect(cell.className).toContain('--st-success');
   });
 
-  it('applies yellow ratio color for ratio between 0.5 and 1.0', async () => {
+  it('applies the warning ratio color for ratio between 0.5 and 1.0', async () => {
     setupFetch({ items: [makeItem(1, { ratio: 0.75 })] });
     renderWithProviders(<TopUsersPage />);
 
     await screen.findByText('0.75');
-    expect(screen.getByText('0.75').className).toContain('yellow');
+    expect(screen.getByText('0.75').className).toContain('--st-warning');
   });
 
-  it('applies red ratio color for ratio below 0.5', async () => {
+  it('applies the danger ratio color for ratio below 0.5', async () => {
     setupFetch({ items: [makeItem(1, { ratio: 0.3 })] });
     renderWithProviders(<TopUsersPage />);
 
     await screen.findByText('0.30');
-    expect(screen.getByText('0.30').className).toContain('red');
+    expect(screen.getByText('0.30').className).toContain('--st-danger');
   });
 
   it('shows Contributed column and hides Consumed column in contributed mode', async () => {

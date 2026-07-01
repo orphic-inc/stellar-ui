@@ -18,19 +18,18 @@ const TYPE_LABELS: Record<UserType, string> = {
   consumeSpeed: 'Fastest Consumers'
 };
 
+// Ratio health as status-token hues (success / warning / danger). Applied to a
+// span inside the cell — the tr[data-st=row]>td rule would win over a td class.
 const ratioColor = (ratio: number) => {
-  if (ratio >= 1.0) return 'text-green-400';
-  if (ratio >= 0.5) return 'text-yellow-400';
-  return 'text-red-400';
+  if (ratio >= 1.0) return 'text-[var(--st-success)]';
+  if (ratio >= 0.5) return 'text-[var(--st-warning)]';
+  return 'text-[var(--st-danger)]';
 };
 
 const fmtSpeed = (bytesPerSec: number) => {
   if (bytesPerSec <= 0) return '—';
   return `${formatBytes(bytesPerSec)}/s`;
 };
-
-const selectCls =
-  'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500';
 
 const TopUsersPage = () => {
   const [type, setType] = useState<UserType>('contributed');
@@ -44,17 +43,14 @@ const TopUsersPage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex flex-wrap gap-4 items-end">
+      <div data-st="panel" className="p-4 flex flex-wrap gap-4 items-end">
         <div>
-          <label
-            htmlFor="users-metric"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="users-metric" data-st="meta" className="block mb-1">
             Metric
           </label>
           <select
             id="users-metric"
-            className={selectCls}
+            data-st="field"
             value={type}
             onChange={(e) => setType(e.target.value as UserType)}
           >
@@ -66,15 +62,12 @@ const TopUsersPage = () => {
           </select>
         </div>
         <div>
-          <label
-            htmlFor="users-limit"
-            className="block text-xs font-medium text-gray-400 mb-1"
-          >
+          <label htmlFor="users-limit" data-st="meta" className="block mb-1">
             Limit
           </label>
           <select
             id="users-limit"
-            className={selectCls}
+            data-st="field"
             value={limit}
             onChange={(e) => setLimit(Number(e.target.value) as LimitValue)}
           >
@@ -93,89 +86,77 @@ const TopUsersPage = () => {
       )}
       {data && (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-gray-300">
-            <thead>
-              <tr className="text-left text-xs text-gray-500 uppercase tracking-wide border-b border-gray-700">
-                <th className="pb-2 pr-3 w-8">#</th>
-                <th className="pb-2 pr-3">User</th>
-                {showContributed && (
-                  <th className="pb-2 pr-3 text-right">Contributed</th>
-                )}
+          {/* Columnar data keeps its <table>; the grid/colhead/row variant
+              (ADR-0006) carries the token paint. */}
+          <table data-st="grid" className="text-sm">
+            <thead data-st="colhead">
+              <tr>
+                <th className="w-8">#</th>
+                <th>User</th>
+                {showContributed && <th data-st-num>Contributed</th>}
                 {showSpeed && type === 'contributionSpeed' && (
-                  <th className="pb-2 pr-3 text-right">Contrib. Speed</th>
+                  <th data-st-num>Contrib. Speed</th>
                 )}
-                {showConsumed && (
-                  <th className="pb-2 pr-3 text-right">Consumed</th>
-                )}
+                {showConsumed && <th data-st-num>Consumed</th>}
                 {showSpeed && type === 'consumeSpeed' && (
-                  <th className="pb-2 pr-3 text-right">Consume Speed</th>
+                  <th data-st-num>Consume Speed</th>
                 )}
                 {type === 'numContributions' && (
-                  <th className="pb-2 pr-3 text-right">Contributions</th>
+                  <th data-st-num>Contributions</th>
                 )}
-                <th className="pb-2 pr-3 text-right">Ratio</th>
-                <th className="pb-2 text-right hidden sm:table-cell">Joined</th>
+                <th data-st-num>Ratio</th>
+                <th data-st-num className="hidden sm:table-cell">
+                  Joined
+                </th>
               </tr>
             </thead>
             <tbody>
               {data.items.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-gray-500">
-                    No data available.
+                <tr data-st="row">
+                  <td colSpan={7} className="text-center">
+                    <span data-st="meta">No data available.</span>
                   </td>
                 </tr>
               )}
               {data.items.map((item) => (
-                <tr
-                  key={item.userId}
-                  className="border-t border-gray-800 hover:bg-gray-800/40"
-                >
-                  <td className="py-2 pr-3 text-gray-500">{item.rank}</td>
-                  <td className="py-2 pr-3">
-                    <Link
-                      to={`/private/user/${item.userId}`}
-                      className="text-indigo-400 hover:text-indigo-300 font-medium"
-                    >
+                <tr key={item.userId} data-st="row">
+                  <td>
+                    <span data-st="meta">{item.rank}</span>
+                  </td>
+                  <td>
+                    <Link to={`/private/user/${item.userId}`} data-st="title">
                       {item.username}
                     </Link>
-                    <span className="ml-2 text-xs text-gray-500">
+                    <span data-st="meta" className="ml-2 text-xs">
                       {item.rankName}
                     </span>
                   </td>
                   {showContributed && (
-                    <td className="py-2 pr-3 text-right tabular-nums">
-                      {formatBytes(Number(item.contributed))}
-                    </td>
+                    <td data-st-num>{formatBytes(Number(item.contributed))}</td>
                   )}
                   {showSpeed && type === 'contributionSpeed' && (
-                    <td className="py-2 pr-3 text-right tabular-nums">
-                      {fmtSpeed(item.contributionSpeed)}
-                    </td>
+                    <td data-st-num>{fmtSpeed(item.contributionSpeed)}</td>
                   )}
                   {showConsumed && (
-                    <td className="py-2 pr-3 text-right tabular-nums">
-                      {formatBytes(Number(item.consumed))}
-                    </td>
+                    <td data-st-num>{formatBytes(Number(item.consumed))}</td>
                   )}
                   {showSpeed && type === 'consumeSpeed' && (
-                    <td className="py-2 pr-3 text-right tabular-nums">
-                      {fmtSpeed(item.consumeSpeed)}
-                    </td>
+                    <td data-st-num>{fmtSpeed(item.consumeSpeed)}</td>
                   )}
                   {type === 'numContributions' && (
-                    <td className="py-2 pr-3 text-right tabular-nums">
+                    <td data-st-num>
                       {item.numContributions.toLocaleString()}
                     </td>
                   )}
-                  <td
-                    className={`py-2 pr-3 text-right tabular-nums font-medium ${ratioColor(
-                      item.ratio
-                    )}`}
-                  >
-                    {item.ratio.toFixed(2)}
+                  <td data-st-num>
+                    <span className={`font-medium ${ratioColor(item.ratio)}`}>
+                      {item.ratio.toFixed(2)}
+                    </span>
                   </td>
-                  <td className="py-2 text-right text-gray-500 text-xs hidden sm:table-cell">
-                    {new Date(item.joinedAt).getFullYear()}
+                  <td data-st-num className="hidden sm:table-cell">
+                    <span data-st="meta" className="text-xs">
+                      {new Date(item.joinedAt).getFullYear()}
+                    </span>
                   </td>
                 </tr>
               ))}
