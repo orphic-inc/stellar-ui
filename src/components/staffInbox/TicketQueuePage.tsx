@@ -5,6 +5,8 @@ import {
   useBulkResolveTicketsMutation
 } from '../../store/services/staffInboxApi';
 import Spinner from '../layout/Spinner';
+import { Badge } from '../ui';
+import type { BadgeVariant } from '../ui';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -13,10 +15,10 @@ const STATUS_OPTIONS = [
   { value: 'Resolved', label: 'Resolved' }
 ];
 
-const STATUS_BADGE: Record<string, string> = {
-  Unanswered: 'bg-yellow-800 text-yellow-200',
-  Open: 'bg-blue-800 text-blue-200',
-  Resolved: 'bg-gray-700 text-gray-400'
+const STATUS_TONE: Record<string, BadgeVariant> = {
+  Unanswered: 'warning',
+  Open: 'info',
+  Resolved: 'default'
 };
 
 const TicketQueuePage = () => {
@@ -58,15 +60,22 @@ const TicketQueuePage = () => {
 
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load ticket queue.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load ticket queue.
+      </div>
+    );
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Ticket Queue</h2>
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          Ticket Queue
+        </h2>
         <Link
           to="/private/staff/inbox/responses"
-          className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+          data-st="control"
+          className="px-3 py-1 rounded border border-[var(--st-border)] text-sm"
         >
           Canned Responses
         </Link>
@@ -74,7 +83,7 @@ const TicketQueuePage = () => {
 
       <div className="flex flex-wrap gap-3 mb-4 text-sm">
         <div className="flex items-center gap-2">
-          <label htmlFor="status-filter" className="text-gray-400">
+          <label htmlFor="status-filter" data-st="meta">
             Status:
           </label>
           <select
@@ -84,7 +93,8 @@ const TicketQueuePage = () => {
               setStatus(e.target.value);
               setPage(1);
             }}
-            className="px-2 py-1 bg-gray-800 border border-gray-700 rounded focus:outline-none focus:border-blue-500"
+            data-st="field"
+            className="px-2 py-1"
           >
             {STATUS_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -93,7 +103,10 @@ const TicketQueuePage = () => {
             ))}
           </select>
         </div>
-        <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
+        <label
+          data-st="meta"
+          className="flex items-center gap-2 cursor-pointer"
+        >
           <input
             type="checkbox"
             checked={assignedToMe}
@@ -102,11 +115,14 @@ const TicketQueuePage = () => {
               if (e.target.checked) setUnassigned(false);
               setPage(1);
             }}
-            className="accent-blue-500"
+            data-st="field"
           />
           Assigned to me
         </label>
-        <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
+        <label
+          data-st="meta"
+          className="flex items-center gap-2 cursor-pointer"
+        >
           <input
             type="checkbox"
             checked={unassigned}
@@ -115,30 +131,32 @@ const TicketQueuePage = () => {
               if (e.target.checked) setAssignedToMe(false);
               setPage(1);
             }}
-            className="accent-blue-500"
+            data-st="field"
           />
           Unassigned only
         </label>
       </div>
 
       {selected.length > 0 && (
-        <div className="flex gap-3 mb-3 p-2 bg-gray-800 rounded text-sm">
-          <span className="text-gray-400">{selected.length} selected</span>
-          <button
-            onClick={handleBulkResolve}
-            className="text-green-400 hover:text-green-300"
-          >
+        <div
+          data-st="panel"
+          className="flex gap-3 items-center mb-3 p-2 text-sm"
+        >
+          <span data-st="meta">{selected.length} selected</span>
+          <button onClick={handleBulkResolve} data-st="control">
             Resolve all
           </button>
         </div>
       )}
 
       {tickets.length === 0 ? (
-        <p className="text-gray-500 text-sm">No tickets match this filter.</p>
+        <p data-st="prose" data-st-muted className="text-sm">
+          No tickets match this filter.
+        </p>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-gray-400">
+        <table data-st="grid" className="w-full text-sm">
+          <thead data-st="colhead">
+            <tr>
               <th className="pb-2 pr-3 w-6">
                 <input
                   type="checkbox"
@@ -146,7 +164,7 @@ const TicketQueuePage = () => {
                     selected.length === tickets.length && tickets.length > 0
                   }
                   onChange={toggleAll}
-                  className="accent-blue-500"
+                  data-st="field"
                 />
               </th>
               <th className="pb-2 pr-3">Subject</th>
@@ -159,20 +177,20 @@ const TicketQueuePage = () => {
           <tbody>
             {tickets.map((ticket) => {
               return (
-                <tr key={ticket.id} className="border-b border-gray-800">
+                <tr key={ticket.id} data-st="row">
                   <td className="py-2 pr-3">
                     <input
                       type="checkbox"
                       checked={selected.includes(ticket.id)}
                       onChange={() => toggleSelect(ticket.id)}
-                      className="accent-blue-500"
+                      data-st="field"
                     />
                   </td>
                   <td className="py-2 pr-3">
                     <div className="flex items-center gap-1">
                       {ticket.status === 'Unanswered' && (
                         <span
-                          className="text-yellow-400 text-xs"
+                          className="text-xs text-[var(--st-warning)]"
                           aria-label="Unread"
                         >
                           ●
@@ -180,30 +198,29 @@ const TicketQueuePage = () => {
                       )}
                       <Link
                         to={`/private/staff/tickets/${ticket.id}`}
-                        className="hover:underline text-blue-400"
+                        data-st="control"
                       >
                         {ticket.subject}
                       </Link>
                     </div>
                   </td>
-                  <td className="py-2 pr-3 text-gray-300">
-                    {ticket.user?.username ?? '—'}
+                  <td className="py-2 pr-3">
+                    <span data-st="meta">{ticket.user?.username ?? '—'}</span>
                   </td>
                   <td className="py-2 pr-3">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded ${
-                        STATUS_BADGE[ticket.status] ??
-                        'bg-gray-700 text-gray-400'
-                      }`}
-                    >
+                    <Badge variant={STATUS_TONE[ticket.status] ?? 'default'}>
                       {ticket.status}
+                    </Badge>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <span data-st="meta">
+                      {ticket.assignedUser?.username ?? '—'}
                     </span>
                   </td>
-                  <td className="py-2 pr-3 text-gray-400">
-                    {ticket.assignedUser?.username ?? '—'}
-                  </td>
-                  <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
-                    {new Date(ticket.updatedAt).toLocaleDateString()}
+                  <td className="py-2 text-xs whitespace-nowrap">
+                    <span data-st="meta">
+                      {new Date(ticket.updatedAt).toLocaleDateString()}
+                    </span>
                   </td>
                 </tr>
               );
@@ -217,17 +234,19 @@ const TicketQueuePage = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Previous
           </button>
-          <span className="px-3 py-1 text-gray-400">
+          <span data-st="meta" className="px-3 py-1">
             {page} / {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Next
           </button>

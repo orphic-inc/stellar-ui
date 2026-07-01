@@ -94,6 +94,13 @@ describe('TicketQueuePage', () => {
     expect(screen.getAllByText('Open').length).toBeGreaterThan(0);
     expect(screen.getByText('bob')).toBeInTheDocument();
     expect(screen.getByText('mod-one')).toBeInTheDocument();
+
+    // Theming contract: table variant, field controls, status chip.
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('select[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(document.querySelector('[data-st="chip"]')).toBeInTheDocument();
   });
 
   it('applies queue filters and bulk resolves selected tickets', async () => {
