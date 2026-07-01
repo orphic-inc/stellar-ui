@@ -244,4 +244,35 @@ describe('ArtistBrowsePage', () => {
     await user.click(toggle);
     expect(screen.getByText(/vanity house only/i)).toBeInTheDocument();
   });
+
+  it('paints the filter form + results table from the data-st contract', () => {
+    mockUseSearchArtistsQuery.mockReturnValue({
+      data: {
+        data: [makeArtist(1, 'Miles Davis')],
+        meta: { total: 1, totalPages: 1 }
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const { container } = renderWithProviders(<ArtistBrowsePage />);
+    // Form is a bounded panel; inputs paint from `field`, labels decompose to
+    // `meta`, the CTA is a primary control.
+    expect(container.querySelector('[data-st="panel"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+    // Columnar results keep the <table>; grid/colhead/row + title/chip paint.
+    expect(
+      container.querySelector('table[data-st="grid"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-st="chip"]')).toBeInTheDocument();
+  });
 });
