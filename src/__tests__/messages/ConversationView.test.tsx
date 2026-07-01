@@ -71,6 +71,19 @@ describe('ConversationView', () => {
     });
   });
 
+  it('carries the data-st contract hooks (panel/field/control)', () => {
+    renderWithProviders(<ConversationView />);
+    expect(
+      document.querySelectorAll('div[data-st="panel"]').length
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      document.querySelector('textarea[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
+
   it('renders participants, replies, toggles flags, and deletes conversations', async () => {
     const user = userEvent.setup();
     const store = createTestStore();

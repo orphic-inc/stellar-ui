@@ -52,7 +52,11 @@ const ConversationView = () => {
 
   if (isLoading) return <Spinner />;
   if (error || !conv)
-    return <div className="p-4 text-red-400">Conversation not found.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Conversation not found.
+      </div>
+    );
 
   const myParticipant = conv.participants?.find(
     (p) => p.userId === currentUser?.id
@@ -64,29 +68,26 @@ const ConversationView = () => {
     <div className="thin">
       <div className="flex items-start justify-between mb-4 gap-4">
         <div>
-          <Link
-            to="/private/messages"
-            className="text-blue-400 text-sm hover:underline"
-          >
+          <Link to="/private/messages" data-st="control" className="text-sm">
             ← Inbox
           </Link>
-          <h2 className="text-xl font-semibold mt-1">{conv.subject}</h2>
+          <h2 data-st="prose" data-st-strong className="text-xl mt-1">
+            {conv.subject}
+          </h2>
           {otherParticipants.length > 0 && (
-            <p className="text-sm text-gray-400">
+            <p data-st="meta" className="text-sm">
               With:{' '}
               {otherParticipants.map((p) =>
                 p.user?.username ? (
                   <Link
                     key={p.userId}
                     to={`/private/user/${p.user.username}`}
-                    className="text-blue-400 hover:underline"
+                    data-st="control"
                   >
                     {p.user.username}
                   </Link>
                 ) : (
-                  <span key={p.userId} className="text-gray-400">
-                    {`User ${p.userId}`}
-                  </span>
+                  <span key={p.userId}>{`User ${p.userId}`}</span>
                 )
               )}
             </p>
@@ -96,10 +97,11 @@ const ConversationView = () => {
         <div className="flex gap-2 text-sm shrink-0">
           <button
             onClick={handleSticky}
-            className={`px-2 py-1 rounded ${
+            data-st="control"
+            className={`px-2 py-1 rounded border ${
               myParticipant?.isSticky
-                ? 'bg-yellow-700 text-yellow-200'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                ? 'border-[var(--st-warning)] text-[var(--st-warning)]'
+                : 'border-[var(--st-border)]'
             }`}
             title="Toggle sticky"
           >
@@ -107,14 +109,16 @@ const ConversationView = () => {
           </button>
           <button
             onClick={handleMarkUnread}
-            className="px-2 py-1 rounded bg-gray-700 text-gray-300 hover:bg-gray-600"
+            data-st="control"
+            className="px-2 py-1 rounded border border-[var(--st-border)]"
             title="Mark unread"
           >
             Unread
           </button>
           <button
             onClick={handleDelete}
-            className="px-2 py-1 rounded bg-gray-700 text-red-400 hover:bg-gray-600"
+            data-st="control"
+            className="px-2 py-1 rounded border border-[var(--st-border)] text-[var(--st-danger)]"
             title="Delete conversation"
           >
             Delete
@@ -128,28 +132,28 @@ const ConversationView = () => {
           return (
             <div
               key={msg.id}
-              className={`rounded p-3 border ${
-                isMine
-                  ? 'bg-gray-800 border-gray-700 ml-8 opacity-90'
-                  : 'bg-gray-900 border-gray-700 mr-8'
-              }`}
+              data-st="panel"
+              className={`p-3 ${isMine ? 'ml-8 opacity-90' : 'mr-8'}`}
             >
               <div className="flex items-center gap-2 mb-2 text-sm">
                 {msg.sender ? (
                   <Link
                     to={`/private/user/${msg.sender.username}`}
-                    className="font-medium text-blue-400 hover:underline"
+                    data-st="control"
+                    className="font-medium"
                   >
                     {msg.sender.username}
                   </Link>
                 ) : (
-                  <span className="font-medium text-gray-400">System</span>
+                  <span data-st="meta" className="font-medium">
+                    System
+                  </span>
                 )}
-                <span className="text-gray-600 text-xs">
+                <span data-st="meta" className="text-xs">
                   {new Date(msg.createdAt).toLocaleString()}
                 </span>
               </div>
-              <p className="text-gray-200 text-sm whitespace-pre-wrap">
+              <p data-st="prose" className="text-sm whitespace-pre-wrap">
                 {msg.body}
               </p>
             </div>
@@ -158,7 +162,7 @@ const ConversationView = () => {
       </div>
 
       <form onSubmit={handleReply} className="flex flex-col gap-3">
-        <label htmlFor="conv-reply" className="text-sm text-gray-400">
+        <label htmlFor="conv-reply" data-st="meta" className="text-sm">
           Reply
         </label>
         <textarea
@@ -167,13 +171,16 @@ const ConversationView = () => {
           onChange={(e) => setReplyBody(e.target.value)}
           rows={5}
           required
-          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+          data-st="field"
+          className="w-full px-3 py-2 text-sm resize-y"
           placeholder="Write a reply…"
         />
         <button
           type="submit"
           disabled={replying}
-          className="self-start px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
+          data-st="control"
+          data-st-primary
+          className="self-start text-sm"
         >
           {replying ? 'Sending…' : 'Send Reply'}
         </button>
