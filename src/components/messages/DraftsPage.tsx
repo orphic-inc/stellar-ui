@@ -26,22 +26,26 @@ const DraftsPage = () => {
 
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load drafts.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load drafts.
+      </div>
+    );
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Drafts</h2>
-        <div className="flex gap-2">
-          <Link
-            to="/private/messages/new"
-            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
-          >
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          Drafts
+        </h2>
+        <div className="flex gap-2 text-sm">
+          <Link to="/private/messages/new" data-st="control" data-st-primary>
             Compose
           </Link>
           <Link
             to="/private/messages"
-            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
             Inbox
           </Link>
@@ -49,11 +53,13 @@ const DraftsPage = () => {
       </div>
 
       {!drafts || drafts.length === 0 ? (
-        <p className="text-gray-500 text-sm">No saved drafts.</p>
+        <p data-st="prose" data-st-muted className="text-sm">
+          No saved drafts.
+        </p>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-gray-400">
+        <table data-st="grid" className="w-full text-sm">
+          <thead data-st="colhead">
+            <tr>
               <th className="pb-2 pr-3">Subject</th>
               <th className="pb-2 pr-3">To</th>
               <th className="pb-2">Last saved</th>
@@ -62,28 +68,29 @@ const DraftsPage = () => {
           </thead>
           <tbody>
             {drafts.map((draft) => (
-              <tr
-                key={draft.id}
-                className="border-b border-gray-800 hover:bg-gray-800/20"
-              >
+              <tr key={draft.id} data-st="row">
                 <td className="py-2 pr-3">
                   <Link
                     to={`/private/messages/new?draft=${draft.id}`}
-                    className="hover:underline text-blue-400"
+                    data-st="control"
                   >
                     {draft.subject || '(no subject)'}
                   </Link>
                 </td>
-                <td className="py-2 pr-3 text-gray-400">
-                  {draft.toUser?.username ?? '—'}
+                <td className="py-2 pr-3">
+                  <span data-st="meta">{draft.toUser?.username ?? '—'}</span>
                 </td>
-                <td className="py-2 text-gray-500 text-xs whitespace-nowrap">
-                  {new Date(draft.updatedAt).toLocaleDateString()}
+                <td className="py-2 text-xs whitespace-nowrap">
+                  <span data-st="meta">
+                    {new Date(draft.updatedAt).toLocaleDateString()}
+                  </span>
                 </td>
                 <td className="py-2">
                   <button
                     onClick={() => handleDelete(draft.id)}
-                    className="text-gray-600 hover:text-red-400 text-xs"
+                    data-st="control"
+                    data-st-danger
+                    className="text-xs"
                     title="Delete draft"
                   >
                     ✕

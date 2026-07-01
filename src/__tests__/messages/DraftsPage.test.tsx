@@ -54,6 +54,15 @@ describe('DraftsPage', () => {
     });
   });
 
+  it('carries the data-st table hooks (theming contract)', () => {
+    renderWithProviders(<DraftsPage />);
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('thead[data-st="colhead"]')
+    ).toBeInTheDocument();
+    expect(document.querySelector('tr[data-st="row"]')).toBeInTheDocument();
+  });
+
   it('shows empty, error, and delete-failure states', async () => {
     const user = userEvent.setup();
     const store = createTestStore();
