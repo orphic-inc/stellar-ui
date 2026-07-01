@@ -73,18 +73,20 @@ const UserStatsHistoryPage = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-white">Stats History</h2>
+      <h2 data-st="prose" data-st-strong className="text-xl">
+        Stats History
+      </h2>
 
-      {/* Period tabs */}
+      {/* Period tabs — active/idle painted from tokens, not a Role. */}
       <div className="flex gap-2">
         {PERIODS.map((p) => (
           <button
             key={p.value}
             onClick={() => setPeriod(p.value)}
-            className={`px-4 py-2 rounded text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded border text-sm font-medium transition-colors ${
               period === p.value
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+                ? 'border-[var(--st-accent)] text-[var(--st-text-strong)]'
+                : 'border-[var(--st-border)] text-[var(--st-text-muted)] hover:text-[var(--st-text)]'
             }`}
           >
             {p.label}
@@ -96,29 +98,34 @@ const UserStatsHistoryPage = () => {
       {isLoading && <Spinner />}
 
       {is403 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-8 text-center">
-          <p className="text-gray-400 text-sm">
+        <div data-st="panel" className="rounded-lg p-8 text-center">
+          <p data-st="prose" data-st-muted className="text-sm">
             This user&apos;s stats are private.
           </p>
         </div>
       )}
 
       {error && !is403 && (
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-6 text-red-300">
+        <div
+          data-st="panel"
+          className="rounded-lg p-6 border-[var(--st-danger)] text-[var(--st-danger)]"
+        >
           Failed to load stats history.
         </div>
       )}
 
       {data && data.length === 0 && !isLoading && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-8 text-center text-gray-500 text-sm">
-          No snapshots for this period yet.
+        <div data-st="panel" className="rounded-lg p-8 text-center">
+          <p data-st="prose" data-st-muted className="text-sm">
+            No snapshots for this period yet.
+          </p>
         </div>
       )}
 
       {data && data.length > 0 && (
         <>
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-300 mb-4">
+          <div data-st="panel" className="rounded-lg p-4">
+            <h3 data-st="prose" data-st-strong className="text-sm mb-4">
               Contributed &amp; Consumed (GB)
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -168,12 +175,12 @@ const UserStatsHistoryPage = () => {
           </div>
 
           {data[data.length - 1]?.contributed === null && (
-            <p className="text-xs text-gray-500">
+            <p data-st="prose" data-st-muted className="text-xs">
               * Contributed data is not public for this user.
             </p>
           )}
           {data[data.length - 1]?.consumed === null && (
-            <p className="text-xs text-gray-500">
+            <p data-st="prose" data-st-muted className="text-xs">
               * Consumed data is not public for this user.
             </p>
           )}
