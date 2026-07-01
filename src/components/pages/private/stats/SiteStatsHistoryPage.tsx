@@ -29,7 +29,10 @@ const SiteStatsHistoryPage = () => {
   if (error) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <div className="bg-red-900/30 border border-red-700 rounded-lg p-6 text-red-300">
+        <div
+          data-st="panel"
+          className="rounded-lg p-6 border-[var(--st-danger)] text-[var(--st-danger)]"
+        >
           Failed to load site stats history.
         </div>
       </div>
@@ -39,11 +42,13 @@ const SiteStatsHistoryPage = () => {
   if (!data || data.length === 0) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-6">
-        <h2 className="text-xl font-semibold text-white mb-4">
+        <h2 data-st="prose" data-st-strong className="text-xl mb-4">
           Site Stats History
         </h2>
-        <div className="bg-gray-900 border border-gray-700 rounded-lg p-8 text-center text-gray-500 text-sm">
-          No historical snapshots yet. Snapshots are captured hourly.
+        <div data-st="panel" className="rounded-lg p-8 text-center">
+          <p data-st="prose" data-st-muted className="text-sm">
+            No historical snapshots yet. Snapshots are captured hourly.
+          </p>
         </div>
       </div>
     );
@@ -60,14 +65,16 @@ const SiteStatsHistoryPage = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      <h2 className="text-xl font-semibold text-white">Site Stats History</h2>
-      <p className="text-gray-400 text-sm">
+      <h2 data-st="prose" data-st-strong className="text-xl">
+        Site Stats History
+      </h2>
+      <p data-st="prose" data-st-muted className="text-sm">
         Hourly snapshots of site-wide metrics. Showing {data.length} data point
         {data.length !== 1 ? 's' : ''}.
       </p>
 
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">
+      <div data-st="panel" className="rounded-lg p-4">
+        <h3 data-st="prose" data-st-strong className="text-sm mb-4">
           Users &amp; Activity
         </h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -112,8 +119,10 @@ const SiteStatsHistoryPage = () => {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-gray-300 mb-4">Content</h3>
+      <div data-st="panel" className="rounded-lg p-4">
+        <h3 data-st="prose" data-st-strong className="text-sm mb-4">
+          Content
+        </h3>
         <ResponsiveContainer width="100%" height={250}>
           <LineChart
             data={chartData}
