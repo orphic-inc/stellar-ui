@@ -104,4 +104,22 @@ describe('WikiListPage', () => {
       screen.queryByRole('link', { name: /\+ new page/i })
     ).not.toBeInTheDocument();
   });
+
+  it('paints the list + controls from the data-st contract', () => {
+    const { container } = renderWithProviders(<WikiListPage />);
+    // List-shaped data: div panel/list/row; search input → field, title →
+    // title, New Page → control -primary.
+    expect(
+      container.querySelector(
+        '[data-st="panel"] [data-st="list"] [data-st="row"]'
+      )
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-st="title"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('input[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
 });

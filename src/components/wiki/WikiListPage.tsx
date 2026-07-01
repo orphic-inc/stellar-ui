@@ -72,8 +72,8 @@ const WikiListPage = () => {
         onClick={() => setSort(field, nextWay)}
         className={`text-xs px-2 py-1 rounded transition-colors ${
           isActive
-            ? 'bg-indigo-700 text-white'
-            : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'
+            ? 'bg-[color-mix(in_oklch,var(--st-accent)_20%,transparent)] text-[var(--st-text-strong)]'
+            : 'text-[var(--st-text-muted)] hover:text-[var(--st-text)] hover:bg-[var(--st-raised)]'
         }`}
       >
         {label} {isActive ? (way === 'asc' ? '↑' : '↓') : ''}
@@ -84,11 +84,15 @@ const WikiListPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Wiki</h1>
+        <h1 data-st="prose" data-st-strong className="text-2xl">
+          Wiki
+        </h1>
         {canCreate && (
           <Link
             to="/private/wiki/new"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             + New Page
           </Link>
@@ -103,11 +107,14 @@ const WikiListPage = () => {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search wiki pages…"
-            className="flex-1 rounded-lg bg-gray-800 border border-gray-700 text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            data-st="field"
+            className="flex-1"
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg transition-colors"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             Search
           </button>
@@ -115,14 +122,15 @@ const WikiListPage = () => {
             <button
               type="button"
               onClick={clearFilters}
-              className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
+              data-st="control"
+              className="text-sm"
             >
               Clear
             </button>
           )}
         </div>
         {/* Search type filter */}
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        <div data-st="meta" className="flex items-center gap-2 text-xs">
           <span>Search in:</span>
           {(['all', 'title', 'body'] as const).map((t) => (
             <label key={t} className="flex items-center gap-1 cursor-pointer">
@@ -136,7 +144,7 @@ const WikiListPage = () => {
                   next.set('type', t);
                   setSearchParams(next);
                 }}
-                className="accent-indigo-500"
+                data-st="field"
               />
               <span className="capitalize">{t}</span>
             </label>
@@ -146,11 +154,13 @@ const WikiListPage = () => {
 
       {/* Active filter indicator */}
       {q && (
-        <p className="text-sm text-gray-400">
+        <p data-st="prose" data-st-muted className="text-sm">
           Showing results for{' '}
-          <span className="text-white">&ldquo;{q}&rdquo;</span>{' '}
+          <span data-st="prose" data-st-strong>
+            &ldquo;{q}&rdquo;
+          </span>{' '}
           {type !== 'all' && (
-            <span className="ml-1 text-gray-500">
+            <span data-st="meta" className="ml-1">
               in {type === 'title' ? 'titles' : 'body text'}
             </span>
           )}
@@ -159,7 +169,9 @@ const WikiListPage = () => {
 
       {/* Sort controls */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-500">Sort:</span>
+        <span data-st="meta" className="text-xs">
+          Sort:
+        </span>
         <SortButton label="Title" field="title" />
         <SortButton label="Created" field="created" />
         <SortButton label="Last edited" field="edited" />
@@ -171,44 +183,43 @@ const WikiListPage = () => {
       )}
 
       {data && data.data.length === 0 && (
-        <div className="bg-gray-900 border border-gray-700 rounded-lg px-6 py-10 text-center">
-          <p className="text-gray-500 text-sm">No pages found.</p>
+        <div data-st="panel" className="px-6 py-10 text-center">
+          <p data-st="meta" className="text-sm">
+            No pages found.
+          </p>
         </div>
       )}
 
       {data && data.data.length > 0 && (
-        <div className="space-y-2">
-          {data.data.map((p) => (
-            <div
-              key={p.id}
-              className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 flex items-center justify-between hover:border-gray-600 transition-colors"
-            >
-              <div>
-                <Link
-                  to={`/private/wiki/${p.id}`}
-                  className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-                >
-                  {p.title}
-                </Link>
-                <div className="text-xs text-gray-500 mt-0.5">
-                  rev {p.revision} · edited{' '}
-                  {new Date(p.updatedAt).toLocaleDateString()} by{' '}
-                  {p.author.username}
-                  {p.minReadLevel > 0 && (
-                    <span className="ml-2 text-amber-500">
-                      restricted (level {p.minReadLevel})
-                    </span>
-                  )}
+        <div data-st="panel">
+          <div data-st="list">
+            {data.data.map((p) => (
+              <div key={p.id} data-st="row" className="justify-between">
+                <div>
+                  <Link to={`/private/wiki/${p.id}`} data-st="title">
+                    {p.title}
+                  </Link>
+                  <div data-st="meta" className="text-xs mt-0.5">
+                    rev {p.revision} · edited{' '}
+                    {new Date(p.updatedAt).toLocaleDateString()} by{' '}
+                    {p.author.username}
+                    {p.minReadLevel > 0 && (
+                      <span className="ml-2 text-[var(--st-warning)]">
+                        restricted (level {p.minReadLevel})
+                      </span>
+                    )}
+                  </div>
                 </div>
+                <Link
+                  to={`/private/wiki/${p.id}/history`}
+                  data-st="control"
+                  className="text-xs"
+                >
+                  History
+                </Link>
               </div>
-              <Link
-                to={`/private/wiki/${p.id}/history`}
-                className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
-              >
-                History
-              </Link>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
@@ -224,11 +235,9 @@ const WikiListPage = () => {
                   next.set('page', String(p));
                   setSearchParams(next);
                 }}
-                className={`px-3 py-1 text-sm rounded transition-colors ${
-                  p === page
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:text-white'
-                }`}
+                data-st="control"
+                data-st-primary={p === page ? '' : undefined}
+                className="px-3 py-1 text-sm"
               >
                 {p}
               </button>
