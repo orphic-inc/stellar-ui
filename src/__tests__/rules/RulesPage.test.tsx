@@ -82,4 +82,19 @@ describe('RulesPage', () => {
     renderWithProviders(<RulesPage />);
     expect(screen.getByText(/failed to load the rules/i)).toBeInTheDocument();
   });
+
+  it('paints the rules from the data-st contract', () => {
+    mockTree.mockReturnValue({ data: TREE, isLoading: false });
+    mockIndex.mockReturnValue({
+      data: { main: null, pages: [{ id: 1, slug: 'cat', title: 'A Category' }] }
+    });
+    const { container } = renderWithProviders(<RulesPage />);
+    // Prose-heavy page: headings → prose -strong, rule codes → meta, category
+    // links → control (no inline gray).
+    expect(
+      container.querySelector('[data-st="prose"][data-st-strong]')
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-st="meta"]')).toBeInTheDocument();
+    expect(container.querySelector('a[data-st="control"]')).toBeInTheDocument();
+  });
 });

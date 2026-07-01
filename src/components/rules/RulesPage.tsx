@@ -41,35 +41,45 @@ const RulesPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-white mb-6">Rules</h1>
+      <h1 data-st="prose" data-st-strong className="text-3xl mb-6">
+        Rules
+      </h1>
 
       {/* The six Golden Rules (GET /api/rules/tree). Bodies are verbatim; the
           ${...} tokens are resolved against the variables map at render time. */}
       {treeError ? (
         <div className="text-red-400 mb-8">Failed to load the rules.</div>
       ) : rules.length === 0 ? (
-        <p className="text-gray-400 mb-8">
+        <p data-st="prose" data-st-muted className="mb-8">
           No rules content has been published yet.
         </p>
       ) : (
         <div className="space-y-8 mb-10">
           {rules.map((rule) => (
             <section key={rule.id} className="space-y-3">
-              <h2 className="text-xl font-semibold text-white">
-                <span className="text-gray-500 mr-2">{rule.code}.</span>
+              <h2 data-st="prose" data-st-strong className="text-xl">
+                <span data-st="meta" className="mr-2">
+                  {rule.code}.
+                </span>
                 {rule.title}
               </h2>
               {rule.description && (
-                <p className="text-gray-300">
+                <p data-st="prose">
                   {renderRuleText(rule.description, variables)}
                 </p>
               )}
               {rule.subRules.length > 0 && (
-                <ul className="space-y-3 border-l border-gray-700 pl-4">
+                <ul className="space-y-3 border-l border-[var(--st-border)] pl-4">
                   {rule.subRules.map((sub) => (
-                    <li key={sub.id} className="text-gray-300">
-                      <span className="font-semibold text-gray-100">
-                        <span className="text-gray-500 mr-2">{sub.code}</span>
+                    <li key={sub.id} data-st="prose">
+                      <span
+                        data-st="prose"
+                        data-st-strong
+                        className="font-semibold"
+                      >
+                        <span data-st="meta" className="mr-2">
+                          {sub.code}
+                        </span>
                         {sub.title}
                       </span>{' '}
                       {renderRuleText(sub.description, variables)}
@@ -85,7 +95,7 @@ const RulesPage = () => {
       {/* Supplementary prose pages (GET /api/rules), shown when published. */}
       {main && (
         <div
-          className="prose prose-invert max-w-none mb-8 text-gray-200"
+          className="prose prose-invert max-w-none mb-8 text-[var(--st-text)]"
           dangerouslySetInnerHTML={{
             __html: DOMPurify.sanitize(main.body, {
               ALLOWED_TAGS,
@@ -97,16 +107,13 @@ const RulesPage = () => {
 
       {pages.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-white mb-4">
+          <h2 data-st="prose" data-st-strong className="text-xl mb-4">
             Rule Categories
           </h2>
           <ul className="space-y-2">
             {pages.map((page) => (
               <li key={page.id}>
-                <Link
-                  to={`/private/rules/${page.slug}`}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
+                <Link to={`/private/rules/${page.slug}`} data-st="control">
                   {page.title}
                 </Link>
               </li>
