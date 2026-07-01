@@ -47,6 +47,19 @@ describe('ComposeForm', () => {
     });
   });
 
+  it('carries the data-st contract hooks (field/control)', () => {
+    renderWithProviders(<ComposeForm />);
+    expect(
+      document.querySelectorAll('input[data-st="field"]').length
+    ).toBeGreaterThanOrEqual(2);
+    expect(
+      document.querySelector('textarea[data-st="field"]')
+    ).toBeInTheDocument();
+    expect(
+      document.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeInTheDocument();
+  });
+
   it('prefills the username, sends a message, and saves drafts', async () => {
     const user = userEvent.setup();
     const store = createTestStore();

@@ -88,10 +88,13 @@ const ComposeForm = () => {
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">New Message</h2>
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          New Message
+        </h2>
         <a
           href="/private/messages/drafts"
-          className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
+          data-st="control"
+          className="text-sm"
         >
           View drafts
         </a>
@@ -100,7 +103,8 @@ const ComposeForm = () => {
         <div>
           <label
             htmlFor="compose-to"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             To (username)
           </label>
@@ -110,14 +114,16 @@ const ComposeForm = () => {
             value={toUsername}
             onChange={(e) => setToUsername(e.target.value)}
             required
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+            data-st="field"
+            className="w-full px-3 py-2 text-sm"
             placeholder="Enter username"
           />
         </div>
         <div>
           <label
             htmlFor="compose-subject"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             Subject
           </label>
@@ -128,14 +134,16 @@ const ComposeForm = () => {
             onChange={(e) => setSubject(e.target.value)}
             required
             maxLength={255}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+            data-st="field"
+            className="w-full px-3 py-2 text-sm"
             placeholder="Subject"
           />
         </div>
         <div>
           <label
             htmlFor="compose-body"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-sm mb-1"
           >
             Message
           </label>
@@ -145,7 +153,8 @@ const ComposeForm = () => {
             onChange={(e) => setBody(e.target.value)}
             required
             rows={8}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500 resize-y"
+            data-st="field"
+            className="w-full px-3 py-2 text-sm resize-y"
             placeholder="Write your message…"
           />
         </div>
@@ -153,7 +162,9 @@ const ComposeForm = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
+            data-st="control"
+            data-st-primary
+            className="text-sm"
           >
             {isLoading ? 'Sending…' : 'Send'}
           </button>
@@ -161,14 +172,16 @@ const ComposeForm = () => {
             type="button"
             onClick={handleSaveDraft}
             disabled={isSavingDraft}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded disabled:opacity-50"
+            data-st="control"
+            className="px-4 py-2 rounded border border-[var(--st-border)] text-sm disabled:opacity-50"
           >
             {isSavingDraft ? 'Saving…' : 'Save Draft'}
           </button>
           <button
             type="button"
             onClick={() => navigate('/private/messages')}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
+            data-st="control"
+            className="px-4 py-2 rounded border border-[var(--st-border)] text-sm"
           >
             Cancel
           </button>
