@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetMyTicketsQuery } from '../../store/services/staffInboxApi';
 import Spinner from '../layout/Spinner';
+import { Badge } from '../ui';
+import type { BadgeVariant } from '../ui';
 
-const STATUS_BADGE: Record<string, string> = {
-  Unanswered: 'bg-yellow-800 text-yellow-200',
-  Open: 'bg-blue-800 text-blue-200',
-  Resolved: 'bg-gray-700 text-gray-400'
+const STATUS_TONE: Record<string, BadgeVariant> = {
+  Unanswered: 'warning',
+  Open: 'info',
+  Resolved: 'default'
 };
 
 const MyTicketsPage = () => {
@@ -20,26 +22,35 @@ const MyTicketsPage = () => {
 
   if (isLoading) return <Spinner />;
   if (error)
-    return <div className="p-4 text-red-400">Failed to load tickets.</div>;
+    return (
+      <div data-st="prose" className="p-4 text-sm text-[var(--st-danger)]">
+        Failed to load tickets.
+      </div>
+    );
 
   return (
     <div className="thin">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">My Support Tickets</h2>
+        <h2 data-st="prose" data-st-strong className="text-xl">
+          My Support Tickets
+        </h2>
         <Link
           to="/private/messages/tickets/new"
-          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded"
+          data-st="control"
+          data-st-primary
         >
           New Ticket
         </Link>
       </div>
 
       {tickets.length === 0 ? (
-        <p className="text-gray-500 text-sm">You have no support tickets.</p>
+        <p data-st="prose" data-st-muted className="text-sm">
+          You have no support tickets.
+        </p>
       ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-700 text-left text-gray-400">
+        <table data-st="grid" className="w-full text-sm">
+          <thead data-st="colhead">
+            <tr>
               <th className="pb-2 pr-3">Subject</th>
               <th className="pb-2 pr-3">Status</th>
               <th className="pb-2 pr-3">Assigned</th>
@@ -49,15 +60,15 @@ const MyTicketsPage = () => {
           <tbody>
             {tickets.map((ticket) => {
               return (
-                <tr key={ticket.id} className="border-b border-gray-800">
+                <tr key={ticket.id} data-st="row">
                   <td className="py-2 pr-3">
                     <Link
                       to={`/private/messages/tickets/${ticket.id}`}
-                      className="hover:underline text-blue-400"
+                      data-st="control"
                     >
                       {!ticket.isReadByUser &&
                         ticket.status !== 'Unanswered' && (
-                          <span className="mr-1 font-bold text-blue-300">
+                          <span className="mr-1 font-bold text-[var(--st-info)]">
                             ●
                           </span>
                         )}
@@ -65,20 +76,19 @@ const MyTicketsPage = () => {
                     </Link>
                   </td>
                   <td className="py-2 pr-3">
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded ${
-                        STATUS_BADGE[ticket.status] ??
-                        'bg-gray-700 text-gray-400'
-                      }`}
-                    >
+                    <Badge variant={STATUS_TONE[ticket.status] ?? 'default'}>
                       {ticket.status}
+                    </Badge>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <span data-st="meta">
+                      {ticket.assignedUser?.username ?? '—'}
                     </span>
                   </td>
-                  <td className="py-2 pr-3 text-gray-400">
-                    {ticket.assignedUser?.username ?? '—'}
-                  </td>
-                  <td className="py-2 text-gray-500 text-xs">
-                    {new Date(ticket.updatedAt).toLocaleDateString()}
+                  <td className="py-2 text-xs">
+                    <span data-st="meta">
+                      {new Date(ticket.updatedAt).toLocaleDateString()}
+                    </span>
                   </td>
                 </tr>
               );
@@ -92,17 +102,19 @@ const MyTicketsPage = () => {
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Previous
           </button>
-          <span className="px-3 py-1 text-gray-400">
+          <span data-st="meta" className="px-3 py-1">
             {page} / {totalPages}
           </span>
           <button
             disabled={page === totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
+            data-st="control"
+            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
           >
             Next
           </button>

@@ -65,5 +65,9 @@ describe('MyTicketsPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('mod-one')).toBeInTheDocument();
     expect(screen.getByText('●')).toBeInTheDocument();
+
+    // Theming contract: table variant + a status chip.
+    expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-st="chip"]')).toBeInTheDocument();
   });
 });
