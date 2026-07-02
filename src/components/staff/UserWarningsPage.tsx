@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetAllWarningsQuery } from '../../store/services/userApi';
-import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
+import { PageShell, DataTable, Button, Pagination } from '../ui';
+import type { Column } from '../ui';
 
 const UserWarningsPage = () => {
   const [page, setPage] = useState(1);
@@ -15,7 +16,7 @@ const UserWarningsPage = () => {
   });
 
   const warnings = data?.data ?? [];
-  const meta = data?.meta;
+  const totalPages = data?.meta?.totalPages ?? 1;
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,18 +31,40 @@ const UserWarningsPage = () => {
     setPage(1);
   };
 
-  return (
-    <div className="space-y-4 max-w-5xl">
-      <div>
-        <Link
-          to="/private/staff/tools"
-          className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
-        >
-          ← Toolbox
+  const columns: Column<(typeof warnings)[number]>[] = [
+    {
+      header: 'User',
+      cell: (w) => (
+        <Link to={`/private/user/${w.userId}`} data-st="control">
+          {w.user?.username ?? `#${w.userId}`}
         </Link>
-        <h2 className="mt-1 text-2xl font-bold text-white">User Warnings</h2>
-      </div>
+      )
+    },
+    {
+      header: 'Reason',
+      cell: (w) => w.reason,
+      tdClassName: 'max-w-xs truncate'
+    },
+    {
+      header: 'Warned by',
+      cell: (w) =>
+        w.warnedBy ? (
+          <Link to={`/private/user/${w.warnedBy.id}`} data-st="control">
+            {w.warnedBy.username}
+          </Link>
+        ) : (
+          '—'
+        )
+    },
+    { header: 'Issued', cell: (w) => <Time date={w.createdAt} /> },
+    {
+      header: 'Expires',
+      cell: (w) => (w.expiresAt ? <Time date={w.expiresAt} /> : '—')
+    }
+  ];
 
+  return (
+    <PageShell title="User Warnings" width="xl">
       <form onSubmit={handleFilter} className="flex items-center gap-2">
         <input
           type="number"
@@ -49,123 +72,29 @@ const UserWarningsPage = () => {
           value={userIdInput}
           onChange={(e) => setUserIdInput(e.target.value)}
           placeholder="Filter by user ID"
-          className="rounded bg-gray-700 border border-gray-600 text-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-44"
+          data-st="field"
+          className="w-44 px-3 py-1.5 text-sm"
         />
-        <button
-          type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors"
-        >
+        <Button type="submit" variant="primary">
           Filter
-        </button>
+        </Button>
         {userIdFilter && (
-          <button
-            type="button"
-            onClick={handleClearFilter}
-            className="text-gray-400 hover:text-white text-sm transition-colors"
-          >
+          <Button type="button" variant="link" onClick={handleClearFilter}>
             Clear
-          </button>
+          </Button>
         )}
       </form>
 
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        {isLoading ? (
-          <div className="p-6">
-            <Spinner />
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-700">
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">
-                  User
-                </th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">
-                  Reason
-                </th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">
-                  Warned by
-                </th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">
-                  Issued
-                </th>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">
-                  Expires
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-700/50">
-              {warnings.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-4 py-6 text-gray-500 text-center"
-                  >
-                    No warnings found.
-                  </td>
-                </tr>
-              ) : (
-                warnings.map((w) => (
-                  <tr key={w.id} className="hover:bg-gray-700/30">
-                    <td className="px-4 py-2">
-                      <Link
-                        to={`/private/user/${w.userId}`}
-                        className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                      >
-                        {w.user?.username ?? `#${w.userId}`}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2 text-gray-200 max-w-xs truncate">
-                      {w.reason}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400">
-                      {w.warnedBy ? (
-                        <Link
-                          to={`/private/user/${w.warnedBy.id}`}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                        >
-                          {w.warnedBy.username}
-                        </Link>
-                      ) : (
-                        '—'
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-gray-400">
-                      <Time date={w.createdAt} />
-                    </td>
-                    <td className="px-4 py-2 text-gray-400">
-                      {w.expiresAt ? <Time date={w.expiresAt} /> : '—'}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <DataTable
+        columns={columns}
+        rows={warnings}
+        rowKey={(w) => w.id}
+        isLoading={isLoading}
+        empty="No warnings found."
+      />
 
-      {meta && meta.totalPages > 1 && (
-        <div className="flex items-center gap-2 text-sm">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white transition-colors"
-          >
-            Prev
-          </button>
-          <span className="text-gray-400">
-            Page {meta.page} of {meta.totalPages}
-          </span>
-          <button
-            disabled={page >= meta.totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40 text-white transition-colors"
-          >
-            Next
-          </button>
-        </div>
-      )}
-    </div>
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+    </PageShell>
   );
 };
 
