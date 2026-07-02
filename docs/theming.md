@@ -228,11 +228,12 @@ rolling handoff, not here.**
 
 ## 11. Post-conversion verification (do this once the surface sweep lands)
 
-The per-surface WS4 sweep (§7) migrates every user-facing and staff surface onto
-the contract; the only surface that stays bespoke by design is
-`GenerateTestDataPage` (a dev-only utility). Once the last surface PR merges, the
-contract is only as good as what the themes render — so verify against real
-themes, not just the token defaults:
+The per-surface WS4 sweep (§7) migrates the user-facing and staff surfaces in its
+cluster list onto the contract (`GenerateTestDataPage`, a dev-only utility, stays
+bespoke by design). "The sweep is done" is a claim this procedure exists to *test*,
+not assume — the 2026-07-02 audit found stragglers never in a cluster (the Toolbox,
+the rank form, the contribution flow). The contract is only as good as what the
+themes render, so verify against real themes, not just the token defaults:
 
 1. **Sublime is the regression baseline.** Sublime injects nothing — the bundled
    Tailwind *is* Sublime and seeds the `--st-*` defaults — so every migrated
@@ -241,15 +242,18 @@ themes, not just the token defaults:
    that shifted (spacing, weight, a control that lost its fill, a value that went
    faint) is a migration bug, not a theme bug. This is the "no visible change on
    the baseline" gate — pass it first.
-2. **Then prove the contract on a real re-skin — kuro.** Switch to a fully
-   token-redefining theme (kuro, the dark theme) and walk the same surfaces. What
-   you're checking is *translation coverage*: every `panel`/`colhead`/`list`/
-   `row`/`prose`/`meta`/`control`/`field`/`chip` should pick up kuro's tokens with
-   no island of un-themed gray. Anything that stays Sublime-colored under kuro is
-   a surface that kept an inline utility instead of a Role — file it and migrate
-   the leaf. (Layer Cake is the token-only *reference* theme and only fully
-   re-skins migrated surfaces by design, so kuro — a shipped end-user theme — is
-   the more honest coverage probe.)
+2. **Hunt for un-migrated islands — with Layer Cake, NOT kuro.** Layer Cake is
+   token-only (zero utility overrides), so it re-skins *only* surfaces already on
+   the hook contract. A surface that kept an inline `.bg-gray-*` utility instead of
+   a Role falls back to the raw Sublime look and **pops as an island** against Layer
+   Cake's palette — file it and migrate the leaf. **Do not island-hunt with
+   kuro/proton/postmod:** they carry legacy `.bg-gray-*` `!important` overrides (see
+   §4.1) that repaint raw grays, so an un-migrated surface *looks* themed under them
+   and the island hides — the exact trap that let the sweep be declared "done" while
+   the Toolbox, the rank form, and the contribution flow were still un-migrated
+   (2026-07-02 audit). Use kuro for the *opposite* check — that **migrated** surfaces
+   **translate**: every `panel`/`colhead`/`list`/`row`/`prose`/`meta`/`control`/
+   `field`/`chip` picks up kuro's tokens with no leftover gray.
 3. **Spot-check the status hues** (`chip`/`control` `-warning`/`-success`/
    `-info`/`-danger`, the `--st-*` status banners) under both themes — status
    colour is the most likely thing to go illegible on a light re-skin.
