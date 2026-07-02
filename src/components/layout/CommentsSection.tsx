@@ -102,29 +102,35 @@ const CommentsSection = ({
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
-      <div className="bg-gray-800 border-b border-gray-700 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400">
-        Comments
-      </div>
+    <div data-st="panel">
+      <div data-st="colhead">Comments</div>
 
       {isLoading ? (
-        <div className="px-3 py-2 text-xs text-gray-500">Loading…</div>
+        <div data-st="meta" className="px-3 py-2 text-xs">
+          Loading…
+        </div>
       ) : !comments?.length ? (
-        <div className="px-3 py-2 text-xs text-gray-500">No comments yet.</div>
+        <div data-st="meta" className="px-3 py-2 text-xs">
+          No comments yet.
+        </div>
       ) : (
-        <div className="divide-y divide-gray-700/40">
+        <div data-st="list">
           {comments.map((c) => (
-            <div key={c.id} className="px-3 py-2 text-xs">
+            <div
+              key={c.id}
+              className="px-3 py-2 text-xs border-t border-[var(--st-border-subtle)] first:border-0"
+            >
               <div className="flex items-center justify-between gap-1 mb-1">
-                <span className="font-semibold text-gray-200 truncate">
+                <span data-st="prose" data-st-strong className="truncate">
                   {c.author?.username ?? 'Unknown'}
                 </span>
-                <span className="text-gray-500 shrink-0">
+                <span data-st="meta" className="shrink-0">
                   <Time date={c.createdAt} />
                 </span>
               </div>
               <div
-                className="text-gray-300 leading-relaxed break-words bbcode-content"
+                data-st="prose"
+                className="leading-relaxed break-words bbcode-content"
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(parseBBCode(c.body), {
                     ADD_TAGS: [
@@ -145,7 +151,7 @@ const CommentsSection = ({
                 {currentUser && currentUser.id !== c.authorId && (
                   <Link
                     to={`/private/reports/new?targetType=Comment&targetId=${c.id}`}
-                    className="text-gray-600 hover:text-gray-400 text-xs"
+                    className="text-xs text-[var(--st-text-faint)] hover:text-[var(--st-text-muted)]"
                     aria-label="Report comment"
                     title="Report this comment"
                   >
@@ -156,7 +162,7 @@ const CommentsSection = ({
                   <button
                     type="button"
                     onClick={() => deleteComment(c.id)}
-                    className="text-gray-600 hover:text-red-400 text-xs"
+                    className="text-xs text-[var(--st-text-faint)] hover:text-[var(--st-danger)]"
                     aria-label="Delete comment"
                   >
                     [×]
@@ -170,23 +176,27 @@ const CommentsSection = ({
 
       {currentUser && (
         <form
-          className="px-3 py-2 border-t border-gray-700/40"
+          className="px-3 py-2 border-t border-[var(--st-border-subtle)]"
           onSubmit={handleSubmit}
         >
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            className="w-full bg-gray-800 border border-gray-700 rounded text-xs text-gray-200 px-2 py-1.5 focus:outline-none focus:border-indigo-500 resize-none h-20"
+            data-st="field"
+            className="w-full rounded text-xs px-2 py-1.5 resize-none h-20"
             placeholder="Add a comment…"
             required
           />
           {canSubscribe && (
-            <label className="flex items-center gap-1.5 text-xs text-gray-400 mt-1.5 mb-1">
+            <label
+              data-st="meta"
+              className="flex items-center gap-1.5 text-xs mt-1.5 mb-1"
+            >
               <input
                 type="checkbox"
                 checked={subscribe}
                 onChange={(e) => setSubscribe(e.target.checked)}
-                className="accent-indigo-500"
+                data-st="field"
               />
               Subscribe to comments
             </label>
@@ -194,7 +204,9 @@ const CommentsSection = ({
           <button
             type="submit"
             disabled={posting || subscribing}
-            className="mt-1.5 px-3 py-1 bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 text-white text-xs rounded transition-colors"
+            data-st="control"
+            data-st-primary
+            className="mt-1.5 text-xs"
           >
             Post comment
           </button>

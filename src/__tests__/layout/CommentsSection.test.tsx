@@ -108,6 +108,18 @@ describe('CommentsSection', () => {
     expect(screen.getByText('bob')).toBeInTheDocument();
   });
 
+  it('emits the data-st theming hooks', () => {
+    const { container } = renderWithProviders(
+      <CommentsSection context="release" pageId={1} />
+    );
+    expect(container.querySelector('[data-st="panel"]')).toBeTruthy();
+    expect(container.querySelector('[data-st="colhead"]')).toBeTruthy();
+    expect(container.querySelector('textarea[data-st="field"]')).toBeTruthy();
+    expect(
+      container.querySelector('button[data-st="control"][data-st-primary]')
+    ).toBeTruthy();
+  });
+
   it('shows delete button for own comment (bob)', () => {
     renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(
