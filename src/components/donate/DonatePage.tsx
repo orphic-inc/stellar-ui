@@ -23,9 +23,13 @@ const Section = ({
   children: React.ReactNode;
 }) => (
   <div>
-    <h2 className="text-lg font-semibold text-white mb-3">{title}</h2>
-    <div className="bg-gray-900 border border-gray-700 rounded-lg p-5 text-sm text-gray-300 leading-relaxed">
-      {children}
+    <h2 data-st="prose" data-st-strong className="text-lg mb-3">
+      {title}
+    </h2>
+    <div data-st="panel" className="rounded-lg p-5">
+      <div data-st="prose" className="text-sm leading-relaxed">
+        {children}
+      </div>
     </div>
   </div>
 );
@@ -35,7 +39,9 @@ const DonatePage = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-white">Donate</h1>
+      <h1 data-st="prose" data-st-strong className="text-2xl">
+        Donate
+      </h1>
 
       <Section title="Why donate?">
         <p>
@@ -64,10 +70,7 @@ const DonatePage = () => {
         <p>
           To make a donation, contact a staff member via private message. You
           can find the current staff list on the{' '}
-          <Link
-            to="/private/staff"
-            className="text-indigo-400 hover:text-indigo-300 transition-colors"
-          >
+          <Link to="/private/staff" data-st="control">
             Staff page
           </Link>
           . A staff member will provide payment details and process your
@@ -96,34 +99,32 @@ const DonatePage = () => {
                 .map(([key]) => PERK_LABELS[key] ?? key);
 
               return (
-                <div
-                  key={rank.id}
-                  className="rounded border border-gray-700 bg-gray-800/60 p-4"
-                >
+                <div key={rank.id} data-st="panel" className="rounded p-4">
                   <div className="flex items-center gap-2 mb-2">
                     {rank.badge && (
                       <span className="text-base">{rank.badge}</span>
                     )}
                     <span
-                      className="font-semibold text-white"
+                      data-st="prose"
+                      data-st-strong
                       style={{ color: rank.color || undefined }}
                     >
                       {rank.name}
                     </span>
-                    <span className="text-xs text-gray-500 ml-auto">
+                    <span data-st="meta" className="text-xs ml-auto">
                       ${rank.minDonation} minimum
                       {rank.expiresAfterDays != null &&
                         ` · expires after ${rank.expiresAfterDays} days`}
                     </span>
                   </div>
                   {enabledPerks.length > 0 ? (
-                    <ul className="list-disc list-inside space-y-0.5 text-gray-300">
+                    <ul className="list-disc list-inside space-y-0.5">
                       {enabledPerks.map((label) => (
                         <li key={label}>{label}</li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-gray-500 text-xs">
+                    <p data-st="meta" className="text-xs">
                       No additional perks configured for this rank.
                     </p>
                   )}
@@ -132,12 +133,12 @@ const DonatePage = () => {
             })}
           </div>
         ) : (
-          <p className="mt-4 text-gray-500">
+          <p data-st="prose" data-st-muted className="mt-4">
             No donor ranks are currently configured.
           </p>
         )}
 
-        <p className="mt-4 text-gray-400">
+        <p data-st="prose" data-st-muted className="mt-4">
           All donor perks are cosmetic or customization options. They are
           subject to change or cancellation at any time without notice.
         </p>
