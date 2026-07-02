@@ -4,17 +4,77 @@ All notable changes to stellar-ui are documented here.
 
 ---
 
-## [Unreleased]
+## [0.6.4] — unreleased
+
+Stylesheet authorship & integration.
+
+### Added
+
+- **kuro mapped onto the `--st-*` contract** — the dark theme now re-skins the app by redefining Role Tokens rather than shipping legacy gray `!important` shims, and the **anorex** theme is ported onto the same contract; the theme contract §4.1 documents the theme→token mapping [#159] (ADR-0005)
+
+### Fixed
+
+- Corrected theming §11 post-conversion verification to probe un-migrated islands with **Layer Cake** (token-only), not kuro — kuro's legacy shims mask the very islands the probe is meant to surface [#159]
+
+### Planned
+
+- Member-authored **AuthorStylesheet** flow — register the anorex `Stylesheet` record (stellar-api #255), register the author-stylesheet routes in OpenAPI (stellar-api #239), and paginate the author list (#146); plus building dark-ambient's missing stylesheet
+
+---
+
+## [0.6.3] — 2026-07-01
+
+Remaining-surface theming sweep — the long tail of member-facing pages migrated onto the `data-st` contract.
+
+### Added
+
+- **Edition disclosure** wired on `ReleasePage` + `CollageDetail` [#129]
+- **Modal primitive** added to the UI kit and adopted across all six modal sites [#151] (ADR-0007)
+
+### Changed
+
+- Migrated the remaining surfaces onto the `data-st` contract: the Artist and Release detail pages; the browse tables — Contributions, CollageBrowse, ArtistBrowse, UserBrowse [#148]; the Top 10 set — History, Tags, Votes, Users, Releases, and the shell [#149]; Wiki (view / edit / list / history) + Rules [#150]; Messages — Inbox, Sent, Drafts, Compose, Conversation, and the forum PostBox [#152]; Reports & Tickets — queues, detail, forms, canned responses [#153]; Requests — list, detail, create [#154]; the Private homepage (dropping the non-staff Blog card) [#156] and the private tail — SnatchList, Bookmarks, Friends, and the site / user stats histories [#157]; misc pages + `CommentsSection` + `DonatePage`, and `UserWarningsPage` adopted onto the kit [#158]
+- Added the §11 post-conversion verification procedure to `docs/theming.md`
+
+---
+
+## [0.6.2] — 2026-06-30
+
+Staff Toolbox information architecture + the UI primitive kit.
+
+### Added
+
+- **UI primitive kit** (`src/components/ui/`) — `PageShell` / `Panel` / `Button` / `Field` / `DataTable` / `Badge` / `Pagination` / `SectionHeading`; each primitive emits the `data-st` contract, so adopting one _completes_ that surface's ADR-0005/0006 migration [#139] (ADR-0007)
+
+### Changed
+
+- Adopted the kit across the staff/admin long tail — log tables, stats pages, moderation queues, CRUD clean-fit and inline-edit forms, and read-only pages — and collapsed the IP-ban / email-blacklist twins into a single `staff/Blacklist.tsx`
+- Adopted the kit on the three heavyweight admin managers — `CommunityManager`, `ForumControlPanel`, `ForumCategoryControlPanel` [#142]
+- Toolbox information architecture: collapsed the staff Toolbox sections 11 → 7 [#140]
+- Migrated the app-chrome header set (WS11) and the shells, footer, and banners (WS12) onto the `data-st` contract [#137]
+- Themed the communities listing table and community page (adopting kit `Pagination`)
+- Added **ADR-0007** (UI primitive kit); recorded rebase-only branch discipline and stopped the `docs/theming.md` §7 conflict magnet
+
+---
+
+## [0.6.1] — 2026-06-30
+
+The `--st-*` Role Token theming contract + initial surface conversion.
 
 ### Added
 
 - **Golden Rules tree** on `/private/rules` — the 6 Golden Rules + sub-rules render read-only above the prose pages, consuming `GET /api/rules/tree`; rule bodies do `${...}` token substitution, with link-vs-text decided by the resolved value's shape plus a small markdown subset [#98] (PRD-09 / ADR-0020)
 - **Community Leader** surfaced on the community header and editable in `CommunityManager` (`leaderId` on create + update; the stale `ownerId` field retired, which also fixes create for restricted communities) [#101] (ADR-0021)
 - **Lock rank** toggle on the staff "Change Rank" panel — `setUserRankLock` → `PUT /users/:id/rank-lock`, optimistic with revert-on-failure, freezing auto class-progression while manual rank changes still apply; completes the per-user `rankLocked` half of [#83] (the promotion-rule-editor half stays blocked on stellar-api #170)
+- **The `--st-*` Role Token + `data-st` hook theming contract** (ADR-0005) with its migration PRD, the table/form contract (ADR-0006), and a token-only reference theme + author guide (WS3)
 
 ### Changed
 
 - Pinned Prettier to an exact `3.5.3` (was `^3.0.0`, resolving to 3.0.0) and reformatted to match — closes the version skew with Codacy's newer Prettier, whose `(x ?? y)` parenthesization and nested-ternary indentation the old local 3.0.0 kept stripping back
+- **Collage pilot** — render `CollageDetail` from Roles/Parts (WS2); wired `global.css` into the build (WS0) and finalized the Tier-1 inventory (WS1)
+- Migrated the first surfaces onto the contract: the community release listing (WS4), `LogBrowsePage`, `ForumPage`, and `ForumTopicPage` + posts (which established the `prose`/`control` Roles); `ForumCategoryPage` + `NewTopicForm` (WS5 table + form contract); the release browser (WS6); `UserProfile` + the `chip`/`control` status modifiers (WS7); the settings forms (WS8); the invite surfaces (WS9); and the ratio surfaces (WS10)
+- Sourced Sublime's token defaults from a Tailwind `@theme` block
+- Evicted handoff/scrap docs from the committed tree
 
 ---
 
