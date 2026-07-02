@@ -132,6 +132,40 @@ source order — **no `!important`, no selectors to chase.**
 - Member-authored CSS arrives **pre-sanitized from the API** (ADR-0003); the UI
   does not re-sanitize.
 
+### 4.1 Anti-pattern — the legacy utility-override theme (and the conversion audit)
+
+**A conformant theme MUST define the `--st-*` primitive set.** A theme that
+re-skins *only* by overriding Tailwind utility classes
+(`.bg-gray-800 { … !important }`, `body { … }`) and sets **no** `--st-*` tokens is
+**not** on the contract. This is the legacy Gazelle porting shortcut, and it is a
+trap: such a theme skins surfaces that *still* carry raw `.bg-gray-*` utilities but
+**silently stops skinning any surface migrated onto the token contract** (those
+read `--st-*` tokens the theme never set, so they fall back to the Sublime look).
+It is the exact mirror of a token-only theme on a not-yet-migrated surface — and as
+the WS4 sweep converts surfaces, a utility-only theme covers *less and less*.
+
+Keeping utility overrides is fine **in addition to** the `--st-*` block (they cover
+not-yet-migrated surfaces during the sweep — see the bullet above). They are never a
+substitute for it.
+
+**Conversion audit (2026-07-02).** Only Layer Cake was ported correctly at first;
+the others shipped as utility-only and were (are being) remediated:
+
+| Theme | `--st-*` primitives | Status |
+|---|---|---|
+| `layer-cake` | all | reference theme (WS3) |
+| `sublime` | — | baseline (skins by omission; bundled Tailwind *is* Sublime) |
+| `kuro` | all | remediated — aliases its `--kuro-*` palette onto `--st-*` |
+| `anorex` | all | ported token-only (the classic Gazelle wood default) |
+| `proton` | none | **legacy utility-only — pending token pass** |
+| `postmod` | none | **legacy utility-only — pending token pass** |
+| `dark-ambient` | — | registered (has a logo) but **no stylesheet yet** |
+
+Per-theme remediation *status* is tracked in the theming handoff, not here (this
+section is the durable contract; a live checklist here becomes a merge-conflict
+magnet). The guard in `src/__tests__/themes.tokens.test.ts` pins the primitive set
+and fails any token-based theme that drops one.
+
 ---
 
 ## 5. Data readiness (WS2 finding)

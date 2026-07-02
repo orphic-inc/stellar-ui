@@ -30,6 +30,8 @@ const THEME_LOGOS: Record<string, [string, string]> = {
   'dark-ambient': [darkAmbientLogo, darkAmbientLogo],
   'layer-cake': [layerCakeLogo, layerCakeLogoHover],
   postmod: [postmodLogo, postmodLogo],
+  // anorex reuses postmod's wood logo until dedicated art lands (both are wood themes).
+  anorex: [postmodLogo, postmodLogo],
   proton: [protonLogo, protonLogo]
 };
 const DEFAULT_LOGO: [string, string] = [kuroLogo, kuroLogoHover];

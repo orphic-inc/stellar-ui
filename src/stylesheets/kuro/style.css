@@ -19,6 +19,39 @@
   --kuro-danger-hover: #8c3f3f;
   --kuro-success: #4f7a4f;
   --kuro-warning: #8a7340;
+
+  /* ─── Role Token contract (ADR-0005) ───────────────────────────────────────
+   * The real re-skin: alias the --kuro-* palette onto the --st-* primitives the
+   * migrated surfaces read through their data-st hooks. Without these kuro only
+   * skinned the legacy `.bg-gray-*` utilities below, so surfaces migrated to the
+   * token contract fell back to the Sublime look. Layer Cake is the template.
+   * The `.bg-gray-*` overrides below are KEPT: they still skin surfaces not yet
+   * on the hook contract, until the WS4 component sweep finishes. */
+  --st-backdrop: var(--kuro-bg-page);
+  --st-base: var(--kuro-bg-panel-alt);
+  --st-panel: var(--kuro-bg-panel);
+  --st-raised: var(--kuro-bg-input);
+
+  --st-text-strong: #e2e2e2;
+  --st-text: var(--kuro-text);
+  --st-text-muted: var(--kuro-text-muted);
+  --st-text-faint: var(--kuro-text-faint);
+
+  --st-accent: var(--kuro-accent);
+  --st-accent-hover: var(--kuro-accent-hover);
+  --st-accent-ring: var(--kuro-accent);
+  --st-link: var(--kuro-link);
+  --st-link-hover: var(--kuro-link-hover);
+
+  --st-border: var(--kuro-border);
+  --st-border-subtle: var(--kuro-border-muted);
+  --st-border-strong: var(--kuro-border);
+
+  --st-danger: var(--kuro-danger);
+  --st-success: var(--kuro-success);
+  --st-warning: var(--kuro-warning);
+  --st-info: var(--kuro-accent);
+  --st-lossless: var(--kuro-success);
 }
 
 /* ─── Base elements ────────────────────────────────────────────────────────── */
