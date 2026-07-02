@@ -191,3 +191,34 @@ rolling handoff, not here.**
 - The Collage renders entirely from Roles/Parts + tokens, no inline paint, no regression (WS2).
 - A power-user theme can restyle `row`/`panel`/`colhead` once and visibly re-skin every migrated surface.
 - Tier-1 stays small; every Tier-2 Part in `global.css` has a one-line justification.
+
+## 11. Post-conversion verification (do this once the surface sweep lands)
+
+The per-surface WS4 sweep (§7) migrates every user-facing and staff surface onto
+the contract; the only surface that stays bespoke by design is
+`GenerateTestDataPage` (a dev-only utility). Once the last surface PR merges, the
+contract is only as good as what the themes render — so verify against real
+themes, not just the token defaults:
+
+1. **Sublime is the regression baseline.** Sublime injects nothing — the bundled
+   Tailwind *is* Sublime and seeds the `--st-*` defaults — so every migrated
+   surface must look **identical to its pre-migration self** under Sublime. Walk
+   the app on the default theme and diff against memory/screenshots: any surface
+   that shifted (spacing, weight, a control that lost its fill, a value that went
+   faint) is a migration bug, not a theme bug. This is the "no visible change on
+   the baseline" gate — pass it first.
+2. **Then prove the contract on a real re-skin — kuro.** Switch to a fully
+   token-redefining theme (kuro, the dark theme) and walk the same surfaces. What
+   you're checking is *translation coverage*: every `panel`/`colhead`/`list`/
+   `row`/`prose`/`meta`/`control`/`field`/`chip` should pick up kuro's tokens with
+   no island of un-themed gray. Anything that stays Sublime-colored under kuro is
+   a surface that kept an inline utility instead of a Role — file it and migrate
+   the leaf. (Layer Cake is the token-only *reference* theme and only fully
+   re-skins migrated surfaces by design, so kuro — a shipped end-user theme — is
+   the more honest coverage probe.)
+3. **Spot-check the status hues** (`chip`/`control` `-warning`/`-success`/
+   `-info`/`-danger`, the `--st-*` status banners) under both themes — status
+   colour is the most likely thing to go illegible on a light re-skin.
+
+Record surface-level findings in the rolling handoff, not here; this section is
+the durable *procedure*, not a running checklist.
