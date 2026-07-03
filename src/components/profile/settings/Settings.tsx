@@ -73,9 +73,31 @@ const Settings = () => {
 
   const paranoiaValue = watch('paranoia') ?? 0;
 
+  // Site Stylesheet slot source (ADR-0024 §4) — Personal (external URL) XOR
+  // Registry (an adopted author sheet). Mirrors the server invariant: the UI
+  // never submits both; picking one nulls the other. `siteAppearance` above is a
+  // separate axis (the built-in fallback), not one of these arms.
+  const adoptedSheetId = profile?.userSettings.activeAuthorStylesheetId ?? null;
+  const [siteSheetSource, setSiteSheetSource] = useState<
+    'personal' | 'registry'
+  >('personal');
+  useEffect(() => {
+    setSiteSheetSource(adoptedSheetId != null ? 'registry' : 'personal');
+  }, [adoptedSheetId]);
+
   const onSubmit = async (data: ProfileForm) => {
+    // Enforce the one-slot invariant client-side (the API enforces it too): send
+    // only the chosen source, and null the other so the two never coexist.
+    const payload: ProfileForm =
+      siteSheetSource === 'registry'
+        ? {
+            ...data,
+            externalStylesheet: '',
+            activeAuthorStylesheetId: adoptedSheetId
+          }
+        : { ...data, activeAuthorStylesheetId: null };
     try {
-      await updateProfile(data).unwrap();
+      await updateProfile(payload).unwrap();
       dispatch(addAlert('Profile settings saved.', 'success'));
     } catch (err) {
       dispatch(
@@ -317,23 +339,62 @@ const Settings = () => {
               </select>
             </div>
 
-            <div>
-              <label
-                htmlFor="settings-stylesheet"
-                data-st="meta"
-                className="block text-sm mb-1"
-              >
-                Custom stylesheet URL
-              </label>
-              <input
-                id="settings-stylesheet"
-                type="text"
-                {...register('externalStylesheet')}
-                data-st="field"
-                className="w-full"
-              />
-              <p data-st="meta" className="text-xs mt-1">
-                If set, this URL overrides the selected stylesheet above.
+            <div className="space-y-3">
+              <p data-st="meta" className="block text-sm">
+                Site stylesheet source
+              </p>
+
+              {/* Personal — a self-hosted external URL */}
+              <div className="space-y-1">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="siteSheetSource"
+                    value="personal"
+                    checked={siteSheetSource === 'personal'}
+                    onChange={() => setSiteSheetSource('personal')}
+                    data-st="field"
+                  />
+                  <span data-st="prose" data-st-strong className="text-sm">
+                    Personal — a stylesheet you host yourself
+                  </span>
+                </label>
+                <input
+                  id="settings-stylesheet"
+                  type="text"
+                  placeholder="https://…/theme.css"
+                  {...register('externalStylesheet')}
+                  disabled={siteSheetSource !== 'personal'}
+                  data-st="field"
+                  className="w-full disabled:opacity-50"
+                />
+              </div>
+
+              {/* Registry — a stylesheet adopted from the community */}
+              <div className="space-y-1">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="siteSheetSource"
+                    value="registry"
+                    checked={siteSheetSource === 'registry'}
+                    onChange={() => setSiteSheetSource('registry')}
+                    data-st="field"
+                  />
+                  <span data-st="prose" data-st-strong className="text-sm">
+                    Registry — a stylesheet adopted from the community
+                  </span>
+                </label>
+                <p data-st="meta" className="text-xs pl-7">
+                  {adoptedSheetId != null
+                    ? `Using adopted stylesheet #${adoptedSheetId}. Adopt a different one from its page.`
+                    : 'None adopted yet — adopt one from its page to use this option.'}
+                </p>
+              </div>
+
+              <p data-st="meta" className="text-xs">
+                One source at a time — choosing one clears the other. With
+                neither set, the built-in stylesheet selected above is used.
               </p>
             </div>
 

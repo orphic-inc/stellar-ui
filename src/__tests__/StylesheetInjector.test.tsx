@@ -49,14 +49,52 @@ describe('StylesheetInjector', () => {
     expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro.css');
   });
 
+  it('injects the API /css delivery route for an adopted registry stylesheet', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { activeAuthorStylesheetId: 42 } }
+    });
+
+    render(<StylesheetInjector />);
+    expect(linkEl()?.getAttribute('href')).toBe(
+      '/api/stylesheet/author-stylesheet/42/css'
+    );
+  });
+
+  it('prefers a Personal URL over a Registry pointer (single winner, no stacking)', () => {
+    // The API enforces XOR, but if both ever arrive, external wins and only one
+    // <link> exists — never a stack.
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        userSettings: {
+          externalStylesheet: 'https://cdn.example.com/me.css',
+          activeAuthorStylesheetId: 42
+        }
+      }
+    });
+
+    render(<StylesheetInjector />);
+    expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
+    expect(linkEl()?.href).toBe('https://cdn.example.com/me.css');
+  });
+
   it('injects nothing when no theme is selected', () => {
     render(<StylesheetInjector />);
     expect(linkEl()).toBeNull();
   });
 
-  it('refuses a non-http(s) external URL scheme', () => {
+  it('refuses a non-https external URL scheme', () => {
     mockUseGetMyProfileQuery.mockReturnValue({
       data: { userSettings: { externalStylesheet: 'javascript:alert(1)' } }
+    });
+    render(<StylesheetInjector />);
+    expect(linkEl()).toBeNull();
+  });
+
+  it('refuses a plain http external URL (https only, ADR-0024 §3)', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        userSettings: { externalStylesheet: 'http://cdn.example.com/x.css' }
+      }
     });
     render(<StylesheetInjector />);
     expect(linkEl()).toBeNull();

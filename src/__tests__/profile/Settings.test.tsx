@@ -555,6 +555,91 @@ describe('Settings', () => {
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
+  it('defaults to Personal and nulls the registry pointer on save (radio mirror)', async () => {
+    const updateFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      updateFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /save settings/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(updateFn).toHaveBeenCalledWith(
+      expect.objectContaining({ activeAuthorStylesheetId: null })
+    );
+  });
+
+  it('pre-selects Registry and mirrors it on save when a sheet is adopted', async () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        ...makeProfile(),
+        userSettings: {
+          ...makeProfile().userSettings,
+          activeAuthorStylesheetId: 42
+        }
+      },
+      isLoading: false
+    });
+    const updateFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      updateFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+
+    expect(
+      screen.getByText(/using adopted stylesheet #42/i)
+    ).toBeInTheDocument();
+    const registryRadio = screen.getByRole('radio', {
+      name: /registry/i
+    }) as HTMLInputElement;
+    expect(registryRadio.checked).toBe(true);
+
+    await user.click(screen.getByRole('button', { name: /save settings/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(updateFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        externalStylesheet: '',
+        activeAuthorStylesheetId: 42
+      })
+    );
+  });
+
+  it('switching from Registry to Personal clears the adopted pointer on save', async () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        ...makeProfile(),
+        userSettings: {
+          ...makeProfile().userSettings,
+          activeAuthorStylesheetId: 42
+        }
+      },
+      isLoading: false
+    });
+    const updateFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      updateFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+
+    await user.click(screen.getByRole('radio', { name: /personal/i }));
+    await user.click(screen.getByRole('button', { name: /save settings/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(updateFn).toHaveBeenCalledWith(
+      expect.objectContaining({ activeAuthorStylesheetId: null })
+    );
+  });
+
   it('pre-selects the radio button matching the saved paranoia level', async () => {
     const profile = makeProfile();
     profile.userSettings.paranoia = 2;
