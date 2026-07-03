@@ -889,6 +889,7 @@ export interface paths {
             profileInfo?: string;
             siteAppearance?: string;
             externalStylesheet?: string | '';
+            activeAuthorStylesheetId?: number | null;
             styledTooltips?: boolean;
             paranoia?: number | null;
             /** @enum {string} */
@@ -12300,6 +12301,7 @@ export interface components {
       id: number;
       siteAppearance: string;
       externalStylesheet?: string | null;
+      activeAuthorStylesheetId?: number | null;
       styledTooltips: boolean;
       paranoia: number;
       /** @enum {string} */
