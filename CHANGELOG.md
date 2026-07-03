@@ -11,6 +11,7 @@ Stylesheet authorship & integration.
 ### Added
 
 - **kuro mapped onto the `--st-*` contract** — the dark theme now re-skins the app by redefining Role Tokens rather than shipping legacy gray `!important` shims, and the **anorex** theme is ported onto the same contract; the theme contract §4.1 documents the theme→token mapping [#159] (ADR-0005)
+- **Registry stylesheet injection + Personal/Registry radio** — the injector links an adopted author sheet's `text/css` delivery route (`activeAuthorStylesheetId` → `/api/stylesheet/author-stylesheet/:id/css`) as a third source, single-winner precedence, no stacking; Settings presents the Site Stylesheet slot as a mutually-exclusive Personal⟷Registry radio mirroring the server invariant; `isInjectableUrl` is `https:`-only [#162] (ADR-0008; stellar-api ADR-0024)
 
 ### Fixed
 
@@ -18,7 +19,7 @@ Stylesheet authorship & integration.
 
 ### Planned
 
-- Member-authored **AuthorStylesheet** flow — register the anorex `Stylesheet` record (stellar-api #255), register the author-stylesheet routes in OpenAPI (stellar-api #239), and paginate the author list (#146); plus building dark-ambient's missing stylesheet
+- Member-authored **AuthorStylesheet** flow, remaining pieces — seed the anorex `AuthorStylesheet` registry fixture (the static file becomes canonical stored source, stellar-api ADR-0024), paginate the author list + rank-gated registry-spaces limit (#146), and the theme-FOUC fix (#161); plus building dark-ambient's missing stylesheet
 
 ---
 
