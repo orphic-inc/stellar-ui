@@ -80,8 +80,14 @@ describe('Toolbox', () => {
   it('shows staff-accessible links for staff user', () => {
     mockUseAppSelector.mockReturnValue(staffUser);
     renderWithProviders(<Toolbox />);
+    // The ticket queue moved to the Staff Inbox nav (one role-dispatched entry),
+    // so it is no longer a standalone Toolbox tool; canned responses remains the
+    // staff_inbox_manage Toolbox affordance.
     expect(
-      screen.getByRole('link', { name: /ticket queue/i })
+      screen.queryByRole('link', { name: /ticket queue/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /canned responses/i })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /reports queue/i })
