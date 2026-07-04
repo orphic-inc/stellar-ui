@@ -10,9 +10,7 @@ import SiteSettingsPage from '../admin/SiteSettingsPage';
 import StylesheetManager from '../admin/StylesheetManager';
 import RatioPolicyPanel from '../admin/RatioPolicyPanel';
 import RulesManager from '../admin/RulesManager';
-import TicketQueuePage from '../staffInbox/TicketQueuePage';
 import CannedResponsesPage from '../staffInbox/CannedResponsesPage';
-import TicketView from '../staffInbox/TicketView';
 import ReportsQueuePage from '../reports/ReportsQueuePage';
 import ReportDetailPage from '../reports/ReportDetailPage';
 import StaffGroupsPage from './StaffGroupsPage';
@@ -369,25 +367,13 @@ export const staffTools: StaffToolDefinition[] = [
     element: <GenerateTestDataPage />,
     section: 'Administration'
   },
-  {
-    id: 'ticket-queue',
-    path: 'staff/tickets',
-    label: 'Ticket queue',
-    permissions: ['staff_inbox_manage'],
-    element: <TicketQueuePage />,
-    section: 'Moderation'
-  },
-  {
-    id: 'ticket-detail',
-    path: 'staff/tickets/:id',
-    label: 'Ticket queue',
-    permissions: ['staff_inbox_manage'],
-    element: <TicketView />,
-    showInToolbox: false
-  },
+  // The staff ticket queue + a single ticket are served under the Staff Inbox
+  // namespace (StaffInboxPage dispatch at /private/inbox/staff, and
+  // /private/inbox/staff/:id), not as standalone staff tools — one
+  // role-dispatched Staff Inbox entry, no duplicate "Staff Queue".
   {
     id: 'canned-responses',
-    path: 'staff/inbox/responses',
+    path: 'inbox/staff/responses',
     label: 'Canned responses',
     permissions: ['staff_inbox_manage'],
     element: <CannedResponsesPage />,

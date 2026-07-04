@@ -108,9 +108,9 @@ const TicketView = () => {
 
   const isResolved = ticket.status === 'Resolved';
   const isOwner = ticket.user?.id === currentUser?.id;
-  const backLink = canManageTicket
-    ? '/private/staff/tickets'
-    : '/private/inbox/staff';
+  // Staff Inbox is one namespace; only the label reflects which view the
+  // staffer came from (the shared queue vs. their own tickets).
+  const backLink = '/private/inbox/staff';
   const backLabel = canManageTicket ? '← Ticket Queue' : '← My Tickets';
 
   return (

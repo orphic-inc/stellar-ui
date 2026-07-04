@@ -5,6 +5,7 @@ import PrivateHeader from '../../components/pages/private/layout/PrivateHeader';
 
 const mockUseGetUnreadCountQuery = jest.fn();
 const mockUseGetQueueCountQuery = jest.fn();
+const mockUseGetMyTicketCountQuery = jest.fn();
 
 jest.mock('../../components/layout/UserMenu', () => ({
   __esModule: true,
@@ -95,7 +96,7 @@ jest.mock('../../store/services/messagesApi', () => ({
 
 jest.mock('../../store/services/staffInboxApi', () => ({
   useGetQueueCountQuery: () => mockUseGetQueueCountQuery(),
-  useGetMyTicketCountQuery: () => ({ data: { count: 0 } })
+  useGetMyTicketCountQuery: () => mockUseGetMyTicketCountQuery()
 }));
 
 const mockUser = {
@@ -115,6 +116,7 @@ describe('PrivateHeader', () => {
     jest.clearAllMocks();
     mockUseGetUnreadCountQuery.mockReturnValue({ data: { count: 0 } });
     mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 0 } });
+    mockUseGetMyTicketCountQuery.mockReturnValue({ data: { count: 0 } });
   });
 
   it('renders Stellar brand link', () => {
@@ -164,14 +166,9 @@ describe('PrivateHeader', () => {
     ).toBeInTheDocument();
   });
 
-  it('hides Staff Queue link for non-staff users', () => {
-    renderWithProviders(<PrivateHeader user={mockUser as never} />);
-    expect(
-      screen.queryByRole('link', { name: /staff queue/i })
-    ).not.toBeInTheDocument();
-  });
-
-  it('shows Staff Queue link for staff users', () => {
+  // Staff Inbox is one role-dispatched entry — there is no separate "Staff
+  // Queue" link (the queue is what a staffer sees under Staff Inbox).
+  it('does not render a separate Staff Queue link, even for staff', () => {
     const staffUser = {
       ...mockUser,
       userRank: {
@@ -181,8 +178,8 @@ describe('PrivateHeader', () => {
     };
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
     expect(
-      screen.getByRole('link', { name: /staff queue/i })
-    ).toBeInTheDocument();
+      screen.queryByRole('link', { name: /staff queue/i })
+    ).not.toBeInTheDocument();
   });
 
   it('shows ModBar for staff users', () => {
@@ -213,7 +210,7 @@ describe('PrivateHeader', () => {
     expect(screen.getByText('4')).toBeInTheDocument();
   });
 
-  it('shows staff inbox badge when there are pending tickets', () => {
+  it('Staff Inbox badge counts the queue for staff (unanswered tickets)', () => {
     const staffUser = {
       ...mockUser,
       userRank: {
@@ -222,8 +219,20 @@ describe('PrivateHeader', () => {
       }
     };
     mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 7 } });
+    mockUseGetMyTicketCountQuery.mockReturnValue({ data: { count: 2 } });
     renderWithProviders(<PrivateHeader user={staffUser as never} />);
+    // Staff see the queue count, not their own tickets.
     expect(screen.getByText('7')).toBeInTheDocument();
+    expect(screen.queryByText('2')).not.toBeInTheDocument();
+  });
+
+  it('Staff Inbox badge counts own unread for non-staff members', () => {
+    mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 7 } });
+    mockUseGetMyTicketCountQuery.mockReturnValue({ data: { count: 3 } });
+    renderWithProviders(<PrivateHeader user={mockUser as never} />);
+    // Members see their own unread, never the staff queue count.
+    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.queryByText('7')).not.toBeInTheDocument();
   });
 
   it('shows 0 B for contributed and consumed when user has no data', () => {

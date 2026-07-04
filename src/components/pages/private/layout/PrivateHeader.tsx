@@ -65,6 +65,10 @@ const PrivateHeader = ({ user }: Props) => {
   const inboxUnread = inboxData?.count ?? 0;
   const ticketUnread = ticketData?.count ?? 0;
   const myTicketUnread = myTicketData?.count ?? 0;
+  // Staff Inbox is one role-dispatched entry: staff who manage the queue see it
+  // (StaffInboxPage → TicketQueuePage), so the badge counts unanswered queue
+  // tickets; everyone else sees their own conversations and their own unread.
+  const staffInboxUnread = showStaffQueue ? ticketUnread : myTicketUnread;
 
   const uploaded = user.contributed
     ? formatBytes(Number(user.contributed))
@@ -133,25 +137,12 @@ const PrivateHeader = ({ user }: Props) => {
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Staff Inbox
-              {myTicketUnread > 0 && (
+              {staffInboxUnread > 0 && (
                 <span className="ml-1 bg-[var(--st-warning)] text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
-                  {myTicketUnread}
+                  {staffInboxUnread}
                 </span>
               )}
             </Link>
-            {showStaffQueue && (
-              <Link
-                to="/private/staff/tickets"
-                className="hover:text-[var(--st-text)] transition-colors"
-              >
-                Staff Queue
-                {ticketUnread > 0 && (
-                  <span className="ml-1 bg-[var(--st-warning)] text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
-                    {ticketUnread}
-                  </span>
-                )}
-              </Link>
-            )}
             <Link
               to="/private/contribute/list"
               className="hover:text-[var(--st-text)] transition-colors"

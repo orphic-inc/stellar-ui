@@ -16,6 +16,7 @@ Stylesheet authorship & integration.
 ### Fixed
 
 - Corrected theming §11 post-conversion verification to probe un-migrated islands with **Layer Cake** (token-only), not kuro — kuro's legacy shims mask the very islands the probe is meant to surface [#159]
+- **Staff Inbox is one role-dispatched entry** — removed the duplicate "Staff Queue" nav item so staff no longer land on a ticket queue indistinguishable from the reports queue. Staff see the queue at Staff Inbox, members see their own tickets; the unread badge is role-aware (queue count for staff, own unread for members). Records the model in stellar-api ADR-0025.
 
 ### Planned
 
