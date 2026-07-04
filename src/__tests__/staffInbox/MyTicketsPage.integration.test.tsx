@@ -130,7 +130,7 @@ describe('MyTicketsPage RTK Query integration', () => {
     await screen.findByText('Cannot download');
     expect(
       screen.getByRole('link', { name: /cannot download/i })
-    ).toHaveAttribute('href', '/private/messages/tickets/3');
+    ).toHaveAttribute('href', '/private/inbox/staff/3');
     expect(screen.getByText('Unanswered')).toBeInTheDocument();
     expect(screen.getByText('staffmod')).toBeInTheDocument();
   });

@@ -34,11 +34,7 @@ const MyTicketsPage = () => {
         <h2 data-st="prose" data-st-strong className="text-xl">
           My Support Tickets
         </h2>
-        <Link
-          to="/private/messages/tickets/new"
-          data-st="control"
-          data-st-primary
-        >
+        <Link to="/private/inbox/staff/new" data-st="control" data-st-primary>
           New Ticket
         </Link>
       </div>
@@ -63,7 +59,7 @@ const MyTicketsPage = () => {
                 <tr key={ticket.id} data-st="row">
                   <td className="py-2 pr-3">
                     <Link
-                      to={`/private/messages/tickets/${ticket.id}`}
+                      to={`/private/inbox/staff/${ticket.id}`}
                       data-st="control"
                     >
                       {!ticket.isReadByUser &&

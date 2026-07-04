@@ -544,7 +544,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                             <td>
                               {conversation.viewerCanOpen ? (
                                 <Link
-                                  to={`/private/messages/tickets/${conversation.id}`}
+                                  to={`/private/inbox/staff/${conversation.id}`}
                                   data-st="title"
                                 >
                                   {conversation.subject}

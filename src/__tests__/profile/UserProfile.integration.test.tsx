@@ -310,7 +310,7 @@ describe('UserProfile RTK Query integration', () => {
     expect(screen.getByText('2')).toBeInTheDocument(); // unresolved
     expect(
       screen.getByRole('link', { name: 'Ticket subject' })
-    ).toHaveAttribute('href', '/private/messages/tickets/101');
+    ).toHaveAttribute('href', '/private/inbox/staff/101');
     expect(screen.getByText('modperson')).toBeInTheDocument();
     expect(screen.getByText('Open')).toBeInTheDocument();
   });

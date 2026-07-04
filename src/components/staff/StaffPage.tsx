@@ -87,7 +87,7 @@ const StaffPage = () => {
       backTo={null}
       actions={
         <Link
-          to="/private/messages/tickets/new"
+          to="/private/inbox/staff/new"
           data-st="control"
           data-st-primary
           className="text-sm"

@@ -110,7 +110,7 @@ const TicketView = () => {
   const isOwner = ticket.user?.id === currentUser?.id;
   const backLink = canManageTicket
     ? '/private/staff/tickets'
-    : '/private/messages/tickets';
+    : '/private/inbox/staff';
   const backLabel = canManageTicket ? '← Ticket Queue' : '← My Tickets';
 
   return (

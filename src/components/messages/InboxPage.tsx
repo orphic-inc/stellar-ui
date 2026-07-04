@@ -70,13 +70,6 @@ const InboxPage = () => {
           >
             Drafts
           </Link>
-          <Link
-            to="/private/messages/tickets"
-            data-st="control"
-            className="px-3 py-1 rounded border border-[var(--st-border)]"
-          >
-            Support
-          </Link>
         </div>
       </div>
 

@@ -35,7 +35,7 @@ import InboxPage from '../../../messages/InboxPage';
 import SentboxPage from '../../../messages/SentboxPage';
 import ComposeForm from '../../../messages/ComposeForm';
 import ConversationView from '../../../messages/ConversationView';
-import MyTicketsPage from '../../../staffInbox/MyTicketsPage';
+import StaffInboxPage from '../../../staffInbox/StaffInboxPage';
 import NewTicketForm from '../../../staffInbox/NewTicketForm';
 import TicketView from '../../../staffInbox/TicketView';
 import ReportForm from '../../../reports/ReportForm';
@@ -168,9 +168,9 @@ const PrivateContent = () => (
     <Route path="collages/:id" element={wrap(CollageDetail)} />
     <Route path="collages" element={wrap(CollageBrowse)} />
 
-    <Route path="messages/tickets/new" element={wrap(NewTicketForm)} />
-    <Route path="messages/tickets/:id" element={wrap(TicketView)} />
-    <Route path="messages/tickets" element={wrap(MyTicketsPage)} />
+    <Route path="inbox/staff/new" element={wrap(NewTicketForm)} />
+    <Route path="inbox/staff/:id" element={wrap(TicketView)} />
+    <Route path="inbox/staff" element={wrap(StaffInboxPage)} />
     <Route path="messages/drafts" element={wrap(DraftsPage)} />
     <Route path="messages/new" element={wrap(ComposeForm)} />
     <Route path="messages/sent" element={wrap(SentboxPage)} />

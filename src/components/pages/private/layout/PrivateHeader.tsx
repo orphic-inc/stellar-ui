@@ -129,7 +129,7 @@ const PrivateHeader = ({ user }: Props) => {
               )}
             </Link>
             <Link
-              to="/private/messages/tickets"
+              to="/private/inbox/staff"
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Staff Inbox
