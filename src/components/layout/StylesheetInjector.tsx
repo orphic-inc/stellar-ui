@@ -3,6 +3,9 @@ import { useGetMyProfileQuery } from '../../store/services/profileApi';
 import { useGetStylesheetsQuery } from '../../store/services/siteApi';
 
 const LINK_ID = 'stellar-theme';
+// Keep in sync with src/preapply-theme.js, which pre-applies this key's value
+// before React mounts to avoid a cold-load FOUC (ADR-0024 §4).
+const STORAGE_KEY = 'stellar-theme-href';
 
 // A theme may restyle anything it likes — visual freedom is the point (ADR-0003).
 // The only boundary is code injection, which is held elsewhere: author CSS is
@@ -41,29 +44,38 @@ const StylesheetInjector = () => {
   // source, then the built-in fallback, then Sublime. No stacking: the slot is
   // Personal XOR Registry (the API enforces that), so at most one of the first
   // two branches is ever populated.
-  const href: string | null = (() => {
+  //
+  // `undefined` is a distinct "not resolved yet" state from `null` ("resolved:
+  // no theme") — profile/stylesheets are momentarily undefined on cold mount,
+  // before either query has returned. Collapsing that into `null` would make
+  // the effect below tear down the pre-applied link (src/preapply-theme.js)
+  // before the real answer arrives, reintroducing the FOUC it exists to avoid.
+  const href: string | null | undefined = (() => {
+    if (profile === undefined) return undefined;
     if (externalStylesheet) {
       return isInjectableUrl(externalStylesheet) ? externalStylesheet : null;
     }
     if (activeAuthorStylesheetId != null) {
       return registryCssHref(activeAuthorStylesheetId);
     }
-    if (!siteAppearance || !stylesheets) return null;
+    if (!siteAppearance || siteAppearance === 'sublime') return null;
+    if (stylesheets === undefined) return undefined;
     const match = stylesheets.find((s) => s.name === siteAppearance);
-    if (!match) return null;
-    // Sublime has an empty stylesheet — no link needed
-    if (siteAppearance === 'sublime') return null;
-    return match.cssUrl;
+    return match ? match.cssUrl : null;
   })();
 
   useEffect(() => {
+    if (href === undefined) return;
+
     const existing = document.getElementById(LINK_ID) as HTMLLinkElement | null;
     if (!href) {
       existing?.remove();
+      window.localStorage.removeItem(STORAGE_KEY);
       return;
     }
     if (existing) {
       existing.href = href;
+      window.localStorage.setItem(STORAGE_KEY, href);
       return;
     }
     const link = document.createElement('link');
@@ -72,6 +84,7 @@ const StylesheetInjector = () => {
     link.type = 'text/css';
     link.href = href;
     document.head.appendChild(link);
+    window.localStorage.setItem(STORAGE_KEY, href);
 
     return () => {
       document.getElementById(LINK_ID)?.remove();

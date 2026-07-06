@@ -2,6 +2,11 @@
 <html lang="en" class="h-full">
   <head>
     <meta charset="utf-8" />
+    <!-- Must run before #root parses: pre-applies the last-resolved theme
+         link from localStorage so first paint isn't base-state (ADR-0024 §4).
+         No defer/async — a classic same-origin script blocks parsing, which
+         is the point. See StylesheetInjector.tsx for the adoption side. -->
+    <script src="/preapply-theme.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Stellar</title>
   </head>

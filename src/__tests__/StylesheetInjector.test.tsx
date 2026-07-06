@@ -13,12 +13,14 @@ jest.mock('../store/services/siteApi', () => ({
 import StylesheetInjector from '../components/layout/StylesheetInjector';
 
 const LINK_ID = 'stellar-theme';
+const STORAGE_KEY = 'stellar-theme-href';
 const linkEl = () => document.getElementById(LINK_ID) as HTMLLinkElement | null;
 
 beforeEach(() => {
   mockUseGetMyProfileQuery.mockReturnValue({ data: undefined });
   mockUseGetStylesheetsQuery.mockReturnValue({ data: undefined });
   linkEl()?.remove();
+  window.localStorage.clear();
 });
 
 describe('StylesheetInjector', () => {
@@ -78,6 +80,9 @@ describe('StylesheetInjector', () => {
   });
 
   it('injects nothing when no theme is selected', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({ data: { userSettings: {} } });
+    mockUseGetStylesheetsQuery.mockReturnValue({ data: [] });
+
     render(<StylesheetInjector />);
     expect(linkEl()).toBeNull();
   });
@@ -106,5 +111,62 @@ describe('StylesheetInjector', () => {
     });
     render(<StylesheetInjector />);
     expect(linkEl()).toBeNull();
+  });
+
+  it('writes the resolved href to localStorage for the cold-load pre-apply script', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { siteAppearance: 'kuro' } }
+    });
+    mockUseGetStylesheetsQuery.mockReturnValue({
+      data: [{ name: 'kuro', cssUrl: '/stylesheets/kuro.css' }]
+    });
+
+    render(<StylesheetInjector />);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(
+      '/stylesheets/kuro.css'
+    );
+  });
+
+  it('clears the stored href once resolved to no theme, so a stale value cannot win a future cold load', () => {
+    window.localStorage.setItem(STORAGE_KEY, '/stylesheets/kuro.css');
+    mockUseGetMyProfileQuery.mockReturnValue({ data: { userSettings: {} } });
+    mockUseGetStylesheetsQuery.mockReturnValue({ data: [] });
+
+    render(<StylesheetInjector />);
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  it('adopts a pre-applied <link> in place instead of creating a duplicate', () => {
+    // Simulates src/preapply-theme.js already having run before mount.
+    const preapplied = document.createElement('link');
+    preapplied.id = LINK_ID;
+    preapplied.rel = 'stylesheet';
+    preapplied.href = '/stylesheets/stale.css';
+    document.head.appendChild(preapplied);
+
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { siteAppearance: 'kuro' } }
+    });
+    mockUseGetStylesheetsQuery.mockReturnValue({
+      data: [{ name: 'kuro', cssUrl: '/stylesheets/kuro.css' }]
+    });
+
+    render(<StylesheetInjector />);
+    expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
+    expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro.css');
+  });
+
+  it('does not touch a pre-applied <link> while the resolving queries are still loading', () => {
+    const preapplied = document.createElement('link');
+    preapplied.id = LINK_ID;
+    preapplied.rel = 'stylesheet';
+    preapplied.href = '/stylesheets/kuro.css';
+    document.head.appendChild(preapplied);
+
+    // Default beforeEach mocks: both queries report `data: undefined`, i.e. still loading.
+    render(<StylesheetInjector />);
+
+    expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
+    expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro.css');
   });
 });

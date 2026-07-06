@@ -73,6 +73,11 @@ const plugins = [
   new CopyPlugin({
     patterns: [
       { from: 'src/stylesheets', to: 'stylesheets' },
+      // Cold-load theme pre-apply script (ADR-0024 §4) — must be a plain,
+      // unbundled same-origin file so it satisfies script-src 'self' without
+      // an inline-script CSP exception, and runs standalone before the app
+      // bundle even starts loading.
+      { from: 'src/preapply-theme.js', to: 'preapply-theme.js' },
       // The footer links to these repo-root files as raw paths (/LICENSE,
       // /CHANGELOG.md). Emit them into the output root so they resolve as real
       // assets in dev and prod — otherwise historyApiFallback swallows /LICENSE
@@ -145,7 +150,16 @@ export default {
         use: [
           {
             loader: 'html-loader',
-            options: { minimize: true }
+            options: {
+              minimize: true,
+              sources: {
+                // The pre-apply script (ADR-0024 §4) is deployed as a static,
+                // unbundled file via CopyPlugin, not a webpack module — html-loader
+                // would otherwise try to resolve its root-absolute src as an
+                // import and fail the build.
+                urlFilter: (_attribute, value) => value !== '/preapply-theme.js'
+              }
+            }
           }
         ]
       },
