@@ -85,10 +85,11 @@ const StylesheetInjector = () => {
     link.href = href;
     document.head.appendChild(link);
     window.localStorage.setItem(STORAGE_KEY, href);
-
-    return () => {
-      document.getElementById(LINK_ID)?.remove();
-    };
+    // No unmount cleanup here on purpose: this is a singleton that outlives
+    // every render, and registering one would remove+recreate the <link> on
+    // every href change instead of mutating it in place like the adopt branch
+    // above — a churn asymmetry between "started from an adopted link" and
+    // "started from one we created" that's otherwise invisible but needless.
   }, [href]);
 
   return null;

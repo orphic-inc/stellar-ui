@@ -51,6 +51,31 @@ describe('StylesheetInjector', () => {
     expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro.css');
   });
 
+  it('mutates the existing <link> in place on a live theme switch, whether it was created or adopted', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { siteAppearance: 'kuro' } }
+    });
+    mockUseGetStylesheetsQuery.mockReturnValue({
+      data: [
+        { name: 'kuro', cssUrl: '/stylesheets/kuro.css' },
+        { name: 'proton', cssUrl: '/stylesheets/proton.css' }
+      ]
+    });
+
+    const { rerender } = render(<StylesheetInjector />);
+    const firstLink = linkEl();
+    expect(firstLink?.getAttribute('href')).toBe('/stylesheets/kuro.css');
+
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { siteAppearance: 'proton' } }
+    });
+    rerender(<StylesheetInjector />);
+
+    expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
+    expect(linkEl()).toBe(firstLink);
+    expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/proton.css');
+  });
+
   it('injects the API /css delivery route for an adopted registry stylesheet', () => {
     mockUseGetMyProfileQuery.mockReturnValue({
       data: { userSettings: { activeAuthorStylesheetId: 42 } }
