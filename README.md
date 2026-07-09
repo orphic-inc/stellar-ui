@@ -14,7 +14,7 @@ The UI is the front door to Stellar's invite-only Communities — browsing/contr
 
 ## Documentation
 
-The README is the lamp-post. Product/decision specs live in **stellar-api** [`docs/`](https://github.com/orphic-inc/stellar-api/tree/main/docs); UI-specific notes live alongside the code.
+The README is the lamp-post; the developer guide is **[`docs/README.md`](docs/README.md)** (architecture, theming, extending the UI). Product/decision specs live in **stellar-api** [`docs/`](https://github.com/orphic-inc/stellar-api/tree/main/docs); UI-owned decisions are in [`docs/adr/`](docs/adr/) and [`docs/theming.md`](docs/theming.md).
 
 | Doc                                                                                                                                              | Covers                                                   |
 | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
@@ -41,8 +41,8 @@ If you prefer to run the UI directly on your local machine for development:
 
 ### 1. Prerequisites
 
-- Node.js (LTS version)
-- The [stellar-api](https://github.com/orphic-inc/stellar-api) backend running locally.
+- **Node.js 22** (see `.nvmrc` / the `engines` field in `package.json`) — `nvm use` picks it up.
+- The [stellar-api](https://github.com/orphic-inc/stellar-api) backend **running locally** — the UI is a pure client; every data call goes to the API. The fastest full stack is [stellar-compose](https://github.com/orphic-inc/stellar-compose).
 
 ### 2. Installation
 
@@ -54,15 +54,20 @@ npm install
 
 ### 3. Environment Variables
 
-You may need to provide environment variables. Typically, the default settings assume the API is running locally on port `8080`.
+Copy `.env.example` to `.env` (webpack loads `.env`, then `.env.local` as an override). All variables have working defaults for a standard local setup:
 
-| Variable          | Description                    | Default     |
-| ----------------- | ------------------------------ | ----------- |
-| `STELLAR_API_URL` | URL pointing to the API server | _undefined_ |
+| Variable          | Description                                  | Default                 |
+| ----------------- | -------------------------------------------- | ----------------------- |
+| `STELLAR_API_URL` | Where the dev server proxies `/api` requests | `http://localhost:8080` |
+| `SENTRY_DSN`      | Error reporting — leave blank to disable     | _(blank)_               |
+
+The Playwright e2e vars (`API_URL`, `BASE_URL`, `TEST_*`) are documented inline in `.env.example`.
+
+> **The dev server proxies only `/api`.** `npm start` serves the SPA on `:9000` and proxies **only** requests under `/api` to `STELLAR_API_URL` (`:8080`); everything else falls through to `index.html` (SPA routing). So if your API calls 404 or hit CORS, the usual cause is the API not running on `:8080` — not a UI bug. Static `/stylesheets` are served by the dev server directly.
 
 ### 4. Running the UI
 
-Start the development server with hot-module replacement (HMR):
+Start the development server (Webpack, with hot-module replacement) on `http://localhost:9000`:
 
 ```bash
 npm start
@@ -72,16 +77,18 @@ Alternatively, simulate a production build with `npm run build`.
 
 ## OpenAPI Synchronization
 
-Stellar utilizes OpenAPI to ensure type safety between the frontend and backend.
-If the API schema has been updated, you can pull the latest TypeScript types into the UI automatically.
+Stellar uses an OpenAPI contract to keep types in sync between the frontend and backend. There are two commands — use the right one:
 
-**Note**: This command assumes that the `stellar-api` directory is checked out _adjacent_ to your `stellar-ui` directory.
+- **`npm run api:sync`** — copies the **fresh** `openapi.json` from the sibling `../stellar-api` checkout into `src/types/openapi.json`, then regenerates `src/types/api.ts`. Use this when the API contract has actually changed.
+- **`npm run api:generate`** — regenerates `src/types/api.ts` from the **already-vendored** `src/types/openapi.json` only. It does **not** pull anything from stellar-api.
 
 ```bash
-npm run api:generate
+# API contract changed → pull it in and regenerate (stellar-api must be a sibling: ../stellar-api)
+npm run api:sync
+npx tsc --noEmit          # verify no type regressions
 ```
 
-This script will execute the export script in the adjacent API repo, parse the resulting `openapi.json`, and regenerate the `src/types/api.ts` file in the UI repository.
+Commit the regenerated `src/types/api.ts` (and `src/types/openapi.json` when it changed). The vendored contract and its CI freshness gate are stellar-ui ADR-0002/0004.
 
 ## Testing
 

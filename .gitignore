@@ -5,6 +5,7 @@ e2e/.auth/
 playwright-report/
 test-results/
 .env
+.env.local
 .DS_Store
 
 # Photoshop sources — keep local, not in git (LFS TBD)
