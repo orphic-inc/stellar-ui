@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Stellar API",
-    "version": "0.6.1",
+    "version": "0.6.4",
     "description": "REST API for the Stellar community tracker. All routes under `/api/*`. Authentication uses JWT cookies (`token` cookie set on login)."
   },
   "servers": [
@@ -77,6 +77,56 @@
           "page",
           "limit",
           "totalPages"
+        ]
+      },
+      "AuthorRef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "username": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDonor": {
+            "type": "boolean"
+          },
+          "donorRank": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "badge": {
+                "type": "string"
+              },
+              "color": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "badge",
+              "color"
+            ]
+          },
+          "warned": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "avatar",
+          "isDonor",
+          "donorRank",
+          "warned"
         ]
       },
       "LoginBody": {
@@ -189,6 +239,9 @@
                 }
               },
               "personalCollageLimit": {
+                "type": "integer"
+              },
+              "authorStylesheetLimit": {
                 "type": "integer"
               }
             },
@@ -1036,11 +1089,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/DonorPresentation"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "collageShelves": {
             "$ref": "#/components/schemas/ProfileCollageShelves"
@@ -1049,11 +1100,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/ProfileStaffPmOverview"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "recentContributions": {
             "type": "array",
@@ -1077,11 +1126,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/CommunityStats"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           }
         },
         "required": [
@@ -1202,11 +1249,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/DonorPresentation"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "collageShelves": {
             "$ref": "#/components/schemas/ProfileCollageShelves"
@@ -1215,11 +1260,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/ProfileStaffPmOverview"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "recentContributions": {
             "type": "array",
@@ -1243,11 +1286,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/CommunityStats"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "userSettings": {
             "$ref": "#/components/schemas/UserSettings"
@@ -1891,7 +1932,11 @@
               "request_filled",
               "collage_updated",
               "comment_sub",
-              "artist_release"
+              "artist_release",
+              "site_news",
+              "global_notice",
+              "rank_promoted",
+              "rank_demoted"
             ]
           },
           "actorId": {
@@ -2068,6 +2113,33 @@
           "authorId",
           "name",
           "source",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AuthorStylesheetListItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "authorId": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "authorId",
+          "name",
           "createdAt",
           "updatedAt"
         ]
@@ -2252,26 +2324,11 @@
             "type": "number"
           },
           "author": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              },
-              "avatar": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
+            "$ref": "#/components/schemas/AuthorRef"
           },
           "lastPost": {
             "type": "object",
+            "nullable": true,
             "properties": {
               "id": {
                 "type": "number"
@@ -2280,19 +2337,7 @@
                 "type": "string"
               },
               "author": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "number"
-                  },
-                  "username": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "id",
-                  "username"
-                ]
+                "$ref": "#/components/schemas/AuthorRef"
               }
             },
             "required": [
@@ -2418,23 +2463,7 @@
             "$ref": "#/components/schemas/ForumPostLastEdit"
           },
           "author": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              },
-              "avatar": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
+            "$ref": "#/components/schemas/AuthorRef"
           },
           "createdAt": {
             "type": "string"
@@ -3598,6 +3627,9 @@
           "personalCollageLimit": {
             "type": "integer"
           },
+          "authorStylesheetLimit": {
+            "type": "integer"
+          },
           "displayStaff": {
             "type": "boolean"
           },
@@ -3716,23 +3748,7 @@
             "type": "string"
           },
           "author": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              },
-              "avatar": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
+            "$ref": "#/components/schemas/AuthorRef"
           }
         },
         "required": [
@@ -4071,23 +4087,7 @@
             "type": "string"
           },
           "user": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              },
-              "avatar": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
+            "$ref": "#/components/schemas/AuthorRef"
           }
         },
         "required": [
@@ -4132,23 +4132,7 @@
             "type": "string"
           },
           "user": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "number"
-              },
-              "username": {
-                "type": "string"
-              },
-              "avatar": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "id",
-              "username"
-            ]
+            "$ref": "#/components/schemas/AuthorRef"
           }
         },
         "required": [
@@ -4208,25 +4192,6 @@
           "updatedAt"
         ]
       },
-      "MessageUser": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "username": {
-            "type": "string"
-          },
-          "avatar": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "id",
-          "username"
-        ]
-      },
       "PrivateMessage": {
         "type": "object",
         "properties": {
@@ -4245,7 +4210,7 @@
           "sender": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MessageUser"
+                "$ref": "#/components/schemas/AuthorRef"
               },
               {
                 "nullable": true
@@ -4290,7 +4255,7 @@
             "nullable": true
           },
           "user": {
-            "$ref": "#/components/schemas/MessageUser"
+            "$ref": "#/components/schemas/AuthorRef"
           }
         },
         "required": [
@@ -4390,12 +4355,12 @@
             "type": "string"
           },
           "user": {
-            "$ref": "#/components/schemas/MessageUser"
+            "$ref": "#/components/schemas/AuthorRef"
           },
           "assignedUser": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MessageUser"
+                "$ref": "#/components/schemas/AuthorRef"
               },
               {
                 "nullable": true
@@ -4405,7 +4370,7 @@
           "resolver": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/MessageUser"
+                "$ref": "#/components/schemas/AuthorRef"
               },
               {
                 "nullable": true
@@ -4429,7 +4394,7 @@
                 "sender": {
                   "allOf": [
                     {
-                      "$ref": "#/components/schemas/MessageUser"
+                      "$ref": "#/components/schemas/AuthorRef"
                     },
                     {
                       "nullable": true
@@ -8008,18 +7973,50 @@
             "required": true,
             "name": "userId",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
           }
         ],
         "responses": {
           "200": {
-            "description": "An author's stylesheets",
+            "description": "An author's stylesheets, paginated (#146)",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AuthorStylesheet"
-                  }
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AuthorStylesheetListItem"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
                 }
               }
             }
@@ -8088,6 +8085,45 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdoptionResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stylesheet/author-stylesheet/{id}/css": {
+      "get": {
+        "tags": [
+          "Stylesheets"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The stored, sanitized stylesheet source as CSS",
+            "content": {
+              "text/css": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -11323,6 +11359,10 @@
                     "type": "integer",
                     "minimum": 0
                   },
+                  "authorStylesheetLimit": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
                   "displayStaff": {
                     "type": "boolean"
                   },
@@ -11658,6 +11698,10 @@
                     "type": "string"
                   },
                   "personalCollageLimit": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "authorStylesheetLimit": {
                     "type": "integer",
                     "minimum": 0
                   },

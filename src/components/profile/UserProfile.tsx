@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { formatBytes, ordinalSuffix } from '../../utils';
-import type { components } from '../../types/api';
 import DOMPurify from 'dompurify';
 import { Modal } from '../ui';
 
-type CommunityStats = components['schemas']['CommunityStats'];
 import {
   useGetMyRatioStatsQuery,
   useGetProfileByUserIdQuery
@@ -1084,8 +1082,7 @@ const UserProfile = () => {
   const profileStats = profile.stats;
   const activitySummary = profile.activitySummary;
   // Paranoia-gated (stellar-api #193): null when the viewer's tier hides stats.
-  // The generated type drops the `| null` from the nullable $ref, so cast.
-  const communityStats = profile.community as CommunityStats | null;
+  const communityStats = profile.community;
   const donorPresentation = profile.donorPresentation;
   const featuredShelves = profile.collageShelves.featuredPersonalCollages;
   const publicShelves = profile.collageShelves.publicCollages;

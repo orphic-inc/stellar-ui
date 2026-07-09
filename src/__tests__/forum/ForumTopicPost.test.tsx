@@ -48,7 +48,14 @@ const mockPost = {
   id: 7,
   forumTopicId: 5,
   authorId: 10,
-  author: { id: 10, username: 'alice', avatar: null },
+  author: {
+    id: 10,
+    username: 'alice',
+    avatar: null,
+    isDonor: false,
+    donorRank: null,
+    warned: null
+  },
   body: 'Hello forum world',
   createdAt: '2024-03-01T00:00:00Z',
   updatedAt: '2024-03-01T00:00:00Z'

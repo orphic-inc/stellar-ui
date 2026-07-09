@@ -1994,7 +1994,10 @@ export interface paths {
     };
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          page?: number;
+          limit?: number;
+        };
         header?: never;
         path: {
           userId: string;
@@ -2003,13 +2006,16 @@ export interface paths {
       };
       requestBody?: never;
       responses: {
-        /** @description An author's stylesheets */
+        /** @description An author's stylesheets, paginated (#146) */
         200: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['AuthorStylesheet'][];
+            'application/json': {
+              data: components['schemas']['AuthorStylesheetListItem'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
           };
         };
       };
@@ -2108,6 +2114,52 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/stylesheet/author-stylesheet/{id}/css': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The stored, sanitized stylesheet source as CSS */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'text/css': string;
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -4789,6 +4841,7 @@ export interface paths {
             color?: string;
             badge?: string;
             personalCollageLimit?: number;
+            authorStylesheetLimit?: number;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -4983,6 +5036,7 @@ export interface paths {
             color?: string;
             badge?: string;
             personalCollageLimit?: number;
+            authorStylesheetLimit?: number;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -12227,6 +12281,18 @@ export interface components {
       limit: number;
       totalPages: number;
     };
+    AuthorRef: {
+      id: number;
+      username: string;
+      avatar: string | null;
+      isDonor: boolean;
+      donorRank: {
+        name: string;
+        badge: string;
+        color: string;
+      } | null;
+      warned: string | null;
+    };
     LoginBody: {
       /** Format: email */
       email: string;
@@ -12263,6 +12329,7 @@ export interface components {
           [key: string]: boolean;
         };
         personalCollageLimit?: number;
+        authorStylesheetLimit?: number;
       };
     };
     PublicUser: {
@@ -12474,14 +12541,13 @@ export interface components {
       profile: components['schemas']['ProfileDetails'];
       activitySummary: components['schemas']['ProfileActivitySummary'];
       percentiles: components['schemas']['ProfilePercentiles'];
-      donorPresentation: components['schemas']['DonorPresentation'] & unknown;
+      donorPresentation: components['schemas']['DonorPresentation'] | null;
       collageShelves: components['schemas']['ProfileCollageShelves'];
-      staffPmOverview: components['schemas']['ProfileStaffPmOverview'] &
-        unknown;
+      staffPmOverview: components['schemas']['ProfileStaffPmOverview'] | null;
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
-      community: components['schemas']['CommunityStats'] & unknown;
+      community: components['schemas']['CommunityStats'] | null;
     };
     MyProfile: {
       id: number;
@@ -12506,14 +12572,13 @@ export interface components {
       profile: components['schemas']['ProfileDetails'];
       activitySummary: components['schemas']['ProfileActivitySummary'];
       percentiles: components['schemas']['ProfilePercentiles'];
-      donorPresentation: components['schemas']['DonorPresentation'] & unknown;
+      donorPresentation: components['schemas']['DonorPresentation'] | null;
       collageShelves: components['schemas']['ProfileCollageShelves'];
-      staffPmOverview: components['schemas']['ProfileStaffPmOverview'] &
-        unknown;
+      staffPmOverview: components['schemas']['ProfileStaffPmOverview'] | null;
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
-      community: components['schemas']['CommunityStats'] & unknown;
+      community: components['schemas']['CommunityStats'] | null;
       userSettings: components['schemas']['UserSettings'];
     };
     AdminCreatedUser: {
@@ -12680,7 +12745,11 @@ export interface components {
         | 'request_filled'
         | 'collage_updated'
         | 'comment_sub'
-        | 'artist_release';
+        | 'artist_release'
+        | 'site_news'
+        | 'global_notice'
+        | 'rank_promoted'
+        | 'rank_demoted';
       actorId?: number | null;
       actor?: {
         id: number;
@@ -12724,6 +12793,13 @@ export interface components {
       authorId: number;
       name: string;
       source: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+    AuthorStylesheetListItem: {
+      id: number;
+      authorId: number;
+      name: string;
       createdAt: string;
       updatedAt: string;
     };
@@ -12775,19 +12851,12 @@ export interface components {
       isLocked: boolean;
       isSticky: boolean;
       numPosts: number;
-      author?: {
-        id: number;
-        username: string;
-        avatar?: string | null;
-      };
+      author?: components['schemas']['AuthorRef'];
       lastPost?: {
         id: number;
         createdAt: string;
-        author?: {
-          id: number;
-          username: string;
-        };
-      };
+        author?: components['schemas']['AuthorRef'];
+      } | null;
       createdAt: string;
       updatedAt: string;
     };
@@ -12818,11 +12887,7 @@ export interface components {
       authorId: number;
       body: string;
       lastEdit?: components['schemas']['ForumPostLastEdit'];
-      author?: {
-        id: number;
-        username: string;
-        avatar?: string | null;
-      };
+      author?: components['schemas']['AuthorRef'];
       createdAt: string;
       updatedAt: string;
     };
@@ -13158,6 +13223,7 @@ export interface components {
       color?: string;
       badge?: string;
       personalCollageLimit?: number;
+      authorStylesheetLimit?: number;
       displayStaff?: boolean;
       staffGroupId?: number | null;
       userCount?: number;
@@ -13188,11 +13254,7 @@ export interface components {
       body: string;
       authorId: number;
       createdAt: string;
-      author?: {
-        id: number;
-        username: string;
-        avatar?: string | null;
-      };
+      author?: components['schemas']['AuthorRef'];
     };
     PaginatedComments: {
       data: components['schemas']['Comment'][];
@@ -13276,11 +13338,7 @@ export interface components {
       userId: number;
       text: string;
       createdAt: string;
-      user?: {
-        id: number;
-        username: string;
-        avatar?: string | null;
-      };
+      user?: components['schemas']['AuthorRef'];
     };
     Post: {
       id: number;
@@ -13291,11 +13349,7 @@ export interface components {
       tags: string[];
       comments: components['schemas']['PostComment'][];
       createdAt: string;
-      user?: {
-        id: number;
-        username: string;
-        avatar?: string | null;
-      };
+      user?: components['schemas']['AuthorRef'];
     };
     ForumTopicNote: {
       id: number;
@@ -13309,17 +13363,12 @@ export interface components {
         username: string;
       };
     };
-    MessageUser: {
-      id: number;
-      username: string;
-      avatar?: string | null;
-    };
     PrivateMessage: {
       id: number;
       conversationId: number;
       body: string;
       createdAt: string;
-      sender?: components['schemas']['MessageUser'] & unknown;
+      sender?: components['schemas']['AuthorRef'] & unknown;
     };
     PrivateConversationParticipant: {
       userId: number;
@@ -13330,7 +13379,7 @@ export interface components {
       isSticky: boolean;
       sentAt?: string | null;
       receivedAt?: string | null;
-      user?: components['schemas']['MessageUser'];
+      user?: components['schemas']['AuthorRef'];
     };
     PrivateConversation: {
       id: number;
@@ -13354,14 +13403,14 @@ export interface components {
       isReadByUser: boolean;
       createdAt: string;
       updatedAt: string;
-      user: components['schemas']['MessageUser'];
-      assignedUser?: components['schemas']['MessageUser'] & unknown;
-      resolver?: components['schemas']['MessageUser'] & unknown;
+      user: components['schemas']['AuthorRef'];
+      assignedUser?: components['schemas']['AuthorRef'] & unknown;
+      resolver?: components['schemas']['AuthorRef'] & unknown;
       messages?: {
         id: number;
         body: string;
         createdAt: string;
-        sender: components['schemas']['MessageUser'] & unknown;
+        sender: components['schemas']['AuthorRef'] & unknown;
       }[];
     };
     PaginatedTickets: {
