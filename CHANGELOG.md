@@ -4,23 +4,33 @@ All notable changes to stellar-ui are documented here.
 
 ---
 
-## [0.6.4] — unreleased
+## [0.6.9] — 2026-07-09
 
-Stylesheet authorship & integration.
+Stylesheet authorship & integration; version-parity cut with stellar-api (consolidates everything unreleased since v0.6.3).
 
 ### Added
 
 - **kuro mapped onto the `--st-*` contract** — the dark theme now re-skins the app by redefining Role Tokens rather than shipping legacy gray `!important` shims, and the **anorex** theme is ported onto the same contract; the theme contract §4.1 documents the theme→token mapping [#159] (ADR-0005)
 - **Registry stylesheet injection + Personal/Registry radio** — the injector links an adopted author sheet's `text/css` delivery route (`activeAuthorStylesheetId` → `/api/stylesheet/author-stylesheet/:id/css`) as a third source, single-winner precedence, no stacking; Settings presents the Site Stylesheet slot as a mutually-exclusive Personal⟷Registry radio mirroring the server invariant; `isInjectableUrl` is `https:`-only [#162] (ADR-0008; stellar-api ADR-0024)
+- **Staff PM given its own surface**, dispatched by permission rather than living inside the ticket queue
+
+### Changed
+
+- Resynced generated API types to stellar-api's OpenAPI contract: `activeAuthorStylesheetId` on `UserSettings` (stellar-api #256), and PR #310's all-10 notification enum + nullable profile refs
 
 ### Fixed
 
 - Corrected theming §11 post-conversion verification to probe un-migrated islands with **Layer Cake** (token-only), not kuro — kuro's legacy shims mask the very islands the probe is meant to surface [#159]
 - **Staff Inbox is one role-dispatched entry** — removed the duplicate "Staff Queue" nav item so staff no longer land on a ticket queue indistinguishable from the reports queue. Staff see the queue at Staff Inbox, members see their own tickets; the unread badge is role-aware (queue count for staff, own unread for members). Records the model in stellar-api ADR-0025.
+- **Killed the cold-load theme FOUC** — pre-apply the resolved theme before mount instead of after, and dropped the unmount cleanup that was churning the theme `<link>` on switch [#161]
+
+### Docs
+
+- Human-facing developer docs; fixed stale `AGENTS.md` + README traps that blocked install
 
 ### Planned
 
-- Member-authored **AuthorStylesheet** flow, remaining pieces — seed the anorex `AuthorStylesheet` registry fixture (the static file becomes canonical stored source, stellar-api ADR-0024), paginate the author list + rank-gated registry-spaces limit (#146), and the theme-FOUC fix (#161); plus building dark-ambient's missing stylesheet
+- Member-authored **AuthorStylesheet** flow, remaining pieces — seed the anorex `AuthorStylesheet` registry fixture (the static file becomes canonical stored source, stellar-api ADR-0024), paginate the author list + rank-gated registry-spaces limit (#146); plus building dark-ambient's missing stylesheet
 
 ---
 
