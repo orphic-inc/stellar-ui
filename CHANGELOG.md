@@ -4,6 +4,16 @@ All notable changes to stellar-ui are documented here.
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Renovate manages dependency and image bumps** — pinned tags stay fresh rather than floating; dev-tooling patch/minor and lockfile maintenance merge via the app's branch-protection bypass, majors remain human-reviewed [#175].
+
+### Changed
+
+- **Dockerfile base images pinned**; dead Gatsby-era build ARGs dropped [#174].
+
 ## [0.6.9] — 2026-07-09
 
 Stylesheet authorship & integration; version-parity cut with stellar-api (consolidates everything unreleased since v0.6.3).
