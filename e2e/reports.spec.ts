@@ -76,7 +76,7 @@ test.describe('as regular user', () => {
   }) => {
     await page.goto('/staff/reports');
     // StaffGate redirects to /
-    await expect(page).toHaveURL(/^https?:\/\/[^\/]+\/?$/);
+    await expect(page).toHaveURL(/^https?:\/\/[^/]+\/?$/);
   });
 });
 

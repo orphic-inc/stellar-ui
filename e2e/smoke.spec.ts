@@ -12,7 +12,7 @@ test('P-01: login navigates to authenticated layout', async ({ page }) => {
   await page.getByLabel(/password/i).fill(password);
   await page.getByRole('button', { name: /sign in/i }).click();
 
-  await page.waitForURL(/^https?:\/\/[^\/]+\/?$/);
+  await page.waitForURL(/^https?:\/\/[^/]+\/?$/);
   await expect(page.getByRole('link', { name: /communities/i })).toBeVisible();
   await expect(page.getByRole('link', { name: /forums/i })).toBeVisible();
 });
@@ -55,7 +55,7 @@ test.describe('as regular user', () => {
 
     // But the staff toolbox stays gated — a direct hit redirects out.
     await page.goto('/staff/tools');
-    await expect(page).toHaveURL(/^https?:\/\/[^\/]+\/?$/);
+    await expect(page).toHaveURL(/^https?:\/\/[^/]+\/?$/);
   });
 });
 
