@@ -50,7 +50,7 @@ const ComposeForm = () => {
         subject,
         body
       }).unwrap();
-      navigate(`/private/messages/${conv.id}`);
+      navigate(`/messages/${conv.id}`);
     } catch (err: unknown) {
       const msg =
         (err as { data?: { msg?: string } })?.data?.msg ??
@@ -91,11 +91,7 @@ const ComposeForm = () => {
         <h2 data-st="prose" data-st-strong className="text-xl">
           New Message
         </h2>
-        <a
-          href="/private/messages/drafts"
-          data-st="control"
-          className="text-sm"
-        >
+        <a href="/messages/drafts" data-st="control" className="text-sm">
           View drafts
         </a>
       </div>
@@ -179,7 +175,7 @@ const ComposeForm = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/private/messages')}
+            onClick={() => navigate('/messages')}
             data-st="control"
             className="px-4 py-2 rounded border border-[var(--st-border)] text-sm"
           >

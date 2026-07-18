@@ -63,11 +63,11 @@ describe('ForumPage', () => {
     });
     expect(screen.getByRole('link', { name: /\+ new topic/i })).toHaveAttribute(
       'href',
-      '/private/forums/9/new'
+      '/forums/9/new'
     );
     expect(
       screen.getByRole('link', { name: 'Favorite labels' })
-    ).toHaveAttribute('href', '/private/forums/9/topics/44');
+    ).toHaveAttribute('href', '/forums/9/topics/44');
     expect(screen.getByText('[Locked]')).toBeInTheDocument();
     expect(screen.getByText('[Sticky]')).toBeInTheDocument();
 

@@ -39,7 +39,7 @@ type PageShellProps = {
 const PageShell = ({
   title,
   actions,
-  backTo = '/private/staff/tools',
+  backTo = '/staff/tools',
   backLabel = '← Toolbox',
   width = 'md',
   className,

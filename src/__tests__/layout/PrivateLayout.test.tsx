@@ -75,10 +75,10 @@ describe('PrivateLayout', () => {
       <PrivateLayout>
         <div>Child content</div>
       </PrivateLayout>,
-      { initialEntries: ['/private/messages'] }
+      { initialEntries: ['/messages'] }
     );
 
-    expect(window.location.pathname).not.toBe('/private/messages');
+    expect(window.location.pathname).not.toBe('/messages');
   });
 
   it('renders the authenticated layout shell', () => {
@@ -136,10 +136,10 @@ describe('PrivateLayout', () => {
       <PrivateLayout>
         <div>Child content</div>
       </PrivateLayout>,
-      { initialEntries: ['/private/forums'] }
+      { initialEntries: ['/forums'] }
     );
 
-    expect(window.location.pathname).not.toBe('/private/forums');
+    expect(window.location.pathname).not.toBe('/forums');
     expect(screen.queryByText('Child content')).not.toBeInTheDocument();
   });
 });

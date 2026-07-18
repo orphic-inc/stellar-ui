@@ -90,7 +90,7 @@ const ForumTopicPost = ({
             #{id}
           </Link>
           <Link
-            to={`/private/user/${author?.username}`}
+            to={`/user/${author?.username}`}
             data-st="control"
             className="font-semibold normal-case tracking-normal"
           >
@@ -122,7 +122,7 @@ const ForumTopicPost = ({
         </div>
         <div className="flex items-center gap-2">
           <Link
-            to={`/private/reports/new?targetType=ForumPost&targetId=${id}`}
+            to={`/reports/new?targetType=ForumPost&targetId=${id}`}
             data-st="control"
           >
             Report
@@ -191,7 +191,7 @@ const ForumTopicPost = ({
               Last edited by{' '}
               {lastEdit.editor ? (
                 <Link
-                  to={`/private/user/${lastEdit.editor.username}`}
+                  to={`/user/${lastEdit.editor.username}`}
                   data-st="control"
                 >
                   {lastEdit.editor.username}
@@ -239,7 +239,7 @@ const ForumTopicPost = ({
                             Edited by{' '}
                             {edit.editor ? (
                               <Link
-                                to={`/private/user/${edit.editor.username}`}
+                                to={`/user/${edit.editor.username}`}
                                 data-st="control"
                               >
                                 {edit.editor.username}

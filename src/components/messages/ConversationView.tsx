@@ -68,7 +68,7 @@ const ConversationView = () => {
     <div className="thin">
       <div className="flex items-start justify-between mb-4 gap-4">
         <div>
-          <Link to="/private/messages" data-st="control" className="text-sm">
+          <Link to="/messages" data-st="control" className="text-sm">
             ← Inbox
           </Link>
           <h2 data-st="prose" data-st-strong className="text-xl mt-1">
@@ -81,7 +81,7 @@ const ConversationView = () => {
                 p.user?.username ? (
                   <Link
                     key={p.userId}
-                    to={`/private/user/${p.user.username}`}
+                    to={`/user/${p.user.username}`}
                     data-st="control"
                   >
                     {p.user.username}
@@ -138,7 +138,7 @@ const ConversationView = () => {
               <div className="flex items-center gap-2 mb-2 text-sm">
                 {msg.sender ? (
                   <Link
-                    to={`/private/user/${msg.sender.username}`}
+                    to={`/user/${msg.sender.username}`}
                     data-st="control"
                     className="font-medium"
                   >

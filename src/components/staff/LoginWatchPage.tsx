@@ -34,7 +34,7 @@ const LoginWatchPage = () => {
     {
       header: 'User',
       cell: (s) => (
-        <Link to={`/private/user/${s.user.id}`} data-st="control">
+        <Link to={`/user/${s.user.id}`} data-st="control">
           {s.user.username}
         </Link>
       )
@@ -67,7 +67,7 @@ const LoginWatchPage = () => {
   ];
 
   return (
-    <PageShell title="Login Watch" width="2xl" backTo="/private/staff/tools">
+    <PageShell title="Login Watch" width="2xl" backTo="/staff/tools">
       <form onSubmit={handleFilter} className="flex gap-2">
         <input
           type="number"

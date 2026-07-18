@@ -593,7 +593,7 @@ const GenerateTestDataPage = () => {
       {/* Header */}
       <div>
         <Link
-          to="/private/staff/tools"
+          to="/staff/tools"
           className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
         >
           ← Toolbox

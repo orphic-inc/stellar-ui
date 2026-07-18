@@ -14,7 +14,7 @@ const renderNode = (node: MemberInviteTreeNode): React.ReactNode => (
         {/* depth drives indentation so the adjacency tree reads as a hierarchy */}
         <span style={{ paddingLeft: `${node.depth * 1.25}rem` }}>
           <Link
-            to={`/private/user/${node.userId}`}
+            to={`/user/${node.userId}`}
             data-st={node.disabled ? 'meta' : 'title'}
             className={node.disabled ? 'line-through' : undefined}
           >

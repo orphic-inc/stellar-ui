@@ -39,7 +39,7 @@ describe('SentboxPage', () => {
     expect(mockUseGetSentboxQuery).toHaveBeenCalledWith({ page: 1 });
     expect(screen.getByRole('link', { name: 'Sent subject' })).toHaveAttribute(
       'href',
-      '/private/messages/3'
+      '/messages/3'
     );
     expect(screen.getByText(/a very long message body/i)).toBeInTheDocument();
 

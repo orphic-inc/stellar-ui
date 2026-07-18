@@ -139,10 +139,7 @@ const TopVotesPage = () => {
                     <span data-st="meta">{item.rank}</span>
                   </td>
                   <td>
-                    <Link
-                      to={`/private/releases/${item.releaseId}`}
-                      data-st="title"
-                    >
+                    <Link to={`/releases/${item.releaseId}`} data-st="title">
                       {item.artistName} – {item.title}
                     </Link>
                     <span data-st="meta" className="ml-2">

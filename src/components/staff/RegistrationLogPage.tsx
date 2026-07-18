@@ -17,7 +17,7 @@ const RegistrationLogPage = () => {
       cell: (user) => (
         <span className="flex items-center gap-2">
           <Link
-            to={`/private/user/${user.id}`}
+            to={`/user/${user.id}`}
             data-st="control"
             className="font-medium"
           >

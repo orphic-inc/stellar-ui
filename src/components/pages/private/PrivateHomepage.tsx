@@ -40,7 +40,7 @@ const PrivateHomepage = () => {
 
   const releaseLink = (communityId?: number | null, releaseId?: number) =>
     communityId && releaseId
-      ? `/private/communities/${communityId}/releases/${releaseId}`
+      ? `/communities/${communityId}/releases/${releaseId}`
       : undefined;
 
   return (
@@ -146,11 +146,7 @@ const PrivateHomepage = () => {
               <StatRow label="Comments" value={stats?.comments} />
             </div>
             <div className="px-4 pb-3 text-right">
-              <Link
-                to="/private/stats/history"
-                data-st="control"
-                className="text-xs"
-              >
+              <Link to="/stats/history" data-st="control" className="text-xs">
                 Details
               </Link>
             </div>

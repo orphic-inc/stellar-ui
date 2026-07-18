@@ -626,7 +626,7 @@ const ReleaseBrowsePage = () => {
                       <td>
                         {r.communityId ? (
                           <Link
-                            to={`/private/communities/${r.communityId}/releases/${r.id}`}
+                            to={`/communities/${r.communityId}/releases/${r.id}`}
                             data-st="title"
                           >
                             {r.title}
@@ -642,7 +642,7 @@ const ReleaseBrowsePage = () => {
                               —
                             </span>
                             <Link
-                              to={`/private/artists/${r.artist.id}`}
+                              to={`/artists/${r.artist.id}`}
                               data-st="meta"
                               data-st-em
                             >

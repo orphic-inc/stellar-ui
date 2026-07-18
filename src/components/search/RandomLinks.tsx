@@ -12,7 +12,7 @@ export const RandomReleaseLink = () => {
     try {
       const r = await trigger().unwrap();
       if (r.communityId) {
-        navigate(`/private/communities/${r.communityId}/releases/${r.id}`);
+        navigate(`/communities/${r.communityId}/releases/${r.id}`);
       }
     } catch {
       // ignore
@@ -37,7 +37,7 @@ export const RandomArtistLink = () => {
   const handleClick = async () => {
     try {
       const a = await trigger().unwrap();
-      navigate(`/private/artists/${a.id}`);
+      navigate(`/artists/${a.id}`);
     } catch {
       // ignore
     }

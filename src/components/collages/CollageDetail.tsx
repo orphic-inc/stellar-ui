@@ -124,7 +124,7 @@ const CollageDetail = () => {
     if (!confirm(msg)) return;
     try {
       await deleteCollage(collageId).unwrap();
-      navigate('/private/collages');
+      navigate('/collages');
     } catch {
       alert('Failed to delete collage.');
     }
@@ -206,7 +206,7 @@ const CollageDetail = () => {
           </div>
           <div className="text-xs text-gray-500 mt-0.5">
             <Link
-              to="/private/collages"
+              to="/collages"
               className="text-indigo-400 hover:text-indigo-300"
             >
               [List of collages]
@@ -215,7 +215,7 @@ const CollageDetail = () => {
               <>
                 {' '}
                 <Link
-                  to={`/private/collages/${collageId}/edit`}
+                  to={`/collages/${collageId}/edit`}
                   className="text-indigo-400 hover:text-indigo-300"
                 >
                   [Edit description]
@@ -247,7 +247,7 @@ const CollageDetail = () => {
           </button>
           {user && (
             <Link
-              to={`/private/reports/new?targetType=Collage&targetId=${collageId}`}
+              to={`/reports/new?targetType=Collage&targetId=${collageId}`}
               className="px-3 py-1 rounded border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-300"
             >
               Report
@@ -344,7 +344,7 @@ const CollageDetail = () => {
                         )}
                         <div className="flex-1 min-w-0">
                           <Link
-                            to={`/private/communities/${
+                            to={`/communities/${
                               communityId ?? 0
                             }/releases/${entry.releaseId}`}
                             data-st="title"
@@ -434,9 +434,7 @@ const CollageDetail = () => {
               <div className="flex justify-between">
                 <span>By</span>
                 <Link
-                  to={`/private/user/${
-                    collage.user?.username ?? collage.userId
-                  }`}
+                  to={`/user/${collage.user?.username ?? collage.userId}`}
                   className="text-indigo-400 hover:text-indigo-300"
                 >
                   {collage.user?.username ?? '—'}
@@ -466,7 +464,7 @@ const CollageDetail = () => {
                       style={{ '--st-w': c.share } as CSSProperties}
                     />
                     <Link
-                      to={`/private/user/${c.username}`}
+                      to={`/user/${c.username}`}
                       data-st="title"
                       className="truncate text-sm"
                     >

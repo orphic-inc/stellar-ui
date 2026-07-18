@@ -129,7 +129,7 @@ describe('Install', () => {
     });
   });
 
-  it('dispatches setCredentials and navigates to /private on success', async () => {
+  it('dispatches setCredentials and navigates to / on success', async () => {
     mockInstall.mockReturnValue({
       unwrap: () =>
         Promise.resolve({ user: { id: 1, username: 'sysop', userRank: {} } })
@@ -139,7 +139,7 @@ describe('Install', () => {
     await fillForm(user);
     await user.click(screen.getByRole('button', { name: /^install$/i }));
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/private');
+      expect(mockNavigate).toHaveBeenCalledWith('/');
     });
     expect(mockDispatch).toHaveBeenCalledWith(
       expect.objectContaining({

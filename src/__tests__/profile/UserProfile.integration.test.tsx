@@ -310,7 +310,7 @@ describe('UserProfile RTK Query integration', () => {
     expect(screen.getByText('2')).toBeInTheDocument(); // unresolved
     expect(
       screen.getByRole('link', { name: 'Ticket subject' })
-    ).toHaveAttribute('href', '/private/inbox/staff/101');
+    ).toHaveAttribute('href', '/inbox/staff/101');
     expect(screen.getByText('modperson')).toBeInTheDocument();
     expect(screen.getByText('Open')).toBeInTheDocument();
   });
@@ -362,7 +362,7 @@ describe('UserProfile RTK Query integration', () => {
     expect(await screen.findByText('Featured Shelves')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /my jazz collection/i })
-    ).toHaveAttribute('href', '/private/collages/10');
+    ).toHaveAttribute('href', '/collages/10');
 
     expect(screen.getByText('Public Collages')).toBeInTheDocument();
     expect(
@@ -394,7 +394,7 @@ describe('UserProfile RTK Query integration', () => {
     expect(screen.getByText('Miles Davis')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /kind of blue/i })).toHaveAttribute(
       'href',
-      '/private/communities/2/releases/5'
+      '/communities/2/releases/5'
     );
   });
 
@@ -416,7 +416,7 @@ describe('UserProfile RTK Query integration', () => {
     expect(await screen.findByText('Recent Snatches')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'A Love Supreme' })
-    ).toHaveAttribute('href', '/private/communities/3/releases/7');
+    ).toHaveAttribute('href', '/communities/3/releases/7');
     expect(screen.getByText('John Coltrane')).toBeInTheDocument();
   });
 

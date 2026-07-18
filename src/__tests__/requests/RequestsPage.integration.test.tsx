@@ -164,7 +164,7 @@ describe('RequestsPage RTK Query integration', () => {
 
     expect(screen.getByRole('link', { name: 'Request 1' })).toHaveAttribute(
       'href',
-      '/private/requests/1'
+      '/requests/1'
     );
     // 'Music' also appears in the type dropdown; check at least one td contains it
     expect(screen.getAllByText('Music').length).toBeGreaterThanOrEqual(1);

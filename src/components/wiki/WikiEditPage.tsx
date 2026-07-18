@@ -61,7 +61,7 @@ const WikiEditPage = () => {
           ...(canManage ? { minReadLevel, minEditLevel } : {})
         }).unwrap();
         dispatch(addAlert('Page created.', 'success'));
-        navigate(`/private/wiki/${page.id}`);
+        navigate(`/wiki/${page.id}`);
       } else {
         await updatePage({
           id: pageId!,
@@ -70,7 +70,7 @@ const WikiEditPage = () => {
           ...(canManage ? { minReadLevel, minEditLevel } : {})
         }).unwrap();
         dispatch(addAlert('Page updated.', 'success'));
-        navigate(`/private/wiki/${pageId}`);
+        navigate(`/wiki/${pageId}`);
       }
     } catch (err) {
       dispatch(
@@ -86,7 +86,7 @@ const WikiEditPage = () => {
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="mb-4">
         <Link
-          to={isNew ? '/private/wiki' : `/private/wiki/${pageId}`}
+          to={isNew ? '/wiki' : `/wiki/${pageId}`}
           data-st="control"
           className="text-xs"
         >
@@ -222,7 +222,7 @@ const WikiEditPage = () => {
 
         <div className="flex gap-3 justify-end">
           <Link
-            to={isNew ? '/private/wiki' : `/private/wiki/${pageId}`}
+            to={isNew ? '/wiki' : `/wiki/${pageId}`}
             data-st="control"
             className="text-sm"
           >

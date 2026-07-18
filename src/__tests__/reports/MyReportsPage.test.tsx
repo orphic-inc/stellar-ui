@@ -54,7 +54,7 @@ describe('MyReportsPage', () => {
 
     expect(screen.getByRole('link', { name: 'spam' })).toHaveAttribute(
       'href',
-      '/private/reports/5'
+      '/reports/5'
     );
     expect(screen.getAllByText('Resolved')).toHaveLength(2);
 

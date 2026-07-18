@@ -57,7 +57,7 @@ const TagAliasesPage = () => {
   };
 
   return (
-    <PageShell title="Tag Aliases" backTo="/private/staff/tools" width="lg">
+    <PageShell title="Tag Aliases" backTo="/staff/tools" width="lg">
       <p data-st="meta" className="text-sm">
         Maps misspelled or non-canonical tag names to the correct tag. Applied
         automatically on new submissions.

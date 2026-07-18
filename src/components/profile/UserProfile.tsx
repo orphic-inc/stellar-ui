@@ -542,7 +542,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                             <td>
                               {conversation.viewerCanOpen ? (
                                 <Link
-                                  to={`/private/inbox/staff/${conversation.id}`}
+                                  to={`/inbox/staff/${conversation.id}`}
                                   data-st="title"
                                 >
                                   {conversation.subject}
@@ -755,7 +755,7 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
                         <tr key={item.id} data-st="row">
                           <td className="py-1">
                             <Link
-                              to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                              to={`/communities/${item.release.communityId}/releases/${item.release.id}`}
                               data-st="control"
                             >
                               {item.release.title}
@@ -1009,7 +1009,7 @@ const SnatchListSection = () => {
           >
             <div>
               <Link
-                to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                to={`/communities/${item.release.communityId}/releases/${item.release.id}`}
                 data-st="control"
               >
                 {item.release.title}
@@ -1113,19 +1113,19 @@ const UserProfile = () => {
         />
         <div className="flex items-center gap-3 ml-auto text-sm">
           {isOwnProfile && (
-            <Link to={`/private/user/edit/${profile.id}`} data-st="control">
+            <Link to={`/user/edit/${profile.id}`} data-st="control">
               Settings
             </Link>
           )}
           {(isOwnProfile || isStaff) && (
-            <Link to={`/private/user/${profile.id}/stats`} data-st="control">
+            <Link to={`/user/${profile.id}/stats`} data-st="control">
               Stats
             </Link>
           )}
           {!isOwnProfile && (
             <>
               <Link
-                to={`/private/messages/new?to=${profile.username}`}
+                to={`/messages/new?to=${profile.username}`}
                 data-st="control"
               >
                 Send Message
@@ -1208,7 +1208,7 @@ const UserProfile = () => {
                 </button>
               )}
               <Link
-                to={`/private/reports/new?targetType=User&targetId=${profile.id}`}
+                to={`/reports/new?targetType=User&targetId=${profile.id}`}
                 data-st="control"
               >
                 Report
@@ -1362,7 +1362,7 @@ const UserProfile = () => {
                     {featuredShelves.map((collage) => (
                       <Link
                         key={collage.id}
-                        to={`/private/collages/${collage.id}`}
+                        to={`/collages/${collage.id}`}
                         className="rounded border border-[var(--st-border)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors overflow-hidden"
                       >
                         <div className="grid grid-cols-2 gap-px bg-[var(--st-border)]">
@@ -1404,7 +1404,7 @@ const UserProfile = () => {
                     {publicShelves.map((collage) => (
                       <Link
                         key={collage.id}
-                        to={`/private/collages/${collage.id}`}
+                        to={`/collages/${collage.id}`}
                         className="flex items-center gap-4 px-4 py-3 hover:bg-[var(--st-border)]/30 transition-colors"
                       >
                         <div className="grid h-16 w-20 shrink-0 grid-cols-2 gap-px overflow-hidden rounded bg-[var(--st-border)]">
@@ -1453,7 +1453,7 @@ const UserProfile = () => {
                 {profile.recentContributions.map((item) => (
                   <Link
                     key={item.id}
-                    to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                    to={`/communities/${item.release.communityId}/releases/${item.release.id}`}
                     className="overflow-hidden rounded border border-[var(--st-border-subtle)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors"
                   >
                     <div className="aspect-square bg-[var(--st-base)]">
@@ -1501,7 +1501,7 @@ const UserProfile = () => {
                   >
                     <div className="min-w-0">
                       <Link
-                        to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                        to={`/communities/${item.release.communityId}/releases/${item.release.id}`}
                         data-st="control"
                       >
                         {item.release.title}
@@ -1617,7 +1617,7 @@ const UserProfile = () => {
                     {myRatioStats.bracket.label}
                   </li>
                   <li>
-                    <Link to="/private/ratio" data-st="control">
+                    <Link to="/ratio" data-st="control">
                       Ratio rules →
                     </Link>
                   </li>

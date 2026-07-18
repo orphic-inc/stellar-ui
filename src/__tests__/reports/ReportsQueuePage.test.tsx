@@ -225,7 +225,7 @@ describe('ReportsQueuePage', () => {
             claimedBy: { username: 'mod-one' },
             createdAt: '2026-05-17T12:00:00.000Z',
             reporter: { username: 'bob' },
-            sourceUrl: '/private/forum/post/42',
+            sourceUrl: '/forum/post/42',
             notes: []
           }
         ]

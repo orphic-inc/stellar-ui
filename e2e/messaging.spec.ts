@@ -25,7 +25,7 @@ test.describe('as sender (regular user)', () => {
     pmSubject = `E2E PM ${Date.now()}`;
 
     // Navigate to the staff user's profile
-    await page.goto(`/private/user/${staffUsername}`);
+    await page.goto(`/user/${staffUsername}`);
 
     // "Send Message" link should be visible (own profile omits it)
     const sendLink = page.getByRole('link', { name: /send message/i });
@@ -50,7 +50,7 @@ test.describe('as sender (regular user)', () => {
 
     // Redirected to the conversation thread
     await page.waitForURL('**/messages/**');
-    await expect(page).toHaveURL(/\/private\/messages\/\d+/);
+    await expect(page).toHaveURL(/\/messages\/\d+/);
   });
 
   test('P-05c: Compose by typing username directly (no profile link)', async ({
@@ -58,16 +58,16 @@ test.describe('as sender (regular user)', () => {
   }) => {
     const subject = `E2E Direct PM ${Date.now()}`;
 
-    await page.goto('/private/messages/new');
+    await page.goto('/messages/new');
     await page.locator('#compose-to').fill(staffUsername);
     await page.locator('#compose-subject').fill(subject);
     await page.locator('#compose-body').fill('Direct compose test.');
     await page.getByRole('button', { name: /^send$/i }).click();
 
-    await page.waitForURL(/\/private\/messages\/\d+/);
+    await page.waitForURL(/\/messages\/\d+/);
 
     // Navigate to sentbox — subject appears there
-    await page.goto('/private/messages/sent');
+    await page.goto('/messages/sent');
     await expect(page.getByRole('link', { name: subject })).toBeVisible();
   });
 });
@@ -81,7 +81,7 @@ test.describe('as recipient (staff user)', () => {
     page
   }) => {
     // pmSubject was set by P-05a; if that test was skipped this will correctly fail.
-    await page.goto('/private/messages');
+    await page.goto('/messages');
 
     // Subject link must exist
     const subjectLink = page.getByRole('link', { name: pmSubject });
@@ -96,12 +96,12 @@ test.describe('as recipient (staff user)', () => {
     page
   }) => {
     // Staff PM reply flow: send a PM back to the regular user
-    await page.goto('/private/messages/new');
+    await page.goto('/messages/new');
     await page.locator('#compose-to').fill(userUsername);
     await page.locator('#compose-subject').fill(`Staff reply ${Date.now()}`);
     await page.locator('#compose-body').fill('Reply from staff.');
     await page.getByRole('button', { name: /^send$/i }).click();
-    await page.waitForURL(/\/private\/messages\/\d+/);
+    await page.waitForURL(/\/messages\/\d+/);
 
     // Grab the conversation ID from the URL
     const url = page.url();

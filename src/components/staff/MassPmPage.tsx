@@ -51,7 +51,7 @@ const MassPmPage = () => {
   };
 
   return (
-    <PageShell title="Mass PM" backTo="/private/staff/tools" width="sm">
+    <PageShell title="Mass PM" backTo="/staff/tools" width="sm">
       {lastResult && (
         <Badge variant="success" className="block w-full text-sm">
           Last send: {lastResult.sentCount} messages delivered.

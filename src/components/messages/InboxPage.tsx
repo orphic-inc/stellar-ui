@@ -53,18 +53,18 @@ const InboxPage = () => {
           Inbox
         </h2>
         <div className="flex gap-2 text-sm">
-          <Link to="/private/messages/new" data-st="control" data-st-primary>
+          <Link to="/messages/new" data-st="control" data-st-primary>
             Compose
           </Link>
           <Link
-            to="/private/messages/sent"
+            to="/messages/sent"
             data-st="control"
             className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
             Sent
           </Link>
           <Link
-            to="/private/messages/drafts"
+            to="/messages/drafts"
             data-st="control"
             className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
@@ -140,7 +140,7 @@ const InboxPage = () => {
                     />
                   </td>
                   <td className="py-2 pr-3">
-                    <Link to={`/private/messages/${conv.id}`} data-st="control">
+                    <Link to={`/messages/${conv.id}`} data-st="control">
                       {userPart?.isSticky && (
                         <span className="mr-1 text-xs text-[var(--st-warning)]">
                           ★

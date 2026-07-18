@@ -28,7 +28,7 @@ const NewUserForm = () => {
     setError('');
     try {
       await createUser(formData).unwrap();
-      navigate('/private/staff/tools');
+      navigate('/staff/tools');
     } catch (err: unknown) {
       setError(getApiErrorMessage(err) ?? 'Failed to create user.');
     }

@@ -105,7 +105,7 @@ const FriendsPage = () => {
             {pendingRequests.map((request) => (
               <li key={request.id} data-st="row" className="justify-between">
                 <Link
-                  to={`/private/user/${request.requester.id}`}
+                  to={`/user/${request.requester.id}`}
                   data-st="control"
                   className="font-medium"
                 >
@@ -178,7 +178,7 @@ const FriendsPage = () => {
                   <tr key={friend.id} data-st="row">
                     <td className="px-4 py-3">
                       <Link
-                        to={`/private/user/${friend.id}`}
+                        to={`/user/${friend.id}`}
                         data-st="control"
                         className="font-medium"
                       >
@@ -212,7 +212,7 @@ const FriendsPage = () => {
                         </button>
                       )}
                       <Link
-                        to={`/private/messages/new?to=${friend.username}`}
+                        to={`/messages/new?to=${friend.username}`}
                         data-st="control"
                         className="text-sm"
                       >

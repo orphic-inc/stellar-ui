@@ -87,7 +87,7 @@ describe('SnatchList', () => {
   it('renders release with community as a link', () => {
     renderWithProviders(<SnatchList />);
     const link = screen.getByRole('link', { name: 'Kind of Blue' });
-    expect(link).toHaveAttribute('href', '/private/communities/3/releases/10');
+    expect(link).toHaveAttribute('href', '/communities/3/releases/10');
   });
 
   it('renders release without community as plain text (no link)', () => {

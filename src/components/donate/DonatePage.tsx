@@ -70,7 +70,7 @@ const DonatePage = () => {
         <p>
           To make a donation, contact a staff member via private message. You
           can find the current staff list on the{' '}
-          <Link to="/private/staff" data-st="control">
+          <Link to="/staff" data-st="control">
             Staff page
           </Link>
           . A staff member will provide payment details and process your

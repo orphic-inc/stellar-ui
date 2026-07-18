@@ -83,7 +83,7 @@ const RatioStats = () => {
       </ul>
 
       <div className="px-4 py-2 border-t border-[var(--st-border)] text-xs">
-        <Link to="/private/ratio" data-st="control">
+        <Link to="/ratio" data-st="control">
           Ratio rules →
         </Link>
       </div>

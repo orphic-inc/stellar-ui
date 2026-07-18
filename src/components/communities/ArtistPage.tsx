@@ -72,7 +72,7 @@ const ArtistPage = () => {
     <div>
       {/* Breadcrumb */}
       <nav data-st="meta" className="text-sm mb-4">
-        <Link to="/private/communities" data-st="control">
+        <Link to="/communities" data-st="control">
           Artists
         </Link>
         {' › '}
@@ -160,10 +160,7 @@ const ArtistPage = () => {
             similar.map((s, i) => (
               <span key={s.similarArtist.id}>
                 {i > 0 && <span data-st="meta">{', '}</span>}
-                <Link
-                  to={`/private/artists/${s.similarArtist.id}`}
-                  data-st="control"
-                >
+                <Link to={`/artists/${s.similarArtist.id}`} data-st="control">
                   {s.similarArtist.name}
                 </Link>
               </span>
@@ -187,10 +184,7 @@ const ArtistPage = () => {
             {aliases.map((a, i) => (
               <span key={a.redirect.id}>
                 {i > 0 && <span data-st="meta">{', '}</span>}
-                <Link
-                  to={`/private/artists/${a.redirect.id}`}
-                  data-st="control"
-                >
+                <Link to={`/artists/${a.redirect.id}`} data-st="control">
                   {a.redirect.name}
                 </Link>
               </span>
@@ -238,7 +232,7 @@ const ArtistPage = () => {
                     <td className="px-4 py-2">
                       {release.communityId ? (
                         <Link
-                          to={`/private/communities/${release.communityId}/releases/${release.id}`}
+                          to={`/communities/${release.communityId}/releases/${release.id}`}
                           data-st="control"
                         >
                           {release.title}
@@ -250,7 +244,7 @@ const ArtistPage = () => {
                     <td className="px-4 py-2 text-xs">
                       {release.community ? (
                         <Link
-                          to={`/private/communities/${release.community.id}`}
+                          to={`/communities/${release.community.id}`}
                           data-st="control"
                         >
                           {release.community.name}

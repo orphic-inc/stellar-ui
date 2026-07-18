@@ -130,7 +130,7 @@ const RequestDetailPage = () => {
     if (!confirm('Delete this request?')) return;
     try {
       await deleteRequest(requestId).unwrap();
-      navigate('/private/requests');
+      navigate('/requests');
     } catch (e: unknown) {
       const msg =
         (e as { data?: { msg?: string } })?.data?.msg ?? 'Failed to delete.';
@@ -185,7 +185,7 @@ const RequestDetailPage = () => {
           {req.user && (
             <span>
               By{' '}
-              <Link to={`/private/user/${req.user.username}`} data-st="control">
+              <Link to={`/user/${req.user.username}`} data-st="control">
                 {req.user.username}
               </Link>
             </span>
@@ -233,10 +233,7 @@ const RequestDetailPage = () => {
                 <tr key={b.id} data-st="row">
                   <td className="py-1">
                     {b.user ? (
-                      <Link
-                        to={`/private/user/${b.user.username}`}
-                        data-st="control"
-                      >
+                      <Link to={`/user/${b.user.username}`} data-st="control">
                         {b.user.username}
                       </Link>
                     ) : (
@@ -288,10 +285,7 @@ const RequestDetailPage = () => {
           <div data-st="prose">
             Filled by{' '}
             {req.filler ? (
-              <Link
-                to={`/private/user/${req.filler.username}`}
-                data-st="control"
-              >
+              <Link to={`/user/${req.filler.username}`} data-st="control">
                 {req.filler.username}
               </Link>
             ) : (
@@ -402,10 +396,7 @@ const RequestDetailPage = () => {
                     <tr key={entry.id} data-st="row">
                       <td className="py-1">
                         {entry.user ? (
-                          <Link
-                            to={`/private/user/${entry.user.id}`}
-                            data-st="control"
-                          >
+                          <Link to={`/user/${entry.user.id}`} data-st="control">
                             {entry.user.username}
                           </Link>
                         ) : (

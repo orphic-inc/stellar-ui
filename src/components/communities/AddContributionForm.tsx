@@ -147,7 +147,7 @@ const AddContributionForm = () => {
         })
       }).unwrap();
       dispatch(addAlert('Contribution added.', 'success'));
-      navigate(`/private/communities/${communityId}/releases/${releaseId}`);
+      navigate(`/communities/${communityId}/releases/${releaseId}`);
     } catch (err) {
       dispatch(
         addAlert(
@@ -165,19 +165,19 @@ const AddContributionForm = () => {
   return (
     <div>
       <nav className="text-sm text-gray-500 mb-4">
-        <Link to="/private/communities" className="hover:text-gray-300">
+        <Link to="/communities" className="hover:text-gray-300">
           Communities
         </Link>
         {' › '}
         <Link
-          to={`/private/communities/${communityId}`}
+          to={`/communities/${communityId}`}
           className="hover:text-gray-300"
         >
           Community
         </Link>
         {' › '}
         <Link
-          to={`/private/communities/${communityId}/releases/${releaseId}`}
+          to={`/communities/${communityId}/releases/${releaseId}`}
           className="hover:text-gray-300"
         >
           {release.title}
@@ -368,7 +368,7 @@ const AddContributionForm = () => {
             {isLoading ? 'Adding…' : 'Add contribution'}
           </button>
           <Link
-            to={`/private/communities/${communityId}/releases/${releaseId}`}
+            to={`/communities/${communityId}/releases/${releaseId}`}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded"
           >
             Cancel

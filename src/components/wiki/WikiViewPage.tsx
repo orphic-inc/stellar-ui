@@ -72,7 +72,7 @@ const WikiViewPage = () => {
     try {
       await deletePage(pageId).unwrap();
       dispatch(addAlert('Page deleted.', 'success'));
-      navigate('/private/wiki');
+      navigate('/wiki');
     } catch (err) {
       dispatch(
         addAlert(getApiErrorMessage(err) ?? 'Failed to delete.', 'danger')
@@ -110,7 +110,7 @@ const WikiViewPage = () => {
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <Link to="/private/wiki" data-st="control" className="text-xs">
+          <Link to="/wiki" data-st="control" className="text-xs">
             ← Wiki
           </Link>
           <h1 data-st="prose" data-st-strong className="text-2xl mt-1">
@@ -119,7 +119,7 @@ const WikiViewPage = () => {
           <p data-st="meta" className="text-xs mt-1">
             Revision {page.revision} · Last edited{' '}
             {new Date(page.updatedAt).toLocaleDateString()} by{' '}
-            <Link to={`/private/user/${page.author.id}`} data-st="control">
+            <Link to={`/user/${page.author.id}`} data-st="control">
               {page.author.username}
             </Link>
             {page.minReadLevel > 0 && (
@@ -133,7 +133,7 @@ const WikiViewPage = () => {
           {/* Secondary pill: bordered token control (no filled/outlined
               conflict); Edit/Delete are filled status controls. */}
           <Link
-            to={`/private/wiki/${pageId}/history`}
+            to={`/wiki/${pageId}/history`}
             data-st="control"
             className="px-3 py-1.5 text-sm rounded-lg border border-[var(--st-border)] hover:border-[var(--st-border-strong)]"
           >
@@ -141,7 +141,7 @@ const WikiViewPage = () => {
           </Link>
           {canEdit && (
             <Link
-              to={`/private/wiki/${pageId}/edit`}
+              to={`/wiki/${pageId}/edit`}
               data-st="control"
               data-st-primary
               className="text-sm"

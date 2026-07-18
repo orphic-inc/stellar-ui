@@ -1,16 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useGetMeQuery } from '../../../store/services/authApi';
+import { Link } from 'react-router-dom';
 import { useGetInstallStatusQuery } from '../../../store/services/installApi';
 
 const PublicLanding = () => {
-  const navigate = useNavigate();
-  const { data: me } = useGetMeQuery();
   const { data: installStatus } = useGetInstallStatusQuery();
-
-  useEffect(() => {
-    if (me) navigate('/private');
-  }, [me, navigate]);
 
   return (
     <div className="landing">

@@ -165,7 +165,7 @@ const ReportForm = () => {
         }).unwrap();
       }
       dispatch(addAlert('Report submitted.', 'success'));
-      navigate('/private/reports/mine');
+      navigate('/reports/mine');
     } catch {
       dispatch(addAlert('Failed to submit report.', 'danger'));
     }

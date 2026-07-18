@@ -275,7 +275,7 @@ const ContributeForm = () => {
             : undefined,
         isRemaster: isMusic && editionEnabled ? isRemaster : undefined
       }).unwrap();
-      navigate('/private/contribute/list');
+      navigate('/contribute/list');
     } catch (err) {
       const message =
         getApiErrorMessage(err) ??
@@ -339,7 +339,7 @@ const ContributeForm = () => {
             <p className={helpClass}>
               Can&apos;t find your community?{' '}
               <Link
-                to="/private/requests"
+                to="/requests"
                 className="text-indigo-400 hover:text-indigo-300"
               >
                 Submit a request.

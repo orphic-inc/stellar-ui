@@ -165,7 +165,7 @@ describe('BookmarksPage RTK Query integration', () => {
     await screen.findByText('John Coltrane');
     expect(screen.getByRole('link', { name: 'John Coltrane' })).toHaveAttribute(
       'href',
-      '/private/artists/7'
+      '/artists/7'
     );
   });
 
@@ -202,7 +202,7 @@ describe('BookmarksPage RTK Query integration', () => {
     await screen.findByText('Kind of Blue');
     expect(screen.getByRole('link', { name: 'Kind of Blue' })).toHaveAttribute(
       'href',
-      '/private/communities/3/releases/10'
+      '/communities/3/releases/10'
     );
   });
 
@@ -246,7 +246,7 @@ describe('BookmarksPage RTK Query integration', () => {
     await screen.findByText('Rock Shelf');
     expect(screen.getByRole('link', { name: 'Rock Shelf' })).toHaveAttribute(
       'href',
-      '/private/communities/5'
+      '/communities/5'
     );
   });
 
@@ -276,7 +276,7 @@ describe('BookmarksPage RTK Query integration', () => {
     await screen.findByText('Looking for Coltrane');
     expect(
       screen.getByRole('link', { name: 'Looking for Coltrane' })
-    ).toHaveAttribute('href', '/private/requests/20');
+    ).toHaveAttribute('href', '/requests/20');
   });
 
   it('shows empty state when no requests are bookmarked', async () => {

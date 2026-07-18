@@ -45,7 +45,7 @@ const sections: SectionProps[] = staffToolSections.map((title) => ({
     .filter((tool) => tool.section === title)
     .map((tool) => ({
       label: tool.label,
-      to: `/private/${tool.path}`
+      to: `/${tool.path}`
     }))
 }));
 
@@ -56,7 +56,7 @@ const Toolbox = () => {
       ...section,
       links: section.links.filter((link) => {
         const tool = toolboxStaffTools.find(
-          (candidate) => `/private/${candidate.path}` === link.to
+          (candidate) => `/${candidate.path}` === link.to
         );
         return tool ? hasAnyPermission(user, tool.permissions) : false;
       })

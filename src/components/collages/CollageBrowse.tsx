@@ -65,7 +65,7 @@ const CollageBrowse = () => {
         </h2>
         {canCreateCollage && (
           <Link
-            to="/private/collages/new"
+            to="/collages/new"
             data-st="control"
             data-st-primary
             className="text-sm"
@@ -145,7 +145,7 @@ const CollageBrowse = () => {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <Link
-                      to={`/private/collages/${c.id}`}
+                      to={`/collages/${c.id}`}
                       data-st="title"
                       className="truncate"
                     >

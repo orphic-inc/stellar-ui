@@ -85,7 +85,7 @@ const CreateRequestForm = () => {
       }).unwrap();
 
       dispatch(addAlert('Request created.', 'success'));
-      navigate(`/private/requests/${result.id}`);
+      navigate(`/requests/${result.id}`);
     } catch (e: unknown) {
       const msg =
         (e as { data?: { msg?: string } })?.data?.msg ??

@@ -160,13 +160,13 @@ describe('WikiListPage RTK Query integration', () => {
     await screen.findByText('Page 5');
     expect(screen.getByRole('link', { name: 'Page 5' })).toHaveAttribute(
       'href',
-      '/private/wiki/5'
+      '/wiki/5'
     );
     expect(screen.getByText(/rev 1/i)).toBeInTheDocument();
     expect(screen.getByText(/alice/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /history/i })).toHaveAttribute(
       'href',
-      '/private/wiki/5/history'
+      '/wiki/5/history'
     );
   });
 

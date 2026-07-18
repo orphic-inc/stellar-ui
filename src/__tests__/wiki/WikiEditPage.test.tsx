@@ -86,7 +86,7 @@ describe('WikiEditPage', () => {
         minReadLevel: 100,
         minEditLevel: 200
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/wiki/33');
+      expect(mockNavigate).toHaveBeenCalledWith('/wiki/33');
       const alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Page created.')).toBe(true);
     });
@@ -124,7 +124,7 @@ describe('WikiEditPage', () => {
         minReadLevel: 0,
         minEditLevel: 0
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/wiki/12');
+      expect(mockNavigate).toHaveBeenCalledWith('/wiki/12');
     });
   });
 
@@ -286,7 +286,7 @@ describe('WikiEditPage', () => {
     await waitFor(() => {
       const alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Save failed')).toBe(true);
-      expect(mockNavigate).not.toHaveBeenCalledWith('/private/wiki/12');
+      expect(mockNavigate).not.toHaveBeenCalledWith('/wiki/12');
     });
   });
 

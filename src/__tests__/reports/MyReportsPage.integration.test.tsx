@@ -129,7 +129,7 @@ describe('MyReportsPage RTK Query integration', () => {
     await screen.findByText('Wrong info');
     expect(screen.getByRole('link', { name: 'Wrong info' })).toHaveAttribute(
       'href',
-      '/private/reports/5'
+      '/reports/5'
     );
     expect(screen.getByText('Artist')).toBeInTheDocument();
     expect(screen.getByText('Claimed')).toBeInTheDocument();

@@ -41,7 +41,7 @@ const SnatchList = () => {
                   <td className="px-4 py-2.5">
                     {item.release.communityId ? (
                       <Link
-                        to={`/private/communities/${item.release.communityId}/releases/${item.release.id}`}
+                        to={`/communities/${item.release.communityId}/releases/${item.release.id}`}
                         data-st="control"
                       >
                         {item.release.title}

@@ -52,7 +52,7 @@ const CollageCreate = () => {
         categoryId,
         tags
       }).unwrap();
-      navigate(`/private/collages/${collage.id}`);
+      navigate(`/collages/${collage.id}`);
     } catch (err: unknown) {
       const e = err as { data?: { msg?: string } };
       setError(e?.data?.msg ?? 'Failed to create collage.');
@@ -164,7 +164,7 @@ const CollageCreate = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/private/collages')}
+            onClick={() => navigate('/collages')}
             className="px-4 py-2 border border-gray-700 text-gray-300 hover:border-gray-500 text-sm rounded"
           >
             Cancel

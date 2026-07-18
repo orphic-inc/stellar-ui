@@ -50,7 +50,7 @@ const CollageEdit = () => {
   if (isLoading) return <Spinner />;
   if (!collage)
     return <div className="p-4 text-red-400">Collage not found.</div>;
-  if (!isOwner && !isStaff) navigate('/private/collages');
+  if (!isOwner && !isStaff) navigate('/collages');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +80,7 @@ const CollageEdit = () => {
 
     try {
       await updateCollage(payload).unwrap();
-      navigate(`/private/collages/${collageId}`);
+      navigate(`/collages/${collageId}`);
     } catch (err: unknown) {
       const e = err as { data?: { msg?: string } };
       setError(e?.data?.msg ?? 'Failed to update collage.');
@@ -236,7 +236,7 @@ const CollageEdit = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate(`/private/collages/${collageId}`)}
+            onClick={() => navigate(`/collages/${collageId}`)}
             className="px-4 py-2 border border-gray-700 text-gray-300 hover:border-gray-500 text-sm rounded"
           >
             Cancel

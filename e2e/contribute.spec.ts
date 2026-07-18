@@ -18,7 +18,7 @@ test.describe('contribute form (as regular user)', () => {
   test.use({ storageState: AUTH_USER });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/private/contribute');
+    await page.goto('/contribute');
     // Wait for communities to load (first real option populated).
     await expect(
       page.locator('#contribute-community option').nth(1)
@@ -59,7 +59,7 @@ test.describe('contribute form (as regular user)', () => {
     await page.getByRole('button', { name: /contribute release/i }).click();
 
     await page.waitForURL('**/contribute/list**');
-    await expect(page).toHaveURL(/\/private\/contribute\/list/);
+    await expect(page).toHaveURL(/\/contribute\/list/);
   });
 
   test('P-08b: contribute form has no axe accessibility violations', async ({

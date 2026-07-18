@@ -39,7 +39,7 @@ describe('CommunitiesTable', () => {
     renderWithProviders(<CommunitiesTable communities={mockCommunities} />);
     expect(screen.getByRole('link', { name: 'Jazz Archive' })).toHaveAttribute(
       'href',
-      '/private/communities/1'
+      '/communities/1'
     );
     expect(screen.getByRole('link', { name: 'Film Noir' })).toBeInTheDocument();
   });

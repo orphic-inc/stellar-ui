@@ -332,7 +332,7 @@ const ReportsQueuePage = () => {
                       </td>
                       <td className="py-2 pr-3">
                         <Link
-                          to={`/private/staff/reports/${report.id}`}
+                          to={`/staff/reports/${report.id}`}
                           data-st="control"
                         >
                           {report.category}

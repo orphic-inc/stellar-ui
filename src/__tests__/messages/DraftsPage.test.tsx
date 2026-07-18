@@ -41,7 +41,7 @@ describe('DraftsPage', () => {
 
     expect(screen.getByRole('link', { name: 'Draft subject' })).toHaveAttribute(
       'href',
-      '/private/messages/new?draft=1'
+      '/messages/new?draft=1'
     );
     expect(screen.getByText('alice')).toBeInTheDocument();
 

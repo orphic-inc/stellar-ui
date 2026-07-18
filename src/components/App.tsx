@@ -1,14 +1,22 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import PublicLayout from './pages/public/PublicLayout';
-import PublicLanding from './pages/public/PublicLanding';
 import Install from './pages/public/Install';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import Recovery from './auth/Recovery';
 import PrivateLayout from './pages/private/layout/PrivateLayout';
 import PrivateContent from './pages/private/layout/PrivateContent';
+import HomeGate from './HomeGate';
 import { useGetInstallStatusQuery } from '../store/services/installApi';
+
+// Pre-#183 URLs kept the authed app under a /private prefix; strip it so old
+// bookmarks and external links keep resolving.
+const LegacyPrivateRedirect = () => {
+  const { pathname, search, hash } = useLocation();
+  const stripped = pathname.replace(/^\/private(?=\/|$)/, '') || '/';
+  return <Navigate to={`${stripped}${search}${hash}`} replace />;
+};
 
 const App = () => {
   const {
@@ -79,24 +87,16 @@ const App = () => {
           }
         />
 
+        <Route path="/private/*" element={<LegacyPrivateRedirect />} />
+        <Route path="/" element={<HomeGate />} />
         <Route
-          path="/private/*"
+          path="/*"
           element={
             <PrivateLayout>
               <PrivateContent />
             </PrivateLayout>
           }
         />
-
-        <Route
-          path="/"
-          element={
-            <PublicLayout>
-              <PublicLanding />
-            </PublicLayout>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );

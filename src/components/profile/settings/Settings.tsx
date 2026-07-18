@@ -196,7 +196,7 @@ const Settings = () => {
           Settings
         </h2>
         <Link
-          to={`/private/user/${currentUser?.id}`}
+          to={`/user/${currentUser?.id}`}
           data-st="control"
           className="text-sm"
         >

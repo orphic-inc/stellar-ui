@@ -44,7 +44,7 @@ const VanityHousePage = () => {
     {
       header: 'Artist',
       cell: (a) => (
-        <Link to={`/private/artist/${a.id}`} data-st="control">
+        <Link to={`/artist/${a.id}`} data-st="control">
           {a.name}
         </Link>
       )
@@ -70,11 +70,7 @@ const VanityHousePage = () => {
   ];
 
   return (
-    <PageShell
-      title="Vanity House Artists"
-      width="lg"
-      backTo="/private/staff/tools"
-    >
+    <PageShell title="Vanity House Artists" width="lg" backTo="/staff/tools">
       <form onSubmit={handleAdd} className="flex gap-2 items-start">
         <div className="flex flex-col gap-1">
           <input

@@ -4,6 +4,13 @@ All notable changes to stellar-ui are documented here.
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- **The `/private` URL prefix is removed** — authenticated pages now live at their natural paths (`/forums`, `/staff/tools`, `/messages/:id`, ...) and `/` is auth-aware: members get the private homepage, visitors get the public landing (no more client-side bounce through a prefixed URL). A legacy `/private/*` redirect keeps old bookmarks resolving. Public routes (`/login`, `/register`, `/recovery`, `/install`) are unchanged [#183].
+- **ModBar follows the inverted launch-checklist item** — the settings quick-link now keys on `registration-closed` (fresh installs default registration to `closed` and the checklist advises opening it at launch; stellar-api#332) instead of the retired `registration-open` warning [#183].
+
 ## [0.6.9] — 2026-07-09
 
 Stylesheet authorship & integration; version-parity cut with stellar-api (consolidates everything unreleased since v0.6.3).

@@ -368,8 +368,8 @@ export const staffTools: StaffToolDefinition[] = [
     section: 'Administration'
   },
   // The staff ticket queue + a single ticket are served under the Staff Inbox
-  // namespace (StaffInboxPage dispatch at /private/inbox/staff, and
-  // /private/inbox/staff/:id), not as standalone staff tools — one
+  // namespace (StaffInboxPage dispatch at /inbox/staff, and
+  // /inbox/staff/:id), not as standalone staff tools — one
   // role-dispatched Staff Inbox entry, no duplicate "Staff Queue".
   {
     id: 'canned-responses',

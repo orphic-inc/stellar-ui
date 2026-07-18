@@ -63,7 +63,7 @@ describe('InboxPage', () => {
     expect(mockUseGetInboxQuery).toHaveBeenCalledWith({ page: 1 });
     expect(screen.getByRole('link', { name: 'Compose' })).toHaveAttribute(
       'href',
-      '/private/messages/new'
+      '/messages/new'
     );
     expect(screen.getByText('Unread thread')).toBeInTheDocument();
     expect(screen.getByText('alice')).toBeInTheDocument();

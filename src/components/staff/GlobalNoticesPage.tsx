@@ -66,7 +66,7 @@ const GlobalNoticesPage = () => {
   ];
 
   return (
-    <PageShell title="Global Notices" backTo="/private/staff/tools" width="lg">
+    <PageShell title="Global Notices" backTo="/staff/tools" width="lg">
       <p data-st="meta" className="text-sm">
         Sent as notifications to all active users.
       </p>

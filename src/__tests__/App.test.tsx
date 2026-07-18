@@ -120,6 +120,23 @@ describe('App', () => {
     expect(screen.getByText('Login Page')).toBeInTheDocument();
 
     render(
+      <MemoryRouter initialEntries={['/messages']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTestId('private-layout')).toBeInTheDocument();
+    expect(screen.getByText('Private Content')).toBeInTheDocument();
+  });
+
+  it('redirects legacy /private URLs to the unprefixed path', () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: { installed: true }
+    });
+
+    render(
       <MemoryRouter initialEntries={['/private/messages']}>
         <App />
       </MemoryRouter>

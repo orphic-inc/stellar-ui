@@ -41,7 +41,7 @@ const ReleaseStatsPage = () => {
   ];
 
   return (
-    <PageShell title="Release Stats" width="lg" backTo="/private/staff/tools">
+    <PageShell title="Release Stats" width="lg" backTo="/staff/tools">
       <div className="grid grid-cols-3 gap-4">
         {stats.map(({ label, value }) => (
           <Panel key={label} className="p-5 text-center">

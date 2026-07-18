@@ -25,11 +25,7 @@ const ClientStatsPage = () => {
   ];
 
   return (
-    <PageShell
-      title="OS & Browser Usage"
-      width="xl"
-      backTo="/private/staff/tools"
-    >
+    <PageShell title="OS & Browser Usage" width="xl" backTo="/staff/tools">
       <DataTable
         columns={columns}
         rows={data}

@@ -248,10 +248,7 @@ const ForumControlPanel = () => {
                     <Fragment key={f.id}>
                       <tr data-st="row">
                         <td className="font-medium">
-                          <Link
-                            to={`/private/forums/${f.id}`}
-                            data-st="control"
-                          >
+                          <Link to={`/forums/${f.id}`} data-st="control">
                             {f.name}
                           </Link>
                         </td>

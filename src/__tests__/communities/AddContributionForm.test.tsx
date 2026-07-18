@@ -136,9 +136,7 @@ describe('AddContributionForm', () => {
     );
     await user.click(screen.getByRole('button', { name: /add contribution/i }));
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/private/communities/3/releases/7'
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/communities/3/releases/7');
     });
   });
 

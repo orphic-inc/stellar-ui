@@ -151,7 +151,7 @@ const RequestsPage = () => {
         </h2>
         {canCreateRequest && (
           <Link
-            to="/private/requests/new"
+            to="/requests/new"
             data-st="control"
             data-st-primary
             className="text-sm"
@@ -316,7 +316,7 @@ const RequestsPage = () => {
             {requests.map((r) => (
               <tr key={r.id} data-st="row">
                 <td className="py-2 pr-4">
-                  <Link to={`/private/requests/${r.id}`} data-st="control">
+                  <Link to={`/requests/${r.id}`} data-st="control">
                     {r.title}
                   </Link>
                 </td>

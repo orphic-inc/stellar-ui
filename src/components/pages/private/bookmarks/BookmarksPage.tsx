@@ -33,7 +33,7 @@ const ArtistsTab = () => {
       {data.map((item) => (
         <li key={item.artistId} data-st="row">
           <Link
-            to={`/private/artists/${item.artistId}`}
+            to={`/artists/${item.artistId}`}
             data-st="control"
             className="text-sm"
           >
@@ -64,7 +64,7 @@ const ReleasesTab = () => {
         <li key={item.releaseId} data-st="row">
           {item.release.communityId ? (
             <Link
-              to={`/private/communities/${item.release.communityId}/releases/${item.releaseId}`}
+              to={`/communities/${item.release.communityId}/releases/${item.releaseId}`}
               data-st="control"
               className="text-sm"
             >
@@ -99,7 +99,7 @@ const CommunitiesTab = () => {
       {data.map((item) => (
         <li key={item.communityId} data-st="row">
           <Link
-            to={`/private/communities/${item.communityId}`}
+            to={`/communities/${item.communityId}`}
             data-st="control"
             className="text-sm"
           >
@@ -129,7 +129,7 @@ const RequestsTab = () => {
       {data.map((item) => (
         <li key={item.requestId} data-st="row">
           <Link
-            to={`/private/requests/${item.requestId}`}
+            to={`/requests/${item.requestId}`}
             data-st="control"
             className="text-sm"
           >

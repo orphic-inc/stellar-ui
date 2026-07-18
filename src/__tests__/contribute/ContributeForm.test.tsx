@@ -209,7 +209,7 @@ describe('ContributeForm', () => {
     });
   });
 
-  it('navigates to /private/contribute/list on successful submit', async () => {
+  it('navigates to /contribute/list on successful submit', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ContributeForm />);
 
@@ -234,7 +234,7 @@ describe('ContributeForm', () => {
     );
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/private/contribute/list');
+      expect(mockNavigate).toHaveBeenCalledWith('/contribute/list');
     });
   });
 

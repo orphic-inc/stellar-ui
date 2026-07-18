@@ -28,7 +28,7 @@ const Login = () => {
   const [form, setForm] = useState<FormState>({ email: '', password: '' });
 
   useEffect(() => {
-    if (user) navigate('/private');
+    if (user) navigate('/');
   }, [user, navigate]);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -38,7 +38,7 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(form).unwrap();
-      navigate('/private');
+      navigate('/');
     } catch (err) {
       const status = (err as { status?: number })?.status;
       const authErrorMessage =

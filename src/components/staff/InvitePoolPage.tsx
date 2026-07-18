@@ -37,7 +37,7 @@ const InvitePoolPage = () => {
     {
       header: 'Inviter',
       cell: (inv) => (
-        <Link to={`/private/user/${inv.inviter.id}`} data-st="control">
+        <Link to={`/user/${inv.inviter.id}`} data-st="control">
           {inv.inviter.username}
         </Link>
       )
@@ -68,7 +68,7 @@ const InvitePoolPage = () => {
   ];
 
   return (
-    <PageShell title="Invite Pool" width="xl" backTo="/private/staff/tools">
+    <PageShell title="Invite Pool" width="xl" backTo="/staff/tools">
       <div className="flex gap-2">
         <select value={status} onChange={handleStatusChange} data-st="field">
           <option value="">All statuses</option>

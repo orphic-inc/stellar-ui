@@ -58,7 +58,7 @@ const DuplicateIpsPage = () => {
                       className="flex items-center gap-4 text-xs py-1"
                     >
                       <Link
-                        to={`/private/user/${user.id}`}
+                        to={`/user/${user.id}`}
                         data-st="control"
                         className="font-medium"
                       >

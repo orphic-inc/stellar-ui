@@ -110,7 +110,7 @@ const TicketView = () => {
   const isOwner = ticket.user?.id === currentUser?.id;
   // Staff Inbox is one namespace; only the label reflects which view the
   // staffer came from (the shared queue vs. their own tickets).
-  const backLink = '/private/inbox/staff';
+  const backLink = '/inbox/staff';
   const backLabel = canManageTicket ? '← Ticket Queue' : '← My Tickets';
 
   return (
@@ -131,10 +131,7 @@ const TicketView = () => {
           {canManageTicket && (
             <p data-st="meta" className="text-sm mt-0.5">
               From:{' '}
-              <Link
-                to={`/private/user/${ticket.user?.username}`}
-                data-st="control"
-              >
+              <Link to={`/user/${ticket.user?.username}`} data-st="control">
                 {ticket.user?.username}
               </Link>
             </p>
@@ -213,7 +210,7 @@ const TicketView = () => {
               <div className="flex items-center gap-2 mb-2 text-sm">
                 {msg.sender ? (
                   <Link
-                    to={`/private/user/${msg.sender.username}`}
+                    to={`/user/${msg.sender.username}`}
                     data-st="control"
                     className="font-medium"
                   >

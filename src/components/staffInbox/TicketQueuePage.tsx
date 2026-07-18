@@ -73,7 +73,7 @@ const TicketQueuePage = () => {
           Ticket Queue
         </h2>
         <Link
-          to="/private/inbox/staff/responses"
+          to="/inbox/staff/responses"
           data-st="control"
           className="px-3 py-1 rounded border border-[var(--st-border)] text-sm"
         >
@@ -196,10 +196,7 @@ const TicketQueuePage = () => {
                           ●
                         </span>
                       )}
-                      <Link
-                        to={`/private/inbox/staff/${ticket.id}`}
-                        data-st="control"
-                      >
+                      <Link to={`/inbox/staff/${ticket.id}`} data-st="control">
                         {ticket.subject}
                       </Link>
                     </div>

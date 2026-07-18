@@ -121,7 +121,7 @@ const RatioPolicyPanel = () => {
     <div className="thin">
       <div className="mb-4">
         <Link
-          to="/private/staff/tools"
+          to="/staff/tools"
           className="text-blue-400 text-sm hover:underline"
         >
           ← Toolbox

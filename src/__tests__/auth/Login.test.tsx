@@ -119,7 +119,7 @@ describe('Login', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('redirects to /private when user is already logged in', async () => {
+  it('redirects to / when user is already logged in', async () => {
     const store = createTestStore();
     store.dispatch(
       setCredentials({
@@ -130,7 +130,7 @@ describe('Login', () => {
     );
     renderWithProviders(<Login />, { store });
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/private');
+      expect(mockNavigate).toHaveBeenCalledWith('/');
     });
   });
 

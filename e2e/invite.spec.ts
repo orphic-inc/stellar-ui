@@ -14,11 +14,11 @@ test.describe('as regular user', () => {
   test('P-09: invite page renders the seeded invite tree above the form', async ({
     page
   }) => {
-    await page.goto('/private/');
+    await page.goto('/');
 
     // The "Invite (N)" link lives in the top-right user menu.
     await page.getByRole('link', { name: /^invite \(/i }).click();
-    await page.waitForURL('**/private/invite**');
+    await page.waitForURL('**/invite**');
 
     const treeHeading = page.getByRole('heading', { name: /^invite tree$/i });
     await expect(treeHeading).toBeVisible();

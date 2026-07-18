@@ -88,7 +88,7 @@ const LogBrowsePage = () => {
           {topics.map((t) => (
             <div key={t.id} data-st="row">
               <Link
-                to={`/private/forums/topics/${t.id}`}
+                to={`/forums/topics/${t.id}`}
                 data-st="title"
                 className="text-sm"
               >
@@ -122,7 +122,7 @@ const LogBrowsePage = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-1.5 flex-wrap">
                   <Link
-                    to={`/private/forums/topics/${p.forumTopicId}#post-${p.id}`}
+                    to={`/forums/topics/${p.forumTopicId}#post-${p.id}`}
                     data-st="title"
                     className="text-sm"
                   >

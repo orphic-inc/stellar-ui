@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 
 const ENTITY_INPUTS = [
-  { label: 'Releases', path: '/private/releases' },
-  { label: 'Artists', path: '/private/artists' },
-  { label: 'Requests', path: '/private/requests' },
-  { label: 'Forums', path: '/private/forums' },
-  { label: 'Log', path: '/private/log' },
-  { label: 'Users', path: '/private/users' }
+  { label: 'Releases', path: '/releases' },
+  { label: 'Artists', path: '/artists' },
+  { label: 'Requests', path: '/requests' },
+  { label: 'Forums', path: '/forums' },
+  { label: 'Log', path: '/log' },
+  { label: 'Users', path: '/users' }
 ];
 
 const QuickSearch = () => {

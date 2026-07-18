@@ -93,7 +93,7 @@ src/
     staff/                    # Staff pages + registry
       staffToolRegistry.tsx   # Central registry of all staff tool routes + permission gates
       staffAffordances.ts     # canSeeModBar, canAccessStaffQueue, canUseReportActions, etc.
-      StaffPage.tsx           # /private/staff — staff landing
+      StaffPage.tsx           # /staff — staff landing
       (+ ~20 other staff pages — see staffToolRegistry for full list)
     auth/                     # Login, Register, Install pages
     forum/                    # Forum pages and post components

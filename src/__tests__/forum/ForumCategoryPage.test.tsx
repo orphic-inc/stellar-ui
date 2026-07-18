@@ -50,12 +50,12 @@ describe('ForumCategoryPage', () => {
     expect(screen.getByText('Music')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Jazz' })).toHaveAttribute(
       'href',
-      '/private/forums/11'
+      '/forums/11'
     );
     expect(screen.getByText('Talk about jazz')).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Best of Blue Note' })
-    ).toHaveAttribute('href', '/private/forums/11/topics/4');
+    ).toHaveAttribute('href', '/forums/11/topics/4');
     expect(screen.getByText('Ambient')).toBeInTheDocument();
   });
 

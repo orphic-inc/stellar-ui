@@ -88,11 +88,11 @@ describe('UserMenu', () => {
     );
   });
 
-  it('profile link points to /private/user/jazzfan', () => {
+  it('profile link points to /user/jazzfan', () => {
     renderWithProviders(<UserMenu user={mockUser} />);
     expect(screen.getByRole('link', { name: 'jazzfan' })).toHaveAttribute(
       'href',
-      '/private/user/jazzfan'
+      '/user/jazzfan'
     );
   });
 });

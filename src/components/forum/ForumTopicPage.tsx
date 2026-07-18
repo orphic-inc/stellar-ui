@@ -86,7 +86,7 @@ const ForumTopicPage = () => {
     if (!window.confirm('Move this thread to the Trash board?')) return;
     try {
       await trashTopic({ forumId: fId, topicId: tId }).unwrap();
-      navigate(`/private/forums/${fId}`);
+      navigate(`/forums/${fId}`);
     } catch {
       return;
     }
@@ -99,7 +99,7 @@ const ForumTopicPage = () => {
   return (
     <div>
       <nav className="text-sm text-gray-500 mb-4">
-        <Link to="/private/forums" className="hover:text-gray-300">
+        <Link to="/forums" className="hover:text-gray-300">
           Forums
         </Link>
         {forum.forumCategory && (
@@ -109,7 +109,7 @@ const ForumTopicPage = () => {
           </>
         )}
         {' › '}
-        <Link to={`/private/forums/${fId}`} className="hover:text-gray-300">
+        <Link to={`/forums/${fId}`} className="hover:text-gray-300">
           {forum.name}
         </Link>
         {' › '}

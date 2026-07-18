@@ -123,7 +123,7 @@ describe('PrivateHeader', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
     expect(screen.getByRole('link', { name: /stellar/i })).toHaveAttribute(
       'href',
-      '/private/'
+      '/'
     );
   });
 

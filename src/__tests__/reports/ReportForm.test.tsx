@@ -87,7 +87,7 @@ describe('ReportForm', () => {
         reason: 'Superseded release',
         evidence: 'https://example.test/releases/99'
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/reports/mine');
+      expect(mockNavigate).toHaveBeenCalledWith('/reports/mine');
     });
   });
 

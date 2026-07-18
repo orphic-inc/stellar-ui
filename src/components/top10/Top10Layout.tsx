@@ -23,7 +23,7 @@ const Top10Layout = () => {
   const { data: user } = useGetMeQuery();
   const canViewHistory = canSeeTop10History(user);
 
-  if (pathname === '/private/top10' || pathname === '/private/top10/') {
+  if (pathname === '/top10' || pathname === '/top10/') {
     return <Navigate to="releases" replace />;
   }
 

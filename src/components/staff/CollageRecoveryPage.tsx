@@ -35,7 +35,7 @@ const CollageRecoveryPage = () => {
     {
       header: 'Created By',
       cell: (c) => (
-        <Link to={`/private/user/${c.user.id}`} data-st="control">
+        <Link to={`/user/${c.user.id}`} data-st="control">
           {c.user.username}
         </Link>
       )
@@ -68,11 +68,7 @@ const CollageRecoveryPage = () => {
   ];
 
   return (
-    <PageShell
-      title="Collage Recovery"
-      width="xl"
-      backTo="/private/staff/tools"
-    >
+    <PageShell title="Collage Recovery" width="xl" backTo="/staff/tools">
       <DataTable
         columns={columns}
         rows={data?.data}

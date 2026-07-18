@@ -33,7 +33,7 @@ const EconomicStatsPage = () => {
     {
       header: 'User',
       cell: (t) => (
-        <Link to={`/private/user/${t.user.id}`} data-st="control">
+        <Link to={`/user/${t.user.id}`} data-st="control">
           {t.user.username}
         </Link>
       )
@@ -69,7 +69,7 @@ const EconomicStatsPage = () => {
   ];
 
   return (
-    <PageShell title="Economic Stats" width="xl" backTo="/private/staff/tools">
+    <PageShell title="Economic Stats" width="xl" backTo="/staff/tools">
       <section className="space-y-3">
         <SectionHeading>Totals by Reason</SectionHeading>
         <DataTable

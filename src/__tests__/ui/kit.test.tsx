@@ -98,7 +98,7 @@ describe('UI kit — data-st contract', () => {
       renderWithProviders(<PageShell title="A">body</PageShell>);
       expect(screen.getByRole('link', { name: '← Toolbox' })).toHaveAttribute(
         'href',
-        '/private/staff/tools'
+        '/staff/tools'
       );
     });
 
@@ -113,13 +113,13 @@ describe('UI kit — data-st contract', () => {
 
     it('renders a back-link when backTo is set', () => {
       renderWithProviders(
-        <PageShell title="A" backTo="/private/staff/tools">
+        <PageShell title="A" backTo="/staff/tools">
           body
         </PageShell>
       );
       expect(screen.getByRole('link', { name: '← Toolbox' })).toHaveAttribute(
         'href',
-        '/private/staff/tools'
+        '/staff/tools'
       );
     });
 

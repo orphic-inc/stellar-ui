@@ -41,15 +41,15 @@ interface Props {
 }
 
 const navLinks = [
-  { label: 'Home', to: '/private/', end: true },
-  { label: 'Communities', to: '/private/communities' },
-  { label: 'Collages', to: '/private/collages' },
-  { label: 'Requests', to: '/private/requests' },
-  { label: 'Forums', to: '/private/forums' },
-  { label: 'Top 10', to: '/private/top10' },
-  { label: 'Wiki', to: '/private/wiki' },
-  { label: 'Rules', to: '/private/rules' },
-  { label: 'Staff', to: '/private/staff', end: true }
+  { label: 'Home', to: '/', end: true },
+  { label: 'Communities', to: '/communities' },
+  { label: 'Collages', to: '/collages' },
+  { label: 'Requests', to: '/requests' },
+  { label: 'Forums', to: '/forums' },
+  { label: 'Top 10', to: '/top10' },
+  { label: 'Wiki', to: '/wiki' },
+  { label: 'Rules', to: '/rules' },
+  { label: 'Staff', to: '/staff', end: true }
 ];
 
 const PrivateHeader = ({ user }: Props) => {
@@ -81,7 +81,7 @@ const PrivateHeader = ({ user }: Props) => {
       {/* Brand + user bar */}
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
         <Link
-          to="/private/"
+          to="/"
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
@@ -112,7 +112,7 @@ const PrivateHeader = ({ user }: Props) => {
               </span>
             </span>
             <Link
-              to="/private/ratio"
+              to="/ratio"
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Ratio:{' '}
@@ -122,7 +122,7 @@ const PrivateHeader = ({ user }: Props) => {
           {/* Quicklinks */}
           <div className="flex items-center gap-3">
             <Link
-              to="/private/messages"
+              to="/messages"
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Inbox
@@ -133,7 +133,7 @@ const PrivateHeader = ({ user }: Props) => {
               )}
             </Link>
             <Link
-              to="/private/inbox/staff"
+              to="/inbox/staff"
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Staff Inbox
@@ -144,19 +144,19 @@ const PrivateHeader = ({ user }: Props) => {
               )}
             </Link>
             <Link
-              to="/private/contribute/list"
+              to="/contribute/list"
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Contributions
             </Link>
             <Link
-              to="/private/bookmarks"
+              to="/bookmarks"
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Bookmarks
             </Link>
             <Link
-              to="/private/friends"
+              to="/friends"
               className="hover:text-[var(--st-text)] transition-colors"
             >
               Friends

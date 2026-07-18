@@ -73,7 +73,7 @@ const DncPage = () => {
       header: 'Added By',
       cell: (entry) =>
         entry.addedBy ? (
-          <Link to={`/private/user/${entry.addedBy.id}`} data-st="control">
+          <Link to={`/user/${entry.addedBy.id}`} data-st="control">
             {entry.addedBy.username}
           </Link>
         ) : (

@@ -4,7 +4,7 @@ import { renderWithProviders } from '../testUtils';
 import Top10Layout from '../../components/top10/Top10Layout';
 
 const mockUseGetMeQuery = jest.fn();
-let mockPathname = '/private/top10/releases';
+let mockPathname = '/top10/releases';
 
 jest.mock('../../store/services/authApi', () => ({
   useGetMeQuery: () => mockUseGetMeQuery()
@@ -24,7 +24,7 @@ jest.mock('react-router-dom', () => ({
     className: ({ isActive }: { isActive: boolean }) => string;
   }) => (
     <a
-      href={`/private/top10/${to}`}
+      href={`/top10/${to}`}
       className={className({ isActive: mockPathname.endsWith(to) })}
     >
       {children}
@@ -38,7 +38,7 @@ jest.mock('react-router-dom', () => ({
 describe('Top10Layout', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPathname = '/private/top10/releases';
+    mockPathname = '/top10/releases';
   });
 
   it('renders standard tabs for a regular user', () => {
@@ -79,8 +79,8 @@ describe('Top10Layout', () => {
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });
 
-  it('redirects to releases when pathname is exactly /private/top10', () => {
-    mockPathname = '/private/top10';
+  it('redirects to releases when pathname is exactly /top10', () => {
+    mockPathname = '/top10';
     mockUseGetMeQuery.mockReturnValue({
       data: { id: 1, userRank: { permissions: {} } }
     });

@@ -96,11 +96,7 @@ const AlbumOfMonthPage = () => {
   ];
 
   return (
-    <PageShell
-      title="Album of the Month"
-      backTo="/private/staff/tools"
-      width="xl"
-    >
+    <PageShell title="Album of the Month" backTo="/staff/tools" width="xl">
       <Panel as="form" onSubmit={handleSubmit} className="p-4 space-y-3">
         <SectionHeading>Add Entry</SectionHeading>
         <div className="grid grid-cols-2 gap-3">

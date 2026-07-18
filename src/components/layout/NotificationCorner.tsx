@@ -44,21 +44,21 @@ function sourcePath(n: Notification): string | null {
   if (!n.source) return null;
   switch (n.page) {
     case 'forums':
-      return `/private/forums/${n.source.forumId}/topics/${n.pageId}#post${n.postId}`;
+      return `/forums/${n.source.forumId}/topics/${n.pageId}#post${n.postId}`;
     case 'artist':
-      return `/private/artists/${n.pageId}`;
+      return `/artists/${n.pageId}`;
     case 'contributions':
     case 'release':
       if (!n.source?.releaseId || !n.source?.communityId) return null;
-      return `/private/communities/${n.source.communityId}/releases/${n.source.releaseId}`;
+      return `/communities/${n.source.communityId}/releases/${n.source.releaseId}`;
     case 'collages':
-      return `/private/collages/${n.pageId}`;
+      return `/collages/${n.pageId}`;
     case 'requests':
-      return `/private/requests/${n.pageId}`;
+      return `/requests/${n.pageId}`;
     case 'communities':
-      return `/private/communities/${n.pageId}`;
+      return `/communities/${n.pageId}`;
     case 'news':
-      return `/private/announcements`;
+      return `/announcements`;
     case 'global_notices':
       return n.source?.url ?? null;
     default:
@@ -125,7 +125,7 @@ const NotificationCorner = () => {
 
           {pmCount > 0 && (
             <Link
-              to="/private/messages"
+              to="/messages"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-3 py-2 border-b border-[var(--st-border-subtle)] bg-[color-mix(in_oklch,var(--st-accent)_15%,transparent)] hover:bg-[color-mix(in_oklch,var(--st-accent)_25%,transparent)] transition-colors"
             >

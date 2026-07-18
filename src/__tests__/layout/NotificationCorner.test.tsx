@@ -162,7 +162,7 @@ describe('NotificationCorner', () => {
       name: /alice quoted you in Jazz Talk/i
     });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', '/private/forums/2/topics/10#post5');
+    expect(link).toHaveAttribute('href', '/forums/2/topics/10#post5');
   });
 
   it('calls markRead when clicking an unread notification link', async () => {
@@ -262,13 +262,13 @@ describe('NotificationCorner', () => {
 
     expect(
       screen.getByRole('link', { name: /carol added to Cool Collage/i })
-    ).toHaveAttribute('href', '/private/collages/30');
+    ).toHaveAttribute('href', '/collages/30');
     expect(
       screen.getByRole('link', { name: /dave filled a request for A Request/i })
-    ).toHaveAttribute('href', '/private/requests/40');
+    ).toHaveAttribute('href', '/requests/40');
     expect(
       screen.getByRole('link', { name: /eve commented on Jazz Heads/i })
-    ).toHaveAttribute('href', '/private/communities/50');
+    ).toHaveAttribute('href', '/communities/50');
     expect(screen.getByText(/unknown #60/i)).toBeInTheDocument();
     expect(screen.getByText(/forums #70/i)).toBeInTheDocument();
   });
@@ -370,7 +370,7 @@ describe('NotificationCorner', () => {
       name: /grace added a new contribution for Kind of Blue/i
     });
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', '/private/communities/3/releases/55');
+    expect(link).toHaveAttribute('href', '/communities/3/releases/55');
   });
 
   it('closes panel when close (✕) button is clicked', async () => {

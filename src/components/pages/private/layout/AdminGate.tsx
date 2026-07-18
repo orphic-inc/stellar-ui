@@ -5,7 +5,7 @@ import { hasStrictAdmin } from '../../../../utils/permissions';
 
 const AdminGate = ({ children }: { children: ReactElement }) => {
   const { data: user } = useGetMeQuery();
-  if (!user || !hasStrictAdmin(user)) return <Navigate to="/private" replace />;
+  if (!user || !hasStrictAdmin(user)) return <Navigate to="/" replace />;
   return children;
 };
 

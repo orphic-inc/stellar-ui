@@ -124,7 +124,7 @@ const TopUsersPage = () => {
                     <span data-st="meta">{item.rank}</span>
                   </td>
                   <td>
-                    <Link to={`/private/user/${item.userId}`} data-st="title">
+                    <Link to={`/user/${item.userId}`} data-st="title">
                       {item.username}
                     </Link>
                     <span data-st="meta" className="ml-2 text-xs">

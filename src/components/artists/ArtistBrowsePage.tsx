@@ -221,7 +221,7 @@ const ArtistBrowsePage = () => {
                   {data.data.map((a) => (
                     <tr key={a.id} data-st="row">
                       <td>
-                        <Link to={`/private/artists/${a.id}`} data-st="title">
+                        <Link to={`/artists/${a.id}`} data-st="title">
                           {a.name}
                         </Link>
                         {a.vanityHouse && (

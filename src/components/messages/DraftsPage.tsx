@@ -39,11 +39,11 @@ const DraftsPage = () => {
           Drafts
         </h2>
         <div className="flex gap-2 text-sm">
-          <Link to="/private/messages/new" data-st="control" data-st-primary>
+          <Link to="/messages/new" data-st="control" data-st-primary>
             Compose
           </Link>
           <Link
-            to="/private/messages"
+            to="/messages"
             data-st="control"
             className="px-3 py-1 rounded border border-[var(--st-border)]"
           >
@@ -71,7 +71,7 @@ const DraftsPage = () => {
               <tr key={draft.id} data-st="row">
                 <td className="py-2 pr-3">
                   <Link
-                    to={`/private/messages/new?draft=${draft.id}`}
+                    to={`/messages/new?draft=${draft.id}`}
                     data-st="control"
                   >
                     {draft.subject || '(no subject)'}

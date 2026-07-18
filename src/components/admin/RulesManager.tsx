@@ -302,10 +302,7 @@ const RulesManager = () => {
                     <Fragment key={page.id}>
                       <tr data-st="row">
                         <td className="font-medium">
-                          <Link
-                            to={`/private/rules/${page.slug}`}
-                            data-st="control"
-                          >
+                          <Link to={`/rules/${page.slug}`} data-st="control">
                             {page.title}
                           </Link>
                         </td>

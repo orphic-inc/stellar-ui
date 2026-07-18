@@ -46,10 +46,7 @@ const UserRankManager = () => {
       header: 'Actions',
       cell: (r) => (
         <span className="flex gap-3">
-          <Link
-            to={`/private/staff/tools/user-ranks/${r.id}/edit`}
-            data-st="control"
-          >
+          <Link to={`/staff/tools/user-ranks/${r.id}/edit`} data-st="control">
             Edit
           </Link>
           <Button variant="link-danger" onClick={() => handleDelete(r.id)}>
@@ -66,7 +63,7 @@ const UserRankManager = () => {
       width="2xl"
       actions={
         <Link
-          to="/private/staff/tools/user-ranks/new"
+          to="/staff/tools/user-ranks/new"
           data-st="control"
           data-st-primary
           className="text-sm"

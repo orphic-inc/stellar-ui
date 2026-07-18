@@ -57,7 +57,7 @@ describe('NewTopicForm', () => {
         question: 'Best format?',
         answers: JSON.stringify(['CD', 'Vinyl'])
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/forums/9/topics/77');
+      expect(mockNavigate).toHaveBeenCalledWith('/forums/9/topics/77');
     });
   });
 

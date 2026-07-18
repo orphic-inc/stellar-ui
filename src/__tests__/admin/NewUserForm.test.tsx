@@ -64,7 +64,7 @@ describe('NewUserForm', () => {
       password: 'secret99'
     });
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/private/staff/tools');
+      expect(mockNavigate).toHaveBeenCalledWith('/staff/tools');
     });
   });
 

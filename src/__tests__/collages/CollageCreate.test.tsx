@@ -89,7 +89,7 @@ describe('CollageCreate', () => {
         categoryId: 2,
         tags: ['jazz', 'synth', 'ambient']
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/collages/88');
+      expect(mockNavigate).toHaveBeenCalledWith('/collages/88');
     });
   });
 
@@ -139,11 +139,11 @@ describe('CollageCreate', () => {
     });
   });
 
-  it('navigates to /private/collages when Cancel is clicked', async () => {
+  it('navigates to /collages when Cancel is clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(<CollageCreate />);
     await user.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/private/collages');
+    expect(mockNavigate).toHaveBeenCalledWith('/collages');
   });
 
   it('disables submit and shows counter when personal collage limit is reached', async () => {

@@ -27,7 +27,7 @@ const ForumPage = () => {
   return (
     <div>
       <nav className="text-sm text-gray-500 mb-4">
-        <Link to="/private/forums" className="hover:text-gray-300">
+        <Link to="/forums" className="hover:text-gray-300">
           Forums
         </Link>
         {' › '}
@@ -46,7 +46,7 @@ const ForumPage = () => {
           {/* New Topic is interactive chrome — no contract Role covers a CTA
               yet, so it keeps its utility paint (deferred, per CommunityPage). */}
           <Link
-            to={`/private/forums/${forumId}/new`}
+            to={`/forums/${forumId}/new`}
             className="text-xs text-indigo-400 hover:text-indigo-300 normal-case tracking-normal"
           >
             + New Topic
@@ -60,7 +60,7 @@ const ForumPage = () => {
                 {topic.isLocked && <span data-st="chip">[Locked]</span>}
                 {topic.isSticky && <span data-st="chip">[Sticky]</span>}
                 <Link
-                  to={`/private/forums/${forumId}/topics/${topic.id}`}
+                  to={`/forums/${forumId}/topics/${topic.id}`}
                   data-st="title"
                   className="text-sm"
                 >
@@ -70,7 +70,7 @@ const ForumPage = () => {
                   {topic.numPosts} replies
                 </span>
                 <Link
-                  to={`/private/user/${topic.author?.username}`}
+                  to={`/user/${topic.author?.username}`}
                   data-st="meta"
                   className="text-xs"
                 >

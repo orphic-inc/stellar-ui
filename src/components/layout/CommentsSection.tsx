@@ -150,7 +150,7 @@ const CommentsSection = ({
               <div className="flex gap-2 mt-1">
                 {currentUser && currentUser.id !== c.authorId && (
                   <Link
-                    to={`/private/reports/new?targetType=Comment&targetId=${c.id}`}
+                    to={`/reports/new?targetType=Comment&targetId=${c.id}`}
                     className="text-xs text-[var(--st-text-faint)] hover:text-[var(--st-text-muted)]"
                     aria-label="Report comment"
                     title="Report this comment"

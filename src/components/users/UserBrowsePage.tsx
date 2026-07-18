@@ -193,7 +193,7 @@ const UserBrowsePage = () => {
                   {data.data.map((u) => (
                     <tr key={u.id} data-st="row">
                       <td>
-                        <Link to={`/private/user/${u.id}`} data-st="title">
+                        <Link to={`/user/${u.id}`} data-st="title">
                           {u.username}
                         </Link>
                       </td>

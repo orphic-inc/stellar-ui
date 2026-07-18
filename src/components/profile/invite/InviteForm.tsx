@@ -47,7 +47,7 @@ const InviteForm = () => {
     <div className="thin">
       <div className="header">
         <h2 data-st="prose" data-st-strong>
-          <Link to={`/private/user/${user?.username}`} data-st="control">
+          <Link to={`/user/${user?.username}`} data-st="control">
             {user?.username}
           </Link>
           {' › '}

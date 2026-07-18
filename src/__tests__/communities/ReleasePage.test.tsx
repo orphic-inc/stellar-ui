@@ -556,7 +556,7 @@ describe('ReleasePage', () => {
     renderWithProviders(<ReleasePage />);
     await user.click(screen.getByRole('button', { name: /add format/i }));
     expect(mockNavigate).toHaveBeenCalledWith(
-      '/private/communities/1/releases/5/contribute'
+      '/communities/1/releases/5/contribute'
     );
   });
 
@@ -573,7 +573,7 @@ describe('ReleasePage', () => {
       screen.getByRole('button', { name: /be the first to contribute/i })
     );
     expect(mockNavigate).toHaveBeenCalledWith(
-      '/private/communities/1/releases/5/contribute'
+      '/communities/1/releases/5/contribute'
     );
   });
 

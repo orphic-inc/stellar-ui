@@ -31,7 +31,7 @@ const RulesSubPage = () => {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Link
-          to="/private/rules"
+          to="/rules"
           className="text-indigo-400 hover:text-indigo-300 text-sm mb-4 inline-block"
         >
           ← Back to Rules
@@ -43,7 +43,7 @@ const RulesSubPage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <Link
-        to="/private/rules"
+        to="/rules"
         className="text-indigo-400 hover:text-indigo-300 text-sm mb-4 inline-block"
       >
         ← Back to Rules

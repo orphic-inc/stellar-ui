@@ -20,7 +20,7 @@ const InviteTreePage = () => {
     {
       header: 'User',
       cell: (row) => (
-        <Link to={`/private/user/${row.user.id}`} data-st="control">
+        <Link to={`/user/${row.user.id}`} data-st="control">
           {row.user.username}
         </Link>
       )
@@ -29,7 +29,7 @@ const InviteTreePage = () => {
       header: 'Invited By',
       cell: (row) =>
         row.inviter ? (
-          <Link to={`/private/user/${row.inviter.id}`} data-st="control">
+          <Link to={`/user/${row.inviter.id}`} data-st="control">
             {row.inviter.username}
           </Link>
         ) : (

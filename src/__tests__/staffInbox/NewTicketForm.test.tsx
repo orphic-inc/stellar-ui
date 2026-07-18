@@ -62,7 +62,7 @@ describe('NewTicketForm', () => {
       subject: 'Account problem',
       body: 'I cannot log in.'
     });
-    expect(mockNavigate).toHaveBeenCalledWith('/private/inbox/staff/42');
+    expect(mockNavigate).toHaveBeenCalledWith('/inbox/staff/42');
   });
 
   it('dispatches danger alert on submission failure', async () => {
@@ -112,6 +112,6 @@ describe('NewTicketForm', () => {
     const user = userEvent.setup();
     renderWithProviders(<NewTicketForm />);
     await user.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/private/inbox/staff');
+    expect(mockNavigate).toHaveBeenCalledWith('/inbox/staff');
   });
 });

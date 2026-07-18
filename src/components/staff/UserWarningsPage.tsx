@@ -35,7 +35,7 @@ const UserWarningsPage = () => {
     {
       header: 'User',
       cell: (w) => (
-        <Link to={`/private/user/${w.userId}`} data-st="control">
+        <Link to={`/user/${w.userId}`} data-st="control">
           {w.user?.username ?? `#${w.userId}`}
         </Link>
       )
@@ -49,7 +49,7 @@ const UserWarningsPage = () => {
       header: 'Warned by',
       cell: (w) =>
         w.warnedBy ? (
-          <Link to={`/private/user/${w.warnedBy.id}`} data-st="control">
+          <Link to={`/user/${w.warnedBy.id}`} data-st="control">
             {w.warnedBy.username}
           </Link>
         ) : (

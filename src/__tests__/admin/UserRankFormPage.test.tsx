@@ -135,9 +135,7 @@ describe('UserRankFormPage — create mode', () => {
           permittedForumIds: [7]
         })
       );
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/private/staff/tools/user-ranks'
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/staff/tools/user-ranks');
     });
   });
 
@@ -268,9 +266,7 @@ describe('UserRankFormPage — edit mode', () => {
       expect(mockUpdateUserRank).toHaveBeenCalledWith(
         expect.objectContaining({ id: 3 })
       );
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/private/staff/tools/user-ranks'
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/staff/tools/user-ranks');
     });
   });
 });

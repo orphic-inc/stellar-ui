@@ -147,11 +147,11 @@ const ReleasePage = () => {
     <div>
       {/* Breadcrumb */}
       <nav data-st="meta" className="text-sm mb-4">
-        <Link to="/private/communities" data-st="control">
+        <Link to="/communities" data-st="control">
           Communities
         </Link>
         {' › '}
-        <Link to={`/private/communities/${communityId}`} data-st="control">
+        <Link to={`/communities/${communityId}`} data-st="control">
           {community?.name ?? 'Community'}
         </Link>
         {' › '}
@@ -178,7 +178,7 @@ const ReleasePage = () => {
           data-st="control"
           onClick={() =>
             navigate(
-              `/private/communities/${communityId}/releases/${releaseId}/contribute`
+              `/communities/${communityId}/releases/${releaseId}/contribute`
             )
           }
         >
@@ -212,7 +212,7 @@ const ReleasePage = () => {
           </button>
         )}
         <Link
-          to={`/private/reports/new?targetType=Release&targetId=${rId}`}
+          to={`/reports/new?targetType=Release&targetId=${rId}`}
           data-st="control"
         >
           [Report release]
@@ -259,7 +259,7 @@ const ReleasePage = () => {
                   data-st="control"
                   onClick={() =>
                     navigate(
-                      `/private/communities/${communityId}/releases/${releaseId}/contribute`
+                      `/communities/${communityId}/releases/${releaseId}/contribute`
                     )
                   }
                 >
@@ -329,7 +329,7 @@ const ReleasePage = () => {
                             <span data-st="prose">{entry.summary}</span>
                             <span data-st="meta">by</span>
                             <Link
-                              to={`/private/user/${entry.actor.username}`}
+                              to={`/user/${entry.actor.username}`}
                               data-st="control"
                             >
                               {entry.actor.username}
@@ -516,10 +516,7 @@ const ReleasePage = () => {
                 Artist
               </div>
               <div className="px-3 py-2 text-sm">
-                <Link
-                  to={`/private/artists/${release.artist.id}`}
-                  data-st="control"
-                >
+                <Link to={`/artists/${release.artist.id}`} data-st="control">
                   {release.artist.name}
                 </Link>
               </div>
@@ -544,9 +541,7 @@ const ReleasePage = () => {
                       className="flex items-center justify-between gap-2 px-2 py-1.5 text-xs"
                     >
                       <Link
-                        to={`/private/releases?tags=${encodeURIComponent(
-                          t.name
-                        )}`}
+                        to={`/releases?tags=${encodeURIComponent(t.name)}`}
                         data-st="control"
                         className="min-w-0 truncate"
                       >

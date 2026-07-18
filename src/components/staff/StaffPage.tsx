@@ -19,7 +19,7 @@ const memberColumns: Column<StaffMember>[] = [
   {
     header: 'Username',
     cell: (m) => (
-      <Link to={`/private/user/${m.userId}`} data-st="control">
+      <Link to={`/user/${m.userId}`} data-st="control">
         {m.username}
       </Link>
     )
@@ -87,7 +87,7 @@ const StaffPage = () => {
       backTo={null}
       actions={
         <Link
-          to="/private/inbox/staff/new"
+          to="/inbox/staff/new"
           data-st="control"
           data-st-primary
           className="text-sm"

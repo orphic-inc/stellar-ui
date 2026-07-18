@@ -56,7 +56,7 @@ describe('ComposeForm RTK Query integration', () => {
           body: 'How are you?'
         })
       );
-      expect(mockNavigate).toHaveBeenCalledWith('/private/messages/12');
+      expect(mockNavigate).toHaveBeenCalledWith('/messages/12');
     });
 
     await user.click(screen.getByRole('button', { name: /save draft/i }));

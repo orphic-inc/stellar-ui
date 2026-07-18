@@ -117,7 +117,7 @@ describe('TopUsersPage RTK Query integration', () => {
     await screen.findByText('user1');
     expect(screen.getByRole('link', { name: 'user1' })).toHaveAttribute(
       'href',
-      '/private/user/1'
+      '/user/1'
     );
     expect(screen.getByText('Member')).toBeInTheDocument();
     expect(screen.getByText('2.00')).toBeInTheDocument();

@@ -113,7 +113,7 @@ const RulesPage = () => {
           <ul className="space-y-2">
             {pages.map((page) => (
               <li key={page.id}>
-                <Link to={`/private/rules/${page.slug}`} data-st="control">
+                <Link to={`/rules/${page.slug}`} data-st="control">
                   {page.title}
                 </Link>
               </li>

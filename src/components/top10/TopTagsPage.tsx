@@ -90,9 +90,7 @@ const TopTagsPage = () => {
                   </td>
                   <td>
                     <Link
-                      to={`/private/releases?tags=${encodeURIComponent(
-                        item.name
-                      )}`}
+                      to={`/releases?tags=${encodeURIComponent(item.name)}`}
                       data-st="title"
                     >
                       {item.name}

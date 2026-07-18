@@ -10,7 +10,7 @@ const CommunityRow = ({ community }: Props) => (
   <tr data-st="row" className="transition-colors">
     <td className="py-3 pr-3">
       <Link
-        to={`/private/communities/${community.id}`}
+        to={`/communities/${community.id}`}
         data-st="title"
         className="font-medium"
       >

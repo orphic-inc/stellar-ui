@@ -98,7 +98,7 @@ describe('CreateRequestForm', () => {
         year: 1960,
         image: 'https://img'
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/requests/55');
+      expect(mockNavigate).toHaveBeenCalledWith('/requests/55');
       const alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Request created.')).toBe(true);
     });

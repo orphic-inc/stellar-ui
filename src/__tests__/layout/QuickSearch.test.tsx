@@ -23,16 +23,14 @@ describe('QuickSearch', () => {
     const input = screen.getByPlaceholderText('Releases');
     fireEvent.change(input, { target: { value: 'miles davis' } });
     fireEvent.keyDown(input, { key: 'Enter' });
-    expect(mockNavigate).toHaveBeenCalledWith(
-      '/private/releases?q=miles%20davis'
-    );
+    expect(mockNavigate).toHaveBeenCalledWith('/releases?q=miles%20davis');
   });
 
   it('navigates to the bare path when the query is empty', () => {
     render(<QuickSearch />);
     const input = screen.getByPlaceholderText('Artists');
     fireEvent.keyDown(input, { key: 'Enter' });
-    expect(mockNavigate).toHaveBeenCalledWith('/private/artists');
+    expect(mockNavigate).toHaveBeenCalledWith('/artists');
   });
 
   it('paints inputs from the field role (data-st contract)', () => {

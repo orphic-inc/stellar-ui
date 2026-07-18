@@ -109,7 +109,7 @@ const ReportDetailPage = () => {
       error.status === 403 &&
       !canModerateReport
     ) {
-      navigate('/private/reports/mine', { replace: true });
+      navigate('/reports/mine', { replace: true });
     }
   }, [error, canModerateReport, navigate]);
 
@@ -128,19 +128,11 @@ const ReportDetailPage = () => {
     <div className="thin">
       <div className="mb-4">
         {canModerateReport ? (
-          <Link
-            to="/private/staff/reports"
-            data-st="control"
-            className="text-sm"
-          >
+          <Link to="/staff/reports" data-st="control" className="text-sm">
             ← Reports Queue
           </Link>
         ) : (
-          <Link
-            to="/private/reports/mine"
-            data-st="control"
-            className="text-sm"
-          >
+          <Link to="/reports/mine" data-st="control" className="text-sm">
             ← My Reports
           </Link>
         )}

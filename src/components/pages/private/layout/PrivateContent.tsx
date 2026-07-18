@@ -81,7 +81,7 @@ const StaffToolboxGate = ({ children }: { children: ReactNode }) => {
   const { data: user } = useGetMeQuery();
 
   if (!user || !canAccessToolbox(user)) {
-    return <Navigate to="/private" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -91,7 +91,7 @@ const StaffTop10HistoryGate = ({ children }: { children: ReactNode }) => {
   const { data: user } = useGetMeQuery();
 
   if (!user || !canSeeTop10History(user)) {
-    return <Navigate to="/private/top10/releases" replace />;
+    return <Navigate to="/top10/releases" replace />;
   }
 
   return <>{children}</>;

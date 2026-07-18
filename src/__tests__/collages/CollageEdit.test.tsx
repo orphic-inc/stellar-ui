@@ -71,7 +71,7 @@ describe('CollageEdit', () => {
       } as never)
     );
     renderWithProviders(<CollageEdit />, { store });
-    expect(mockNavigate).toHaveBeenCalledWith('/private/collages');
+    expect(mockNavigate).toHaveBeenCalledWith('/collages');
   });
 
   it('staff user sees staff settings, submits with staff payload', async () => {
@@ -183,7 +183,7 @@ describe('CollageEdit', () => {
     renderWithProviders(<CollageEdit />, { store });
 
     await user.click(screen.getByRole('button', { name: /^cancel$/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/private/collages/8');
+    expect(mockNavigate).toHaveBeenCalledWith('/collages/8');
   });
 
   it('submits owner edits for a personal collage', async () => {
@@ -219,7 +219,7 @@ describe('CollageEdit', () => {
         name: 'Updated Mix',
         isFeatured: true
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/collages/8');
+      expect(mockNavigate).toHaveBeenCalledWith('/collages/8');
     });
   });
 });

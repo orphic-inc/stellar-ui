@@ -71,7 +71,7 @@ const RecoveryQueuePage = () => {
     {
       header: 'User',
       cell: (row) => (
-        <Link to={`/private/user/${row.userId}`} data-st="control">
+        <Link to={`/user/${row.userId}`} data-st="control">
           {row.username}
         </Link>
       )

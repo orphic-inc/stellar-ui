@@ -47,7 +47,7 @@ describe('ReportDetailPage', () => {
         resolvedAt: null,
         resolution: null,
         resolutionAction: null,
-        sourceUrl: '/private/forums/42',
+        sourceUrl: '/forums/42',
         notes: [
           {
             id: 1,
@@ -137,7 +137,7 @@ describe('ReportDetailPage', () => {
     renderWithProviders(<ReportDetailPage />, { store });
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/private/reports/mine', {
+      expect(mockNavigate).toHaveBeenCalledWith('/reports/mine', {
         replace: true
       });
     });
@@ -189,7 +189,7 @@ describe('ReportDetailPage', () => {
         resolvedAt: null,
         resolution: null,
         resolutionAction: null,
-        sourceUrl: '/private/forums/42',
+        sourceUrl: '/forums/42',
         notes: []
       },
       isLoading: false,
@@ -243,7 +243,7 @@ describe('ReportDetailPage', () => {
         resolvedAt: null,
         resolution: null,
         resolutionAction: null,
-        sourceUrl: '/private/forums/42',
+        sourceUrl: '/forums/42',
         notes: []
       },
       isLoading: false,

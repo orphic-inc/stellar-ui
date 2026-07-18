@@ -46,7 +46,7 @@ const Register = () => {
         ...(isInviteMode && { inviteKey: form.inviteKey })
       }).unwrap();
       dispatch(addAlert('Account created.', 'success'));
-      navigate('/private');
+      navigate('/');
     } catch (err: unknown) {
       dispatch(
         addAlert(getApiErrorMessage(err) ?? 'Registration failed.', 'danger')

@@ -96,7 +96,7 @@ const UserRankFormPage = () => {
       } else {
         await createUserRank(payload).unwrap();
       }
-      navigate('/private/staff/tools/user-ranks');
+      navigate('/staff/tools/user-ranks');
     } catch {
       dispatch(
         addAlert(
@@ -115,14 +115,14 @@ const UserRankFormPage = () => {
         <div>
           <div className="flex gap-3 text-sm mb-2">
             <Link
-              to="/private/staff/tools/user-ranks"
+              to="/staff/tools/user-ranks"
               className="text-indigo-400 hover:text-indigo-300 transition-colors"
             >
               ← User Ranks
             </Link>
             <span className="text-gray-600">·</span>
             <Link
-              to="/private/staff/tools"
+              to="/staff/tools"
               className="text-gray-400 hover:text-gray-300 transition-colors"
             >
               Toolbox
@@ -353,7 +353,7 @@ const UserRankFormPage = () => {
 
         <div className="flex justify-end gap-3">
           <Link
-            to="/private/staff/tools/user-ranks"
+            to="/staff/tools/user-ranks"
             className="bg-gray-700 hover:bg-gray-600 text-gray-300 px-4 py-2 rounded text-sm transition-colors"
           >
             Cancel

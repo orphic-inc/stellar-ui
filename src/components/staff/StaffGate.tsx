@@ -12,7 +12,7 @@ const StaffGate = ({ permissions, children }: StaffGateProps) => {
   const { data: user } = useGetMeQuery();
 
   if (!user || !hasAnyPermission(user, permissions)) {
-    return <Navigate to="/private" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

@@ -34,7 +34,7 @@ const MyReportsPage = () => {
         <h2 data-st="prose" data-st-strong className="text-xl">
           My Reports
         </h2>
-        <Link to="/private/reports/new" data-st="control" data-st-primary>
+        <Link to="/reports/new" data-st="control" data-st-primary>
           File a Report
         </Link>
       </div>
@@ -61,7 +61,7 @@ const MyReportsPage = () => {
                   <span data-st="meta">{report.targetType}</span>
                 </td>
                 <td className="py-2 pr-3">
-                  <Link to={`/private/reports/${report.id}`} data-st="control">
+                  <Link to={`/reports/${report.id}`} data-st="control">
                     {report.category}
                   </Link>
                 </td>

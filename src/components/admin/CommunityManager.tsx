@@ -335,10 +335,7 @@ const CommunityManager = () => {
                     ) : (
                       <tr key={c.id} data-st="row">
                         <td className="font-medium">
-                          <Link
-                            to={`/private/communities/${c.id}`}
-                            data-st="control"
-                          >
+                          <Link to={`/communities/${c.id}`} data-st="control">
                             {c.name}
                           </Link>
                         </td>

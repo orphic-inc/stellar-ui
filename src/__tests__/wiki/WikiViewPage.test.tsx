@@ -89,7 +89,7 @@ describe('WikiViewPage', () => {
         alias: 'old-page'
       });
       expect(mockDeleteWikiPage).toHaveBeenCalledWith(12);
-      expect(mockNavigate).toHaveBeenCalledWith('/private/wiki');
+      expect(mockNavigate).toHaveBeenCalledWith('/wiki');
       const alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Page deleted.')).toBe(true);
     });

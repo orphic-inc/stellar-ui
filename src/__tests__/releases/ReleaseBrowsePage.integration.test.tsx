@@ -206,7 +206,7 @@ describe('ReleaseBrowsePage RTK Query integration', () => {
 
     expect(screen.getByRole('link', { name: 'Release 1' })).toHaveAttribute(
       'href',
-      '/private/communities/5/releases/1'
+      '/communities/5/releases/1'
     );
     // Release 2 has no communityId — should be a span, not a link
     expect(screen.queryByRole('link', { name: 'Release 2' })).toBeNull();

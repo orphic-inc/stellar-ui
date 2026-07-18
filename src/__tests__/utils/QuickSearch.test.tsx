@@ -32,7 +32,7 @@ describe('QuickSearch', () => {
       'Kind of Blue{Enter}'
     );
     expect(mockNavigate).toHaveBeenCalledWith(
-      `/private/releases?q=${encodeURIComponent('Kind of Blue')}`
+      `/releases?q=${encodeURIComponent('Kind of Blue')}`
     );
   });
 
@@ -40,7 +40,7 @@ describe('QuickSearch', () => {
     const user = userEvent.setup();
     renderWithProviders(<QuickSearch />);
     await user.type(screen.getByPlaceholderText('Artists'), '{Enter}');
-    expect(mockNavigate).toHaveBeenCalledWith('/private/artists');
+    expect(mockNavigate).toHaveBeenCalledWith('/artists');
   });
 
   it('clears input after navigation', async () => {

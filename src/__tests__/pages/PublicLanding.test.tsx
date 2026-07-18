@@ -3,22 +3,14 @@ import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../testUtils';
 import PublicLanding from '../../components/pages/public/PublicLanding';
 
-const mockNavigate = jest.fn();
-
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
     <a href={to}>{children}</a>
   )
 }));
 
-let mockMe: { id: number } | undefined = undefined;
 let mockInstallStatus: { registrationStatus: string } | undefined = undefined;
-
-jest.mock('../../store/services/authApi', () => ({
-  useGetMeQuery: () => ({ data: mockMe })
-}));
 
 jest.mock('../../store/services/installApi', () => ({
   useGetInstallStatusQuery: () => ({ data: mockInstallStatus })
@@ -27,7 +19,6 @@ jest.mock('../../store/services/installApi', () => ({
 describe('PublicLanding', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockMe = undefined;
     mockInstallStatus = undefined;
   });
 
@@ -53,11 +44,5 @@ describe('PublicLanding', () => {
     expect(
       screen.queryByRole('link', { name: /request access/i })
     ).not.toBeInTheDocument();
-  });
-
-  it('navigates to /private when user is logged in', () => {
-    mockMe = { id: 1 };
-    renderWithProviders(<PublicLanding />);
-    expect(mockNavigate).toHaveBeenCalledWith('/private');
   });
 });

@@ -40,7 +40,7 @@ const ForumCategoryPage = () => {
               {category.forums?.map((forum) => (
                 <tr key={forum.id} data-st="row">
                   <td>
-                    <Link to={`/private/forums/${forum.id}`} data-st="title">
+                    <Link to={`/forums/${forum.id}`} data-st="title">
                       {forum.name}
                     </Link>
                     {forum.description && (
@@ -54,7 +54,7 @@ const ForumCategoryPage = () => {
                   <td>
                     {forum.lastTopic ? (
                       <Link
-                        to={`/private/forums/${forum.id}/topics/${forum.lastTopic.id}`}
+                        to={`/forums/${forum.id}/topics/${forum.lastTopic.id}`}
                         data-st="control"
                         className="text-xs"
                       >

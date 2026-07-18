@@ -276,11 +276,7 @@ const WikiHistoryPage = () => {
       )}
 
       <div className="mb-4">
-        <Link
-          to={`/private/wiki/${pageId}`}
-          data-st="control"
-          className="text-xs"
-        >
+        <Link to={`/wiki/${pageId}`} data-st="control" className="text-xs">
           ← Back to page
         </Link>
         <h1 data-st="prose" data-st-strong className="text-xl mt-1">
@@ -385,7 +381,7 @@ const WikiHistoryPage = () => {
                 <span data-st="prose">{rev.title}</span>
                 <div data-st="meta" className="text-xs mt-0.5">
                   Rev {rev.revision} · by{' '}
-                  <Link to={`/private/user/${rev.author.id}`} data-st="control">
+                  <Link to={`/user/${rev.author.id}`} data-st="control">
                     {rev.author.username}
                   </Link>{' '}
                   · {new Date(rev.createdAt).toLocaleString()}

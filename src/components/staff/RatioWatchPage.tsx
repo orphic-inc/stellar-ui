@@ -17,7 +17,7 @@ const RatioWatchPage = () => {
     {
       header: 'User',
       cell: (r) => (
-        <Link to={`/private/user/${r.user.id}`} data-st="control">
+        <Link to={`/user/${r.user.id}`} data-st="control">
           {r.user.username}
         </Link>
       )
@@ -61,7 +61,7 @@ const RatioWatchPage = () => {
   ];
 
   return (
-    <PageShell title="Ratio Watch" width="xl" backTo="/private/staff/tools">
+    <PageShell title="Ratio Watch" width="xl" backTo="/staff/tools">
       <DataTable
         columns={columns}
         rows={data?.data}

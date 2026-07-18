@@ -449,7 +449,7 @@ describe('CollageDetail', () => {
         releaseId: 55
       });
       expect(mockDeleteCollage).toHaveBeenCalledWith(8);
-      expect(mockNavigate).toHaveBeenCalledWith('/private/collages');
+      expect(mockNavigate).toHaveBeenCalledWith('/collages');
     });
   });
 

@@ -21,18 +21,18 @@ test.describe('as regular user', () => {
   test('P-06: browse to a release and see contributions section', async ({
     page
   }) => {
-    await page.goto('/private/communities');
+    await page.goto('/communities');
 
     // Click the first community in the list
     const communityLink = page
-      .locator('a[href*="/private/communities/"]')
+      .locator('a[href*="/communities/"]')
       .first();
     await expect(communityLink).toBeVisible({
       message:
         'No communities found — seed at least one before running E2E tests'
     });
     await communityLink.click();
-    await page.waitForURL('**/private/communities/**');
+    await page.waitForURL('**/communities/**');
 
     // Click the first release in the table
     const releaseLink = page.locator('a[href*="/releases/"]').first();
@@ -93,7 +93,7 @@ test.describe('as regular user', () => {
 
     // Navigates to the contributions list on success
     await page.waitForURL('**/contribute/list**');
-    await expect(page).toHaveURL(/\/private\/contribute\/list/);
+    await expect(page).toHaveURL(/\/contribute\/list/);
   });
 
   test('P-07b: report a dead link via the inline modal', async ({ page }) => {

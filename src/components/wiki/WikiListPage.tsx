@@ -89,7 +89,7 @@ const WikiListPage = () => {
         </h1>
         {canCreate && (
           <Link
-            to="/private/wiki/new"
+            to="/wiki/new"
             data-st="control"
             data-st-primary
             className="text-sm"
@@ -196,7 +196,7 @@ const WikiListPage = () => {
             {data.data.map((p) => (
               <div key={p.id} data-st="row" className="justify-between">
                 <div>
-                  <Link to={`/private/wiki/${p.id}`} data-st="title">
+                  <Link to={`/wiki/${p.id}`} data-st="title">
                     {p.title}
                   </Link>
                   <div data-st="meta" className="text-xs mt-0.5">
@@ -211,7 +211,7 @@ const WikiListPage = () => {
                   </div>
                 </div>
                 <Link
-                  to={`/private/wiki/${p.id}/history`}
+                  to={`/wiki/${p.id}/history`}
                   data-st="control"
                   className="text-xs"
                 >

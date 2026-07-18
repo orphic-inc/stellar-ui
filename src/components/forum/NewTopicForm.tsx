@@ -47,7 +47,7 @@ const NewTopicForm = () => {
     }
     try {
       const topic = await createTopic(payload).unwrap();
-      navigate(`/private/forums/${forumId}/topics/${topic.id}`);
+      navigate(`/forums/${forumId}/topics/${topic.id}`);
     } catch (err) {
       dispatch(
         addAlert(
@@ -62,11 +62,11 @@ const NewTopicForm = () => {
   return (
     <div className="space-y-6">
       <nav className="text-sm">
-        <Link to="/private/forums" data-st="control">
+        <Link to="/forums" data-st="control">
           Forums
         </Link>
         <span data-st="meta">{' › '}</span>
-        <Link to={`/private/forums/${forumId}`} data-st="control">
+        <Link to={`/forums/${forumId}`} data-st="control">
           {forum?.name ?? 'Forum'}
         </Link>
         <span data-st="meta">{' › '}</span>

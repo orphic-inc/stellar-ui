@@ -188,7 +188,7 @@ describe('CommunityPage', () => {
     });
     renderWithProviders(<CommunityPage />);
     const leaderLink = screen.getByRole('link', { name: 'staffmember' });
-    expect(leaderLink).toHaveAttribute('href', '/private/user/staffmember');
+    expect(leaderLink).toHaveAttribute('href', '/user/staffmember');
     expect(screen.getByText(/leader:/i)).toBeInTheDocument();
   });
 
@@ -200,7 +200,7 @@ describe('CommunityPage', () => {
     });
     renderWithProviders(<CommunityPage />);
     const leaderLink = screen.getByRole('link', { name: 'User #555' });
-    expect(leaderLink).toHaveAttribute('href', '/private/user/555');
+    expect(leaderLink).toHaveAttribute('href', '/user/555');
   });
 
   it('omits the leader line when the community has no leader', () => {

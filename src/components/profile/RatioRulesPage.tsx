@@ -34,7 +34,7 @@ const RatioRulesPage = () => {
       className="max-w-3xl mx-auto px-4 py-8 space-y-8 text-sm leading-relaxed"
     >
       <div>
-        <Link to="/private/" data-st="control" className="text-xs">
+        <Link to="/" data-st="control" className="text-xs">
           ← Home
         </Link>
         <h1 data-st="prose" data-st-strong className="mt-2 text-2xl">

@@ -188,7 +188,7 @@ describe('RequestDetailPage', () => {
         contributionId: 55
       });
       expect(mockDeleteRequest).toHaveBeenCalledWith(12);
-      expect(mockNavigate).toHaveBeenCalledWith('/private/requests');
+      expect(mockNavigate).toHaveBeenCalledWith('/requests');
       expect(mockCommentsSection).toHaveBeenCalledWith({
         context: 'requests',
         pageId: 12

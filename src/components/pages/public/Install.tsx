@@ -51,7 +51,7 @@ const Install = () => {
         )
       );
       dispatch(addAlert('Installation complete. Welcome, SysOp.', 'success'));
-      navigate('/private');
+      navigate('/');
     } catch (err: unknown) {
       dispatch(
         addAlert(getApiErrorMessage(err) ?? 'Installation failed', 'danger')

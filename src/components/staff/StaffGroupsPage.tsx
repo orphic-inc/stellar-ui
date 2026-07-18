@@ -167,7 +167,7 @@ const StaffGroupsPage = () => {
   ];
 
   return (
-    <PageShell title="Staff Groups" backTo="/private/staff/tools" width="sm">
+    <PageShell title="Staff Groups" backTo="/staff/tools" width="sm">
       <section className="space-y-3">
         <SectionHeading>New Group</SectionHeading>
         <Panel

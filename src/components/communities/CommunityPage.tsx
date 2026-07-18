@@ -119,7 +119,7 @@ const CommunityPage = () => {
   return (
     <div>
       <nav className="text-sm text-gray-500 mb-4">
-        <Link to="/private/communities" className="hover:text-gray-300">
+        <Link to="/communities" className="hover:text-gray-300">
           Communities
         </Link>
         {' › '}
@@ -144,7 +144,7 @@ const CommunityPage = () => {
         <p className="text-sm text-gray-400 mb-4">
           <span className="text-gray-500">Leader: </span>
           <Link
-            to={`/private/user/${leader?.username ?? community.leaderId}`}
+            to={`/user/${leader?.username ?? community.leaderId}`}
             className="text-indigo-400 hover:text-indigo-300"
           >
             {leader?.username ?? `User #${community.leaderId}`}
@@ -269,7 +269,7 @@ const CommunityPage = () => {
                   {/* Release header row */}
                   <div data-st="row">
                     <Link
-                      to={`/private/communities/${communityId}/releases/${release.id}`}
+                      to={`/communities/${communityId}/releases/${release.id}`}
                       className="shrink-0"
                       tabIndex={-1}
                     >
@@ -299,7 +299,7 @@ const CommunityPage = () => {
                           </span>
                         )}
                         <Link
-                          to={`/private/communities/${communityId}/releases/${release.id}`}
+                          to={`/communities/${communityId}/releases/${release.id}`}
                           data-st="title"
                           className="text-sm"
                         >
@@ -372,7 +372,7 @@ const CommunityPage = () => {
                                 : '—'}
                             </span>
                             <Link
-                              to={`/private/user/${c.user.username}`}
+                              to={`/user/${c.user.username}`}
                               className="text-xs text-indigo-400 hover:text-indigo-300 shrink-0"
                             >
                               {c.user.username}

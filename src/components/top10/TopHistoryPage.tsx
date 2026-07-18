@@ -84,10 +84,7 @@ const TopHistoryPage = () => {
                   </td>
                   <td>
                     {entry.releaseId && !entry.deleted ? (
-                      <Link
-                        to={`/private/releases/${entry.releaseId}`}
-                        data-st="title"
-                      >
+                      <Link to={`/releases/${entry.releaseId}`} data-st="title">
                         {entry.releaseTitle}
                       </Link>
                     ) : (

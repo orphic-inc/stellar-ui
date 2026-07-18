@@ -45,9 +45,7 @@ describe('RandomReleaseLink', () => {
     renderWithProviders(<RandomReleaseLink />);
     await user.click(screen.getByRole('button', { name: /random release/i }));
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/private/communities/3/releases/10'
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/communities/3/releases/10');
     });
   });
 
@@ -96,7 +94,7 @@ describe('RandomArtistLink', () => {
     renderWithProviders(<RandomArtistLink />);
     await user.click(screen.getByRole('button', { name: /random artist/i }));
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/private/artists/7');
+      expect(mockNavigate).toHaveBeenCalledWith('/artists/7');
     });
   });
 

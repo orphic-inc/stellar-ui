@@ -132,7 +132,7 @@ describe('Toolbox', () => {
     renderWithProviders(<Toolbox />);
     expect(screen.getByRole('link', { name: /user ranks/i })).toHaveAttribute(
       'href',
-      '/private/staff/tools/user-ranks'
+      '/staff/tools/user-ranks'
     );
   });
 

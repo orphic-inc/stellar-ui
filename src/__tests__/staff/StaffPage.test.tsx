@@ -52,13 +52,13 @@ describe('StaffPage', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'alice' })).toHaveAttribute(
       'href',
-      '/private/user/7'
+      '/user/7'
     );
     expect(screen.getByText('SysOp')).toBeInTheDocument();
     // Member-facing CTA to open a ticket.
     expect(
       screen.getByRole('link', { name: /contact staff/i })
-    ).toHaveAttribute('href', '/private/inbox/staff/new');
+    ).toHaveAttribute('href', '/inbox/staff/new');
     // Members render on the kit grid table.
     expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
   });

@@ -20,7 +20,7 @@ const ContributionsPage = () => {
         <h2 data-st="prose" data-st-strong className="text-xl">
           My Contributions
         </h2>
-        <Link to="/private/contribute" data-st="control" data-st-primary>
+        <Link to="/contribute" data-st="control" data-st-primary>
           + Upload
         </Link>
       </div>
@@ -28,7 +28,7 @@ const ContributionsPage = () => {
       {contributions.length === 0 ? (
         <p data-st="prose" data-st-muted className="text-sm">
           No contributions yet.{' '}
-          <Link to="/private/contribute" data-st="control">
+          <Link to="/contribute" data-st="control">
             Upload something!
           </Link>
         </p>
@@ -53,7 +53,7 @@ const ContributionsPage = () => {
                   <td>
                     {c.release.communityId ? (
                       <Link
-                        to={`/private/communities/${c.release.communityId}/releases/${c.release.id}`}
+                        to={`/communities/${c.release.communityId}/releases/${c.release.id}`}
                         data-st="title"
                       >
                         {c.release.title}

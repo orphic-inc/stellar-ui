@@ -77,7 +77,7 @@ describe('ComposeForm', () => {
         subject: 'Hello',
         body: 'How are you?'
       });
-      expect(mockNavigate).toHaveBeenCalledWith('/private/messages/12');
+      expect(mockNavigate).toHaveBeenCalledWith('/messages/12');
     });
 
     await user.click(screen.getByRole('button', { name: /save draft/i }));
@@ -177,11 +177,11 @@ describe('ComposeForm', () => {
     });
   });
 
-  it('navigates to /private/messages when Cancel is clicked', async () => {
+  it('navigates to /messages when Cancel is clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(<ComposeForm />);
     await user.click(screen.getByRole('button', { name: /^cancel$/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/private/messages');
+    expect(mockNavigate).toHaveBeenCalledWith('/messages');
   });
 
   it('shows "Sending…" when isLoading is true', () => {

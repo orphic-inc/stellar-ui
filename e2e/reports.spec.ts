@@ -25,7 +25,7 @@ test.describe('as regular user', () => {
   test.use({ storageState: AUTH_USER });
 
   test('P-11a: file a report via the report form', async ({ page }) => {
-    await page.goto('/private/reports/new');
+    await page.goto('/reports/new');
     await expect(
       page.getByRole('heading', { name: /file a report/i })
     ).toBeVisible();
@@ -54,7 +54,7 @@ test.describe('as regular user', () => {
   });
 
   test('P-11b: report appears in My Reports list as Open', async ({ page }) => {
-    await page.goto('/private/reports/mine');
+    await page.goto('/reports/mine');
 
     // Find the User/Other report we just filed
     const reportLink = page
@@ -74,9 +74,9 @@ test.describe('as regular user', () => {
   test('P-11c: staff reports queue is not accessible to regular user', async ({
     page
   }) => {
-    await page.goto('/private/staff/reports');
-    // StaffGate redirects to /private
-    await expect(page).toHaveURL(/\/private\/?$/);
+    await page.goto('/staff/reports');
+    // StaffGate redirects to /
+    await expect(page).toHaveURL(/^https?:\/\/[^\/]+\/?$/);
   });
 });
 
@@ -86,7 +86,7 @@ test.describe('as staff user', () => {
   test.use({ storageState: AUTH_STAFF });
 
   test('P-12a: report appears in staff queue', async ({ page }) => {
-    await page.goto('/private/staff/reports');
+    await page.goto('/staff/reports');
 
     await expect(
       page.getByRole('heading', { name: /reports queue/i })
@@ -94,12 +94,12 @@ test.describe('as staff user', () => {
 
     // The report link (category text) for our specific report
     await expect(
-      page.locator(`a[href="/private/staff/reports/${reportId}"]`)
+      page.locator(`a[href="/staff/reports/${reportId}"]`)
     ).toBeVisible();
   });
 
   test('P-12b: staff claims the report', async ({ page }) => {
-    await page.goto(`/private/staff/reports/${reportId}`);
+    await page.goto(`/staff/reports/${reportId}`);
 
     await expect(
       page.getByRole('heading', { name: new RegExp(REPORT_CATEGORY) })
@@ -115,7 +115,7 @@ test.describe('as staff user', () => {
   });
 
   test('P-12c: staff resolves the report', async ({ page }) => {
-    await page.goto(`/private/staff/reports/${reportId}`);
+    await page.goto(`/staff/reports/${reportId}`);
 
     // Open resolve form
     await page.getByRole('button', { name: /^resolve$/i }).click();

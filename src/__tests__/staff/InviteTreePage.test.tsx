@@ -46,7 +46,7 @@ describe('InviteTreePage', () => {
     expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'user1' })).toHaveAttribute(
       'href',
-      '/private/user/1'
+      '/user/1'
     );
   });
 
