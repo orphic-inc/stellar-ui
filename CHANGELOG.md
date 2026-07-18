@@ -6,10 +6,20 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-07-18
+
+Flattens the URL space and cuts to version parity with stellar-api 0.8.0 (0.7.0 was never cut here, so this consolidates everything unreleased since v0.6.9).
+
 ### Changed
 
 - **The `/private` URL prefix is removed** — authenticated pages now live at their natural paths (`/forums`, `/staff/tools`, `/messages/:id`, ...) and `/` is auth-aware: members get the private homepage, visitors get the public landing (no more client-side bounce through a prefixed URL). A legacy `/private/*` redirect keeps old bookmarks resolving. Public routes (`/login`, `/register`, `/recovery`, `/install`) are unchanged [#183].
 - **ModBar follows the inverted launch-checklist item** — the settings quick-link now keys on `registration-closed` (fresh installs default registration to `closed` and the checklist advises opening it at launch; stellar-api#332) instead of the retired `registration-open` warning [#183].
+- **Vendored API contract resynced to 0.8.0** — the committed `src/types/openapi.json` had drifted back to the 0.6.4 contract (permitted by the ADR-0004 check, which compares major.minor only). The resync is additive: the `ratioExempt` enum (`NONE`/`FREEPASS`/`NEUTRALPASS`) arrives on the contribution schemas from stellar-api's Freepass/Neutralpass work, and nothing is removed or retyped.
+
+### Internal
+
+- **Renovate manages dependency and image bumps** — matches the stellar-api adoption (fleet #9): weekly grouped non-major bumps, with `platformAutomerge` off so the app merges via the branch-protection bypass. An auto-approve workflow for labeled Renovate PRs was tried and reverted.
+- **Dockerfile bases pinned** — build and runtime bases pin to digests rather than floating tags, and the dead Gatsby-era build ARGs are dropped.
 
 ## [0.6.9] — 2026-07-09
 

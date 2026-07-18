@@ -13015,6 +13015,8 @@ export interface components {
       /** @enum {string} */
       linkStatus: 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL';
       linkCheckedAt?: string | null;
+      /** @enum {string} */
+      ratioExempt: 'NONE' | 'FREEPASS' | 'NEUTRALPASS';
       collaborators: {
         id: number;
         name: string;
@@ -13072,6 +13074,8 @@ export interface components {
       /** @enum {string|null} */
       linkStatus: 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL' | null;
       linkCheckedAt: string | null;
+      /** @enum {string} */
+      ratioExempt: 'NONE' | 'FREEPASS' | 'NEUTRALPASS';
       type: string;
       createdAt: string;
       updatedAt: string;

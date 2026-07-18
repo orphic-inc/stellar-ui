@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Stellar API",
-    "version": "0.6.4",
+    "version": "0.8.0",
     "description": "REST API for the Stellar community tracker. All routes under `/api/*`. Authentication uses JWT cookies (`token` cookie set on login)."
   },
   "servers": [
@@ -2979,6 +2979,14 @@
             "type": "string",
             "nullable": true
           },
+          "ratioExempt": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "FREEPASS",
+              "NEUTRALPASS"
+            ]
+          },
           "collaborators": {
             "type": "array",
             "items": {
@@ -3012,6 +3020,7 @@
           "type",
           "downloadUrl",
           "linkStatus",
+          "ratioExempt",
           "collaborators"
         ]
       },
@@ -3149,6 +3158,14 @@
             "type": "string",
             "nullable": true
           },
+          "ratioExempt": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "FREEPASS",
+              "NEUTRALPASS"
+            ]
+          },
           "type": {
             "type": "string"
           },
@@ -3215,6 +3232,7 @@
           "sizeInBytes",
           "linkStatus",
           "linkCheckedAt",
+          "ratioExempt",
           "type",
           "createdAt",
           "updatedAt",
