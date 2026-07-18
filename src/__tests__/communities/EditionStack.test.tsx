@@ -16,6 +16,7 @@ const contribution = (
   sizeInBytes: 520_000_000,
   linkStatus: 'PASS',
   linkCheckedAt: null,
+  ratioExempt: 'NONE',
   type: 'flac',
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
