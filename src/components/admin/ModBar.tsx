@@ -13,16 +13,16 @@ const CHECKLIST_LINKS: Record<
   string,
   { to: string; label: string } | undefined
 > = {
-  'registration-open': {
-    to: '/private/staff/tools/settings',
+  'registration-closed': {
+    to: '/staff/tools/settings',
     label: 'Open settings'
   },
   'max-users-default': {
-    to: '/private/staff/tools/settings',
+    to: '/staff/tools/settings',
     label: 'Open settings'
   },
   'approved-domains-empty': {
-    to: '/private/staff/tools/settings',
+    to: '/staff/tools/settings',
     label: 'Open settings'
   }
 };
@@ -49,7 +49,7 @@ const ModBar = () => {
           {showToolboxLink && (
             <>
               <Link
-                to="/private/staff/tools"
+                to="/staff/tools"
                 className="hover:text-amber-200 transition-colors"
               >
                 Toolbox
@@ -59,7 +59,7 @@ const ModBar = () => {
           )}
           {showReportsLink && (
             <Link
-              to="/private/staff/reports"
+              to="/staff/reports"
               className="hover:text-amber-200 transition-colors flex items-center gap-1"
             >
               Reports

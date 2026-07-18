@@ -120,8 +120,8 @@ describe('ModBar', () => {
       data: {
         setupChecklist: [
           {
-            id: 'registration-open',
-            message: 'registrationStatus is still "open".'
+            id: 'registration-closed',
+            message: 'registrationStatus is "closed".'
           },
           {
             id: 'site-url-default',
@@ -137,14 +137,14 @@ describe('ModBar', () => {
       screen.getByText(/configuration steps to complete before launch/i)
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/registrationStatus is still "open"/i)
+      screen.getByText(/registrationStatus is "closed"/i)
     ).toBeInTheDocument();
     expect(
       screen.getByText(/STELLAR_SITE_URL is not set/i)
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /open settings/i })
-    ).toHaveAttribute('href', '/private/staff/tools/settings');
+    ).toHaveAttribute('href', '/staff/tools/settings');
   });
 
   it('dismisses a checklist item', async () => {
