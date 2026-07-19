@@ -8,7 +8,9 @@ const PublicLanding = () => {
     <div className="landing">
       <div className="landing-hero">
         <h1>Stellar</h1>
-        <p className="lead">We didn't start the fire, but it's hot.</p>
+        <p className="lead">
+          We didn&apos;t start the fire, but it&apos;s hot.
+        </p>
         <div className="landing-actions flex gap-3">
           <Link to="/login" className="btn btn-primary">
             Sign In
