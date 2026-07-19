@@ -6,6 +6,14 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.8.1] — 2026-07-18
+
+Public landing copy, cut to version parity with stellar-api 0.8.1.
+
+### Changed
+
+- **Public landing copy reworded** — the tagline becomes "We didn't start the fire, but it's hot." and the registration CTA reads "Register" rather than "Request Access". The CTA stays conditional on `registrationStatus === 'open'`, so a fresh 0.8.0+ instance (which defaults to `closed`) still shows visitors Sign In alone until an admin opens registration [#187].
+
 ## [0.8.0] — 2026-07-18
 
 Flattens the URL space and cuts to version parity with stellar-api 0.8.0 (0.7.0 was never cut here, so this consolidates everything unreleased since v0.6.9).
