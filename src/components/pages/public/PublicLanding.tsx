@@ -8,14 +8,14 @@ const PublicLanding = () => {
     <div className="landing">
       <div className="landing-hero">
         <h1>Stellar</h1>
-        <p className="lead">A curated community for music and media.</p>
+        <p className="lead">We didn't start the fire, but it's hot.</p>
         <div className="landing-actions flex gap-3">
           <Link to="/login" className="btn btn-primary">
             Sign In
           </Link>
           {installStatus?.registrationStatus === 'open' && (
             <Link to="/register" className="btn btn-secondary">
-              Request Access
+              Register
             </Link>
           )}
         </div>

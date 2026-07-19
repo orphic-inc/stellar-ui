@@ -30,19 +30,19 @@ describe('PublicLanding', () => {
     expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
   });
 
-  it('shows Request Access link when registration is open', () => {
+  it('shows Register link when registration is open', () => {
     mockInstallStatus = { registrationStatus: 'open' };
     renderWithProviders(<PublicLanding />);
     expect(
-      screen.getByRole('link', { name: /request access/i })
+      screen.getByRole('link', { name: /^register$/i })
     ).toBeInTheDocument();
   });
 
-  it('hides Request Access when registration is not open', () => {
+  it('hides Register when registration is not open', () => {
     mockInstallStatus = { registrationStatus: 'invite' };
     renderWithProviders(<PublicLanding />);
     expect(
-      screen.queryByRole('link', { name: /request access/i })
+      screen.queryByRole('link', { name: /^register$/i })
     ).not.toBeInTheDocument();
   });
 });
