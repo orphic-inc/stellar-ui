@@ -24,7 +24,7 @@ const PrivateFooter = () => {
             CHANGELOG
           </a>
         </div>
-        <span>Powered by Stellar v{version}</span>
+        <span title="&lt;3">Powered by Stellar v{version}</span>
       </div>
     </footer>
   );
