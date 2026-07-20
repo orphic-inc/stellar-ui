@@ -60,7 +60,7 @@ const DonatePage = () => {
           donations.
         </p>
         <p className="mt-3">
-          When you donate you aren&apos;t paying the staff, purchasing upload
+          When you donate you aren&apos;t paying the staff, purchasing contribution
           credit, or buying the ability to download. When you donate you are
           paying the site&apos;s bills.
         </p>
@@ -147,7 +147,7 @@ const DonatePage = () => {
       <Section title="What you won't receive">
         <ul className="list-disc list-inside space-y-1">
           <li>Immunity from the rules</li>
-          <li>Additional upload credit</li>
+          <li>Additional contribution credit</li>
           <li>The ability to break or circumvent site policies</li>
         </ul>
       </Section>
