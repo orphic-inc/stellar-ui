@@ -6,13 +6,14 @@
  * The `--st-*` Role Theme Tokens the data-st contract paints from. Sublime is
  * "just the default token values" (docs/theming.md §2), so its defaults ARE
  * Tailwind's palette — sourced here by REFERENCE (`var(--color-*)`), not by
- * hand-copying oklch literals into common/global.css. One source: a Tailwind
+ * hand-copying oklch literals into global.css. One source: a Tailwind
  * palette bump propagates; Sublime and the contract can no longer drift.
  *
  * `static` forces emission so the tokens land on :root even before a utility or
  * hook references them (default @theme tree-shakes unused vars). Only PRIMITIVE
  * color tokens live here; derived tokens (--st-lossy/weight/…) and geometry stay
- * in common/global.css next to the hooks that consume them. Injected themes
+ * in global.css (its sibling here in src/) next to the hooks that consume them.
+ * Injected themes
  * (layer-cake, kuro, …) still win by source order — their <link> :root loads
  * after this and after global.css.
  *

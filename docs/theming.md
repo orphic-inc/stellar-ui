@@ -21,7 +21,7 @@ The progression is continuous: the dabbler's tokens and the power user's role ov
 
 ## 2. The contract, in one paragraph
 
-A themeable surface emits a `data-st` **hook** and (almost) no inline utilities; the contract CSS (`src/stylesheets/common/global.css`) paints that hook from `--st-*` **role tokens**. **Sublime is just the default token values.** A Theme = redefined token values + optional role/part overrides. The contract CSS is **unlayered**, so hooks win over any stray Tailwind utility. Hooks come in **two tiers**: a small fixed set of app-wide **Roles**, and **Parts** scoped inside a Role that must _earn their place_.
+A themeable surface emits a `data-st` **hook** and (almost) no inline utilities; the contract CSS (`src/global.css`) paints that hook from `--st-*` **role tokens**. **Sublime is just the default token values.** A Theme = redefined token values + optional role/part overrides. The contract CSS is **unlayered**, so hooks win over any stray Tailwind utility. Hooks come in **two tiers**: a small fixed set of app-wide **Roles**, and **Parts** scoped inside a Role that must _earn their place_.
 
 > **React layer (ADR-0007).** A surface need not emit the hooks by hand. A small primitive kit in `src/components/ui/` (`PageShell`/`Panel`/`Button`/`Field`/`DataTable`/`Badge`/`Pagination`/`SectionHeading`) **owns the hooks**, so the contract lands **once per primitive, not once per page** — adopting a primitive *completes* that surface's migration. The CSS contract below is unchanged; the kit is purely the React layer that emits it.
 
@@ -202,6 +202,23 @@ failures and neither subsumes the other:
 
 Neither is cross-repo: editing the token list here does not fail anything in the
 api, and vice versa. That gap is known, not overlooked.
+
+**The residual risk this leaves (accepted).** The api's `REQUIRED_ST_PRIMITIVES`
+and this repo's `PRIMITIVE_TOKENS` are now **independent copies of one contract**.
+They are byte-identical today — 21 tokens each, verified 2026-07-20 — and nothing
+detects future divergence. The failure that matters: someone weakens the api list,
+a new theme ships missing a token, and ui surfaces reading it silently fall back
+to Sublime values rather than failing. It degrades quietly, which is what makes it
+worth writing down.
+
+This is accepted rather than repaired, and the "lost backstop" framing is
+misleading: before ui#168 the ui test was not a designed safety net, it was
+accidental redundancy produced by the very duplication #168 removed. Re-adding one
+is re-duplication. Rejected alternatives — a cross-repo CI divergence check
+(introduces repo-to-repo coupling neither repo has today) and single-sourcing the
+list through the `api:generate` pipeline (the token set is not an API type; it
+needs a new export path and a real build change). Revisit only if drift actually
+bites.
 
 ---
 

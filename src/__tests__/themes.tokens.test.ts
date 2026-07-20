@@ -65,7 +65,7 @@ describe('theme Role Token contract', () => {
 
   it('index.scss declares ONLY primitives — derived tokens live in global.css', () => {
     // The documented split (index.scss header): primitive colour tokens here,
-    // derived (--st-lossy/--st-weight/…) and geometry in common/global.css.
+    // derived (--st-lossy/--st-weight/…) and geometry in global.css.
     // Without this direction the block could accrete derived tokens and the
     // separation would erode silently.
     const extra = [...declaredTokens('index.scss')].filter(

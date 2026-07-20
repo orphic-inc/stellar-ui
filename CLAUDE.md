@@ -42,7 +42,9 @@ The Playwright users must exist in the running stellar-api instance before `npm 
 ```
 src/
   index.tsx                   # React root (createRoot), Redux Provider, Router; webpack entry
-                              # imports stylesheets/common/global.css — the theming contract
+                              # imports global.css — the theming contract
+  global.css                  # Theming contract, half 2: derived --st-* tokens + data-st hooks.
+                              # Sits next to index.scss (half 1, the primitives) on purpose (ADR-0005)
   components/App.tsx          # Install probe → route tree
   store/
     index.ts                  # Redux store + AppDispatch / RootState types
@@ -77,11 +79,12 @@ src/
   utils/
     permissions.ts            # hasPermission, hasAnyPermission, isStaffUser, canSeeModBar, hasStrictAdmin
     avatar.ts                 # avatarSrc(avatar?) → string; onAvatarError handler; SEEDED_AVATAR_SENTINEL
-  stylesheets/                # Only two tenants left — built-in themes are api-canonical (ui#168)
-    common/global.css         # The theming contract: derived --st-* tokens + data-st hooks (see Theming)
+  stylesheets/                # One tenant left — built-in themes are api-canonical (ui#168).
+                              # Contents pinned as an exact set by stylesheetsDir.test.ts
     postmod/                  # The last ui-static theme; served at /stylesheets. Blocked on
                               # stellar-api #343 (commercial fonts). When it migrates, the webpack
-                              # CopyPlugin + devServer static entries that serve it go too.
+                              # CopyPlugin + devServer static entries that serve it go too —
+                              # and src/stylesheets/ itself is deleted.
   components/
     ui/                       # Site-wide primitive kit (ADR-0007): PageShell/Panel/Button/
                               # Field/DataTable/Badge/Pagination/SectionHeading (barrel index.ts)
@@ -106,8 +109,9 @@ Themes are **injected stylesheets** that re-skin the app by redefining `--st-*`
 Role Tokens — never by writing selectors. The contract spans two files: the
 **primitive** token set is the `@theme static` block in `src/index.scss` (this is
 also Sublime, and it is what `themes.tokens.test.ts` pins), while the **derived**
-tokens and the `data-st` hooks live in `src/stylesheets/common/global.css`
+tokens and the `data-st` hooks live in `src/global.css`
 (imported once by `index.tsx`, unlayered so its hooks beat Tailwind utilities).
+The two halves sit side by side in `src/` because neither is a theme.
 A built-in theme's own CSS is in neither — it is api-canonical (ui#168).
 Authority: ADR-0005
 (`docs/adr/0005-injected-theme-contract.md`), `docs/theming.md`, and the
