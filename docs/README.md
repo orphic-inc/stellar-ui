@@ -31,7 +31,7 @@ React 18 SPA, Webpack-bundled, Redux Toolkit + **RTK Query** for all data, React
 
 ## Theming
 
-Themes target **role tokens** (`--st-*`) and semantic `data-st` hooks, not raw component styles — a two-tier vocabulary (Roles vs Parts). The full contract, token catalogue, and a worked recolor example (using `src/stylesheets/layer-cake/` as the ~20-token reference) are in **[theming.md](theming.md)** (stellar-ui [ADR-0005](adr/0005-injected-theme-contract.md)/[0006](adr/0006-table-and-form-contract.md)).
+Themes target **role tokens** (`--st-*`) and semantic `data-st` hooks, not raw component styles — a two-tier vocabulary (Roles vs Parts). The full contract, token catalogue, and a worked recolor example (`layer-cake`, the ~20-token reference — api-canonical since ui#168, so it is no longer a directory in this repo) are in **[theming.md](theming.md)** (stellar-ui [ADR-0005](adr/0005-injected-theme-contract.md)/[0006](adr/0006-table-and-form-contract.md)).
 
 - **Authoring** (recolor or restructure a theme): follow theming.md §4 — copy the token set, restyle, run the §11 verification.
 - **Registering** a bundled theme so the injector serves it: see [ADR-0008](adr/0008-registry-stylesheet-injection.md) and `src/components/layout/StylesheetInjector.tsx` (single-winner precedence; adopted registry sheets link the API `/css` route).

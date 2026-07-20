@@ -7,27 +7,16 @@ import { join } from 'path';
  *
  * A token-based theme re-skins the app ONLY by redefining the --st-* primitive
  * Role Tokens — migrated surfaces read them through their data-st hooks. This
- * test pins the primitive set so a new/edited theme can't silently regress to
- * the legacy approach of overriding Tailwind `.bg-gray-*` utilities (which stops
- * skinning surfaces as they migrate onto the contract — the bug that motivated
- * this test).
+ * test pins the primitive set so the contract can't silently regress to the
+ * legacy approach of overriding Tailwind `.bg-gray-*` utilities, which stops
+ * skinning surfaces as they migrate onto the contract (the motivating bug).
  *
- * **Subject changed with ui#168.** This used to read `src/stylesheets/{theme}/
- * style.css` for layer-cake, kuro and anorex. Those files were bundled copies of
- * themes the api now serves canonically (stellar-api ADR-0024), and #168 deleted
- * them — so the old subject no longer exists.
- *
- * Conformance of the *delivered themes* is not lost, and is not restated here:
- * stellar-api's `stylesheetFixtures.spec.ts` asserts this same primitive list
- * against the canonical bytes, for all ten token themes rather than three.
- * Copying the CSS into a ui fixture path to keep this test literally intact
- * would have re-created exactly the cross-repo duplication #168 exists to end,
- * and the copies would go stale the moment the api edited a theme.
- *
- * What the ui owns — and what this now guards — is the *contract itself*: the
- * `@theme static` block in `src/index.scss` that every data-st hook paints from
- * (the Sublime baseline). If the primitive set drifts here, every theme's
- * contract drifts with it, and that is a ui-side failure no api guard can see.
+ * The subject is `src/index.scss`'s `@theme static` block — the Sublime baseline
+ * every data-st hook paints from — because that is the part of the contract this
+ * repo owns. Built-in themes are api-canonical and are NOT checked here; the api
+ * asserts this same list against their canonical bytes. See docs/theming.md §4.1
+ * ("Two guards, on opposite sides of the seam") for why the split falls where it
+ * does and what neither guard covers.
  */
 
 const PRIMITIVE_TOKENS = [

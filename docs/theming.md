@@ -166,7 +166,7 @@ the others shipped as utility-only and were (are being) remediated:
 | `anorex` | all | ported token-only (the classic Gazelle wood default) | api-canonical |
 | `proton` | none | **legacy utility-only — pending token pass** | api-canonical |
 | `postmod` | none | **legacy utility-only — pending token pass** | ui-static (blocked) |
-| `dark-ambient` | all | shipped in the api 0.6.4 palette set | api-canonical |
+| `dark-ambient` | — | registered (has a logo) but **no stylesheet yet** | api-canonical since 0.6.3 |
 
 **Where a theme's CSS lives (ui#168).** "api-canonical" means the authored file is
 `prisma/seed-assets/stylesheets/<name>.css` in **stellar-api**, seeded as a
@@ -179,11 +179,15 @@ sharpens rather than settles). `sublime` is not a file at all — it is the
 `@theme static` block in `src/index.scss`, which is why the injector links
 nothing for it.
 
-The table is the 2026-07-02 audit, not the live catalogue — api 0.6.4 added six
-more token-only palettes (`shiro`, `mono`, `minimal`, `hydro`, `bubblegum`,
-`white`), all api-canonical. Per-theme remediation *status* is tracked in the
-theming handoff, not here (this section is the durable contract; a live checklist
-here becomes a merge-conflict magnet).
+**The first three columns are frozen at the 2026-07-02 audit** — they record what
+was found then, not today's catalogue, so `dark-ambient`'s "no stylesheet yet"
+reads as of that date. Only the "Lives" column is maintained, because a wrong
+location sends someone editing a file that changes nothing. Since the audit, api
+0.6.3 shipped `dark-ambient` and 0.6.4 added six more token-only palettes
+(`shiro`, `mono`, `minimal`, `hydro`, `bubblegum`, `white`), all api-canonical
+and none listed above. Per-theme remediation *status* is tracked in the theming
+handoff, not here (this section is the durable contract; a live checklist here
+becomes a merge-conflict magnet).
 
 **Two guards, on opposite sides of the seam (ui#168).** They cover different
 failures and neither subsumes the other:

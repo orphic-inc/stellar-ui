@@ -10,7 +10,7 @@ The UI is the front door to Stellar's invite-only Communities — browsing/contr
 
 - **Communities, forums & profiles** — the member-facing surfaces over the [stellar-api](https://github.com/orphic-inc/stellar-api) backend.
 - **Contributions & releases** — submit/browse releases; file-size input (see [#65](https://github.com/orphic-inc/stellar-ui/issues/65)).
-- **Theming / StylesheetInjector** — `src/components/layout/StylesheetInjector.tsx` applies a selected theme or a user's profile stylesheet behind a global-CSS-reset boundary. Themes live in `src/stylesheets/<theme>/` (`kuro`, `layer-cake`, `postmod`, `proton`, `sublime`).
+- **Theming / StylesheetInjector** — `src/components/layout/StylesheetInjector.tsx` applies a selected theme or a user's profile stylesheet behind a global-CSS-reset boundary. Built-in themes are **api-canonical** — authored and served by [stellar-api](https://github.com/orphic-inc/stellar-api), not bundled here (ui#168). The exceptions are `sublime` (the baseline — the `@theme static` block in `src/index.scss`, no file) and `postmod`, the last theme still under `src/stylesheets/`.
 
 ## Documentation
 

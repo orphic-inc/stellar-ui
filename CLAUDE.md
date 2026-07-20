@@ -77,13 +77,11 @@ src/
   utils/
     permissions.ts            # hasPermission, hasAnyPermission, isStaffUser, canSeeModBar, hasStrictAdmin
     avatar.ts                 # avatarSrc(avatar?) → string; onAvatarError handler; SEEDED_AVATAR_SENTINEL
-  stylesheets/                # Bundled CSS themes served at /stylesheets — do not import directly
-    common/global.css         # The theming contract: --st-* Role Tokens + data-st hooks (see Theming)
-    kuro/                     # Dark theme
-    layer-cake/               # Classic-gray alternate; token-only reference theme (ADR-0005 / WS3)
-    postmod/                  # Legacy tracker-era theme
-    proton/                   # Light theme
-    sublime/                  # Default/baseline — injects nothing; bundled Tailwind IS Sublime (seeds the --st-* token defaults)
+  stylesheets/                # Only two tenants left — built-in themes are api-canonical (ui#168)
+    common/global.css         # The theming contract: derived --st-* tokens + data-st hooks (see Theming)
+    postmod/                  # The last ui-static theme; served at /stylesheets. Blocked on
+                              # stellar-api #343 (commercial fonts). When it migrates, the webpack
+                              # CopyPlugin + devServer static entries that serve it go too.
   components/
     ui/                       # Site-wide primitive kit (ADR-0007): PageShell/Panel/Button/
                               # Field/DataTable/Badge/Pagination/SectionHeading (barrel index.ts)
@@ -105,9 +103,13 @@ src/
 ## Theming (the data-st contract)
 
 Themes are **injected stylesheets** that re-skin the app by redefining `--st-*`
-Role Tokens — never by writing selectors. The contract lives in
-`src/stylesheets/common/global.css` (imported once by `index.tsx`, unlayered so
-its `data-st` hooks beat Tailwind utilities). Authority: ADR-0005
+Role Tokens — never by writing selectors. The contract spans two files: the
+**primitive** token set is the `@theme static` block in `src/index.scss` (this is
+also Sublime, and it is what `themes.tokens.test.ts` pins), while the **derived**
+tokens and the `data-st` hooks live in `src/stylesheets/common/global.css`
+(imported once by `index.tsx`, unlayered so its hooks beat Tailwind utilities).
+A built-in theme's own CSS is in neither — it is api-canonical (ui#168).
+Authority: ADR-0005
 (`docs/adr/0005-injected-theme-contract.md`), `docs/theming.md`, and the
 `CONTEXT.md` glossary (use its words — Theme / Theme Token / Semantic Hook;
 Role vs Part).
