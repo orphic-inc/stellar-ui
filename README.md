@@ -2,9 +2,9 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ddbd8663fbd640aa96f4a89770a387d6)](https://app.codacy.com/gh/orphic-inc/stellar-ui/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
-This is the React-based Single Page Application (SPA) for **Stellar**, a modern, next-generation community content tracker and forum software.
+This is the React-based Single Page Application (SPA) for **Stellar**, a community content tracker.
 
-The UI is the front door to Stellar's invite-only Communities — browsing/contributing releases, forums, profiles, and **user theming** (the StylesheetInjector applies built-in or user-authored stylesheets site-wide).
+The UI is the front door to Stellar's invite-only Communities — browsing/contributing releases, forums, profiles, and **user theming**.
 
 ## What's here
 
