@@ -6,6 +6,7 @@ import PrivateHeader from '../../components/pages/private/layout/PrivateHeader';
 const mockUseGetUnreadCountQuery = jest.fn();
 const mockUseGetQueueCountQuery = jest.fn();
 const mockUseGetMyTicketCountQuery = jest.fn();
+const mockUseGetMyProfileQuery = jest.fn();
 
 jest.mock('../../components/layout/UserMenu', () => ({
   __esModule: true,
@@ -82,12 +83,13 @@ jest.mock('../../components/staff/staffAffordances', () => ({
     )
 }));
 
-// PrivateHeader fires useGetMyProfileQuery for the donor/warning surface; mock
-// it so the test store doesn't issue a real fetch (no jsdom Request → no
-// unhandled-rejection / act() noise). These tests assert on the `user` prop, not
-// the profile query.
+// PrivateHeader fires useGetMyProfileQuery for the donor/warning surface and for
+// the header logo (userSettings.siteAppearance); mock it so the test store
+// doesn't issue a real fetch (no jsdom Request → no unhandled-rejection / act()
+// noise). Most tests assert on the `user` prop, so the default is an unresolved
+// profile; the branding tests below set it.
 jest.mock('../../store/services/profileApi', () => ({
-  useGetMyProfileQuery: () => ({ data: undefined })
+  useGetMyProfileQuery: () => mockUseGetMyProfileQuery()
 }));
 
 jest.mock('../../store/services/messagesApi', () => ({
@@ -117,6 +119,62 @@ describe('PrivateHeader', () => {
     mockUseGetUnreadCountQuery.mockReturnValue({ data: { count: 0 } });
     mockUseGetQueueCountQuery.mockReturnValue({ data: { count: 0 } });
     mockUseGetMyTicketCountQuery.mockReturnValue({ data: { count: 0 } });
+    mockUseGetMyProfileQuery.mockReturnValue({ data: undefined });
+  });
+
+  /*
+   * Header branding (ui#168). The logo map is the ui's inventory of art it
+   * ships, NOT a mirror of the api's theme catalog. The regression these pin:
+   * the map went six themes stale after the api 0.6.4 palette expansion, and
+   * every unlisted theme fell through to a DEFAULT_LOGO that was *kuro's* — so
+   * light themes rendered a dark-theme logo. Absence must now under-brand
+   * (wordmark), never mis-brand (another theme's art).
+   */
+  describe('theme logo', () => {
+    const withAppearance = (siteAppearance: string | undefined) =>
+      mockUseGetMyProfileQuery.mockReturnValue({
+        data: { userSettings: { siteAppearance } }
+      });
+
+    // These assert the ART-vs-WORDMARK branch, not which specific image renders:
+    // jest's moduleNameMapper resolves every .png to one shared fileMock, so all
+    // logo imports are indistinguishable here. That is the branch the regression
+    // lived in, so it is the branch worth pinning.
+    it('renders the theme’s own art when the ui ships it', () => {
+      withAppearance('layer-cake');
+      renderWithProviders(<PrivateHeader user={mockUser as never} />);
+      expect(screen.getByRole('img', { name: /stellar/i })).toBeInTheDocument();
+    });
+
+    it('renders the wordmark — not another theme’s logo — for a theme with no art', () => {
+      // `white` is a light theme in the api catalog with no ui art. Before the
+      // fix this rendered kuro's dark logo.
+      withAppearance('white');
+      renderWithProviders(<PrivateHeader user={mockUser as never} />);
+      expect(screen.queryByRole('img', { name: /stellar/i })).toBeNull();
+      expect(screen.getByRole('link', { name: /stellar/i })).toHaveTextContent(
+        'STELLAR'
+      );
+    });
+
+    it('does not mis-brand any api theme lacking ui art', () => {
+      // The full set of catalog themes with no entry in THEME_LOGOS. If art
+      // lands for one, move it to the case above rather than deleting coverage.
+      for (const theme of ['shiro', 'mono', 'minimal', 'hydro', 'bubblegum']) {
+        withAppearance(theme);
+        const { unmount } = renderWithProviders(
+          <PrivateHeader user={mockUser as never} />
+        );
+        expect(screen.queryByRole('img', { name: /stellar/i })).toBeNull();
+        unmount();
+      }
+    });
+
+    it('falls back to the wordmark while the profile is still loading', () => {
+      withAppearance(undefined);
+      renderWithProviders(<PrivateHeader user={mockUser as never} />);
+      expect(screen.queryByRole('img', { name: /stellar/i })).toBeNull();
+    });
   });
 
   it('renders Stellar brand link', () => {

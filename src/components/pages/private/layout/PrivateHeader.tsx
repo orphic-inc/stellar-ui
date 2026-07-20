@@ -24,17 +24,29 @@ import {
 } from '../../../../store/services/staffInboxApi';
 import { useGetMyProfileQuery } from '../../../../store/services/profileApi';
 
-// Asset naming convention: src/assets/logos/{stylesheet}-logo.png (+ -hover.png)
+/*
+ * Logos are ui BRANDING ASSETS, not api-canonical theme data — unlike a theme's
+ * CSS, they deliberately did not follow it to the api (no `Stylesheet.logoUrl`).
+ * So this map is the ui's inventory of art it actually ships, keyed by the
+ * convention src/assets/logos/{stylesheet}-logo.png (+ -hover.png).
+ *
+ * It is NOT a list of the themes that exist — that list is the api's, and this
+ * file must never try to mirror it. A theme with no art here renders the
+ * wordmark below, so a new api stylesheet can only ever be under-branded, never
+ * MIS-branded. It used to be the latter: the map went six themes stale after the
+ * api 0.6.4 palette expansion and light themes (`white`, `shiro`, `minimal`)
+ * fell through to kuro's dark logo.
+ */
 const THEME_LOGOS: Record<string, [string, string]> = {
   kuro: [kuroLogo, kuroLogoHover],
   'dark-ambient': [darkAmbientLogo, darkAmbientLogo],
   'layer-cake': [layerCakeLogo, layerCakeLogoHover],
   postmod: [postmodLogo, postmodLogo],
-  // anorex reuses postmod's wood logo until dedicated art lands (both are wood themes).
+  // Deliberate alias, not a missing entry: anorex has no art of its own and
+  // borrows postmod's wood mark (both are wood themes).
   anorex: [postmodLogo, postmodLogo],
   proton: [protonLogo, protonLogo]
 };
-const DEFAULT_LOGO: [string, string] = [kuroLogo, kuroLogoHover];
 
 interface Props {
   user: AuthUser;
@@ -55,8 +67,8 @@ const navLinks = [
 const PrivateHeader = ({ user }: Props) => {
   const [hovered, setHovered] = useState(false);
   const { data: profile } = useGetMyProfileQuery();
-  const [logo, logoHovered] =
-    THEME_LOGOS[profile?.userSettings?.siteAppearance ?? ''] ?? DEFAULT_LOGO;
+  const art = THEME_LOGOS[profile?.userSettings?.siteAppearance ?? ''];
+  const [logo, logoHovered] = art ?? [];
   const showModBar = canSeeModBar(user);
   const showStaffQueue = canAccessStaffQueue(user);
   const { data: inboxData } = useGetUnreadCountQuery();
@@ -85,11 +97,20 @@ const PrivateHeader = ({ user }: Props) => {
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
-          <img
-            src={hovered ? logoHovered : logo}
-            alt="Stellar"
-            className="h-8 w-auto"
-          />
+          {art ? (
+            <img
+              src={hovered ? logoHovered : logo}
+              alt="Stellar"
+              className="h-8 w-auto"
+            />
+          ) : (
+            // Themes without dedicated art get the wordmark rather than another
+            // theme's logo. Painted from the contract token, so it reads on light
+            // and dark alike — which a raster fallback cannot do (ADR-0005).
+            <span className="h-8 flex items-center text-xl font-bold tracking-widest text-[var(--st-text-strong)]">
+              STELLAR
+            </span>
+          )}
         </Link>
         <UserMenu user={user} />
       </div>
