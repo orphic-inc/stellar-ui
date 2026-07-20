@@ -60,9 +60,9 @@ const DonatePage = () => {
           donations.
         </p>
         <p className="mt-3">
-          When you donate you aren&apos;t paying the staff, purchasing contribution
-          credit, or buying the ability to download. When you donate you are
-          paying the site&apos;s bills.
+          When you donate you aren&apos;t paying the staff, purchasing
+          contribution credit, or buying the ability to download. When you
+          donate you are paying the site&apos;s bills.
         </p>
       </Section>
 
