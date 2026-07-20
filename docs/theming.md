@@ -119,9 +119,12 @@ source order — **no `!important`, no selectors to chase.**
   `--st-weight-track → color-mix(… var(--st-raised) …)`. Geometry/type
   (`--st-radius`, `--st-gap`, `--st-mono`) inherit unless you want to retune
   density. Token catalogue: §3.1.
-  - **Worked example:** `src/stylesheets/layer-cake/style.css` — the classic-gray
-    theme, expressed as ~20 primitive token redefinitions and **zero** utility
-    overrides (WS3). It is the reference every recolor should look like.
+  - **Worked example:** `layer-cake` — the classic-gray theme, expressed as ~20
+    primitive token redefinitions and **zero** utility overrides (WS3). It is the
+    reference every recolor should look like. It is no longer bundled here: like
+    every built-in it is api-canonical, authored at
+    `prisma/seed-assets/stylesheets/layer-cake.css` in stellar-api and delivered
+    from the registry (ui#168).
 - **Structural theme:** the recolor block, plus overrides on **Roles**
   (`[data-st="row"] { … }`) and, rarely, **Parts**. Still one stylesheet, still
   no chasing utility classes.
@@ -129,8 +132,12 @@ source order — **no `!important`, no selectors to chase.**
   the hook contract (the Collage today; more as WS4+ migrates). A theme that must
   also cover not-yet-migrated surfaces keeps its old utility overrides until
   those surfaces convert.
-- Member-authored CSS arrives **pre-sanitized from the API** (ADR-0003); the UI
-  does not re-sanitize.
+- Member-authored CSS arrives **pre-validated from the API** (stellar-api
+  ADR-0031, which supersedes ADR-0003); the UI does not re-check it. Note the
+  mechanism changed: the api no longer *sanitizes*. It validates and **rejects**,
+  storing the author's bytes verbatim, so what the UI receives is the CSS as
+  written — never a silently rewritten copy. Nothing arrives cleaned, so the UI
+  must not assume anything was stripped out of it on the way.
 
 ### 4.1 Anti-pattern — the legacy utility-override theme (and the conversion audit)
 
@@ -151,20 +158,46 @@ substitute for it.
 **Conversion audit (2026-07-02).** Only Layer Cake was ported correctly at first;
 the others shipped as utility-only and were (are being) remediated:
 
-| Theme | `--st-*` primitives | Status |
-|---|---|---|
-| `layer-cake` | all | reference theme (WS3) |
-| `sublime` | — | baseline (skins by omission; bundled Tailwind *is* Sublime) |
-| `kuro` | all | remediated — aliases its `--kuro-*` palette onto `--st-*` |
-| `anorex` | all | ported token-only (the classic Gazelle wood default) |
-| `proton` | none | **legacy utility-only — pending token pass** |
-| `postmod` | none | **legacy utility-only — pending token pass** |
-| `dark-ambient` | — | registered (has a logo) but **no stylesheet yet** |
+| Theme | `--st-*` primitives | Status | Lives |
+|---|---|---|---|
+| `layer-cake` | all | reference theme (WS3) | api-canonical |
+| `sublime` | — | baseline (skins by omission; bundled Tailwind *is* Sublime) | ui — `src/index.scss` |
+| `kuro` | all | remediated — aliases its `--kuro-*` palette onto `--st-*` | api-canonical |
+| `anorex` | all | ported token-only (the classic Gazelle wood default) | api-canonical |
+| `proton` | none | **legacy utility-only — pending token pass** | api-canonical |
+| `postmod` | none | **legacy utility-only — pending token pass** | ui-static (blocked) |
+| `dark-ambient` | all | shipped in the api 0.6.4 palette set | api-canonical |
 
-Per-theme remediation *status* is tracked in the theming handoff, not here (this
-section is the durable contract; a live checklist here becomes a merge-conflict
-magnet). The guard in `src/__tests__/themes.tokens.test.ts` pins the primitive set
-and fails any token-based theme that drops one.
+**Where a theme's CSS lives (ui#168).** "api-canonical" means the authored file is
+`prisma/seed-assets/stylesheets/<name>.css` in **stellar-api**, seeded as a
+System-owned `AuthorStylesheet` and delivered from the `/stylesheet` registry — it
+is not bundled here, and editing a copy in this repo would change nothing.
+`postmod` is the last ui-static theme; its migration is blocked on stellar-api
+[#343](https://github.com/orphic-inc/stellar-api/issues/343) (four commercial
+fonts, whose redistribution question `/api/asset`'s unauthenticated delivery
+sharpens rather than settles). `sublime` is not a file at all — it is the
+`@theme static` block in `src/index.scss`, which is why the injector links
+nothing for it.
+
+The table is the 2026-07-02 audit, not the live catalogue — api 0.6.4 added six
+more token-only palettes (`shiro`, `mono`, `minimal`, `hydro`, `bubblegum`,
+`white`), all api-canonical. Per-theme remediation *status* is tracked in the
+theming handoff, not here (this section is the durable contract; a live checklist
+here becomes a merge-conflict magnet).
+
+**Two guards, on opposite sides of the seam (ui#168).** They cover different
+failures and neither subsumes the other:
+
+- `src/__tests__/themes.tokens.test.ts` (**here**) pins the primitive set against
+  `src/index.scss` — the contract every `data-st` hook paints from. It catches the
+  set *itself* drifting, which no api guard can see. It used to read the bundled
+  `layer-cake`/`kuro`/`anorex` files; those are gone, and copying them back as ui
+  fixtures would have restored the duplication #168 removed.
+- stellar-api's `stylesheetFixtures.spec.ts` asserts the same list against each
+  **delivered theme's** canonical bytes — ten token themes, not three.
+
+Neither is cross-repo: editing the token list here does not fail anything in the
+api, and vice versa. That gap is known, not overlooked.
 
 ---
 
