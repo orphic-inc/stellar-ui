@@ -3,46 +3,28 @@ import { screen } from '@testing-library/react';
 import { renderWithProviders } from '../testUtils';
 import PublicLanding from '../../components/pages/public/PublicLanding';
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  Link: ({ to, children }: { to: string; children: React.ReactNode }) => (
-    <a href={to}>{children}</a>
-  )
-}));
-
-let mockInstallStatus: { registrationStatus: string } | undefined = undefined;
-
-jest.mock('../../store/services/installApi', () => ({
-  useGetInstallStatusQuery: () => ({ data: mockInstallStatus })
-}));
-
+/**
+ * PublicLanding is now the hero copy and nothing else. The Sign In / Register
+ * links it used to render were duplicates of the ones in `PublicLayout`'s nav,
+ * and were removed from here rather than from the layout.
+ *
+ * The auth-link behaviour is therefore NOT untested — it lives in
+ * `__tests__/layout/PublicLayout.test.tsx`, against the component that actually
+ * owns those links, including the `registrationStatus` gate in both directions.
+ * This file deliberately does not restate it: a gate assertion here would only
+ * re-prove that a component with no links has no links, which is how the old
+ * "hides Register" case kept passing after the links were gone.
+ */
 describe('PublicLanding', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockInstallStatus = undefined;
+  it('renders the hero tagline', () => {
+    renderWithProviders(<PublicLanding />);
+    expect(screen.getByText(/we didn't start the fire/i)).toBeInTheDocument();
   });
 
-  it('renders Stellar heading and Sign In link', () => {
+  it('renders no auth links of its own — those belong to PublicLayout', () => {
+    // Guards the de-duplication itself: re-adding a Sign In / Register link
+    // here would restore the double-rendered CTA this change removed.
     renderWithProviders(<PublicLanding />);
-    expect(
-      screen.getByRole('heading', { name: /stellar/i })
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
-  });
-
-  it('shows Register link when registration is open', () => {
-    mockInstallStatus = { registrationStatus: 'open' };
-    renderWithProviders(<PublicLanding />);
-    expect(
-      screen.getByRole('link', { name: /^register$/i })
-    ).toBeInTheDocument();
-  });
-
-  it('hides Register when registration is not open', () => {
-    mockInstallStatus = { registrationStatus: 'invite' };
-    renderWithProviders(<PublicLanding />);
-    expect(
-      screen.queryByRole('link', { name: /^register$/i })
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });
