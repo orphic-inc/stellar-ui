@@ -41,9 +41,15 @@ const StylesheetInjector = () => {
     profile?.userSettings?.activeAuthorStylesheetId;
 
   // Single-winner precedence (ADR-0024 §4) — the Site Stylesheet slot's explicit
-  // source, then the built-in fallback, then Sublime. No stacking: the slot is
-  // Personal XOR Registry (the API enforces that), so at most one of the first
-  // two branches is ever populated.
+  // source, then the selected registry row. No stacking: the slot is Personal
+  // XOR Registry (the API enforces that), so at most one of the first two
+  // branches is ever populated.
+  //
+  // Sublime is not special here (#196): it resolves through the registry like
+  // any other row and renders nothing because its `cssUrl` is null, not because
+  // the client recognises the name. Matching on the name would also force the
+  // API's registry guard to carry a carve-out, and a carve-out is where the next
+  // unreachable theme hides.
   //
   // `undefined` is a distinct "not resolved yet" state from `null` ("resolved:
   // no theme") — profile/stylesheets are momentarily undefined on cold mount,
@@ -58,7 +64,7 @@ const StylesheetInjector = () => {
     if (activeAuthorStylesheetId != null) {
       return registryCssHref(activeAuthorStylesheetId);
     }
-    if (!siteAppearance || siteAppearance === 'sublime') return null;
+    if (!siteAppearance) return null;
     if (stylesheets === undefined) return undefined;
     const match = stylesheets.find((s) => s.name === siteAppearance);
     return match ? match.cssUrl : null;

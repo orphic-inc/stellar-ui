@@ -31,7 +31,10 @@ jest.mock('../../store/services/siteApi', () => ({
         id: 1,
         name: 'sublime',
         description: 'Default',
-        cssUrl: '/stylesheets/sublime/style.css',
+        // null since stellar-api #377 — Sublime has no delivery target (its look
+        // is the bundled Tailwind). It still keeps isDefault and its picker
+        // entry, which is what this fixture exercises.
+        cssUrl: null,
         isDefault: true
       },
       {

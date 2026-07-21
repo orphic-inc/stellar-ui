@@ -112,6 +112,64 @@ describe('StylesheetInjector', () => {
     expect(linkEl()).toBeNull();
   });
 
+  // #196 — Sublime is resolved through the registry like any other row; the
+  // client no longer recognises the name. A null `cssUrl` (stellar-api #377 /
+  // ADR-0024 §3) is what means "renders nothing", so these three pin the
+  // behaviour to the field rather than to the string 'sublime'.
+
+  it('injects nothing for a registry row whose cssUrl is null', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { siteAppearance: 'sublime' } }
+    });
+    mockUseGetStylesheetsQuery.mockReturnValue({
+      data: [{ name: 'sublime', cssUrl: null }]
+    });
+
+    render(<StylesheetInjector />);
+    expect(linkEl()).toBeNull();
+  });
+
+  it('injects Sublime when an operator has repointed it at a real delivery target', () => {
+    // The #377 migration nulls Sublime's cssUrl only when it still holds the
+    // dead '/stylesheets/sublime/style.css' path, deliberately preserving an
+    // operator's own target. Recognising the name would discard it.
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { siteAppearance: 'sublime' } }
+    });
+    mockUseGetStylesheetsQuery.mockReturnValue({
+      data: [
+        { name: 'sublime', cssUrl: '/api/stylesheet/author-stylesheet/7/css' }
+      ]
+    });
+
+    render(<StylesheetInjector />);
+    expect(linkEl()?.getAttribute('href')).toBe(
+      '/api/stylesheet/author-stylesheet/7/css'
+    );
+  });
+
+  it('leaves a pre-applied <link> alone while the stylesheets query is still loading, on Sublime too', () => {
+    // Resolving Sublime by name short-circuited to null before the
+    // `stylesheets === undefined` check, so a Sublime user's pre-applied link
+    // was torn down mid-load — the FOUC the undefined/null split exists to
+    // prevent (see the href comment in the component).
+    const preapplied = document.createElement('link');
+    preapplied.id = LINK_ID;
+    preapplied.rel = 'stylesheet';
+    preapplied.href = '/stylesheets/kuro.css';
+    document.head.appendChild(preapplied);
+
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: { userSettings: { siteAppearance: 'sublime' } }
+    });
+    mockUseGetStylesheetsQuery.mockReturnValue({ data: undefined });
+
+    render(<StylesheetInjector />);
+
+    expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
+    expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro.css');
+  });
+
   it('refuses a non-https external URL scheme', () => {
     mockUseGetMyProfileQuery.mockReturnValue({
       data: { userSettings: { externalStylesheet: 'javascript:alert(1)' } }
