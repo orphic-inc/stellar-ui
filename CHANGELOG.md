@@ -6,10 +6,34 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+Completes the move of built-in themes to the API: the UI stops shipping theme CSS, stops recognising theme names, and keeps only the branding art it actually owns.
+
+### Added
+
+- **Public pages get a footer** — `PublicLayout` now carries the same footer as the private shell (LICENSE and CHANGELOG links, "Powered by Stellar"), painted from `--st-backdrop` / `--st-border-subtle` / `--st-text-faint` so it themes like everything else. The duplicated markup inside `PublicLanding` is dropped in favour of the shared layout.
+
 ### Changed
 
+- **Built-in theme CSS is no longer bundled in the UI** — `anorex`, `kuro`, `layer-cake`, `sublime` and `proton` are deleted from `src/stylesheets/`. All five were already unreachable: the first three had their registry `cssUrl` reconciled to the API `/css` route, `sublime` is rule-free by design, and `proton` became API-canonical when stellar-api#341 landed (its imagery served from `/api/asset/<sha256>`). `postmod` stays as the last tenant — its four commercial fonts make migration a redistribution question rather than a bundling one (stellar-api#343) — so the webpack `CopyPlugin` and devServer `static` entries stay with it [#168].
+- **The theming contract moved out of the theme directory** — `global.css` is half the contract, not a theme, but lived at `src/stylesheets/common/global.css`, which implied otherwise once that directory held nothing but a blocked theme. It now sits at `src/global.css`, beside the `index.scss` `@theme static` block holding the other half. `src/stylesheets/` is pinned as an exact set by a new guard, so an addition fails loudly and a removal forces a deliberate edit — a whitelist rather than the carve-out list stellar-api#371 warns against.
 - **The injector resolves Sublime from data, not from its name** — `StylesheetInjector` linked nothing for Sublime by comparing `siteAppearance` against the string `'sublime'`, a magic string paired across repos with stellar-api's `getDefaultStylesheetName` fallback. It now links nothing because the selected registry row's `cssUrl` is `null` (stellar-api#377 made the field nullable). Two behaviours change with it: an operator who repoints Sublime at a real delivery target now gets it honoured, and a Sublime user's pre-applied `<link>` is no longer torn down while the stylesheets query is still loading — the name comparison short-circuited ahead of the "not resolved yet" guard, reintroducing the cold-load FOUC `preapply-theme.js` prevents. Sublime keeps `isDefault` and its picker entry [#196].
 - **Vendored API contract resynced** — `Stylesheet.cssUrl` becomes `string | null` (stellar-api#377) and `GET /asset/{hash}` arrives (stellar-api ADR-0026). Additive; nothing removed or retyped [#196].
+- **Donation copy follows the upload to contribution rename** — the Donate page no longer offers "purchasing upload credit" or "Additional upload credit"; both read "contribution" now.
+- **README description tightened** — Stellar is described as "a community content tracker" rather than "a modern, next-generation community content tracker and forum software".
+
+### Fixed
+
+- **Light themes no longer render a dark-theme logo** — `THEME_LOGOS` was the last hardcoded theme list in the UI and had gone six themes stale since the API 0.6.4 palette expansion. Every unlisted theme fell through to a `DEFAULT_LOGO` that was kuro's, so members on `white`, `shiro` and `minimal` were served a dark-theme logo on a light background. A theme with no shipped art now gets a theme-agnostic wordmark painted from `--st-text-strong`, which reads on light and dark alike, so absence can only under-brand and never mis-brand. The map's job is now stated explicitly: it is the UI's inventory of art it ships, not a mirror of the API's catalogue.
+
+### Docs
+
+- **e2e container-stack verification runbook** added (`docs/runbooks/e2e-stack-pass.md`) — the operator half of the 0.8.1 readiness runbook, answering whether an image pair actually functions.
+- Doc surfaces left stale by the theme deletion were finished: CLAUDE.md's architecture map still listed the deleted directories and pointed at `common/global.css` as "the contract", and both READMEs named the removed `src/stylesheets/layer-cake/` as the worked reference.
+
+### Internal
+
+- The theme-token test now pins the primitive set against `src/index.scss` — the `@theme static` block every `data-st` hook paints from — rather than reading three files that no longer exist.
+- `PublicLanding` tests follow the auth links to the component that owns them instead of asserting them locally.
 
 ## [0.8.1] — 2026-07-18
 
