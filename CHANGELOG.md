@@ -6,6 +6,11 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **The injector resolves Sublime from data, not from its name** — `StylesheetInjector` linked nothing for Sublime by comparing `siteAppearance` against the string `'sublime'`, a magic string paired across repos with stellar-api's `getDefaultStylesheetName` fallback. It now links nothing because the selected registry row's `cssUrl` is `null` (stellar-api#377 made the field nullable). Two behaviours change with it: an operator who repoints Sublime at a real delivery target now gets it honoured, and a Sublime user's pre-applied `<link>` is no longer torn down while the stylesheets query is still loading — the name comparison short-circuited ahead of the "not resolved yet" guard, reintroducing the cold-load FOUC `preapply-theme.js` prevents. Sublime keeps `isDefault` and its picker entry [#196].
+- **Vendored API contract resynced** — `Stylesheet.cssUrl` becomes `string | null` (stellar-api#377) and `GET /asset/{hash}` arrives (stellar-api ADR-0026). Additive; nothing removed or retyped [#196].
+
 ## [0.8.1] — 2026-07-18
 
 Public landing copy, cut to version parity with stellar-api 0.8.1.
