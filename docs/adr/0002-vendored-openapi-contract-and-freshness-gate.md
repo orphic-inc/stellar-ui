@@ -21,7 +21,7 @@ stellar-api already guards its side with OpenAPI + ERD freshness gates in CI (st
 **Vendor the spec, pin it, and gate freshness in CI.**
 
 - The OpenAPI document is **vendored** into the UI repo at `src/types/openapi.json` — a pinned snapshot, not a live fetch. `api.ts` is generated from that committed file (`npm run api:generate`).
-- Re-syncing the spec is a **deliberate, separate act**: `npm run api:sync` copies `../stellar-api/openapi.json` over the vendored copy and regenerates. This is a manual step before any PR that touches API response shapes (per `CLAUDE.md`).
+- Re-syncing the spec is a **deliberate, separate act**: `npm run api:sync` copies `../stellar-api/openapi.json` over the vendored copy and regenerates. This is a manual step before any PR that touches API response shapes (per `AGENTS.md`).
 - CI enforces freshness with an **`API contract freshness`** step in `.github/workflows/publish.yml`: it runs `npm run api:generate && git diff --exit-code src/types/api.ts`. If the committed `api.ts` doesn't match what regeneration produces from the vendored spec, the build reds.
 
 ## Consequences

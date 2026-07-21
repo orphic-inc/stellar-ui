@@ -1,6 +1,6 @@
 # Stellar UI — Developer Documentation
 
-The human entry point for developing the Stellar UI. Start here after the root [README.md](../README.md) (install & run) and [CONTRIBUTING.md](../CONTRIBUTING.md) (fork workflow, standards, PR gate). [CLAUDE.md](../CLAUDE.md) / [AGENTS.md](../AGENTS.md) carry the same ground formatted for AI coding agents — this is the human-facing source.
+The human entry point for developing the Stellar UI. Start here after the root [README.md](../README.md) (install & run) and [CONTRIBUTING.md](../CONTRIBUTING.md) (fork workflow, standards, PR gate). [AGENTS.md](../AGENTS.md) carries the same ground formatted for AI coding agents (`CLAUDE.md` is a thin pointer at it) — this is the human-facing source.
 
 ## Where things live
 
@@ -27,7 +27,7 @@ React 18 SPA, Webpack-bundled, Redux Toolkit + **RTK Query** for all data, React
 - **Types come from the contract.** Derive request/response types from the generated spec — `components['schemas']['Foo']` or `paths['/route']['get']['responses'][200]['content']['application/json']` — never hand-written interfaces. If stellar-api changed the shape, `npm run api:sync` first.
 - **Data goes through RTK Query.** Add an endpoint to the relevant `src/store/services/*.ts`. Register any new tag type in `src/store/api.ts` **before** using it; mutations must invalidate the specific tags their queries provide (use `{ type: 'ForumTopic', id }`, not the bare tag). Read errors as `err.data?.msg` / `err.data?.errors` (never `err.data?.error`).
 - **Build UI from the primitive kit.** New surfaces should use the primitive kit in `src/components/ui/` (`PageShell`/`Panel`/`Button`/`Field`/`DataTable`/`Badge`/`Pagination`/`SectionHeading`) — each emits the theming `data-st` contract, so adopting a primitive completes the theming migration for that surface (stellar-ui [ADR-0007](adr/0007-ui-primitive-kit.md)). Staff tools additionally register in `staffToolRegistry.tsx` (permission-filtered; only add links for implemented routes).
-- The exhaustive service map and pattern gotchas are in [CLAUDE.md](../CLAUDE.md).
+- The exhaustive service map and pattern gotchas are in [AGENTS.md](../AGENTS.md).
 
 ## Theming
 
