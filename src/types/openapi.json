@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Stellar API",
-    "version": "0.8.0",
+    "version": "0.8.1",
     "description": "REST API for the Stellar community tracker. All routes under `/api/*`. Authentication uses JWT cookies (`token` cookie set on login)."
   },
   "servers": [
@@ -2049,7 +2049,8 @@
             "type": "string"
           },
           "cssUrl": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "isDefault": {
             "type": "boolean"
@@ -8159,6 +8160,55 @@
         }
       }
     },
+    "/asset/{hash}": {
+      "get": {
+        "tags": [
+          "Assets"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "hash",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The stored asset bytes, with the mime verified at ingest and immutable caching",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed content address (not a 64-char lowercase sha256)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/stylesheet": {
       "get": {
         "tags": [
@@ -8200,6 +8250,7 @@
                   },
                   "cssUrl": {
                     "type": "string",
+                    "nullable": true,
                     "minLength": 1
                   },
                   "isDefault": {
@@ -8328,6 +8379,7 @@
                   },
                   "cssUrl": {
                     "type": "string",
+                    "nullable": true,
                     "minLength": 1
                   },
                   "isDefault": {

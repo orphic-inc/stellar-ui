@@ -2166,6 +2166,61 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/asset/{hash}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          hash: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The stored asset bytes, with the mime verified at ingest and immutable caching */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/octet-stream': string;
+          };
+        };
+        /** @description Malformed content address (not a 64-char lowercase sha256) */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/stylesheet': {
     parameters: {
       query?: never;
@@ -2207,7 +2262,7 @@ export interface paths {
             name: string;
             /** @default  */
             description?: string;
-            cssUrl: string;
+            cssUrl: string | null;
             /** @default false */
             isDefault?: boolean;
           };
@@ -2327,7 +2382,7 @@ export interface paths {
           'application/json': {
             name?: string;
             description?: string;
-            cssUrl?: string;
+            cssUrl?: string | null;
             isDefault?: boolean;
           };
         };
@@ -12779,7 +12834,7 @@ export interface components {
       id: number;
       name: string;
       description: string;
-      cssUrl: string;
+      cssUrl: string | null;
       isDefault: boolean;
       createdAt: string;
     };
