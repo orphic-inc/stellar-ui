@@ -76,7 +76,7 @@ Stylesheet authorship & integration; version-parity cut with stellar-api (consol
 
 - Corrected theming §11 post-conversion verification to probe un-migrated islands with **Layer Cake** (token-only), not kuro — kuro's legacy shims mask the very islands the probe is meant to surface [#159]
 - **Staff Inbox is one role-dispatched entry** — removed the duplicate "Staff Queue" nav item so staff no longer land on a ticket queue indistinguishable from the reports queue. Staff see the queue at Staff Inbox, members see their own tickets; the unread badge is role-aware (queue count for staff, own unread for members). Records the model in stellar-api ADR-0025.
-- **Killed the cold-load theme FOUC** — pre-apply the resolved theme before mount instead of after, and dropped the unmount cleanup that was churning the theme `<link>` on switch [#161]
+- **Cut the cold-load theme FOUC on repeat visits** — pre-apply the resolved theme before mount instead of after, and dropped the unmount cleanup that was churning the theme `<link>` on switch. This works from a stored href, so it covers return visits, not a member's first-ever load: that still paints the base state before the profile and stylesheet queries resolve, which is why [#161] remains open. (Corrected 2026-07-20 — this entry originally read "Killed the cold-load theme FOUC", which overclaimed against an issue that never closed.)
 
 ### Docs
 
