@@ -62,6 +62,15 @@ describe('RulesPage', () => {
     );
   });
 
+  it('anchors each rule and sub-rule by its code for [rule] links', () => {
+    mockTree.mockReturnValue({ data: TREE, isLoading: false });
+    const { container } = renderWithProviders(<RulesPage />);
+    // BBCode `[rule]hX` → /rules#X (rule heading) and `[rule]X.Y` → /rules#X.Y
+    // (sub-rule); the ids must match the positional codes (#398).
+    expect(container.querySelector('section[id="1"]')).toBeInTheDocument();
+    expect(container.querySelector('li[id="1.1"]')).toBeInTheDocument();
+  });
+
   it('shows the empty state when the tree has no rules', () => {
     mockTree.mockReturnValue({
       data: { rules: [], variables: {} },

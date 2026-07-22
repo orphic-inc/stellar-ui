@@ -27,6 +27,10 @@ export interface WikiPage {
 
 export interface WikiPageWithBody extends WikiPage {
   body: string;
+  // Server-rendered, sanitized HTML transcription of the raw BBCode `body`
+  // (#398). The API is the single source of transcription; the UI renders this
+  // and no longer parses `body` itself. `body` is retained for the edit form.
+  bodyHtml: string;
 }
 
 export interface WikiRevisionSummary {

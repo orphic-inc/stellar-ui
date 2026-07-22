@@ -49,7 +49,8 @@ describe('WikiViewPage', () => {
         updatedAt: '2026-05-17T12:00:00.000Z',
         minReadLevel: 0,
         minEditLevel: 100,
-        body: '<p>Safe body</p>',
+        body: '[b]raw bbcode[/b]',
+        bodyHtml: '<h2>Rendered heading</h2><strong>bold body</strong>',
         slug: 'wiki-page',
         author: { id: 7, username: 'alice' },
         aliases: [{ alias: 'wiki-page' }, { alias: 'old-page' }]
@@ -93,6 +94,15 @@ describe('WikiViewPage', () => {
       const alerts = selectAlerts(store.getState());
       expect(alerts.some((a) => a.msg === 'Page deleted.')).toBe(true);
     });
+  });
+
+  it('renders the API bodyHtml, not the raw body', () => {
+    const { container } = renderWithProviders(<WikiViewPage />);
+    // The server-transcribed bodyHtml is shown; the raw BBCode body is not.
+    expect(screen.getByText('Rendered heading')).toBeInTheDocument();
+    expect(screen.getByText('bold body')).toBeInTheDocument();
+    expect(container.querySelector('h2')).toBeInTheDocument();
+    expect(container.textContent).not.toContain('[b]raw bbcode[/b]');
   });
 
   it('shows not found when the page request fails', () => {

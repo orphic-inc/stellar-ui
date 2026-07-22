@@ -12,28 +12,11 @@ import { useGetMeQuery } from '../../store/services/authApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
+import {
+  BBCODE_ALLOWED_TAGS,
+  BBCODE_ALLOWED_ATTR
+} from '../../utils/bbcodeSanitize';
 import Spinner from '../layout/Spinner';
-
-const ALLOWED_WIKI_TAGS = [
-  'b',
-  'i',
-  'u',
-  'em',
-  'strong',
-  'a',
-  'p',
-  'br',
-  'ul',
-  'ol',
-  'li',
-  'blockquote',
-  'code',
-  'pre',
-  'span',
-  'h1',
-  'h2',
-  'h3'
-];
 
 const WikiViewPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -62,9 +45,12 @@ const WikiViewPage = () => {
     (hasAnyPermission(user, ['wiki_edit']) &&
       userRankLevel >= page.minEditLevel);
 
-  const renderedBody = DOMPurify.sanitize(page.body, {
-    ALLOWED_TAGS: ALLOWED_WIKI_TAGS,
-    ALLOWED_ATTR: ['href', 'class', 'rel', 'target']
+  // The API transcribes BBCode → sanitized HTML server-side (#398); render its
+  // `bodyHtml` rather than parsing the raw `body` here. DOMPurify with the
+  // mirrored allowlist is the second net over the already-sanitized markup.
+  const renderedBody = DOMPurify.sanitize(page.bodyHtml ?? '', {
+    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
+    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
   });
 
   const handleDelete = async () => {
