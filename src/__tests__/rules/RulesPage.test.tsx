@@ -10,17 +10,20 @@ jest.mock('../../store/services/rulesApi', () => ({
   useGetRulesIndexQuery: () => mockIndex()
 }));
 
+// `code` is the slug machine key the API actually returns (PRD-09); the UI must
+// derive the displayed number + anchor id positionally, so the mock uses slugs
+// on purpose — a regression to id={rule.code} would fail the anchor assertions.
 const TREE = {
   rules: [
     {
       id: 1,
-      code: '1',
+      code: 'golden.accounts',
       title: 'Accounts',
       description: '',
       subRules: [
         {
           id: 11,
-          code: '1.1',
+          code: 'single-account',
           title: 'Do not create more than one account.',
           description:
             'If your account is disabled, contact staff in ${disabled_channel} on ${irc}.'
@@ -62,13 +65,20 @@ describe('RulesPage', () => {
     );
   });
 
-  it('anchors each rule and sub-rule by its code for [rule] links', () => {
+  it('anchors each rule and sub-rule by its positional number for [rule] links', () => {
     mockTree.mockReturnValue({ data: TREE, isLoading: false });
     const { container } = renderWithProviders(<RulesPage />);
     // BBCode `[rule]hX` → /rules#X (rule heading) and `[rule]X.Y` → /rules#X.Y
-    // (sub-rule); the ids must match the positional codes (#398).
+    // (sub-rule); the ids are POSITIONAL (#398), not the slug `code`.
     expect(container.querySelector('section[id="1"]')).toBeInTheDocument();
     expect(container.querySelector('li[id="1.1"]')).toBeInTheDocument();
+    // The slug code must never leak into an anchor id.
+    expect(
+      container.querySelector('[id="golden.accounts"]')
+    ).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[id="single-account"]')
+    ).not.toBeInTheDocument();
   });
 
   it('shows the empty state when the tree has no rules', () => {

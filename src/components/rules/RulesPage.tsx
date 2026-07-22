@@ -55,44 +55,51 @@ const RulesPage = () => {
         </p>
       ) : (
         <div className="space-y-8 mb-10">
-          {rules.map((rule) => (
-            // id = positional code so `[rule]hX` → /rules#X lands on the rule
-            // heading (BBCode `[rule]` tag, #398).
-            <section key={rule.id} id={rule.code} className="space-y-3">
-              <h2 data-st="prose" data-st-strong className="text-xl">
-                <span data-st="meta" className="mr-2">
-                  {rule.code}.
-                </span>
-                {rule.title}
-              </h2>
-              {rule.description && (
-                <p data-st="prose">
-                  {renderRuleText(rule.description, variables)}
-                </p>
-              )}
-              {rule.subRules.length > 0 && (
-                <ul className="space-y-3 border-l border-[var(--st-border)] pl-4">
-                  {rule.subRules.map((sub) => (
-                    // id = X.Y code so `[rule]X.Y` → /rules#X.Y lands on the
-                    // sub-rule (#398).
-                    <li key={sub.id} id={sub.code} data-st="prose">
-                      <span
-                        data-st="prose"
-                        data-st-strong
-                        className="font-semibold"
-                      >
-                        <span data-st="meta" className="mr-2">
-                          {sub.code}
-                        </span>
-                        {sub.title}
-                      </span>{' '}
-                      {renderRuleText(sub.description, variables)}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ))}
+          {rules.map((rule, i) => {
+            // The public rule number is POSITIONAL (X, X.Y from tree order),
+            // matching CODE_OF_CONDUCT.md — not the DB `code`, which is a slug
+            // machine key (PRD-09). It's both the displayed number and the
+            // anchor id so `[rule]hX` → /rules#X and `[rule]X.Y` → /rules#X.Y
+            // land (BBCode `[rule]` tag, #398).
+            const ruleNum = String(i + 1);
+            return (
+              <section key={rule.id} id={ruleNum} className="space-y-3">
+                <h2 data-st="prose" data-st-strong className="text-xl">
+                  <span data-st="meta" className="mr-2">
+                    {ruleNum}.
+                  </span>
+                  {rule.title}
+                </h2>
+                {rule.description && (
+                  <p data-st="prose">
+                    {renderRuleText(rule.description, variables)}
+                  </p>
+                )}
+                {rule.subRules.length > 0 && (
+                  <ul className="space-y-3 border-l border-[var(--st-border)] pl-4">
+                    {rule.subRules.map((sub, j) => {
+                      const subNum = `${i + 1}.${j + 1}`;
+                      return (
+                        <li key={sub.id} id={subNum} data-st="prose">
+                          <span
+                            data-st="prose"
+                            data-st-strong
+                            className="font-semibold"
+                          >
+                            <span data-st="meta" className="mr-2">
+                              {subNum}
+                            </span>
+                            {sub.title}
+                          </span>{' '}
+                          {renderRuleText(sub.description, variables)}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </section>
+            );
+          })}
         </div>
       )}
 
