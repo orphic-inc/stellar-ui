@@ -47,7 +47,11 @@ module.exports = {
           '^@axe-core/playwright$',
           // exports-field package: resolves locally but Codacy's no-install
           // sandbox can't parse it (same class as the entries above).
-          '^react-hook-form$'
+          '^react-hook-form$',
+          // katex/dist/katex.min.css (#207): the CSS subpath resolves through
+          // katex's conditional `exports` map, which Codacy's no-install
+          // no-unresolved resolver can't follow. Local lint passes off `main`.
+          '^katex/'
         ]
       }
     ]
