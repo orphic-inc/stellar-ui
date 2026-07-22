@@ -416,6 +416,7 @@ describe('UserProfile', () => {
       profile: {
         profileTitle: 'Jazz Fan',
         profileInfo: '<p>Bio content here</p>',
+        profileInfoHtml: '<p>Bio content here</p>',
         avatar: null
       }
     } as never;

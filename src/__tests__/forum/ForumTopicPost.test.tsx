@@ -8,8 +8,7 @@ jest.mock('dompurify', () => ({
   sanitize: (html: string) => html
 }));
 
-jest.mock('../../utils/bbcode', () => ({
-  parseBBCode: (s: string) => s,
+jest.mock('../../utils/quoteBBCode', () => ({
   quotePost: (username: string, body: string) =>
     `[quote=${username}]${body}[/quote]`
 }));
@@ -57,6 +56,7 @@ const mockPost = {
     warned: null
   },
   body: 'Hello forum world',
+  bodyHtml: 'Hello forum world',
   createdAt: '2024-03-01T00:00:00Z',
   updatedAt: '2024-03-01T00:00:00Z'
 };

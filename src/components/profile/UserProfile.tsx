@@ -3,6 +3,10 @@ import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { formatBytes, ordinalSuffix } from '../../utils';
 import DOMPurify from 'dompurify';
+import {
+  BBCODE_ALLOWED_TAGS,
+  BBCODE_ALLOWED_ATTR
+} from '../../utils/bbcodeSanitize';
 import { Modal } from '../ui';
 
 import {
@@ -1221,7 +1225,7 @@ const UserProfile = () => {
       <div className="flex gap-6 items-start">
         {/* Main content (left) */}
         <div className="flex-1 space-y-4 min-w-0">
-          {profile.profile?.profileInfo && (
+          {profile.profile?.profileInfoHtml && (
             <div data-st="panel">
               <div data-st="colhead" data-st-title>
                 <span>Profile</span>
@@ -1230,7 +1234,12 @@ const UserProfile = () => {
                 data-st="prose"
                 className="p-4 text-sm"
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(profile.profile.profileInfo)
+                  // Render the API's server-transcribed HTML (#398/#402);
+                  // mirrored-allowlist DOMPurify is the second net.
+                  __html: DOMPurify.sanitize(profile.profile.profileInfoHtml, {
+                    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
+                    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
+                  })
                 }}
               />
             </div>

@@ -6,8 +6,11 @@ import type { CollageOrderBy } from '../../types';
 import Spinner from '../layout/Spinner';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { hasPermission } from '../../utils/permissions';
-import { parseBBCode } from '../../utils/bbcode';
 import DOMPurify from 'dompurify';
+import {
+  BBCODE_ALLOWED_TAGS,
+  BBCODE_ALLOWED_ATTR
+} from '../../utils/bbcodeSanitize';
 
 const CATEGORIES = [
   { id: undefined, label: 'All' },
@@ -161,7 +164,12 @@ const CollageBrowse = () => {
                     data-st="meta"
                     className="text-xs line-clamp-2 bbcode-content"
                     dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(parseBBCode(c.description))
+                      // Server-transcribed HTML (#398/#402); mirrored-allowlist
+                      // DOMPurify is the second net.
+                      __html: DOMPurify.sanitize(c.descriptionHtml ?? '', {
+                        ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
+                        ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
+                      })
                     }}
                   />
                   {c.tags.length > 0 && (

@@ -214,6 +214,9 @@ export interface Collage {
   id: number;
   name: string;
   description: string;
+  // Server-transcribed, sanitized HTML of the raw BBCode `description` (#402/#207).
+  // Additive: `description` still round-trips the editor; read this for display.
+  descriptionHtml?: string;
   userId: number;
   categoryId: number;
   tags: string[];

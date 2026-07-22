@@ -23,6 +23,7 @@ const mockComments = [
     authorId: 10,
     author: { username: 'alice' },
     body: '<b>Hello</b>',
+    bodyHtml: '<b>Hello</b>',
     createdAt: '2024-01-01'
   },
   {
@@ -30,6 +31,7 @@ const mockComments = [
     authorId: 99,
     author: { username: 'bob' },
     body: 'World',
+    bodyHtml: 'World',
     createdAt: '2024-01-02'
   }
 ];

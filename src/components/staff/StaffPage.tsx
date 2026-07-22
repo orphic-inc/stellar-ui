@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
-import { parseBBCode } from '../../utils/bbcode';
+import {
+  BBCODE_ALLOWED_TAGS,
+  BBCODE_ALLOWED_ATTR
+} from '../../utils/bbcodeSanitize';
 import { useGetStaffQuery } from '../../store/services/staffApi';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
@@ -13,6 +16,7 @@ type StaffMember = {
   rankColor?: string | null;
   lastSeen?: string | null;
   staffBio?: string | null;
+  staffBioHtml?: string | null;
 };
 
 const memberColumns: Column<StaffMember>[] = [
@@ -49,12 +53,15 @@ const memberColumns: Column<StaffMember>[] = [
   {
     header: 'Bio',
     cell: (m) =>
-      m.staffBio ? (
+      m.staffBioHtml ? (
         <span
           className="text-xs bbcode-content"
           dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(parseBBCode(m.staffBio), {
-              ALLOWED_TAGS: ['b', 'i', 'u', 's', 'a', 'br']
+            // Server-transcribed HTML (#398/#402); mirrored-allowlist
+            // DOMPurify is the second net.
+            __html: DOMPurify.sanitize(m.staffBioHtml, {
+              ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
+              ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
             })
           }}
         />

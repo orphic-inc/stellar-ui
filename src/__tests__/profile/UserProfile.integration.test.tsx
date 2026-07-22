@@ -232,6 +232,7 @@ describe('UserProfile RTK Query integration', () => {
         profile: {
           profileTitle: 'Jazz Fan',
           profileInfo: '<p>Hello from alice!</p>',
+          profileInfoHtml: '<p>Hello from alice!</p>',
           avatar: null
         }
       })

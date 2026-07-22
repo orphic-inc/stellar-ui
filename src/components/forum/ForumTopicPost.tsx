@@ -7,7 +7,11 @@ import {
   useUpdatePostMutation,
   useDeletePostMutation
 } from '../../store/services/forumApi';
-import { parseBBCode, quotePost } from '../../utils/bbcode';
+import { quotePost } from '../../utils/quoteBBCode';
+import {
+  BBCODE_ALLOWED_TAGS,
+  BBCODE_ALLOWED_ATTR
+} from '../../utils/bbcodeSanitize';
 import { avatarSrc, onAvatarError } from '../../utils/avatar';
 import type { ForumPost, ForumPostEdit } from '../../types';
 
@@ -60,9 +64,12 @@ const ForumTopicPost = ({
     onQuote?.(quotePost(author?.username ?? 'unknown', body));
   };
 
-  const renderedBody = DOMPurify.sanitize(parseBBCode(body), {
-    ADD_TAGS: ['blockquote', 'cite', 'u', 's', 'pre', 'code', 'ul', 'li'],
-    ADD_ATTR: ['style', 'class', 'rel', 'target']
+  // The API transcribes BBCode → sanitized HTML server-side (#398/#402); render
+  // its `bodyHtml` rather than parsing the raw `body` here. DOMPurify with the
+  // mirrored allowlist is the second net over the already-sanitized markup.
+  const renderedBody = DOMPurify.sanitize(post.bodyHtml ?? '', {
+    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
+    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
   });
 
   const renderedEdits: ForumPostEdit[] = editHistory?.data ?? [];

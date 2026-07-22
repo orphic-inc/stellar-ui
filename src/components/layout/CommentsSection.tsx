@@ -10,7 +10,10 @@ import {
 } from '../../store/services/commentApi';
 import { useSubscribeCommentsMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { parseBBCode } from '../../utils/bbcode';
+import {
+  BBCODE_ALLOWED_TAGS,
+  BBCODE_ALLOWED_ATTR
+} from '../../utils/bbcodeSanitize';
 import Time from './Time';
 
 const SUBSCRIBABLE_PAGES: CommentPage[] = [
@@ -132,18 +135,11 @@ const CommentsSection = ({
                 data-st="prose"
                 className="leading-relaxed break-words bbcode-content"
                 dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(parseBBCode(c.body), {
-                    ADD_TAGS: [
-                      'blockquote',
-                      'cite',
-                      'u',
-                      's',
-                      'pre',
-                      'code',
-                      'ul',
-                      'li'
-                    ],
-                    ADD_ATTR: ['style', 'class', 'rel', 'target']
+                  // Render the API's server-transcribed HTML (#398/#402);
+                  // DOMPurify with the mirrored allowlist is the second net.
+                  __html: DOMPurify.sanitize(c.bodyHtml ?? '', {
+                    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
+                    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
                   })
                 }}
               />
