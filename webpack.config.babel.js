@@ -166,6 +166,13 @@ export default {
       {
         test: /\.png$/,
         type: 'asset/resource'
+      },
+      {
+        // KaTeX ships its glyph fonts as woff2/woff/ttf, referenced by url()
+        // from katex.min.css (#403/#207). css-loader resolves those to these
+        // emitted assets; served self-host so the `font-src 'self'` CSP passes.
+        test: /\.(woff2?|ttf)$/,
+        type: 'asset/resource'
       }
     ]
   },
