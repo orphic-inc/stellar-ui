@@ -243,6 +243,10 @@
               },
               "authorStylesheetLimit": {
                 "type": "integer"
+              },
+              "assetLimit": {
+                "type": "integer",
+                "nullable": true
               }
             },
             "required": [
@@ -317,6 +321,9 @@
               "profileInfo": {
                 "type": "string",
                 "nullable": true
+              },
+              "profileInfoHtml": {
+                "type": "string"
               }
             },
             "required": [
@@ -356,6 +363,9 @@
           "profileInfo": {
             "type": "string",
             "nullable": true
+          },
+          "profileInfoHtml": {
+            "type": "string"
           }
         },
         "required": [
@@ -584,12 +594,17 @@
           },
           "total": {
             "type": "number"
+          },
+          "raw": {
+            "type": "number",
+            "nullable": true
           }
         },
         "required": [
           "percentile",
           "rank",
-          "total"
+          "total",
+          "raw"
         ]
       },
       "ProfilePercentiles": {
@@ -609,6 +624,12 @@
           },
           "requestsFilled": {
             "$ref": "#/components/schemas/ProfilePercentile"
+          },
+          "artistsAdded": {
+            "$ref": "#/components/schemas/ProfilePercentile"
+          },
+          "overall": {
+            "type": "number"
           }
         },
         "required": [
@@ -616,7 +637,9 @@
           "consumed",
           "contributions",
           "forumPosts",
-          "requestsFilled"
+          "requestsFilled",
+          "artistsAdded",
+          "overall"
         ]
       },
       "ProfileCollageShelf": {
@@ -2205,6 +2228,33 @@
           "createdBy"
         ]
       },
+      "AssetUploadResponse": {
+        "type": "object",
+        "properties": {
+          "hash": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "mime": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hash",
+          "url",
+          "mime",
+          "size",
+          "kind"
+        ]
+      },
       "Forum": {
         "type": "object",
         "properties": {
@@ -2458,6 +2508,9 @@
             "type": "number"
           },
           "body": {
+            "type": "string"
+          },
+          "bodyHtml": {
             "type": "string"
           },
           "lastEdit": {
@@ -3461,6 +3514,9 @@
             "type": "string",
             "nullable": true
           },
+          "descriptionHtml": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string"
           },
@@ -3649,6 +3705,10 @@
           "authorStylesheetLimit": {
             "type": "integer"
           },
+          "assetLimit": {
+            "type": "integer",
+            "nullable": true
+          },
           "displayStaff": {
             "type": "boolean"
           },
@@ -3710,6 +3770,9 @@
           "staffBio": {
             "type": "string",
             "nullable": true
+          },
+          "staffBioHtml": {
+            "type": "string"
           }
         },
         "required": [
@@ -3758,6 +3821,9 @@
             "type": "string"
           },
           "body": {
+            "type": "string"
+          },
+          "bodyHtml": {
             "type": "string"
           },
           "authorId": {
@@ -6060,7 +6126,19 @@
                     "setupChecklist": {
                       "type": "array",
                       "items": {
-                        "type": "string"
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "message": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "message"
+                        ]
                       }
                     }
                   },
@@ -8196,8 +8274,66 @@
               }
             }
           },
+          "401": {
+            "description": "A member-uploaded asset fetched without authentication",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/asset": {
+      "post": {
+        "tags": [
+          "Assets"
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The stored asset address",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetUploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Empty, oversize, non-image, or misdeclared payload, or the rank asset limit is reached (or zero)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
             "content": {
               "application/json": {
                 "schema": {
@@ -8251,7 +8387,7 @@
                   "cssUrl": {
                     "type": "string",
                     "nullable": true,
-                    "minLength": 1
+                    "pattern": "^\\/api\\/stylesheet\\/author-stylesheet\\/(\\d+)\\/css$"
                   },
                   "isDefault": {
                     "type": "boolean",
@@ -8380,7 +8516,7 @@
                   "cssUrl": {
                     "type": "string",
                     "nullable": true,
-                    "minLength": 1
+                    "pattern": "^\\/api\\/stylesheet\\/author-stylesheet\\/(\\d+)\\/css$"
                   },
                   "isDefault": {
                     "type": "boolean"
@@ -11433,6 +11569,11 @@
                     "type": "integer",
                     "minimum": 0
                   },
+                  "assetLimit": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0
+                  },
                   "displayStaff": {
                     "type": "boolean"
                   },
@@ -11773,6 +11914,11 @@
                   },
                   "authorStylesheetLimit": {
                     "type": "integer",
+                    "minimum": 0
+                  },
+                  "assetLimit": {
+                    "type": "integer",
+                    "nullable": true,
                     "minimum": 0
                   },
                   "displayStaff": {

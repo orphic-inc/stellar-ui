@@ -201,7 +201,10 @@ export interface paths {
               /** @enum {string} */
               registrationStatus: 'open' | 'invite' | 'closed';
               configWarnings: string[];
-              setupChecklist: string[];
+              setupChecklist: {
+                id: string;
+                message: string;
+              }[];
             };
           };
         };
@@ -2202,6 +2205,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A member-uploaded asset fetched without authentication */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -2215,6 +2227,63 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/asset': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/octet-stream': string;
+        };
+      };
+      responses: {
+        /** @description The stored asset address */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['AssetUploadResponse'];
+          };
+        };
+        /** @description Empty, oversize, non-image, or misdeclared payload, or the rank asset limit is reached (or zero) */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -4897,6 +4966,7 @@ export interface paths {
             badge?: string;
             personalCollageLimit?: number;
             authorStylesheetLimit?: number;
+            assetLimit?: number | null;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -5092,6 +5162,7 @@ export interface paths {
             badge?: string;
             personalCollageLimit?: number;
             authorStylesheetLimit?: number;
+            assetLimit?: number | null;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -12385,6 +12456,7 @@ export interface components {
         };
         personalCollageLimit?: number;
         authorStylesheetLimit?: number;
+        assetLimit?: number | null;
       };
     };
     PublicUser: {
@@ -12404,6 +12476,7 @@ export interface components {
         avatarMouseoverText?: string | null;
         profileTitle?: string | null;
         profileInfo?: string | null;
+        profileInfoHtml?: string;
       };
     };
     ProfileDetails: {
@@ -12412,6 +12485,7 @@ export interface components {
       avatarMouseoverText?: string | null;
       profileTitle?: string | null;
       profileInfo?: string | null;
+      profileInfoHtml?: string;
     };
     UserRankSummary: {
       name: string;
@@ -12474,6 +12548,7 @@ export interface components {
       percentile: number;
       rank: number;
       total: number;
+      raw: number | null;
     };
     ProfilePercentiles: {
       contributed: components['schemas']['ProfilePercentile'];
@@ -12481,6 +12556,8 @@ export interface components {
       contributions: components['schemas']['ProfilePercentile'];
       forumPosts: components['schemas']['ProfilePercentile'];
       requestsFilled: components['schemas']['ProfilePercentile'];
+      artistsAdded: components['schemas']['ProfilePercentile'];
+      overall: number;
     };
     ProfileCollageShelf: {
       id: number;
@@ -12873,6 +12950,13 @@ export interface components {
         username: string;
       };
     };
+    AssetUploadResponse: {
+      hash: string;
+      url: string;
+      mime: string;
+      size: number;
+      kind: string;
+    };
     Forum: {
       id: number;
       sort: number;
@@ -12941,6 +13025,7 @@ export interface components {
       forumTopicId: number;
       authorId: number;
       body: string;
+      bodyHtml?: string;
       lastEdit?: components['schemas']['ForumPostLastEdit'];
       author?: components['schemas']['AuthorRef'];
       createdAt: string;
@@ -13204,6 +13289,7 @@ export interface components {
       releaseType?: string | null;
       image?: string | null;
       description?: string | null;
+      descriptionHtml?: string;
       createdAt?: string;
       artist?: components['schemas']['ReleaseArtist'] & unknown;
       tags?: components['schemas']['ReleaseTag'][];
@@ -13283,6 +13369,7 @@ export interface components {
       badge?: string;
       personalCollageLimit?: number;
       authorStylesheetLimit?: number;
+      assetLimit?: number | null;
       displayStaff?: boolean;
       staffGroupId?: number | null;
       userCount?: number;
@@ -13300,6 +13387,7 @@ export interface components {
       rankColor: string;
       lastSeen: string | null;
       staffBio: string | null;
+      staffBioHtml?: string;
     };
     StaffGroupWithMembers: {
       id: number | null;
@@ -13311,6 +13399,7 @@ export interface components {
       id: number;
       page: string;
       body: string;
+      bodyHtml?: string;
       authorId: number;
       createdAt: string;
       author?: components['schemas']['AuthorRef'];
