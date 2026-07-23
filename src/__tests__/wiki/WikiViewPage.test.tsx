@@ -102,6 +102,9 @@ describe('WikiViewPage', () => {
     expect(screen.getByText('Rendered heading')).toBeInTheDocument();
     expect(screen.getByText('bold body')).toBeInTheDocument();
     expect(container.querySelector('h2')).toBeInTheDocument();
+    expect(screen.getByText('Rendered heading').parentElement).toHaveClass(
+      'bbcode-content'
+    );
     expect(container.textContent).not.toContain('[b]raw bbcode[/b]');
   });
 

@@ -153,7 +153,7 @@ const WikiViewPage = () => {
       {/* Body */}
       <div
         data-st="panel"
-        className="prose prose-invert prose-sm max-w-none p-6 text-[var(--st-text)] leading-relaxed"
+        className="bbcode-content max-w-none p-6 text-[var(--st-text)] leading-relaxed"
         dangerouslySetInnerHTML={{ __html: renderedBody }}
       />
 
