@@ -8,13 +8,24 @@ const mockGetArtistBookmarks = jest.fn();
 const mockGetReleaseBookmarks = jest.fn();
 const mockGetCommunityBookmarks = jest.fn();
 const mockGetRequestBookmarks = jest.fn();
+const mockRemoveConsumed = jest.fn();
 
 jest.mock('../../store/services/bookmarkApi', () => ({
   useGetArtistBookmarksQuery: () => mockGetArtistBookmarks(),
   useGetReleaseBookmarksQuery: () => mockGetReleaseBookmarks(),
   useGetCommunityBookmarksQuery: () => mockGetCommunityBookmarks(),
-  useGetRequestBookmarksQuery: () => mockGetRequestBookmarks()
+  useGetRequestBookmarksQuery: () => mockGetRequestBookmarks(),
+  useRemoveConsumedReleaseBookmarksMutation: () => [
+    mockRemoveConsumed,
+    { isLoading: false }
+  ]
 }));
+
+const releaseBookmark = {
+  releaseId: 10,
+  createdAt: '2026-03-01T00:00:00Z',
+  release: { id: 10, title: 'Kind of Blue', communityId: 1 }
+};
 
 describe('BookmarksPage', () => {
   beforeEach(() => {
@@ -44,6 +55,9 @@ describe('BookmarksPage', () => {
       data: [],
       isLoading: false,
       error: undefined
+    });
+    mockRemoveConsumed.mockReturnValue({
+      unwrap: () => Promise.resolve({ removed: 0 })
     });
   });
 
@@ -114,18 +128,51 @@ describe('BookmarksPage', () => {
   it('switches to Releases tab and shows release bookmarks', async () => {
     const user = userEvent.setup();
     mockGetReleaseBookmarks.mockReturnValue({
-      data: [
-        {
-          releaseId: 10,
-          createdAt: '2026-03-01T00:00:00Z',
-          release: { id: 10, title: 'Kind of Blue', communityId: 1 }
-        }
-      ],
+      data: [releaseBookmark],
       isLoading: false,
       error: undefined
     });
     renderWithProviders(<BookmarksPage />);
     await user.click(screen.getByRole('button', { name: 'Releases' }));
     expect(screen.getByText('Kind of Blue')).toBeInTheDocument();
+  });
+
+  it('shows the Remove consumed button on the Releases tab when releases exist', async () => {
+    const user = userEvent.setup();
+    mockGetReleaseBookmarks.mockReturnValue({
+      data: [releaseBookmark],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<BookmarksPage />);
+    await user.click(screen.getByRole('button', { name: 'Releases' }));
+    expect(
+      screen.getByRole('button', { name: /remove consumed/i })
+    ).toBeInTheDocument();
+  });
+
+  it('hides the Remove consumed button when no releases are bookmarked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<BookmarksPage />);
+    await user.click(screen.getByRole('button', { name: 'Releases' }));
+    expect(
+      screen.queryByRole('button', { name: /remove consumed/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('invokes the remove-consumed mutation when the button is clicked', async () => {
+    const user = userEvent.setup();
+    mockGetReleaseBookmarks.mockReturnValue({
+      data: [releaseBookmark],
+      isLoading: false,
+      error: undefined
+    });
+    mockRemoveConsumed.mockReturnValue({
+      unwrap: () => Promise.resolve({ removed: 3 })
+    });
+    renderWithProviders(<BookmarksPage />);
+    await user.click(screen.getByRole('button', { name: 'Releases' }));
+    await user.click(screen.getByRole('button', { name: /remove consumed/i }));
+    expect(mockRemoveConsumed).toHaveBeenCalledTimes(1);
   });
 });

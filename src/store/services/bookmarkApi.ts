@@ -13,6 +13,9 @@ export type CommunityBookmark =
 export type RequestBookmark =
   paths['/bookmarks/requests']['get']['responses'][200]['content']['application/json'][number];
 
+export type RemoveConsumedResponse =
+  paths['/bookmarks/releases/consumed']['delete']['responses'][200]['content']['application/json'];
+
 export const bookmarkApi = api.injectEndpoints({
   endpoints: (build) => ({
     // Artists
@@ -46,6 +49,16 @@ export const bookmarkApi = api.injectEndpoints({
     getReleaseBookmarks: build.query<ReleaseBookmark[], void>({
       query: () => '/bookmarks/releases',
       providesTags: [{ type: 'Bookmark', id: 'RELEASES' }]
+    }),
+    removeConsumedReleaseBookmarks: build.mutation<
+      RemoveConsumedResponse,
+      void
+    >({
+      query: () => ({
+        url: '/bookmarks/releases/consumed',
+        method: 'DELETE'
+      }),
+      invalidatesTags: [{ type: 'Bookmark', id: 'RELEASES' }]
     }),
 
     // Communities
@@ -82,6 +95,7 @@ export const {
   useGetArtistBookmarksQuery,
   useToggleReleaseBookmarkMutation,
   useGetReleaseBookmarksQuery,
+  useRemoveConsumedReleaseBookmarksMutation,
   useToggleCommunityBookmarkMutation,
   useGetCommunityBookmarksQuery,
   useToggleRequestBookmarkMutation,

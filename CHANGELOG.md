@@ -6,6 +6,10 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **"Remove consumed" bulk action on the Bookmarks page** ([#212](https://github.com/orphic-inc/stellar-ui/issues/212)) — the release-bookmark list is a consumption queue, but it was read-only: clearing the releases you had already grabbed meant unbookmarking them one at a time. The Releases tab now carries a "Remove consumed" button that calls `DELETE /api/bookmarks/releases/consumed` (stellar-api #296), then surfaces a toast with the count and lets RTK Query invalidation refetch the list. The button only appears when releases are bookmarked; `removed: 0` reports "No consumed bookmarks to remove" rather than an error. The API decides what "consumed" means, so no confirm dialog.
+
 ## [0.8.2] — 2026-07-22
 
 Completes the move of built-in themes to the API: the UI stops shipping theme CSS, stops recognising theme names, and keeps only the branding art it actually owns.

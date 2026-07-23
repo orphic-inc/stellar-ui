@@ -46,6 +46,7 @@ type FetchOpts = {
   communitiesStatus?: number;
   requests?: object[];
   requestsStatus?: number;
+  consumedRemoved?: number;
 };
 
 const setupFetch = (opts: FetchOpts = {}) => {
@@ -57,12 +58,21 @@ const setupFetch = (opts: FetchOpts = {}) => {
     communities = [makeCommunityBookmark(1, 'Jazz Vault')],
     communitiesStatus = 200,
     requests = [makeRequestBookmark(20, 'Looking for Coltrane')],
-    requestsStatus = 200
+    requestsStatus = 200,
+    consumedRemoved = 2
   } = opts;
 
   (global.fetch as jest.Mock).mockImplementation((request: Request) => {
     const url = new URL(request.url, 'http://localhost');
 
+    if (
+      url.pathname === '/api/bookmarks/releases/consumed' &&
+      request.method === 'DELETE'
+    ) {
+      return Promise.resolve(
+        makeResponse({ status: 200, body: { removed: consumedRemoved } })
+      );
+    }
     if (url.pathname === '/api/bookmarks/artists') {
       return Promise.resolve(
         makeResponse({
@@ -290,5 +300,40 @@ describe('BookmarksPage RTK Query integration', () => {
     expect(
       await screen.findByText(/no bookmarked requests yet/i)
     ).toBeInTheDocument();
+  });
+
+  it('sends DELETE /api/bookmarks/releases/consumed and refetches on Remove consumed', async () => {
+    const user = userEvent.setup();
+    setupFetch({ releases: [makeReleaseBookmark(10, 'Kind of Blue')] });
+    renderWithProviders(<BookmarksPage />);
+
+    await screen.findByText('Miles Davis');
+    await user.click(screen.getByRole('button', { name: 'Releases' }));
+    await screen.findByText('Kind of Blue');
+
+    await user.click(screen.getByRole('button', { name: /remove consumed/i }));
+
+    // The mutation fires the DELETE, then invalidation refetches the list.
+    await waitFor(() => {
+      const paths = (global.fetch as jest.Mock).mock.calls
+        .map((c) => c[0] as Request)
+        .filter(
+          (r) =>
+            new URL(r.url, 'http://localhost').pathname ===
+              '/api/bookmarks/releases/consumed' && r.method === 'DELETE'
+        );
+      expect(paths.length).toBe(1);
+    });
+    await waitFor(() => {
+      const listGets = (global.fetch as jest.Mock).mock.calls
+        .map((c) => c[0] as Request)
+        .filter(
+          (r) =>
+            new URL(r.url, 'http://localhost').pathname ===
+              '/api/bookmarks/releases' && r.method === 'GET'
+        );
+      // One GET on tab entry, a second from the post-delete invalidation.
+      expect(listGets.length).toBeGreaterThanOrEqual(2);
+    });
   });
 });

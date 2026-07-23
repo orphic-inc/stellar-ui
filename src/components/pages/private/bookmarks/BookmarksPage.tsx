@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetArtistBookmarksQuery,
   useGetReleaseBookmarksQuery,
   useGetCommunityBookmarksQuery,
-  useGetRequestBookmarksQuery
+  useGetRequestBookmarksQuery,
+  useRemoveConsumedReleaseBookmarksMutation
 } from '../../../../store/services/bookmarkApi';
+import { addAlert } from '../../../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../../../utils/apiError';
+import Button from '../../../ui/Button';
 import Spinner from '../../../layout/Spinner';
 
 type Tab = 'artists' | 'releases' | 'communities' | 'requests';
@@ -49,7 +54,32 @@ const ArtistsTab = () => {
 };
 
 const ReleasesTab = () => {
+  const dispatch = useDispatch();
   const { data, isLoading, error } = useGetReleaseBookmarksQuery();
+  const [removeConsumed, { isLoading: isRemoving }] =
+    useRemoveConsumedReleaseBookmarksMutation();
+
+  const handleRemoveConsumed = async () => {
+    try {
+      const { removed } = await removeConsumed().unwrap();
+      dispatch(
+        removed === 0
+          ? addAlert('No consumed bookmarks to remove.', 'info')
+          : addAlert(
+              `Removed ${removed} consumed bookmark${removed === 1 ? '' : 's'}.`,
+              'success'
+            )
+      );
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to remove consumed bookmarks.',
+          'danger'
+        )
+      );
+    }
+  };
+
   if (isLoading) return <Spinner />;
   if (error)
     return (
@@ -59,28 +89,42 @@ const ReleasesTab = () => {
     );
   if (!data || data.length === 0) return <EmptyState label="releases" />;
   return (
-    <ul data-st="list">
-      {data.map((item) => (
-        <li key={item.releaseId} data-st="row">
-          {item.release.communityId ? (
-            <Link
-              to={`/communities/${item.release.communityId}/releases/${item.releaseId}`}
-              data-st="control"
-              className="text-sm"
-            >
-              {item.release.title}
-            </Link>
-          ) : (
-            <span data-st="prose" className="text-sm">
-              {item.release.title}
+    <>
+      {/* Clears the queue of releases already consumed; self-scoped, so no
+          confirm — the API decides consumption, the button just asks. */}
+      <div className="flex justify-end px-4 pt-3">
+        <Button
+          variant="link-danger"
+          onClick={handleRemoveConsumed}
+          disabled={isRemoving}
+          className="text-xs"
+        >
+          {isRemoving ? 'Removing…' : 'Remove consumed'}
+        </Button>
+      </div>
+      <ul data-st="list">
+        {data.map((item) => (
+          <li key={item.releaseId} data-st="row">
+            {item.release.communityId ? (
+              <Link
+                to={`/communities/${item.release.communityId}/releases/${item.releaseId}`}
+                data-st="control"
+                className="text-sm"
+              >
+                {item.release.title}
+              </Link>
+            ) : (
+              <span data-st="prose" className="text-sm">
+                {item.release.title}
+              </span>
+            )}
+            <span data-st="meta" className="text-xs ml-2">
+              {new Date(item.createdAt).toLocaleDateString()}
             </span>
-          )}
-          <span data-st="meta" className="text-xs ml-2">
-            {new Date(item.createdAt).toLocaleDateString()}
-          </span>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 
