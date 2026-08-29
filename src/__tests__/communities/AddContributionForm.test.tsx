@@ -23,8 +23,7 @@ const mockAddContribution = jest.fn();
 const mockDispatch = jest.fn();
 
 let mockRelease:
-  | { id: number; title: string; artist?: { name: string } }
-  | undefined = {
+  { id: number; title: string; artist?: { name: string } } | undefined = {
   id: 7,
   title: 'Kind of Blue',
   artist: { name: 'Miles Davis' }

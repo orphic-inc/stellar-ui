@@ -19,9 +19,7 @@ const UserBrowsePage = () => {
 
   const q = searchParams.get('q') ?? undefined;
   const orderBy = (searchParams.get('orderBy') ?? 'username') as
-    | 'username'
-    | 'createdAt'
-    | 'lastLogin';
+    'username' | 'createdAt' | 'lastLogin';
   const order = (searchParams.get('order') ?? 'asc') as 'asc' | 'desc';
   const rawDisabled = searchParams.get('disabled');
   const disabled =

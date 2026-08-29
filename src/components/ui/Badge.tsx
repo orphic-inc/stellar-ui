@@ -8,11 +8,7 @@ import type { ReactNode } from 'react';
  * `bg-red-900/50` span (which goes illegible on a light theme).
  */
 export type BadgeVariant =
-  | 'default'
-  | 'warning'
-  | 'info'
-  | 'success'
-  | 'danger';
+  'default' | 'warning' | 'info' | 'success' | 'danger';
 
 type BadgeProps = {
   variant?: BadgeVariant;

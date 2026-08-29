@@ -306,13 +306,9 @@ const ReleasePage = () => {
                   <div data-st="list">
                     {historyEntries.map((entry) => {
                       const beforeSnap = entry.before as
-                        | Record<string, unknown>
-                        | null
-                        | undefined;
+                        Record<string, unknown> | null | undefined;
                       const afterSnap = entry.after as
-                        | Record<string, unknown>
-                        | null
-                        | undefined;
+                        Record<string, unknown> | null | undefined;
                       const showDiff =
                         entry.action === 'edit' &&
                         beforeSnap &&

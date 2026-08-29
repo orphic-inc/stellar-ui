@@ -14,12 +14,7 @@ import cn from 'classnames';
  * unpadded — don't add `px-*`/`py-*`, the contract's `padding:0` would beat it.
  */
 export type ButtonVariant =
-  | 'primary'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'link'
-  | 'link-danger';
+  'primary' | 'success' | 'warning' | 'danger' | 'link' | 'link-danger';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;

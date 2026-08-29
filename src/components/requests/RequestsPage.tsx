@@ -67,12 +67,9 @@ const RequestsPage = () => {
     ? Number(searchParams.get('year'))
     : undefined;
   const status = (searchParams.get('status') ?? undefined) as
-    | RequestStatus
-    | undefined;
+    RequestStatus | undefined;
   const orderBy = (searchParams.get('orderBy') ?? 'createdAt') as
-    | 'createdAt'
-    | 'voteCount'
-    | 'random';
+    'createdAt' | 'voteCount' | 'random';
   const order = (searchParams.get('order') ?? 'desc') as 'asc' | 'desc';
   const page = Number(searchParams.get('page') ?? 1);
 

@@ -243,11 +243,7 @@ export interface CollageListResponse {
 }
 
 export type CollageOrderBy =
-  | 'createdAt'
-  | 'updatedAt'
-  | 'name'
-  | 'numEntries'
-  | 'numSubscribers';
+  'createdAt' | 'updatedAt' | 'name' | 'numEntries' | 'numSubscribers';
 
 export interface ListCollagesQuery {
   page?: number;

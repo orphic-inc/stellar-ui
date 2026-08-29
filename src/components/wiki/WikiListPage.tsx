@@ -13,9 +13,7 @@ const WikiListPage = () => {
   const q = searchParams.get('q') ?? undefined;
   const type = (searchParams.get('type') ?? 'all') as 'title' | 'body' | 'all';
   const order = (searchParams.get('order') ?? 'title') as
-    | 'title'
-    | 'created'
-    | 'edited';
+    'title' | 'created' | 'edited';
   const way = (searchParams.get('way') ?? 'asc') as 'asc' | 'desc';
   const page = Number(searchParams.get('page') ?? 1);
 
