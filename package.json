@@ -57,7 +57,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.14.2",
     "recharts": "^3.8.1",
-    "reselect": "^4.1.8",
+    "reselect": "^5.0.0",
     "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
