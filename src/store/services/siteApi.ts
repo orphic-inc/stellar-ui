@@ -57,7 +57,7 @@ type UpdateStylesheetBody = NonNullable<
 >['content']['application/json'];
 type UpdateStylesheetResponse =
   paths['/stylesheet/{id}']['put']['responses'][200]['content']['application/json'];
-interface SiteSettingsResponse {
+export interface SiteSettingsResponse {
   id: number;
   approvedDomains: string[];
   registrationStatus: 'open' | 'invite' | 'closed';

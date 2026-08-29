@@ -24,6 +24,15 @@ type ReplyResponse =
 type UnreadCountResponse =
   paths['/messages/unread-count']['get']['responses'][200]['content']['application/json'];
 
+export interface MessageDraft {
+  id: number;
+  toUserId: number | null;
+  subject: string;
+  body: string;
+  updatedAt: string;
+  toUser: { id: number; username: string } | null;
+}
+
 export const messagesApi = api.injectEndpoints({
   endpoints: (build) => ({
     getInbox: build.query<InboxResponse, { page?: number; search?: string }>({
@@ -98,17 +107,7 @@ export const messagesApi = api.injectEndpoints({
     }),
 
     // Drafts
-    getDrafts: build.query<
-      Array<{
-        id: number;
-        toUserId: number | null;
-        subject: string;
-        body: string;
-        updatedAt: string;
-        toUser: { id: number; username: string } | null;
-      }>,
-      void
-    >({
+    getDrafts: build.query<MessageDraft[], void>({
       query: () => '/messages/drafts',
       providesTags: ['Draft']
     }),

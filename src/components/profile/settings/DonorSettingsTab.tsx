@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   useGetDonorRewardsQuery,
   useUpdateDonorRewardsMutation,
-  useUpdateDonorForumTitleMutation
+  useUpdateDonorForumTitleMutation,
+  type DonorRewardsResponse
 } from '../../../store/services/profileApi';
 import { addAlert } from '../../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
@@ -21,56 +22,49 @@ const LockedNote = () => (
   </p>
 );
 
-const DonorSettingsTab = () => {
+const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
   const dispatch = useDispatch();
-  const { data, isLoading } = useGetDonorRewardsQuery();
   const [updateRewards, { isLoading: isSavingRewards }] =
     useUpdateDonorRewardsMutation();
   const [updateTitle, { isLoading: isSavingTitle }] =
     useUpdateDonorForumTitleMutation();
 
-  const perks = data?.perks ?? {};
-  const rewards = data?.rewards;
-  const forumTitle = data?.forumTitle;
+  const perks = data.perks;
+  const rewards = data.rewards;
+  const forumTitle = data.forumTitle;
 
-  const [iconMouseOverText, setIconMouseOverText] = useState('');
-  const [avatarMouseOverText, setAvatarMouseOverText] = useState('');
-  const [customIcon, setCustomIcon] = useState('');
-  const [customIconLink, setCustomIconLink] = useState('');
-  const [secondAvatar, setSecondAvatar] = useState('');
-  const [profileInfoTitle1, setProfileInfoTitle1] = useState('');
-  const [profileInfo1, setProfileInfo1] = useState('');
-  const [profileInfoTitle2, setProfileInfoTitle2] = useState('');
-  const [profileInfo2, setProfileInfo2] = useState('');
-  const [profileInfoTitle3, setProfileInfoTitle3] = useState('');
-  const [profileInfo3, setProfileInfo3] = useState('');
-  const [profileInfoTitle4, setProfileInfoTitle4] = useState('');
-  const [profileInfo4, setProfileInfo4] = useState('');
-  const [titlePrefix, setTitlePrefix] = useState('');
-  const [titleSuffix, setTitleSuffix] = useState('');
-  const [titleUseComma, setTitleUseComma] = useState(false);
-
-  useEffect(() => {
-    if (!rewards) return;
-    setIconMouseOverText(rewards.iconMouseOverText ?? '');
-    setAvatarMouseOverText(rewards.avatarMouseOverText ?? '');
-    setCustomIcon(rewards.customIcon ?? '');
-    setCustomIconLink(rewards.customIconLink ?? '');
-    setSecondAvatar(rewards.secondAvatar ?? '');
-    setProfileInfoTitle1(rewards.profileInfoTitle1 ?? '');
-    setProfileInfo1(rewards.profileInfo1 ?? '');
-    setProfileInfoTitle2(rewards.profileInfoTitle2 ?? '');
-    setProfileInfo2(rewards.profileInfo2 ?? '');
-    setProfileInfoTitle3(rewards.profileInfoTitle3 ?? '');
-    setProfileInfo3(rewards.profileInfo3 ?? '');
-    setProfileInfoTitle4(rewards.profileInfoTitle4 ?? '');
-    setProfileInfo4(rewards.profileInfo4 ?? '');
-    if (forumTitle) {
-      setTitlePrefix(forumTitle.prefix ?? '');
-      setTitleSuffix(forumTitle.suffix ?? '');
-      setTitleUseComma(forumTitle.useComma ?? false);
-    }
-  }, [rewards, forumTitle]);
+  // Every field seeds from the loaded rewards at mount, so there is no effect
+  // resyncing them behind the member's typing.
+  const [iconMouseOverText, setIconMouseOverText] = useState(
+    rewards.iconMouseOverText
+  );
+  const [avatarMouseOverText, setAvatarMouseOverText] = useState(
+    rewards.avatarMouseOverText
+  );
+  const [customIcon, setCustomIcon] = useState(rewards.customIcon);
+  const [customIconLink, setCustomIconLink] = useState(rewards.customIconLink);
+  const [secondAvatar, setSecondAvatar] = useState(rewards.secondAvatar);
+  const [profileInfoTitle1, setProfileInfoTitle1] = useState(
+    rewards.profileInfoTitle1
+  );
+  const [profileInfo1, setProfileInfo1] = useState(rewards.profileInfo1);
+  const [profileInfoTitle2, setProfileInfoTitle2] = useState(
+    rewards.profileInfoTitle2
+  );
+  const [profileInfo2, setProfileInfo2] = useState(rewards.profileInfo2);
+  const [profileInfoTitle3, setProfileInfoTitle3] = useState(
+    rewards.profileInfoTitle3
+  );
+  const [profileInfo3, setProfileInfo3] = useState(rewards.profileInfo3);
+  const [profileInfoTitle4, setProfileInfoTitle4] = useState(
+    rewards.profileInfoTitle4
+  );
+  const [profileInfo4, setProfileInfo4] = useState(rewards.profileInfo4);
+  const [titlePrefix, setTitlePrefix] = useState(forumTitle?.prefix ?? '');
+  const [titleSuffix, setTitleSuffix] = useState(forumTitle?.suffix ?? '');
+  const [titleUseComma, setTitleUseComma] = useState(
+    forumTitle?.useComma ?? false
+  );
 
   const handleSaveRewards = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,8 +113,6 @@ const DonorSettingsTab = () => {
       );
     }
   };
-
-  if (isLoading) return <Spinner />;
 
   return (
     <div className="space-y-6">
@@ -419,6 +411,13 @@ const DonorSettingsTab = () => {
       </form>
     </div>
   );
+};
+
+const DonorSettingsTab = () => {
+  const { data, isLoading } = useGetDonorRewardsQuery();
+
+  if (isLoading || !data) return <Spinner />;
+  return <DonorSettingsForm data={data} />;
 };
 
 export default DonorSettingsTab;

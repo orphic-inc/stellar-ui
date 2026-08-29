@@ -157,12 +157,22 @@ const makeForumFetch = ({
 };
 
 jest.mock('../../components/layout/PostBox', () => {
-  const MockPostBox = ({
-    quoteText
-  }: {
-    quoteText?: string;
-    onQuoteConsumed?: () => void;
-  }) => <div data-testid="post-box">{quoteText || 'PostBox'}</div>;
+  // Mirrors the real imperative handle: the page pushes quotes in through the
+  // ref rather than passing them down as a prop.
+  // `jest` is one of the few bindings a mock factory may reach, and
+  // requireActual runs inside the factory, so there is no hoisting hazard.
+  const react = jest.requireActual<typeof import('react')>('react');
+  const MockPostBox = react.forwardRef<{
+    appendQuote: (_text: string) => void;
+  }>((_props, ref) => {
+    const [quoted, setQuoted] = react.useState('');
+    react.useImperativeHandle(ref, () => ({
+      appendQuote: (text: string) => {
+        setQuoted((prev) => prev + text);
+      }
+    }));
+    return <div data-testid="post-box">{quoted || 'PostBox'}</div>;
+  });
   MockPostBox.displayName = 'MockPostBox';
   return MockPostBox;
 });

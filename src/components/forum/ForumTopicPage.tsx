@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
@@ -12,7 +12,7 @@ import {
 import { useSubscribeMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import Spinner from '../layout/Spinner';
-import PostBox from '../layout/PostBox';
+import PostBox, { type PostBoxHandle } from '../layout/PostBox';
 import ForumTopicPost from './ForumTopicPost';
 import ErrorBoundary from '../layout/ErrorBoundary';
 import FallbackComponent from '../layout/FallbackComponent';
@@ -40,7 +40,7 @@ const ForumTopicPage = () => {
   const [catchupForum] = useCatchupForumMutation();
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [quoteText, setQuoteText] = useState('');
+  const postBoxRef = useRef<PostBoxHandle>(null);
 
   // Mark the last visible post as read whenever the posts list refreshes.
   useEffect(() => {
@@ -288,18 +288,13 @@ const ForumTopicPage = () => {
             topicId={tId}
             currentUserId={currentUser?.id}
             canModerate={affordances.canModerate}
-            onQuote={(text) => setQuoteText((prev) => prev + text)}
+            onQuote={(text) => postBoxRef.current?.appendQuote(text)}
           />
         </ErrorBoundary>
       ))}
 
       {affordances.canReply && (
-        <PostBox
-          forumId={forumId!}
-          topicId={forumTopicId!}
-          quoteText={quoteText}
-          onQuoteConsumed={() => setQuoteText('')}
-        />
+        <PostBox ref={postBoxRef} forumId={forumId!} topicId={forumTopicId!} />
       )}
     </div>
   );

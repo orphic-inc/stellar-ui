@@ -2,7 +2,23 @@ import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
-import PostBox from '../../components/layout/PostBox';
+import PostBox, { type PostBoxHandle } from '../../components/layout/PostBox';
+
+// Drives the imperative handle the way ForumTopicPage does — through a ref held
+// by a parent, with a real click rather than a hand-rolled act() call.
+const QuoteHarness = () => {
+  const ref = React.useRef<PostBoxHandle>(null);
+  return (
+    <>
+      <button
+        onClick={() => ref.current?.appendQuote('[quote]Some text[/quote]')}
+      >
+        quote
+      </button>
+      <PostBox ref={ref} forumId="1" topicId="5" />
+    </>
+  );
+};
 
 const mockCreatePost = jest.fn();
 const mockDispatch = jest.fn();
@@ -117,18 +133,20 @@ describe('PostBox', () => {
     ).toBeInTheDocument();
   });
 
-  it('prepopulates body with quoteText when provided', () => {
-    const mockConsumed = jest.fn();
-    renderWithProviders(
-      <PostBox
-        forumId="1"
-        topicId="5"
-        quoteText="[quote]Some text[/quote]"
-        onQuoteConsumed={mockConsumed}
-      />
+  it('appends quoted text to the body through the imperative handle', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<QuoteHarness />);
+    await user.click(screen.getByRole('button', { name: 'quote' }));
+    expect(screen.getByRole('textbox')).toHaveValue('[quote]Some text[/quote]');
+  });
+
+  it('accumulates successive quotes rather than replacing them', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<QuoteHarness />);
+    await user.click(screen.getByRole('button', { name: 'quote' }));
+    await user.click(screen.getByRole('button', { name: 'quote' }));
+    expect(screen.getByRole('textbox')).toHaveValue(
+      '[quote]Some text[/quote][quote]Some text[/quote]'
     );
-    expect(
-      (screen.getByRole('textbox') as HTMLTextAreaElement).value
-    ).toContain('[quote]Some text[/quote]');
   });
 });

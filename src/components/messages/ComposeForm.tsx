@@ -1,42 +1,40 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   useComposeMessageMutation,
   useCreateDraftMutation,
   useUpdateDraftMutation,
-  useGetDraftsQuery
+  useGetDraftsQuery,
+  type MessageDraft
 } from '../../store/services/messagesApi';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 
-const ComposeForm = () => {
+const ComposeForm = ({
+  draftId,
+  draft,
+  toSeed
+}: {
+  draftId: number | null;
+  draft?: MessageDraft;
+  toSeed: string;
+}) => {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
   const dispatch = useAppDispatch();
 
-  const draftId = params.get('draft') ? Number(params.get('draft')) : null;
-
-  // `to` query param accepts a username (not a numeric userId)
-  const [toUsername, setToUsername] = useState(params.get('to') ?? '');
-  const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
+  // Seeded from the draft if one loaded, otherwise from the ?to= param. The
+  // caller keys on the draft's id, so a late-arriving draft remounts the form.
+  const [toUsername, setToUsername] = useState(
+    draft?.toUser?.username ?? toSeed
+  );
+  const [subject, setSubject] = useState(
+    draft && draft.subject !== '(no subject)' ? draft.subject : ''
+  );
+  const [body, setBody] = useState(draft?.body ?? '');
 
   const [compose, { isLoading }] = useComposeMessageMutation();
   const [createDraft, { isLoading: isSavingDraft }] = useCreateDraftMutation();
   const [updateDraft] = useUpdateDraftMutation();
-
-  const { data: drafts } = useGetDraftsQuery(undefined, { skip: !draftId });
-  const draftToLoad = draftId ? drafts?.find((d) => d.id === draftId) : null;
-
-  useEffect(() => {
-    if (!draftToLoad) return;
-    if (draftToLoad.toUser?.username)
-      setToUsername(draftToLoad.toUser.username);
-    setSubject(
-      draftToLoad.subject === '(no subject)' ? '' : draftToLoad.subject
-    );
-    setBody(draftToLoad.body);
-  }, [draftToLoad]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,4 +185,22 @@ const ComposeForm = () => {
   );
 };
 
-export default ComposeForm;
+const ComposePage = () => {
+  const [params] = useSearchParams();
+  const draftId = params.get('draft') ? Number(params.get('draft')) : null;
+
+  const { data: drafts } = useGetDraftsQuery(undefined, { skip: !draftId });
+  const draft = draftId ? drafts?.find((d) => d.id === draftId) : undefined;
+
+  return (
+    <ComposeForm
+      key={draft?.id ?? 'new'}
+      draftId={draftId}
+      draft={draft}
+      // `to` query param accepts a username (not a numeric userId)
+      toSeed={params.get('to') ?? ''}
+    />
+  );
+};
+
+export default ComposePage;

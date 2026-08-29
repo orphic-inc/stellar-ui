@@ -5,6 +5,37 @@ import { useGetMeQuery } from '../../store/services/authApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 
+type SortField = 'title' | 'created' | 'edited';
+
+const SortButton = ({
+  label,
+  field,
+  order,
+  way,
+  setSort
+}: {
+  label: string;
+  field: SortField;
+  order: SortField;
+  way: string;
+  setSort: (order: string, way: string) => void;
+}) => {
+  const isActive = order === field;
+  const nextWay = isActive && way === 'asc' ? 'desc' : 'asc';
+  return (
+    <button
+      onClick={() => setSort(field, nextWay)}
+      className={`text-xs px-2 py-1 rounded transition-colors ${
+        isActive
+          ? 'bg-[color-mix(in_oklch,var(--st-accent)_20%,transparent)] text-[var(--st-text-strong)]'
+          : 'text-[var(--st-text-muted)] hover:text-[var(--st-text)] hover:bg-[var(--st-raised)]'
+      }`}
+    >
+      {label} {isActive ? (way === 'asc' ? '↑' : '↓') : ''}
+    </button>
+  );
+};
+
 const WikiListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState(searchParams.get('q') ?? '');
@@ -12,8 +43,7 @@ const WikiListPage = () => {
 
   const q = searchParams.get('q') ?? undefined;
   const type = (searchParams.get('type') ?? 'all') as 'title' | 'body' | 'all';
-  const order = (searchParams.get('order') ?? 'title') as
-    'title' | 'created' | 'edited';
+  const order = (searchParams.get('order') ?? 'title') as SortField;
   const way = (searchParams.get('way') ?? 'asc') as 'asc' | 'desc';
   const page = Number(searchParams.get('page') ?? 1);
 
@@ -54,29 +84,6 @@ const WikiListPage = () => {
   const clearFilters = () => {
     setSearchInput('');
     setSearchParams(new URLSearchParams());
-  };
-
-  const SortButton = ({
-    label,
-    field
-  }: {
-    label: string;
-    field: 'title' | 'created' | 'edited';
-  }) => {
-    const isActive = order === field;
-    const nextWay = isActive && way === 'asc' ? 'desc' : 'asc';
-    return (
-      <button
-        onClick={() => setSort(field, nextWay)}
-        className={`text-xs px-2 py-1 rounded transition-colors ${
-          isActive
-            ? 'bg-[color-mix(in_oklch,var(--st-accent)_20%,transparent)] text-[var(--st-text-strong)]'
-            : 'text-[var(--st-text-muted)] hover:text-[var(--st-text)] hover:bg-[var(--st-raised)]'
-        }`}
-      >
-        {label} {isActive ? (way === 'asc' ? '↑' : '↓') : ''}
-      </button>
-    );
   };
 
   return (
@@ -170,9 +177,27 @@ const WikiListPage = () => {
         <span data-st="meta" className="text-xs">
           Sort:
         </span>
-        <SortButton label="Title" field="title" />
-        <SortButton label="Created" field="created" />
-        <SortButton label="Last edited" field="edited" />
+        <SortButton
+          label="Title"
+          field="title"
+          order={order}
+          way={way}
+          setSort={setSort}
+        />
+        <SortButton
+          label="Created"
+          field="created"
+          order={order}
+          way={way}
+          setSort={setSort}
+        />
+        <SortButton
+          label="Last edited"
+          field="edited"
+          order={order}
+          way={way}
+          setSort={setSort}
+        />
       </div>
 
       {isLoading && <Spinner />}
