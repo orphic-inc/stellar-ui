@@ -2,7 +2,7 @@
 # Alpine 3.23 and crash-looped the api's Prisma engine (stellar-compose ADR-0001);
 # don't "tidy" these back to floating. Node 22 matches package.json `engines`.
 # Bump deliberately via a reviewed PR, not by drift.
-FROM node:22-alpine3.23 AS build
+FROM node:24-alpine3.23 AS build
 
 WORKDIR /usr/src/stellar-ui
 
