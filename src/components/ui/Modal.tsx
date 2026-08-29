@@ -114,7 +114,6 @@ const Modal = ({
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4"
       // Backdrop scrim: a pointer-only convenience. The a11y-complete close
       // paths are the native ✕ button and Esc, so keyboard users never need it.
-      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       onMouseDown={onBackdropMouseDown}
     >
       <div
