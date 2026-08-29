@@ -1,16 +1,16 @@
-import { resolve } from 'path';
-import webpack from 'webpack';
-import dotenv from 'dotenv';
-import HtmlPlugin from 'html-webpack-plugin';
-import ESLintPlugin from 'eslint-webpack-plugin';
-import TerserPlugin from 'terser-webpack-plugin';
-import StylelintPlugin from 'stylelint-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import { CleanWebpackPlugin as CleanPlugin } from 'clean-webpack-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import CopyPlugin from 'copy-webpack-plugin';
+const { resolve } = require('path');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
+const HtmlPlugin = require('html-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const StylelintPlugin = require('stylelint-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin: CleanPlugin } = require('clean-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
-import pkg from './package.json';
+const pkg = require('./package.json');
 
 dotenv.config();
 dotenv.config({ path: '.env.local', override: true });
@@ -94,7 +94,7 @@ if (dev) {
   plugins.push(new ESLintPlugin({ extensions: ['js', 'ts', 'tsx'] }));
 }
 
-export default {
+module.exports = {
   mode: dev ? 'development' : 'production',
   devtool: dev ? 'eval-cheap-module-source-map' : 'cheap-module-source-map',
   entry: './src/index.tsx',
