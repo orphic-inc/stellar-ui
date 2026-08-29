@@ -1,3 +1,5 @@
+import { TextEncoder, TextDecoder } from 'node:util';
+
 if (typeof global.fetch !== 'function') {
   global.fetch = jest.fn();
 }
@@ -10,8 +12,10 @@ if (typeof global.__APP_VERSION__ === 'undefined') {
 
 // react-router v7 reaches for TextEncoder/TextDecoder, which jsdom does not
 // expose as globals even though Node has had them since v11. Bridge them from
-// node:util rather than pulling in a polyfill package.
-const { TextEncoder, TextDecoder } = require('node:util');
+// node:util rather than pulling in a polyfill package. Imported rather than
+// required: Codacy lints .js too, and @typescript-eslint/no-var-requires flags
+// a bare require() here even though the repo's own lint script only covers
+// .ts/.tsx.
 if (typeof global.TextEncoder === 'undefined') {
   global.TextEncoder = TextEncoder;
 }
