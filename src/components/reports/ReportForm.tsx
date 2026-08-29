@@ -260,8 +260,7 @@ const ReportForm = () => {
               onChange={(e) =>
                 setReleaseCategory(
                   e.target.value as
-                    | (typeof RELEASE_CATEGORIES)[number]['value']
-                    | ''
+                    (typeof RELEASE_CATEGORIES)[number]['value'] | ''
                 )
               }
               required

@@ -50,8 +50,10 @@ const summary: InviteTreeSummary = {
 
 let mockParamId: string | undefined;
 let mockData:
-  | { tree: MemberInviteTreeNode[]; summary: InviteTreeSummary }
-  | undefined = { tree, summary };
+  { tree: MemberInviteTreeNode[]; summary: InviteTreeSummary } | undefined = {
+  tree,
+  summary
+};
 let mockIsLoading = false;
 const mockUseGetMemberInviteTreeQuery = jest.fn();
 

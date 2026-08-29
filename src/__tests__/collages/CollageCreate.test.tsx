@@ -10,8 +10,7 @@ const mockCreateCollage = jest.fn();
 const mockNavigate = jest.fn();
 let mockIsLoading = false;
 let mockListCollagesData:
-  | { data: unknown[]; meta: { total: number } }
-  | undefined = undefined;
+  { data: unknown[]; meta: { total: number } } | undefined = undefined;
 
 jest.mock('../../store/services/collageApi', () => ({
   useCreateCollageMutation: () => [

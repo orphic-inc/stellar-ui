@@ -79,13 +79,7 @@ export interface HistorySnapshot {
 
 export interface ReleasesParams {
   type?:
-    | 'day'
-    | 'week'
-    | 'month'
-    | 'year'
-    | 'overall'
-    | 'consumed'
-    | 'contributed';
+    'day' | 'week' | 'month' | 'year' | 'overall' | 'consumed' | 'contributed';
   limit?: 10 | 100 | 250;
   excludeTags?: string;
   format?: string;

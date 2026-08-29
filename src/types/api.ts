@@ -505,11 +505,7 @@ export interface paths {
             avatar?: string;
             /** @enum {string} */
             notificationMethod?:
-              | 'Disabled'
-              | 'Popup'
-              | 'Traditional'
-              | 'Push'
-              | 'Combined';
+              'Disabled' | 'Popup' | 'Traditional' | 'Push' | 'Combined';
             showEmail?: boolean;
             showLastSeen?: boolean;
             showContributedStats?: boolean;
@@ -897,11 +893,7 @@ export interface paths {
             paranoia?: number | null;
             /** @enum {string} */
             notificationMethod?:
-              | 'Disabled'
-              | 'Popup'
-              | 'Traditional'
-              | 'Push'
-              | 'Combined';
+              'Disabled' | 'Popup' | 'Traditional' | 'Push' | 'Combined';
             showEmail?: boolean;
             showLastSeen?: boolean;
             showContributedStats?: boolean;
@@ -11215,11 +11207,7 @@ export interface paths {
           tags?: string;
           tagMode?: 'any' | 'all';
           orderBy?:
-            | 'createdAt'
-            | 'year'
-            | 'consumers'
-            | 'contributors'
-            | 'random';
+            'createdAt' | 'year' | 'consumers' | 'contributors' | 'random';
           order?: 'asc' | 'desc';
           communityId?: number | number[];
           artist?: string;
@@ -12539,11 +12527,7 @@ export interface components {
       paranoia: number;
       /** @enum {string} */
       notificationMethod:
-        | 'Disabled'
-        | 'Popup'
-        | 'Traditional'
-        | 'Push'
-        | 'Combined';
+        'Disabled' | 'Popup' | 'Traditional' | 'Push' | 'Combined';
       showEmail: boolean;
       showLastSeen: boolean;
       showContributedStats: boolean;
@@ -13297,11 +13281,7 @@ export interface components {
       id: number;
       /** @enum {string} */
       action:
-        | 'created'
-        | 'edit'
-        | 'tag_added'
-        | 'tag_removed'
-        | 'contribution_added';
+        'created' | 'edit' | 'tag_added' | 'tag_removed' | 'contribution_added';
       summary: string;
       changedFields: string[];
       before?: {

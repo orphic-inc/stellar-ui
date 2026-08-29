@@ -42,8 +42,7 @@ jest.mock('react-router-dom', () => ({
   }: {
     to: string;
     children:
-      | ((arg: { isActive: boolean }) => React.ReactNode)
-      | React.ReactNode;
+      ((arg: { isActive: boolean }) => React.ReactNode) | React.ReactNode;
     className?: ((arg: { isActive: boolean }) => string) | string;
   }) => {
     const inactiveClass =

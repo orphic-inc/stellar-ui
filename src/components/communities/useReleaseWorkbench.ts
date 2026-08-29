@@ -87,8 +87,8 @@ export const useReleaseWorkbench = ({
   const historyEntries = historyData?.data ?? [];
   const canManageTags = Boolean(
     user?.userRank?.permissions?.communities_manage ||
-      user?.userRank?.permissions?.staff ||
-      user?.userRank?.permissions?.admin
+    user?.userRank?.permissions?.staff ||
+    user?.userRank?.permissions?.admin
   );
   const canEdit = canManageTags || Boolean(releaseView?.isContributor);
 
