@@ -17,29 +17,56 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: API contract freshness
+        if: ${{ !cancelled() }}
         # Regenerate api.ts from the vendored, pinned openapi.json; a stale
         # committed copy reds the build (mirrors stellar-api's OpenAPI/ERD gates,
         # ADR-0018). Re-sync deliberately with `npm run api:sync`.
         run: npm run api:generate && git diff --exit-code src/types/api.ts
       - name: Version consistency
+        if: ${{ !cancelled() }}
         # Internal version surfaces (lockfile, CHANGELOG) must match the manifest
         # — mirrors stellar-api's version:check (ADR-0018). The footer's displayed
         # version is derived at runtime from the platform (#105), so it isn't
         # gated here; this guards the remaining committed surfaces.
         run: npm run version:check
       - name: Format check
+        if: ${{ !cancelled() }}
         run: npx prettier --check src
       - name: Lint
+        if: ${{ !cancelled() }}
         run: npm run lint
       - name: Type check
+        if: ${{ !cancelled() }}
         run: npm run typecheck
       - name: Unit tests
+        if: ${{ !cancelled() }}
         run: npm test
       # Playwright E2E requires both stellar-api and stellar-ui running with
       # seeded test users. Setup is tracked separately; add here once ready.
 
+  # The production build is the gate this repo was missing: `publish` only runs
+  # on main and tags, so every webpack/loader/babel/base-image bump reached main
+  # having never once been built. Mirrors stellar-api's `smoke` job.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Build the production image
+        run: docker build -t stellar-ui:ci .
+      - name: Boot it and prove nginx serves the bundle
+        run: |
+          set -euo pipefail
+          docker run -d --name ui -p 8081:80 stellar-ui:ci
+          for _ in $(seq 1 30); do
+            if curl -sf http://localhost:8081/ > /dev/null; then
+              echo "index served"; exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::nginx never served the bundle"; docker logs ui; exit 1
+
   publish:
-    needs: [test]
+    needs: [test, build]
     # This workflow's history lives in both the obrien-k fork and the canonical
     # orphic-inc repo (same file, same commits). Gate on repository rather than
     # deleting the job, so it fires in the canonical context and no-ops on the
