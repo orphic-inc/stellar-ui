@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
@@ -8,49 +8,30 @@ import {
   type UpdateCollagePayload
 } from '../../store/services/collageApi';
 import { hasAnyPermission } from '../../utils/permissions';
+import type { Collage } from '../../types';
 import Spinner from '../layout/Spinner';
 
-const CollageEdit = () => {
-  const { id } = useParams<{ id: string }>();
-  const collageId = Number(id);
+const CollageEditForm = ({
+  collage,
+  isStaff
+}: {
+  collage: Collage;
+  isStaff: boolean;
+}) => {
+  const collageId = collage.id;
   const navigate = useNavigate();
-  const user = useSelector(selectCurrentUser);
-
-  const { data: collage, isLoading } = useGetCollageQuery(collageId);
   const [updateCollage, { isLoading: isSaving }] = useUpdateCollageMutation();
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [tagsInput, setTagsInput] = useState('');
-  const [isFeatured, setIsFeatured] = useState(false);
-  const [isLocked, setIsLocked] = useState(false);
-  const [maxEntries, setMaxEntries] = useState(0);
-  const [maxEntriesPerUser, setMaxEntriesPerUser] = useState(0);
+  const [name, setName] = useState(collage.name);
+  const [description, setDescription] = useState(collage.description);
+  const [tagsInput, setTagsInput] = useState(collage.tags.join(', '));
+  const [isFeatured, setIsFeatured] = useState(collage.isFeatured);
+  const [isLocked, setIsLocked] = useState(collage.isLocked);
+  const [maxEntries, setMaxEntries] = useState(collage.maxEntries);
+  const [maxEntriesPerUser, setMaxEntriesPerUser] = useState(
+    collage.maxEntriesPerUser
+  );
   const [error, setError] = useState('');
-
-  const isStaff = hasAnyPermission(user, [
-    'collages_moderate',
-    'staff',
-    'admin'
-  ]);
-  const isOwner = user?.id === collage?.userId;
-
-  useEffect(() => {
-    if (collage) {
-      setName(collage.name);
-      setDescription(collage.description);
-      setTagsInput(collage.tags.join(', '));
-      setIsFeatured(collage.isFeatured);
-      setIsLocked(collage.isLocked);
-      setMaxEntries(collage.maxEntries);
-      setMaxEntriesPerUser(collage.maxEntriesPerUser);
-    }
-  }, [collage]);
-
-  if (isLoading) return <Spinner />;
-  if (!collage)
-    return <div className="p-4 text-red-400">Collage not found.</div>;
-  if (!isOwner && !isStaff) navigate('/collages');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -245,6 +226,29 @@ const CollageEdit = () => {
       </form>
     </div>
   );
+};
+
+const CollageEdit = () => {
+  const { id } = useParams<{ id: string }>();
+  const collageId = Number(id);
+  const navigate = useNavigate();
+  const user = useSelector(selectCurrentUser);
+
+  const { data: collage, isLoading } = useGetCollageQuery(collageId);
+
+  const isStaff = hasAnyPermission(user, [
+    'collages_moderate',
+    'staff',
+    'admin'
+  ]);
+  const isOwner = user?.id === collage?.userId;
+
+  if (isLoading) return <Spinner />;
+  if (!collage)
+    return <div className="p-4 text-red-400">Collage not found.</div>;
+  if (!isOwner && !isStaff) navigate('/collages');
+
+  return <CollageEditForm collage={collage} isStaff={isStaff} />;
 };
 
 export default CollageEdit;

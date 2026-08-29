@@ -1,31 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import {
   useGetSiteSettingsQuery,
-  useUpdateSiteSettingsMutation
+  useUpdateSiteSettingsMutation,
+  type SiteSettingsResponse
 } from '../../store/services/siteApi';
 import Spinner from '../layout/Spinner';
 import { PageShell, Panel, Button, Field } from '../ui';
 
-const SiteSettingsPage = () => {
+const SiteSettingsForm = ({ settings }: { settings: SiteSettingsResponse }) => {
   const dispatch = useAppDispatch();
-  const { data: settings, isLoading } = useGetSiteSettingsQuery();
   const [updateSettings, { isLoading: saving }] =
     useUpdateSiteSettingsMutation();
 
   const [registrationStatus, setRegistrationStatus] = useState<
     'open' | 'invite' | 'closed'
-  >('open');
-  const [maxUsers, setMaxUsers] = useState('7000');
-  const [domainsText, setDomainsText] = useState('');
-
-  useEffect(() => {
-    if (!settings) return;
-    setRegistrationStatus(settings.registrationStatus);
-    setMaxUsers(String(settings.maxUsers));
-    setDomainsText(settings.approvedDomains.join('\n'));
-  }, [settings]);
+  >(settings.registrationStatus);
+  const [maxUsers, setMaxUsers] = useState(String(settings.maxUsers));
+  const [domainsText, setDomainsText] = useState(
+    settings.approvedDomains.join('\n')
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,8 +44,6 @@ const SiteSettingsPage = () => {
       dispatch(addAlert('Failed to save settings.', 'danger'));
     }
   };
-
-  if (isLoading) return <Spinner />;
 
   return (
     <PageShell title="Site Settings" width="sm">
@@ -123,6 +116,13 @@ const SiteSettingsPage = () => {
       </Panel>
     </PageShell>
   );
+};
+
+const SiteSettingsPage = () => {
+  const { data: settings, isLoading } = useGetSiteSettingsQuery();
+
+  if (isLoading || !settings) return <Spinner />;
+  return <SiteSettingsForm settings={settings} />;
 };
 
 export default SiteSettingsPage;

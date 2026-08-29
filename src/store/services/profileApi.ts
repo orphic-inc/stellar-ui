@@ -15,7 +15,7 @@ type CreateInviteArgs = NonNullable<
 type CreateInviteResponse =
   paths['/profile/referral/create-invite']['post']['responses'][201]['content']['application/json'];
 
-type DonorRewardsResponse = components['schemas']['DonorRewards'];
+export type DonorRewardsResponse = components['schemas']['DonorRewards'];
 type UpdateDonorRewardsArgs = NonNullable<
   paths['/profile/me/donor-rewards']['put']['requestBody']
 >['content']['application/json'];

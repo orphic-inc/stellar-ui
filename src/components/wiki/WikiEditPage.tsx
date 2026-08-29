@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
   useGetWikiPageQuery,
   useCreateWikiPageMutation,
-  useUpdateWikiPageMutation
+  useUpdateWikiPageMutation,
+  type WikiPageWithBody
 } from '../../store/services/wikiApi';
 import { useGetMeQuery } from '../../store/services/authApi';
 import { hasAnyPermission } from '../../utils/permissions';
@@ -12,41 +13,29 @@ import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 
-const WikiEditPage = () => {
-  const { id } = useParams<{ id?: string }>();
-  const isNew = !id;
-  const pageId = id ? Number(id) : undefined;
+const WikiEditForm = ({
+  pageId,
+  existing,
+  canManage
+}: {
+  pageId?: number;
+  existing?: WikiPageWithBody;
+  canManage: boolean;
+}) => {
+  const isNew = pageId === undefined;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { data: user } = useGetMeQuery();
-
-  const { data: existing, isLoading: isLoadingPage } = useGetWikiPageQuery(
-    pageId!,
-    { skip: isNew }
-  );
 
   const [createPage, { isLoading: isCreating }] = useCreateWikiPageMutation();
   const [updatePage, { isLoading: isUpdating }] = useUpdateWikiPageMutation();
 
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [slug, setSlug] = useState('');
-  const [minReadLevel, setMinReadLevel] = useState(0);
-  const [minEditLevel, setMinEditLevel] = useState(0);
-
-  const canManage = hasAnyPermission(user, ['wiki_manage', 'admin', 'staff']);
-
-  useEffect(() => {
-    if (existing) {
-      setTitle(existing.title);
-      setBody(existing.body);
-      setSlug(existing.slug);
-      setMinReadLevel(existing.minReadLevel);
-      setMinEditLevel(existing.minEditLevel);
-    }
-  }, [existing]);
-
-  if (!isNew && isLoadingPage) return <Spinner />;
+  // Seeded from the loaded page; the caller keys on its id, so the form
+  // remounts with real values the moment the fetch settles.
+  const [title, setTitle] = useState(existing?.title ?? '');
+  const [body, setBody] = useState(existing?.body ?? '');
+  const [slug, setSlug] = useState(existing?.slug ?? '');
+  const [minReadLevel, setMinReadLevel] = useState(existing?.minReadLevel ?? 0);
+  const [minEditLevel, setMinEditLevel] = useState(existing?.minEditLevel ?? 0);
 
   const isSaving = isCreating || isUpdating;
 
@@ -240,6 +229,31 @@ const WikiEditPage = () => {
         </div>
       </form>
     </div>
+  );
+};
+
+const WikiEditPage = () => {
+  const { id } = useParams<{ id?: string }>();
+  const isNew = !id;
+  const pageId = id ? Number(id) : undefined;
+  const { data: user } = useGetMeQuery();
+
+  const { data: existing, isLoading: isLoadingPage } = useGetWikiPageQuery(
+    pageId!,
+    { skip: isNew }
+  );
+
+  const canManage = hasAnyPermission(user, ['wiki_manage', 'admin', 'staff']);
+
+  if (!isNew && isLoadingPage) return <Spinner />;
+
+  return (
+    <WikiEditForm
+      key={existing?.id ?? 'new'}
+      pageId={pageId}
+      existing={existing}
+      canManage={canManage}
+    />
   );
 };
 

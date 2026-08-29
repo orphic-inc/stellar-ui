@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { formatBytes, ordinalSuffix } from '../../utils';
@@ -35,7 +35,9 @@ import {
   useGetSnatchListByUserIdQuery,
   useGetSnatchListQuery,
   useTriggerUserRecoveryMutation,
-  useSetStaffBioMutation
+  useSetStaffBioMutation,
+  type UserRankAssignment,
+  type UserRankRecord
 } from '../../store/services/userApi';
 import {
   useGetFriendStatusQuery,
@@ -181,10 +183,6 @@ const StaffBioEditor = ({
   const [staffBioValue, setStaffBioValue] = useState(initialBio ?? '');
   const [setStaffBio, { isLoading: isSettingBio }] = useSetStaffBioMutation();
 
-  useEffect(() => {
-    setStaffBioValue(initialBio ?? '');
-  }, [initialBio, profileId]);
-
   const handleSetStaffBio = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -235,100 +233,33 @@ const StaffBioEditor = ({
   );
 };
 
-const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
+const RankAssignmentPanel = ({
+  profileId,
+  assignment,
+  primaryRanks,
+  secondaryRanks,
+  bodyClass
+}: {
+  profileId: number;
+  assignment: UserRankAssignment;
+  primaryRanks: UserRankRecord[];
+  secondaryRanks: UserRankRecord[];
+  bodyClass: string;
+}) => {
   const dispatch = useDispatch();
-  const [showWarnModal, setShowWarnModal] = useState(false);
-  const [showIpHistory, setShowIpHistory] = useState(false);
-  const [showEmailHistory, setShowEmailHistory] = useState(false);
-  const [showNotes, setShowNotes] = useState(false);
-  const [showWarnings, setShowWarnings] = useState(false);
-  const [showSnatchList, setShowSnatchList] = useState(false);
-  const [newNote, setNewNote] = useState('');
-  const [selectedRankId, setSelectedRankId] = useState<number | ''>('');
+  // Seeded from the loaded assignment at mount; the caller keys this on the
+  // profile, so switching users remounts rather than resyncing through an effect.
+  const [selectedRankId, setSelectedRankId] = useState<number | ''>(
+    assignment.userRankId
+  );
   const [selectedSecondaryRankIds, setSelectedSecondaryRankIds] = useState<
     number[]
-  >([]);
-  const [rankLocked, setRankLocked] = useState(false);
-  const [donorRankId, setDonorRankId] = useState<number | ''>('');
-  const [donorExpiry, setDonorExpiry] = useState('');
+  >(assignment.secondaryRankIds);
+  const [rankLocked, setRankLocked] = useState(assignment.rankLocked);
 
-  const { data: userRanks } = useGetUserRanksQuery();
-  const { data: rankAssignment } = useGetUserRankAssignmentQuery(profileId);
-  const { data: donorRanks } = useGetDonorRanksQuery();
-  const { data: ipHistory } = useGetUserIpHistoryQuery(profileId, {
-    skip: !showIpHistory
-  });
-  const { data: emailHistory } = useGetUserEmailHistoryQuery(profileId, {
-    skip: !showEmailHistory
-  });
-  const { data: notes } = useGetUserNotesQuery(profileId, { skip: !showNotes });
-  const { data: warnings } = useGetUserWarningsQuery(profileId, {
-    skip: !showWarnings
-  });
-  const { data: snatchList } = useGetSnatchListByUserIdQuery(profileId, {
-    skip: !showSnatchList
-  });
-
-  const { data: profile } = useGetProfileByUserIdQuery(String(profileId));
-  const isDisabled = profile?.disabled;
-  const staffPmOverview = profile?.staffPmOverview;
-  const primaryRanks =
-    userRanks
-      ?.filter((rank) => !rank.secondary)
-      .sort((a, b) => a.level - b.level) ?? [];
-  const secondaryRanks =
-    userRanks
-      ?.filter((rank) => rank.secondary)
-      .sort((a, b) => a.level - b.level) ?? [];
-
-  useEffect(() => {
-    if (!rankAssignment) return;
-    setSelectedRankId(rankAssignment.userRankId);
-    setSelectedSecondaryRankIds(rankAssignment.secondaryRankIds);
-    setRankLocked(rankAssignment.rankLocked);
-  }, [rankAssignment]);
-
-  const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
-  const [enableUser, { isLoading: isEnabling }] = useEnableUserMutation();
   const [setUserRank, { isLoading: isSettingRank }] = useSetUserRankMutation();
   const [setUserRankLock, { isLoading: isTogglingLock }] =
     useSetUserRankLockMutation();
-  const [addUserNote, { isLoading: isAddingNote }] = useAddUserNoteMutation();
-  const [deleteUserNote] = useDeleteUserNoteMutation();
-  const [removeUserWarning] = useRemoveUserWarningMutation();
-  const [grantDonor, { isLoading: isGrantingDonor }] = useGrantDonorMutation();
-  const [revokeDonor, { isLoading: isRevokingDonor }] =
-    useRevokeDonorMutation();
-  const [triggerRecovery, { isLoading: isSendingRecovery }] =
-    useTriggerUserRecoveryMutation();
-
-  const handleDisableToggle = async () => {
-    try {
-      if (isDisabled) {
-        await enableUser(profileId).unwrap();
-        dispatch(addAlert('Account enabled.', 'success'));
-      } else {
-        await disableUser(profileId).unwrap();
-        dispatch(addAlert('Account disabled.', 'success'));
-      }
-    } catch (err) {
-      dispatch(addAlert(getApiErrorMessage(err) ?? 'Action failed.', 'danger'));
-    }
-  };
-
-  const handleAddNote = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newNote.trim()) return;
-    try {
-      await addUserNote({ id: profileId, body: newNote }).unwrap();
-      setNewNote('');
-      dispatch(addAlert('Note added.', 'success'));
-    } catch (err) {
-      dispatch(
-        addAlert(getApiErrorMessage(err) ?? 'Failed to add note.', 'danger')
-      );
-    }
-  };
 
   const handleSetRank = async () => {
     if (!selectedRankId) return;
@@ -376,6 +307,175 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
         ? current.filter((id) => id !== rankId)
         : [...current, rankId].sort((a, b) => a - b)
     );
+  };
+
+  return (
+    <div data-st="panel">
+      <div data-st="colhead">Change Rank</div>
+      <div className={`${bodyClass} space-y-3`}>
+        <div className="flex gap-2">
+          <select
+            value={selectedRankId}
+            onChange={(e) =>
+              setSelectedRankId(e.target.value ? Number(e.target.value) : '')
+            }
+            data-st="field"
+            className="flex-1"
+          >
+            <option value="">Select rank…</option>
+            {primaryRanks.map((rank) => (
+              <option key={rank.id} value={rank.id}>
+                {rank.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleSetRank}
+            disabled={!selectedRankId || isSettingRank}
+            data-st="control"
+            data-st-primary
+            className="text-xs"
+          >
+            {isSettingRank ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+        {secondaryRanks.length > 0 ? (
+          <div data-st="panel" className="p-3 space-y-2">
+            <div data-st="meta" className="text-xs uppercase tracking-wide">
+              Secondary Classes
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {secondaryRanks.map((rank) => (
+                <label
+                  key={rank.id}
+                  aria-label={rank.name}
+                  className="flex items-start gap-3 rounded border border-[var(--st-border)] px-3 py-2 cursor-pointer hover:border-[var(--st-border-strong)]"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedSecondaryRankIds.includes(rank.id)}
+                    onChange={() => handleToggleSecondaryRank(rank.id)}
+                    data-st="field"
+                    className="mt-0.5"
+                  />
+                  <span className="min-w-0">
+                    <span data-st="prose" className="block text-sm">
+                      {rank.name}
+                    </span>
+                    <span data-st="meta" className="block text-xs">
+                      Level {rank.level}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        <label
+          aria-label="Lock rank"
+          className="flex items-start gap-3 rounded border border-[var(--st-border)] px-3 py-2 cursor-pointer hover:border-[var(--st-border-strong)]"
+        >
+          <input
+            type="checkbox"
+            checked={rankLocked}
+            disabled={isTogglingLock}
+            onChange={handleToggleRankLock}
+            data-st="field"
+            className="mt-0.5"
+          />
+          <span className="min-w-0">
+            <span data-st="prose" className="block text-sm">
+              Lock rank
+            </span>
+            <span data-st="meta" className="block text-xs">
+              Freeze this user from automatic class progression. Manual rank
+              changes above still apply.
+            </span>
+          </span>
+        </label>
+      </div>
+    </div>
+  );
+};
+
+const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
+  const dispatch = useDispatch();
+  const [showWarnModal, setShowWarnModal] = useState(false);
+  const [showIpHistory, setShowIpHistory] = useState(false);
+  const [showEmailHistory, setShowEmailHistory] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  const [showWarnings, setShowWarnings] = useState(false);
+  const [showSnatchList, setShowSnatchList] = useState(false);
+  const [newNote, setNewNote] = useState('');
+  const [donorRankId, setDonorRankId] = useState<number | ''>('');
+  const [donorExpiry, setDonorExpiry] = useState('');
+
+  const { data: userRanks } = useGetUserRanksQuery();
+  const { data: rankAssignment } = useGetUserRankAssignmentQuery(profileId);
+  const { data: donorRanks } = useGetDonorRanksQuery();
+  const { data: ipHistory } = useGetUserIpHistoryQuery(profileId, {
+    skip: !showIpHistory
+  });
+  const { data: emailHistory } = useGetUserEmailHistoryQuery(profileId, {
+    skip: !showEmailHistory
+  });
+  const { data: notes } = useGetUserNotesQuery(profileId, { skip: !showNotes });
+  const { data: warnings } = useGetUserWarningsQuery(profileId, {
+    skip: !showWarnings
+  });
+  const { data: snatchList } = useGetSnatchListByUserIdQuery(profileId, {
+    skip: !showSnatchList
+  });
+
+  const { data: profile } = useGetProfileByUserIdQuery(String(profileId));
+  const isDisabled = profile?.disabled;
+  const staffPmOverview = profile?.staffPmOverview;
+  const primaryRanks =
+    userRanks
+      ?.filter((rank) => !rank.secondary)
+      .sort((a, b) => a.level - b.level) ?? [];
+  const secondaryRanks =
+    userRanks
+      ?.filter((rank) => rank.secondary)
+      .sort((a, b) => a.level - b.level) ?? [];
+
+  const [disableUser, { isLoading: isDisabling }] = useDisableUserMutation();
+  const [enableUser, { isLoading: isEnabling }] = useEnableUserMutation();
+  const [addUserNote, { isLoading: isAddingNote }] = useAddUserNoteMutation();
+  const [deleteUserNote] = useDeleteUserNoteMutation();
+  const [removeUserWarning] = useRemoveUserWarningMutation();
+  const [grantDonor, { isLoading: isGrantingDonor }] = useGrantDonorMutation();
+  const [revokeDonor, { isLoading: isRevokingDonor }] =
+    useRevokeDonorMutation();
+  const [triggerRecovery, { isLoading: isSendingRecovery }] =
+    useTriggerUserRecoveryMutation();
+
+  const handleDisableToggle = async () => {
+    try {
+      if (isDisabled) {
+        await enableUser(profileId).unwrap();
+        dispatch(addAlert('Account enabled.', 'success'));
+      } else {
+        await disableUser(profileId).unwrap();
+        dispatch(addAlert('Account disabled.', 'success'));
+      }
+    } catch (err) {
+      dispatch(addAlert(getApiErrorMessage(err) ?? 'Action failed.', 'danger'));
+    }
+  };
+
+  const handleAddNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNote.trim()) return;
+    try {
+      await addUserNote({ id: profileId, body: newNote }).unwrap();
+      setNewNote('');
+      dispatch(addAlert('Note added.', 'success'));
+    } catch (err) {
+      dispatch(
+        addAlert(getApiErrorMessage(err) ?? 'Failed to add note.', 'danger')
+      );
+    }
   };
 
   const handleDeleteNote = async (noteId: number) => {
@@ -591,96 +691,16 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             </div>
           )}
 
-          <div data-st="panel">
-            <div data-st="colhead">Change Rank</div>
-            <div className={`${bodyClass} space-y-3`}>
-              <div className="flex gap-2">
-                <select
-                  value={selectedRankId}
-                  onChange={(e) =>
-                    setSelectedRankId(
-                      e.target.value ? Number(e.target.value) : ''
-                    )
-                  }
-                  data-st="field"
-                  className="flex-1"
-                >
-                  <option value="">Select rank…</option>
-                  {primaryRanks.map((rank) => (
-                    <option key={rank.id} value={rank.id}>
-                      {rank.name}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleSetRank}
-                  disabled={!selectedRankId || isSettingRank}
-                  data-st="control"
-                  data-st-primary
-                  className="text-xs"
-                >
-                  {isSettingRank ? 'Saving…' : 'Save'}
-                </button>
-              </div>
-              {secondaryRanks.length > 0 ? (
-                <div data-st="panel" className="p-3 space-y-2">
-                  <div
-                    data-st="meta"
-                    className="text-xs uppercase tracking-wide"
-                  >
-                    Secondary Classes
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {secondaryRanks.map((rank) => (
-                      <label
-                        key={rank.id}
-                        aria-label={rank.name}
-                        className="flex items-start gap-3 rounded border border-[var(--st-border)] px-3 py-2 cursor-pointer hover:border-[var(--st-border-strong)]"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedSecondaryRankIds.includes(rank.id)}
-                          onChange={() => handleToggleSecondaryRank(rank.id)}
-                          data-st="field"
-                          className="mt-0.5"
-                        />
-                        <span className="min-w-0">
-                          <span data-st="prose" className="block text-sm">
-                            {rank.name}
-                          </span>
-                          <span data-st="meta" className="block text-xs">
-                            Level {rank.level}
-                          </span>
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-              <label
-                aria-label="Lock rank"
-                className="flex items-start gap-3 rounded border border-[var(--st-border)] px-3 py-2 cursor-pointer hover:border-[var(--st-border-strong)]"
-              >
-                <input
-                  type="checkbox"
-                  checked={rankLocked}
-                  disabled={isTogglingLock}
-                  onChange={handleToggleRankLock}
-                  data-st="field"
-                  className="mt-0.5"
-                />
-                <span className="min-w-0">
-                  <span data-st="prose" className="block text-sm">
-                    Lock rank
-                  </span>
-                  <span data-st="meta" className="block text-xs">
-                    Freeze this user from automatic class progression. Manual
-                    rank changes above still apply.
-                  </span>
-                </span>
-              </label>
-            </div>
-          </div>
+          {rankAssignment && (
+            <RankAssignmentPanel
+              key={profileId}
+              profileId={profileId}
+              assignment={rankAssignment}
+              primaryRanks={primaryRanks}
+              secondaryRanks={secondaryRanks}
+              bodyClass={bodyClass}
+            />
+          )}
 
           {/* Donor status */}
           <div data-st="panel">
@@ -1534,6 +1554,7 @@ const UserProfile = () => {
 
           {canEditOwnStaffBio && (
             <StaffBioEditor
+              key={profile.id}
               profileId={profile.id}
               initialBio={profile.staffBio}
             />

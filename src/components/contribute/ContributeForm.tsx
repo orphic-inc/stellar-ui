@@ -191,14 +191,6 @@ const ContributeForm = () => {
     { skip: !community }
   );
 
-  useEffect(() => {
-    if (type === 'Music') {
-      setCollaborators([{ artist: '', importance: 'Main artist' }]);
-    } else {
-      setCollaborators([{ artist: '', importance: 'Creator' }]);
-    }
-  }, [type]);
-
   // Move focus to the row requested by the last add/remove action.
   useEffect(() => {
     if (pendingFocus.current === null) return;
@@ -206,6 +198,13 @@ const ContributeForm = () => {
     target?.focus();
     pendingFocus.current = null;
   }, [collaborators]);
+
+  const handleTypeChange = (next: ContentType) => {
+    setType(next);
+    setCollaborators([
+      { artist: '', importance: next === 'Music' ? 'Main artist' : 'Creator' }
+    ]);
+  };
 
   const addCollaborator = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -386,7 +385,9 @@ const ContributeForm = () => {
               <select
                 id="contribute-type"
                 value={type}
-                onChange={(e) => setType(e.target.value as ContentType)}
+                onChange={(e) =>
+                  handleTypeChange(e.target.value as ContentType)
+                }
                 className={inputClass}
               >
                 {CONTENT_TYPES.map((t) => (
