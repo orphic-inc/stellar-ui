@@ -22,6 +22,24 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: ['@typescript-eslint'],
+  overrides: [
+    {
+      // Root-level build configs are CommonJS by design — webpack-cli, jest and
+      // babel all load them through require(). The TypeScript rule steering code
+      // toward `import` does not apply to them.
+      //
+      // Both rule names are listed on purpose: local typescript-eslint reports
+      // this as `no-require-imports`, while Codacy bundles an older plugin that
+      // still calls it `no-var-requires`. Setting an absent rule to "off" is a
+      // no-op, so each tool matches whichever name it knows. Local lint never
+      // sees these files (`eslint src --ext .ts,.tsx`); Codacy lints .js too.
+      files: ['webpack.config.js', 'jest.config.js', 'babel.config.test.js'],
+      rules: {
+        '@typescript-eslint/no-require-imports': 'off',
+        '@typescript-eslint/no-var-requires': 'off'
+      }
+    }
+  ],
   rules: {
     'no-undef': 'off',
     'no-unused-vars': 'off',
