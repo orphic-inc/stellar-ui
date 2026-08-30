@@ -6,6 +6,12 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **Codacy's ESLint tool is switched off; Trivy and Semgrep stay** ([stellar-ui ADR-0009](docs/adr/0009-codacy-eslint-is-off.md)) — Codacy had accumulated **5,749 open issues**, all from ESLint, and not one of them was a defect. Codacy runs ESLint **8**, which cannot read this repo's flat `eslint.config.mjs`; rather than failing, it silently falls back to its own default pattern set, so every finding is a rule this project does not enable (local `npm run lint` on ESLint 9.39.5 is clean). 84% of the total — 4,806 findings — is the type-aware `no-unsafe-*` family cascading from imports Codacy's no-install analyzer cannot resolve, chiefly `@reduxjs/toolkit/query/react`, which is already excepted under `import/no-unresolved` for that exact reason. The rest is parameter names in _type_ positions read as unused variables, and a security family that inverts the guards it is looking at — `renderedBody` flagged as unencoded when it is the return of `DOMPurify.sanitize` four lines above, `parseSize`'s regex flagged unsafe when it measures linear (0.08 ms on 3 KB, 1.46 ms on 150 KB), and a "timing attack" on a variable named `token` that holds a rules-text template token. All 24 `src` security findings were checked individually. The ADR records the full triage so the count is never re-litigated.
+
+- **All seven dev-only advisories cleared — `npm audit` is now zero** — `@babel/runtime`, `ajv` (ReDoS via `$data`), `brace-expansion` (five DoS entries), `js-yaml` (quadratic CPU via merge-key chains), `picomatch` and `ws`. All confined to `devDependencies`; `npm audit --omit=dev` was already clean, and Codacy never reported them because Trivy scans the production tree. Applied with a plain `npm audit fix`: `package.json` untouched, **no major versions moved**, and `typescript`, `prettier`, `eslint`, `jest`, `webpack` and `react` all confirmed unmoved. `@babel/runtime` reaches the tree only through `@testing-library/*`, so nothing here is bundled. Nine patch/minor bumps and one removal (`regenerator-runtime`, dropped by the `@babel/runtime` bump). Verified with lint, typecheck, `npm test` (169 suites / 1488 tests) and a full production `webpack` build.
+
 ## [0.8.3] — 2026-08-30
 
 ### Added
