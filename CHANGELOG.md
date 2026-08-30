@@ -6,13 +6,23 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
-### Changed
-
-- **Form state is seeded at mount instead of resynced by an effect** — eight components hydrated their local form fields from an async query inside a `useEffect`, which re-runs on every refetch and can overwrite what someone is part-way through typing. Each now splits into a shell that waits for the record and a child that seeds `useState` from it, remounted by `key` when the record changes: `SiteSettingsPage`, `CollageEdit`, `ComposeForm`, `WikiEditPage`, `DonorSettingsTab` and the rank panel in `UserProfile` (extracted as `RankAssignmentPanel`); the staff-bio editor drops its effect for a `key` at the call site. `ContributeForm` moves its collaborator reset into the content-type change handler, where the change actually originates. `WikiListPage`'s `SortButton` is hoisted to module scope so it is no longer re-created on every render. `PostBox` replaces the `quoteText`/`onQuoteConsumed` prop pair with an imperative `appendQuote` handle, so quoting a post is a call rather than a prop change an effect has to notice and hand back. One edge case does change, deliberately: `SiteSettingsPage` and `DonorSettingsTab` now hold the spinner when the fetch settles with no record, where before they rendered an empty form whose Save would have written blanks over live settings. Everything else behaves as it did. The work clears the React Compiler findings that `eslint-plugin-react-hooks` v7 reports, so the react 19 bump [#249](https://github.com/orphic-inc/stellar-ui/pull/249) can land as a dependency change on its own.
+## [0.8.3] — 2026-08-30
 
 ### Added
 
 - **"Remove consumed" bulk action on the Bookmarks page** ([#212](https://github.com/orphic-inc/stellar-ui/issues/212)) — the release-bookmark list is a consumption queue, but it was read-only: clearing the releases you had already grabbed meant unbookmarking them one at a time. The Releases tab now carries a "Remove consumed" button that calls `DELETE /api/bookmarks/releases/consumed` (stellar-api #296), then surfaces a toast with the count and lets RTK Query invalidation refetch the list. The button only appears when releases are bookmarked; `removed: 0` reports "No consumed bookmarks to remove" rather than an error. The API decides what "consumed" means, so no confirm dialog.
+
+### Changed
+
+- **Dependency and toolchain refresh** — the bulk of this release, and the reason it is being cut. The runtime crosses a major: **React 18 → 19** with `react-dom` alongside it, and **react-router-dom 6 → 7**. The build and test stack moves with it — **Babel 7 → 8** across `core`/`preset-env`/`preset-react`/`preset-typescript`/`register`/`eslint-parser` (with the webpack config converted off `@babel/register` to CommonJS), **Jest 29 → 30**, **webpack-cli 5 → 7** and **webpack-dev-server 4 → 6**, `babel-loader` 9 → 10, `css-loader` 6 → 7, `style-loader` 3 → 4, `sass-loader` 13 → 17, `postcss-loader` 7 → 8, `html-loader` 4 → 5, `css-minimizer-webpack-plugin` 5 → 8, `eslint-webpack-plugin` 4 → 6, **stylelint 15 → 17** with `stylelint-config-recommended` 13 → 18 and `stylelint-webpack-plugin` 4 → 5, `@testing-library/jest-dom` 6 → 7, `cross-env` 7 → 10, and Prettier 3.5 → 3.9. Lint crosses **eslint 8 → 9** with the eslintrc config migrated to flat config; flat config has no `--ext`, so `npm run lint` is now plain `eslint src`. **`eslint-plugin-react-hooks` 4 → 7** brings the React Compiler rules with it — the twelve findings they raised were cleared first, in their own pass, so the React bump could land as a dependency change on its own. **FontAwesome 6 → 7** (`fontawesome-svg-core`, `free-solid-svg-icons`, and `react-fontawesome` 0.2 → 3), `normalize-scss` 7 → 8, `katex` 0.16 → 0.18 in lockstep with the API, `reselect` 4 → 5, `@babel/runtime-corejs3` 7 → 8, **husky 8 → 9** and **lint-staged 13 → 17**. Node moves to 24 — `engines` widens from `>=22 <23` to `>=22 <25` and the Docker build image follows. No user-visible behaviour changes with any of it.
+
+- **`@eslint/js` realigned to the installed eslint major** — it had been carried at `^10` (resolving 10.0.1) while `eslint` itself is `^9` (9.39.5), because `@eslint/js` declares no peer dependency on eslint and so nothing rejected the mismatched major. Lint was green, so this was latent rather than broken, but it meant `js.configs.recommended` came from a different major than the engine consuming it. Now pinned to `^9`, matching stellar-api.
+
+- **Form state is seeded at mount instead of resynced by an effect** — eight components hydrated their local form fields from an async query inside a `useEffect`, which re-runs on every refetch and can overwrite what someone is part-way through typing. Each now splits into a shell that waits for the record and a child that seeds `useState` from it, remounted by `key` when the record changes: `SiteSettingsPage`, `CollageEdit`, `ComposeForm`, `WikiEditPage`, `DonorSettingsTab` and the rank panel in `UserProfile` (extracted as `RankAssignmentPanel`); the staff-bio editor drops its effect for a `key` at the call site. `ContributeForm` moves its collaborator reset into the content-type change handler, where the change actually originates. `WikiListPage`'s `SortButton` is hoisted to module scope so it is no longer re-created on every render. `PostBox` replaces the `quoteText`/`onQuoteConsumed` prop pair with an imperative `appendQuote` handle, so quoting a post is a call rather than a prop change an effect has to notice and hand back. One edge case does change, deliberately: `SiteSettingsPage` and `DonorSettingsTab` now hold the spinner when the fetch settles with no record, where before they rendered an empty form whose Save would have written blanks over live settings. Everything else behaves as it did. The work clears the React Compiler findings that `eslint-plugin-react-hooks` v7 reports, so the react 19 bump [#249](https://github.com/orphic-inc/stellar-ui/pull/249) can land as a dependency change on its own.
+
+### Fixed
+
+- **Rendered BBCode headings are styled** — headings produced by the server-side BBCode transcription rendered without heading styles, so they read as body copy.
 
 ## [0.8.2] — 2026-07-22
 
@@ -240,3 +250,16 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
+
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.3...HEAD
+[0.8.3]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.2...v0.8.3
+[0.8.2]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.6.9...v0.8.0
+[0.6.9]: https://github.com/orphic-inc/stellar-ui/compare/v0.6.3...v0.6.9
+[0.6.3]: https://github.com/orphic-inc/stellar-ui/compare/v0.6.2...v0.6.3
+[0.6.2]: https://github.com/orphic-inc/stellar-ui/compare/v0.6.1...v0.6.2
+[0.6.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.5.4...v0.6.0
+[0.5.4]: https://github.com/orphic-inc/stellar-ui/compare/v0.5.3...v0.5.4
+[0.5.3]: https://github.com/orphic-inc/stellar-ui/releases/tag/v0.5.3
