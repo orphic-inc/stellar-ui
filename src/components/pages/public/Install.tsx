@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import {
   installApi,
   useGetInstallStatusQuery,
@@ -26,10 +26,10 @@ const Install = () => {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors }
   } = useForm<FormValues>();
-  const password = watch('password');
+  const password = useWatch({ control, name: 'password' });
 
   const onSubmit = async (values: FormValues) => {
     try {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import {
   useGetUserRankByIdQuery,
   useCreateUserRankMutation,
@@ -46,7 +46,7 @@ const UserRankFormPage = () => {
   const [updateUserRank] = useUpdateUserRankMutation();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit, reset, watch, setValue } =
+  const { register, handleSubmit, reset, control, setValue } =
     useForm<FormValues>({
       defaultValues: {
         level: 0,
@@ -60,8 +60,8 @@ const UserRankFormPage = () => {
       }
     });
 
-  const displayStaff = watch('displayStaff');
-  const selectedForumIds = watch('permittedForumIds');
+  const displayStaff = useWatch({ control, name: 'displayStaff' });
+  const selectedForumIds = useWatch({ control, name: 'permittedForumIds' });
 
   useEffect(() => {
     if (existing) {
