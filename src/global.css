@@ -6,7 +6,7 @@
  *
  *   1. ROLE THEME TOKENS  — the fixed `--st-*` set, named by role (surface,
  *      panel, accent, danger…). The PRIMITIVE color tokens are Sublime's
- *      defaults and live in `src/index.scss` as a Tailwind `@theme` block that
+ *      defaults and live in `src/index.css` as a Tailwind `@theme` block that
  *      references the palette (`--st-panel: var(--color-gray-800)`) — one source,
  *      no hand-copied oklch. This file keeps only the DERIVED tokens (which
  *      reference the primitives via var() and resolve lazily) and the
@@ -38,14 +38,14 @@
 /* ── 1. ROLE THEME TOKENS ─────────────────────────────────────────────────── */
 
 /* Primitive color tokens (surfaces, text, accent/link, borders, status,
- * --st-lossless) are Sublime's defaults and live in src/index.scss as a Tailwind
+ * --st-lossless) are Sublime's defaults and live in src/index.css as a Tailwind
  * `@theme` block sourced from the palette by reference — see that file. They are
  * emitted to :root from there; the derived + geometry tokens below complete the
  * set and resolve against them. */
 :root {
   /* Quality + weight — core tokens (D-3): the lossless cue recurs across
      listings / search / the workbench; weight feeds the `bar` Role.
-     (--st-lossless is primitive — it lives in the index.scss @theme block.) */
+     (--st-lossless is primitive — it lives in the index.css @theme block.) */
   --st-lossy: var(--st-text-faint); /* lossy = quiet, not penalized */
   --st-weight: var(--st-accent-ring); /* contribution-weight bar fill */
   --st-weight-track: color-mix(in oklch, var(--st-raised) 60%, transparent);

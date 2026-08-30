@@ -51,7 +51,7 @@ const plugins = [
   new StylelintPlugin({
     configFile: '.stylelintrc',
     context: 'src',
-    files: '**/*.scss',
+    files: '**/*.css',
     failOnError: true,
     quiet: false
   }),
@@ -129,7 +129,7 @@ module.exports = {
         use: ['babel-loader']
       },
       {
-        test: /\.(sa|sc|c)ss$/,
+        test: /\.css$/,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
@@ -146,8 +146,7 @@ module.exports = {
                 sourceMap: dev
               }
             }
-          },
-          'sass-loader'
+          }
         ]
       },
       {

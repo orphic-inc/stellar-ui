@@ -11,7 +11,7 @@ import { join } from 'path';
  * legacy approach of overriding Tailwind `.bg-gray-*` utilities, which stops
  * skinning surfaces as they migrate onto the contract (the motivating bug).
  *
- * The subject is `src/index.scss`'s `@theme static` block — the Sublime baseline
+ * The subject is `src/index.css`'s `@theme static` block — the Sublime baseline
  * every data-st hook paints from — because that is the part of the contract this
  * repo owns. Built-in themes are api-canonical and are NOT checked here; the api
  * asserts this same list against their canonical bytes. See docs/theming.md §4.1
@@ -57,18 +57,18 @@ describe('theme Role Token contract', () => {
     expect(new Set(PRIMITIVE_TOKENS).size).toBe(PRIMITIVE_TOKENS.length);
   });
 
-  it('index.scss declares every primitive --st-* token', () => {
-    const declared = declaredTokens('index.scss');
+  it('index.css declares every primitive --st-* token', () => {
+    const declared = declaredTokens('index.css');
     const missing = PRIMITIVE_TOKENS.filter((t) => !declared.has(t));
     expect(missing).toEqual([]);
   });
 
-  it('index.scss declares ONLY primitives — derived tokens live in global.css', () => {
-    // The documented split (index.scss header): primitive colour tokens here,
+  it('index.css declares ONLY primitives — derived tokens live in global.css', () => {
+    // The documented split (index.css header): primitive colour tokens here,
     // derived (--st-lossy/--st-weight/…) and geometry in global.css.
     // Without this direction the block could accrete derived tokens and the
     // separation would erode silently.
-    const extra = [...declaredTokens('index.scss')].filter(
+    const extra = [...declaredTokens('index.css')].filter(
       (t) => !(PRIMITIVE_TOKENS as readonly string[]).includes(t)
     );
     expect(extra).toEqual([]);
