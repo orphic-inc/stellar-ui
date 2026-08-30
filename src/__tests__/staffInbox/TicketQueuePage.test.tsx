@@ -229,7 +229,7 @@ describe('TicketQueuePage', () => {
     });
     renderWithProviders(<TicketQueuePage />);
     await user.click(screen.getByRole('button', { name: /next/i }));
-    await user.click(screen.getByRole('button', { name: /previous/i }));
+    await user.click(screen.getByRole('button', { name: /prev/i }));
     expect(mockUseGetTicketQueueQuery).toHaveBeenLastCalledWith(
       expect.objectContaining({ page: 1 })
     );

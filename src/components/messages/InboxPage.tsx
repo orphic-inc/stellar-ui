@@ -6,6 +6,7 @@ import {
   useBulkUpdateConversationsMutation
 } from '../../store/services/messagesApi';
 import Spinner from '../layout/Spinner';
+import { Pagination } from '../ui';
 
 const InboxPage = () => {
   const [page, setPage] = useState(1);
@@ -179,29 +180,7 @@ const InboxPage = () => {
         </table>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-4 text-sm">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            data-st="control"
-            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
-          >
-            Previous
-          </button>
-          <span data-st="meta" className="px-3 py-1">
-            {page} / {totalPages}
-          </span>
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            data-st="control"
-            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 };

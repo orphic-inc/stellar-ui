@@ -1,18 +1,9 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
 import { useGetUserStatsHistoryQuery } from '../../../../store/services/siteApi';
 import Spinner from '../../../layout/Spinner';
 import type { UserStatSnapshot } from '../../../../store/services/siteApi';
+import StatsChartPanel from './StatsChartPanel';
 
 type Period = 'Daily' | 'Monthly' | 'Yearly';
 
@@ -124,55 +115,16 @@ const UserStatsHistoryPage = () => {
 
       {data && data.length > 0 && (
         <>
-          <div data-st="panel" className="rounded-lg p-4">
-            <h3 data-st="prose" data-st-strong className="text-sm mb-4">
-              Contributed &amp; Consumed (GB)
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart
-                data={buildChartData(data, period)}
-                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis
-                  dataKey="time"
-                  tick={{ fill: '#9ca3af', fontSize: 11 }}
-                />
-                <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} unit=" GB" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#111827',
-                    border: '1px solid #374151',
-                    borderRadius: '6px'
-                  }}
-                  labelStyle={{ color: '#e5e7eb' }}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="Contributed (GB)"
-                  stroke="#10b981"
-                  dot={false}
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="Consumed (GB)"
-                  stroke="#f59e0b"
-                  dot={false}
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="Buffer (GB)"
-                  stroke="#6366f1"
-                  dot={false}
-                  strokeWidth={2}
-                  strokeDasharray="4 2"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <StatsChartPanel
+            title="Contributed &amp; Consumed (GB)"
+            data={buildChartData(data, period)}
+            yAxisUnit=" GB"
+            series={[
+              { dataKey: 'Contributed (GB)', stroke: '#10b981' },
+              { dataKey: 'Consumed (GB)', stroke: '#f59e0b' },
+              { dataKey: 'Buffer (GB)', stroke: '#6366f1', dashed: true }
+            ]}
+          />
 
           {data[data.length - 1]?.contributed === null && (
             <p data-st="prose" data-st-muted className="text-xs">

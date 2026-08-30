@@ -1,15 +1,6 @@
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts';
 import { useGetSiteStatsHistoryQuery } from '../../../../store/services/siteApi';
 import Spinner from '../../../layout/Spinner';
+import StatsChartPanel from './StatsChartPanel';
 
 const formatDate = (iso: string) => {
   const d = new Date(iso);
@@ -73,90 +64,25 @@ const SiteStatsHistoryPage = () => {
         {data.length !== 1 ? 's' : ''}.
       </p>
 
-      <div data-st="panel" className="rounded-lg p-4">
-        <h3 data-st="prose" data-st-strong className="text-sm mb-4">
-          Users &amp; Activity
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={chartData}
-            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="time" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-            <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#111827',
-                border: '1px solid #374151',
-                borderRadius: '6px'
-              }}
-              labelStyle={{ color: '#e5e7eb' }}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="Total Users"
-              stroke="#6366f1"
-              dot={false}
-              strokeWidth={2}
-            />
-            <Line
-              type="monotone"
-              dataKey="Active Today"
-              stroke="#10b981"
-              dot={false}
-              strokeWidth={2}
-            />
-            <Line
-              type="monotone"
-              dataKey="Active This Week"
-              stroke="#f59e0b"
-              dot={false}
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <StatsChartPanel
+        title="Users &amp; Activity"
+        data={chartData}
+        series={[
+          { dataKey: 'Total Users', stroke: '#6366f1' },
+          { dataKey: 'Active Today', stroke: '#10b981' },
+          { dataKey: 'Active This Week', stroke: '#f59e0b' }
+        ]}
+      />
 
-      <div data-st="panel" className="rounded-lg p-4">
-        <h3 data-st="prose" data-st-strong className="text-sm mb-4">
-          Content
-        </h3>
-        <ResponsiveContainer width="100%" height={250}>
-          <LineChart
-            data={chartData}
-            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="time" tick={{ fill: '#9ca3af', fontSize: 11 }} />
-            <YAxis tick={{ fill: '#9ca3af', fontSize: 11 }} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#111827',
-                border: '1px solid #374151',
-                borderRadius: '6px'
-              }}
-              labelStyle={{ color: '#e5e7eb' }}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="Releases"
-              stroke="#8b5cf6"
-              dot={false}
-              strokeWidth={2}
-            />
-            <Line
-              type="monotone"
-              dataKey="Communities"
-              stroke="#ec4899"
-              dot={false}
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <StatsChartPanel
+        title="Content"
+        data={chartData}
+        height={250}
+        series={[
+          { dataKey: 'Releases', stroke: '#8b5cf6' },
+          { dataKey: 'Communities', stroke: '#ec4899' }
+        ]}
+      />
     </div>
   );
 };
