@@ -10,13 +10,13 @@ import {
 const STATUS_BADGE: Record<string, string> = {
   OK: 'bg-green-800 text-green-200',
   WATCH: 'bg-yellow-800 text-yellow-200',
-  LEECH_DISABLED: 'bg-red-800 text-red-200'
+  DOWNLOAD_DISABLED: 'bg-red-800 text-red-200'
 };
 
 const STATUS_OPTIONS = [
   { value: 'OK', label: 'OK — no restrictions' },
   { value: 'WATCH', label: 'WATCH — ratio watch period' },
-  { value: 'LEECH_DISABLED', label: 'LEECH_DISABLED — downloads blocked' }
+  { value: 'DOWNLOAD_DISABLED', label: 'DOWNLOAD_DISABLED — downloads blocked' }
 ] as const;
 
 const fmt = (iso: string | null) =>
@@ -27,9 +27,9 @@ const PolicyView = ({ userId }: { userId: number }) => {
   const { data: state, isLoading, error } = useGetRatioPolicyQuery(userId);
   const [override, { isLoading: overriding }] =
     useOverrideRatioPolicyMutation();
-  const [newStatus, setNewStatus] = useState<'OK' | 'WATCH' | 'LEECH_DISABLED'>(
-    'OK'
-  );
+  const [newStatus, setNewStatus] = useState<
+    'OK' | 'WATCH' | 'DOWNLOAD_DISABLED'
+  >('OK');
 
   if (isLoading) return <p className="text-sm text-gray-400 mt-4">Loading…</p>;
   if (error || !state)
@@ -67,8 +67,8 @@ const PolicyView = ({ userId }: { userId: number }) => {
           <span className="text-gray-300">{fmt(state.watchStartedAt)}</span>
           <span className="text-gray-500">Watch expires</span>
           <span className="text-gray-300">{fmt(state.watchExpiresAt)}</span>
-          <span className="text-gray-500">Leech disabled</span>
-          <span className="text-gray-300">{fmt(state.leechDisabledAt)}</span>
+          <span className="text-gray-500">Download disabled</span>
+          <span className="text-gray-300">{fmt(state.downloadDisabledAt)}</span>
           <span className="text-gray-500">Last evaluated</span>
           <span className="text-gray-300">{fmt(state.lastEvaluatedAt)}</span>
         </div>

@@ -10,11 +10,11 @@ jest.mock('../../store/services/adminApi', () => ({
 
 const makeRow = (status: string) => ({
   userId: 3,
-  user: { id: 3, username: 'leecher' },
+  user: { id: 3, username: 'overconsumer' },
   status,
   watchStartedAt: '2026-01-02T00:00:00.000Z',
   watchExpiresAt: null,
-  leechDisabledAt: null,
+  downloadDisabledAt: null,
   lastEvaluatedAt: '2026-01-03T00:00:00.000Z'
 });
 
@@ -30,16 +30,16 @@ describe('RatioWatchPage', () => {
     expect(screen.getByText('No users on ratio watch.')).toBeInTheDocument();
   });
 
-  it('labels a leech-disabled user', () => {
+  it('labels a download-disabled user', () => {
     mockQuery.mockReturnValue({
-      data: { data: [makeRow('LEECH_DISABLED')], meta: { totalPages: 1 } },
+      data: { data: [makeRow('DOWNLOAD_DISABLED')], meta: { totalPages: 1 } },
       isLoading: false
     });
     renderWithProviders(<RatioWatchPage />);
     expect(document.querySelector('table[data-st="grid"]')).toBeInTheDocument();
-    // "Leech Disabled" is also a column header; target the status cell span.
+    // "Download Disabled" is also a column header; target the status cell span.
     expect(
-      screen.getByText('Leech Disabled', { selector: 'span' })
+      screen.getByText('Download Disabled', { selector: 'span' })
     ).toBeInTheDocument();
   });
 

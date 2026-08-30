@@ -116,13 +116,13 @@ export interface RequestsListResponse {
 
 // ─── Ratio ───────────────────────────────────────────────────────────────────
 
-export type RatioPolicyStatus = 'OK' | 'WATCH' | 'LEECH_DISABLED';
+export type RatioPolicyStatus = 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
 
 export interface PolicyStateView {
   status: RatioPolicyStatus;
   watchStartedAt: string | null;
   watchExpiresAt: string | null;
-  leechDisabledAt: string | null;
+  downloadDisabledAt: string | null;
   lastEvaluatedAt: string;
 }
 

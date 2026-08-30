@@ -17,7 +17,7 @@ const RatioStats = () => {
     <div data-st="panel" className="mt-4">
       <div data-st="colhead">Upload / Download</div>
 
-      {stats.policy?.status === 'LEECH_DISABLED' && (
+      {stats.policy?.status === 'DOWNLOAD_DISABLED' && (
         <div className="border-b border-[color-mix(in_oklch,var(--st-danger)_40%,transparent)] bg-[color-mix(in_oklch,var(--st-danger)_12%,transparent)] px-4 py-3 text-sm text-[var(--st-danger)]">
           <strong>Downloads disabled.</strong> Your ratio fell below the
           required threshold and your download access has been suspended.
