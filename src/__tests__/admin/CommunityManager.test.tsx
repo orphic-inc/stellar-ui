@@ -40,7 +40,7 @@ const makeCommunity = (id: number) => ({
   description: `Desc ${id}`,
   registrationStatus: 'open' as const,
   allowDuplicateFormats: true,
-  staffIds: [],
+  curatorIds: [],
   _count: { releases: id * 5 }
 });
 
@@ -234,7 +234,7 @@ describe('CommunityManager', () => {
     expect(checkbox.checked).toBe(false);
   });
 
-  it('adds a staff member in the edit row', async () => {
+  it('adds a curator in the edit row', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [makeCommunity(5)] },
@@ -244,19 +244,19 @@ describe('CommunityManager', () => {
     renderWithProviders(<CommunityManager />);
     await user.click(screen.getByRole('button', { name: /edit/i }));
 
-    const staffInput = screen.getByPlaceholderText('User ID');
-    await user.type(staffInput, '42');
+    const curatorInput = screen.getByPlaceholderText('User ID');
+    await user.type(curatorInput, '42');
     await user.click(screen.getByRole('button', { name: /add/i }));
 
-    // Staff member should appear as a tag
+    // Curator should appear as a tag
     expect(screen.getByText('#42')).toBeInTheDocument();
   });
 
-  it('removes a staff member when × is clicked', async () => {
+  it('removes a curator when × is clicked', async () => {
     const user = userEvent.setup();
     const community = {
       ...makeCommunity(6),
-      staff: [{ id: 10, username: 'mod-alice' }]
+      curators: [{ id: 10, username: 'mod-alice' }]
     };
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [community] },
@@ -298,11 +298,11 @@ describe('CommunityManager', () => {
     expect((descInput as HTMLInputElement).value).toBe('New desc');
   });
 
-  it('saves edit row with staff members and fires map callback', async () => {
+  it('saves edit row with curators and fires map callback', async () => {
     const user = userEvent.setup();
     const community = {
       ...makeCommunity(8),
-      staff: [{ id: 20, username: 'staffer' }]
+      curators: [{ id: 20, username: 'staffer' }]
     };
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [community] },
@@ -314,7 +314,7 @@ describe('CommunityManager', () => {
     await user.click(screen.getByRole('button', { name: /^save$/i }));
     await waitFor(() => {
       expect(mockUpdateCommunity).toHaveBeenCalledWith(
-        expect.objectContaining({ staffIds: [20] })
+        expect.objectContaining({ curatorIds: [20] })
       );
     });
   });
@@ -355,7 +355,7 @@ describe('CommunityManager', () => {
     });
   });
 
-  it('does not add a staff member when user ID is zero or empty', async () => {
+  it('does not add a curator when user ID is zero or empty', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [makeCommunity(9)] },
@@ -364,17 +364,17 @@ describe('CommunityManager', () => {
     });
     renderWithProviders(<CommunityManager />);
     await user.click(screen.getByRole('button', { name: /edit/i }));
-    const staffInput = screen.getByPlaceholderText('User ID');
-    await user.type(staffInput, '0');
+    const curatorInput = screen.getByPlaceholderText('User ID');
+    await user.type(curatorInput, '0');
     await user.click(screen.getByRole('button', { name: /add/i }));
     expect(screen.queryByText('#0')).toBeNull();
   });
 
-  it('does not add a duplicate staff member', async () => {
+  it('does not add a duplicate curator', async () => {
     const user = userEvent.setup();
     const community = {
       ...makeCommunity(10),
-      staff: [{ id: 30, username: 'existing' }]
+      curators: [{ id: 30, username: 'existing' }]
     };
     mockGetCommunitiesQuery.mockReturnValue({
       data: { data: [community] },
@@ -383,8 +383,8 @@ describe('CommunityManager', () => {
     });
     renderWithProviders(<CommunityManager />);
     await user.click(screen.getByRole('button', { name: /edit/i }));
-    const staffInput = screen.getByPlaceholderText('User ID');
-    await user.type(staffInput, '30');
+    const curatorInput = screen.getByPlaceholderText('User ID');
+    await user.type(curatorInput, '30');
     await user.click(screen.getByRole('button', { name: /add/i }));
     // 'existing' should appear exactly once (no duplicate)
     expect(screen.getAllByText('existing').length).toBe(1);
@@ -431,7 +431,7 @@ describe('CommunityManager', () => {
             description: undefined,
             registrationStatus: 'open',
             allowDuplicateFormats: false,
-            staffIds: [],
+            curatorIds: [],
             _count: undefined
           }
         ]
@@ -452,7 +452,7 @@ describe('CommunityManager', () => {
       description: undefined,
       registrationStatus: undefined,
       allowDuplicateFormats: false,
-      staffIds: [],
+      curatorIds: [],
       _count: { releases: 0 }
     };
     mockGetCommunitiesQuery.mockReturnValue({

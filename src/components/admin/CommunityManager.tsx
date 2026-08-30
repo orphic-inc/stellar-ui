@@ -55,21 +55,21 @@ const EditRow = ({
   const [allowDuplicateFormats, setAllowDuplicateFormats] = useState(
     community.allowDuplicateFormats
   );
-  const [staffMembers, setStaffMembers] = useState(community.staff ?? []);
-  const [newStaffUserId, setNewStaffUserId] = useState('');
+  const [curators, setCurators] = useState(community.curators ?? []);
+  const [newCuratorUserId, setNewCuratorUserId] = useState('');
   const [leaderId, setLeaderId] = useState(
     community.leaderId != null ? String(community.leaderId) : ''
   );
 
-  const handleAddStaff = () => {
-    const uid = parseInt(newStaffUserId, 10);
-    if (!uid || staffMembers.some((s) => s.id === uid)) return;
-    setStaffMembers((prev) => [...prev, { id: uid, username: `#${uid}` }]);
-    setNewStaffUserId('');
+  const handleAddCurator = () => {
+    const uid = parseInt(newCuratorUserId, 10);
+    if (!uid || curators.some((s) => s.id === uid)) return;
+    setCurators((prev) => [...prev, { id: uid, username: `#${uid}` }]);
+    setNewCuratorUserId('');
   };
 
-  const handleRemoveStaff = (uid: number) => {
-    setStaffMembers((prev) => prev.filter((s) => s.id !== uid));
+  const handleRemoveCurator = (uid: number) => {
+    setCurators((prev) => prev.filter((s) => s.id !== uid));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -80,7 +80,7 @@ const EditRow = ({
       description,
       registrationStatus,
       allowDuplicateFormats,
-      staffIds: staffMembers.map((s) => s.id),
+      curatorIds: curators.map((s) => s.id),
       leaderId: leaderId.trim() === '' ? null : parseInt(leaderId, 10)
     });
     onDone();
@@ -185,21 +185,21 @@ const EditRow = ({
             </div>
           </div>
 
-          {/* Staff management */}
+          {/* Curator management (ADR-0033) */}
           <div className="border border-[var(--st-border)] rounded p-3 space-y-2">
             <p
               data-st="meta"
               className="text-xs font-semibold uppercase tracking-wider"
             >
-              Community Staff
+              Community Curators
             </p>
             <div className="flex flex-wrap gap-1.5">
-              {staffMembers.length === 0 && (
+              {curators.length === 0 && (
                 <span data-st="meta" className="text-xs">
-                  No staff assigned.
+                  No curators assigned.
                 </span>
               )}
-              {staffMembers.map((s) => (
+              {curators.map((s) => (
                 <span
                   key={s.id}
                   data-st="chip"
@@ -208,7 +208,7 @@ const EditRow = ({
                   {s.username}
                   <Button
                     variant="link-danger"
-                    onClick={() => handleRemoveStaff(s.id)}
+                    onClick={() => handleRemoveCurator(s.id)}
                     className="ml-0.5"
                   >
                     ×
@@ -221,17 +221,17 @@ const EditRow = ({
                 data-st="field"
                 type="number"
                 min={1}
-                value={newStaffUserId}
-                onChange={(e) => setNewStaffUserId(e.target.value)}
+                value={newCuratorUserId}
+                onChange={(e) => setNewCuratorUserId(e.target.value)}
                 placeholder="User ID"
                 className="w-24"
               />
               <Button
                 variant="primary"
-                onClick={handleAddStaff}
-                disabled={!newStaffUserId}
+                onClick={handleAddCurator}
+                disabled={!newCuratorUserId}
               >
-                Add Staff
+                Add Curator
               </Button>
             </div>
           </div>
