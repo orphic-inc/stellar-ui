@@ -109,12 +109,17 @@ module.exports = {
     open: true,
     historyApiFallback: true,
     port: 9000,
-    proxy: {
-      '/api': {
+    // webpack-dev-server 5 replaced the keyed-object proxy form with an array
+    // of entries carrying an explicit `context`. Same behaviour as before: /api
+    // is forwarded and nothing else, which is why root-level API routes are
+    // unreachable from the dev server (see AGENTS.md).
+    proxy: [
+      {
+        context: ['/api'],
         target: apiUrl,
         changeOrigin: true
       }
-    }
+    ]
   },
   module: {
     rules: [
