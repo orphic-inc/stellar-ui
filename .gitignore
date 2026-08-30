@@ -15,3 +15,6 @@ test-results/
 # (adr/, agents/, PRDs). Persistent home for handoffs: ~/.claude/projects/.../handoff/.
 docs/*handoff*.md
 docs/handoff/
+
+# Written by the dev-server smoke job and by anyone running it locally.
+dev-server.log
