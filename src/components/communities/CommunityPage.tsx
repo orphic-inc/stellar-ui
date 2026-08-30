@@ -155,7 +155,10 @@ const CommunityPage = () => {
         <div data-st="panel" className="mb-4">
           <div data-st="colhead">
             <span>Members</span>
-            <span>{community._count?.consumers ?? 0} total</span>
+            {/* The roster's own length, not _count.consumers — membership is the
+                role union (ADR-0033), so a curator holding no Consumer row is a
+                member the relation count cannot see. */}
+            <span>{community.members?.length ?? 0} total</span>
           </div>
           <div className="px-4 py-3 border-b border-gray-800">
             <form onSubmit={handleAddMember} className="flex gap-2">
