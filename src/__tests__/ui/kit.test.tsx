@@ -10,6 +10,7 @@ import {
   DataTable,
   Badge,
   Pagination,
+  PageNumbers,
   SectionHeading,
   type Column
 } from '../../components/ui';
@@ -252,6 +253,47 @@ describe('UI kit — data-st contract', () => {
       expect(onChange).toHaveBeenCalledWith(3);
       await user.click(screen.getByRole('button', { name: 'Prev' }));
       expect(onChange).toHaveBeenCalledWith(1);
+    });
+  });
+
+  describe('PageNumbers', () => {
+    it('renders nothing for a single page', () => {
+      const { container } = renderWithProviders(
+        <PageNumbers page={1} totalPages={1} onChange={() => {}} />
+      );
+      expect(container).toBeEmptyDOMElement();
+    });
+
+    it('renders one control per page, carrying the data-st hooks', () => {
+      renderWithProviders(
+        <PageNumbers page={2} totalPages={4} onChange={() => {}} />
+      );
+      const buttons = screen.getAllByRole('button');
+      expect(buttons.map((b) => b.textContent)).toEqual(['1', '2', '3', '4']);
+      buttons.forEach((b) => expect(b).toHaveAttribute('data-st', 'control'));
+    });
+
+    // The active page is the only one marked, which is what the themes paint on.
+    it('marks only the current page primary', () => {
+      renderWithProviders(
+        <PageNumbers page={3} totalPages={4} onChange={() => {}} />
+      );
+      expect(screen.getByRole('button', { name: '3' })).toHaveAttribute(
+        'data-st-primary'
+      );
+      expect(screen.getByRole('button', { name: '1' })).not.toHaveAttribute(
+        'data-st-primary'
+      );
+    });
+
+    it('reports the clicked page', async () => {
+      const user = userEvent.setup();
+      const onChange = jest.fn();
+      renderWithProviders(
+        <PageNumbers page={1} totalPages={4} onChange={onChange} />
+      );
+      await user.click(screen.getByRole('button', { name: '3' }));
+      expect(onChange).toHaveBeenCalledWith(3);
     });
   });
 

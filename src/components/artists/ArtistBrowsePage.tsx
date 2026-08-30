@@ -4,6 +4,8 @@ import { useSearchArtistsQuery } from '../../store/services/searchApi';
 import { useGetMeQuery } from '../../store/services/authApi';
 import { hasPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
+import { formParamSetter, withPage } from '../../utils/searchParams';
+import { PageNumbers } from '../ui';
 
 // Layout-only class strings; paint comes from the `field`/`meta` Roles below.
 // Native radio/checkbox keep `field` for its accent-color (the box rules are
@@ -40,10 +42,7 @@ const ArtistBrowsePage = () => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const next = new URLSearchParams();
-    const set = (k: string) => {
-      const v = fd.get(k);
-      if (v && String(v).trim()) next.set(k, String(v).trim());
-    };
+    const set = formParamSetter(fd, next);
     set('q');
     set('tags');
     const tm = fd.get('tagMode');
@@ -57,11 +56,7 @@ const ArtistBrowsePage = () => {
     setSearchParams(next);
   };
 
-  const setPage = (p: number) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('page', String(p));
-    setSearchParams(next);
-  };
+  const setPage = (p: number) => setSearchParams(withPage(searchParams, p));
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -250,24 +245,11 @@ const ArtistBrowsePage = () => {
               </table>
             </div>
           )}
-          {data.meta.totalPages > 1 && (
-            <div className="flex gap-1 flex-wrap">
-              {Array.from(
-                { length: data.meta.totalPages },
-                (_, i) => i + 1
-              ).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  data-st="control"
-                  data-st-primary={p === page ? '' : undefined}
-                  className="px-2.5 py-1 text-xs"
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          )}
+          <PageNumbers
+            page={page}
+            totalPages={data.meta.totalPages}
+            onChange={setPage}
+          />
         </>
       )}
     </div>

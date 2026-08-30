@@ -9,8 +9,9 @@ import {
 import type { RequestStatus } from '../../types';
 import Spinner from '../layout/Spinner';
 import { hasPermission } from '../../utils/permissions';
-import { Badge } from '../ui';
+import { Badge, PageNumbers } from '../ui';
 import type { BadgeVariant } from '../ui';
+import { formParamSetter, withPage } from '../../utils/searchParams';
 
 const STATUS_LABELS: Record<RequestStatus, string> = {
   open: 'Open',
@@ -103,10 +104,7 @@ const RequestsPage = () => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const next = new URLSearchParams();
-    const set = (k: string) => {
-      const v = fd.get(k);
-      if (v && String(v).trim()) next.set(k, String(v).trim());
-    };
+    const set = formParamSetter(fd, next);
     set('q');
     set('artist');
     set('year');
@@ -130,11 +128,7 @@ const RequestsPage = () => {
     setSearchParams(next);
   };
 
-  const setPage = (p: number) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('page', String(p));
-    setSearchParams(next);
-  };
+  const setPage = (p: number) => setSearchParams(withPage(searchParams, p));
 
   const requests = data?.data ?? [];
   const meta = data?.meta;
@@ -351,23 +345,12 @@ const RequestsPage = () => {
         </table>
       )}
 
-      {meta && meta.totalPages > 1 && (
-        <div className="flex gap-1 mt-4 flex-wrap">
-          {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`px-2.5 py-1 text-xs rounded border ${
-                p === page
-                  ? 'border-[var(--st-accent)] text-[var(--st-text-strong)]'
-                  : 'border-[var(--st-border)] text-[var(--st-text-muted)] hover:text-[var(--st-text)]'
-              }`}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
-      )}
+      <PageNumbers
+        page={page}
+        totalPages={meta?.totalPages ?? 1}
+        onChange={setPage}
+        className="mt-4"
+      />
     </div>
   );
 };

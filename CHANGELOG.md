@@ -18,6 +18,12 @@ All notable changes to stellar-ui are documented here.
 
 Together these remove **230 lines of duplicated production code** (jscpd `src`-to-`src`: 414 → 184 duplicated lines, −56%; 61 → 54 clones repo-wide). No behaviour changes beyond the Prev label and link styling noted above.
 
+- **Six browse surfaces adopt a new `PageNumbers` primitive** ([stellar-ui ADR-0007](docs/adr/0007-ui-primitive-kit.md)) — the browse pages want to jump straight to a page rather than step Prev/Next, so each had grown its own numbered pager. Six copies in **four different spellings**: Artists/Users/Releases on `data-st="control"` + `data-st-primary`; Wiki on the same hooks but wider buttons and its page-param write inlined in `onClick`; Requests themed by reaching for `var(--st-*)` inside class strings rather than through the hook vocabulary; and Logs on raw `bg-indigo-600`/`bg-gray-800`/`text-gray-400`. **The Logs pager was a live ADR-0005 contract break** — it kept its colours regardless of the applied theme — and carried a comment explaining that pagination "has no contract Role", a premise the other four pages had already made untrue. `PageNumbers` is the sibling of `Pagination`, not its replacement: Prev/Next suits a queue read front-to-back, numbered suits a browse. It standardises on the contract-correct spelling, and the Requests and Logs pagers change appearance to match — the visible half of this change.
+
+- **Two URL-search-param helpers are shared instead of retyped** — every browse and list page keeps filter state in the query string, so `withPage` (bump the `page` param on a copy, never mutating react-router's live instance) and `formParamSetter` (copy a form field into the params only when non-blank, trimmed) were written out longhand on six and three pages respectively. Only those two are shared: which fields a page has, and which defaults are worth omitting from the URL, stay per-page rather than being folded into a common submit handler.
+
+Together with the pager work, jscpd `src`-to-`src` duplication falls to **97 lines — down 77% from the 414 this pass started at** (61 → 50 clones repo-wide). `PageNumbers` carries one known limitation unchanged from every copy it replaces: no windowing, so a result running to hundreds of pages still renders hundreds of buttons. Adding an ellipsis window is a UX decision rather than a consolidation, so it is deliberately left out.
+
 ## [0.8.3] — 2026-08-30
 
 ### Added
