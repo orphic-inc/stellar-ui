@@ -29,7 +29,7 @@ describe('RatioRulesPage', () => {
           status: 'WATCH',
           watchStartedAt: '2026-05-17T12:00:00.000Z',
           watchExpiresAt: '2026-05-31T12:00:00.000Z',
-          leechDisabledAt: null,
+          downloadDisabledAt: null,
           lastEvaluatedAt: '2026-05-17T18:00:00.000Z'
         }
       }
@@ -58,7 +58,7 @@ describe('RatioRulesPage', () => {
           status: 'OK',
           watchStartedAt: null,
           watchExpiresAt: null,
-          leechDisabledAt: null,
+          downloadDisabledAt: null,
           lastEvaluatedAt: null
         }
       }
@@ -93,7 +93,7 @@ describe('RatioRulesPage', () => {
           status: 'WATCH',
           watchStartedAt: '2026-05-17T12:00:00.000Z',
           watchExpiresAt: '2026-05-31T12:00:00.000Z',
-          leechDisabledAt: null,
+          downloadDisabledAt: null,
           lastEvaluatedAt: '2026-05-17T18:00:00.000Z'
         }
       }

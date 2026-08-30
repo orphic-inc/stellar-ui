@@ -30,7 +30,7 @@ describe('RatioPolicyPanel', () => {
           status: 'WATCH',
           watchStartedAt: '2026-05-17T12:00:00.000Z',
           watchExpiresAt: '2026-05-31T12:00:00.000Z',
-          leechDisabledAt: null,
+          downloadDisabledAt: null,
           lastEvaluatedAt: '2026-05-17T18:00:00.000Z'
         },
         isLoading: false,
@@ -54,18 +54,18 @@ describe('RatioPolicyPanel', () => {
 
     await user.selectOptions(
       screen.getByLabelText(/override status/i),
-      'LEECH_DISABLED'
+      'DOWNLOAD_DISABLED'
     );
     await user.click(screen.getByRole('button', { name: /apply override/i }));
 
     await waitFor(() => {
       expect(mockOverrideRatioPolicy).toHaveBeenCalledWith({
         userId: 42,
-        status: 'LEECH_DISABLED'
+        status: 'DOWNLOAD_DISABLED'
       });
       const alerts = selectAlerts(store.getState());
       expect(
-        alerts.some((a) => a.msg === 'Status set to LEECH_DISABLED.')
+        alerts.some((a) => a.msg === 'Status set to DOWNLOAD_DISABLED.')
       ).toBe(true);
     });
   });

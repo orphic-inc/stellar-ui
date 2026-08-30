@@ -85,7 +85,7 @@ export interface RatioWatchItem {
   status: string;
   watchStartedAt: string | null;
   watchExpiresAt: string | null;
-  leechDisabledAt: string | null;
+  downloadDisabledAt: string | null;
   lastEvaluatedAt: string;
 }
 

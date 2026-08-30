@@ -34,7 +34,7 @@ const policyData = {
   status: 'OK',
   watchStartedAt: null,
   watchExpiresAt: null,
-  leechDisabledAt: null,
+  downloadDisabledAt: null,
   lastEvaluatedAt: null
 };
 
@@ -182,7 +182,7 @@ describe('RatioPolicyPanel', () => {
         status: 'CUSTOM_STATUS',
         watchStartedAt: '2026-05-01T00:00:00.000Z',
         watchExpiresAt: null,
-        leechDisabledAt: null,
+        downloadDisabledAt: null,
         lastEvaluatedAt: null
       },
       isLoading: false

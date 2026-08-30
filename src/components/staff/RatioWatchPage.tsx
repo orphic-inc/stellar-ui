@@ -28,12 +28,12 @@ const RatioWatchPage = () => {
         <span
           className={cn(
             'text-xs font-semibold',
-            r.status === 'LEECH_DISABLED'
+            r.status === 'DOWNLOAD_DISABLED'
               ? 'text-[var(--st-danger)]'
               : 'text-[var(--st-warning)]'
           )}
         >
-          {r.status === 'LEECH_DISABLED' ? 'Leech Disabled' : 'Watch'}
+          {r.status === 'DOWNLOAD_DISABLED' ? 'Download Disabled' : 'Watch'}
         </span>
       )
     },
@@ -48,9 +48,9 @@ const RatioWatchPage = () => {
       tdClassName: 'text-xs'
     },
     {
-      header: 'Leech Disabled',
+      header: 'Download Disabled',
       cell: (r) =>
-        r.leechDisabledAt ? <Time date={r.leechDisabledAt} /> : '—',
+        r.downloadDisabledAt ? <Time date={r.downloadDisabledAt} /> : '—',
       tdClassName: 'text-xs'
     },
     {

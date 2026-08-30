@@ -90,8 +90,8 @@ describe('RatioStats', () => {
     expect(ratioEl.className).toContain('text-[var(--st-danger)]');
   });
 
-  it('shows LEECH_DISABLED warning', () => {
-    mockStatsData = { ...baseStats, policy: { status: 'LEECH_DISABLED' } };
+  it('shows DOWNLOAD_DISABLED warning', () => {
+    mockStatsData = { ...baseStats, policy: { status: 'DOWNLOAD_DISABLED' } };
     renderWithProviders(<RatioStats />);
     expect(screen.getByText(/downloads disabled/i)).toBeInTheDocument();
   });
