@@ -161,7 +161,7 @@ the others shipped as utility-only and were (are being) remediated:
 | Theme | `--st-*` primitives | Status | Lives |
 |---|---|---|---|
 | `layer-cake` | all | reference theme (WS3) | api-canonical |
-| `sublime` | — | baseline (skins by omission; bundled Tailwind *is* Sublime) | ui — `src/index.scss` |
+| `sublime` | — | baseline (skins by omission; bundled Tailwind *is* Sublime) | ui — `src/index.css` |
 | `kuro` | all | remediated — aliases its `--kuro-*` palette onto `--st-*` | api-canonical |
 | `anorex` | all | ported token-only (the classic Gazelle wood default) | api-canonical |
 | `proton` | none | **legacy utility-only — pending token pass** | api-canonical |
@@ -176,7 +176,7 @@ is not bundled here, and editing a copy in this repo would change nothing.
 [#343](https://github.com/orphic-inc/stellar-api/issues/343) (four commercial
 fonts, whose redistribution question `/api/asset`'s unauthenticated delivery
 sharpens rather than settles). `sublime` is not a file at all — it is the
-`@theme static` block in `src/index.scss`. The injector links nothing for it
+`@theme static` block in `src/index.css`. The injector links nothing for it
 because its registry row's `cssUrl` is `null` (stellar-api
 [#377](https://github.com/orphic-inc/stellar-api/pull/377) / ADR-0024 §3), not
 because the client recognises the name — that comparison was removed in
@@ -197,7 +197,7 @@ becomes a merge-conflict magnet).
 failures and neither subsumes the other:
 
 - `src/__tests__/themes.tokens.test.ts` (**here**) pins the primitive set against
-  `src/index.scss` — the contract every `data-st` hook paints from. It catches the
+  `src/index.css` — the contract every `data-st` hook paints from. It catches the
   set *itself* drifting, which no api guard can see. It used to read the bundled
   `layer-cake`/`kuro`/`anorex` files; those are gone, and copying them back as ui
   fixtures would have restored the duplication #168 removed.

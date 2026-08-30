@@ -52,7 +52,7 @@ src/
   index.tsx                   # React root (createRoot), Redux Provider, Router; webpack entry
                               # imports global.css — the theming contract
   global.css                  # Theming contract, half 2: derived --st-* tokens + data-st hooks.
-                              # Sits next to index.scss (half 1, the primitives) on purpose (ADR-0005)
+                              # Sits next to index.css (half 1, the primitives) on purpose (ADR-0005)
   components/App.tsx          # Install probe → route tree
   store/
     index.ts                  # Redux store + AppDispatch / RootState types
@@ -115,7 +115,7 @@ src/
 
 Themes are **injected stylesheets** that re-skin the app by redefining `--st-*`
 Role Tokens — never by writing selectors. The contract spans two files: the
-**primitive** token set is the `@theme static` block in `src/index.scss` (this is
+**primitive** token set is the `@theme static` block in `src/index.css` (this is
 also Sublime, and it is what `themes.tokens.test.ts` pins), while the **derived**
 tokens and the `data-st` hooks live in `src/global.css`
 (imported once by `index.tsx`, unlayered so its hooks beat Tailwind utilities).
