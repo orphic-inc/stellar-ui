@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import {
   useGetMyProfileQuery,
   useUpdateMyProfileMutation
@@ -64,26 +64,33 @@ const Settings = () => {
   const { data: profile, isLoading } = useGetMyProfileQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
   const { data: stylesheets } = useGetStylesheetsQuery();
-  const { register, handleSubmit, reset, watch, setValue } =
+  const { register, handleSubmit, reset, control, setValue } =
     useForm<ProfileForm>();
 
   useEffect(() => {
     if (profile) reset(toProfileForm(profile));
   }, [profile, reset]);
 
-  const paranoiaValue = watch('paranoia') ?? 0;
+  const paranoiaValue = useWatch({ control, name: 'paranoia' }) ?? 0;
 
   // Site Stylesheet slot source (ADR-0024 §4) — Personal (external URL) XOR
   // Registry (an adopted author sheet). Mirrors the server invariant: the UI
   // never submits both; picking one nulls the other. `siteAppearance` above is a
   // separate axis (the built-in fallback), not one of these arms.
   const adoptedSheetId = profile?.userSettings.activeAuthorStylesheetId ?? null;
+  const sourceFor = (id: number | null) =>
+    id != null ? ('registry' as const) : ('personal' as const);
   const [siteSheetSource, setSiteSheetSource] = useState<
     'personal' | 'registry'
-  >('personal');
-  useEffect(() => {
-    setSiteSheetSource(adoptedSheetId != null ? 'registry' : 'personal');
-  }, [adoptedSheetId]);
+  >(() => sourceFor(adoptedSheetId));
+  // Adjust during render rather than in an effect: the arm follows the profile
+  // when the adopted sheet changes, without the extra commit an effect costs.
+  // Seeded from the same value so a cached profile is correct on first render.
+  const [prevAdoptedSheetId, setPrevAdoptedSheetId] = useState(adoptedSheetId);
+  if (prevAdoptedSheetId !== adoptedSheetId) {
+    setPrevAdoptedSheetId(adoptedSheetId);
+    setSiteSheetSource(sourceFor(adoptedSheetId));
+  }
 
   const onSubmit = async (data: ProfileForm) => {
     // Enforce the one-slot invariant client-side (the API enforces it too): send
