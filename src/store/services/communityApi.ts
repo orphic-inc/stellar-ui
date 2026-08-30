@@ -76,7 +76,7 @@ export const communityApi = api.injectEndpoints({
         image?: string;
         registrationStatus?: string;
         allowDuplicateFormats?: boolean;
-        staffIds?: number[];
+        curatorIds?: number[];
         // Transfers the community leader (ADR-0021); communities_manage-gated
         // server-side. null clears the leader.
         leaderId?: number | null;
@@ -168,13 +168,13 @@ export const communityApi = api.injectEndpoints({
       ]
     }),
 
-    // Staff
-    addCommunityStaff: build.mutation<
+    // Curators (ADR-0033: the per-community role, renamed from staff)
+    addCommunityCurator: build.mutation<
       void,
       { communityId: number; userId: number }
     >({
       query: ({ communityId, userId }) => ({
-        url: `/communities/${communityId}/staff`,
+        url: `/communities/${communityId}/curators`,
         method: 'POST',
         body: { userId }
       }),
@@ -182,12 +182,12 @@ export const communityApi = api.injectEndpoints({
         { type: 'Community', id: communityId }
       ]
     }),
-    removeCommunityStaff: build.mutation<
+    removeCommunityCurator: build.mutation<
       void,
       { communityId: number; userId: number }
     >({
       query: ({ communityId, userId }) => ({
-        url: `/communities/${communityId}/staff/${userId}`,
+        url: `/communities/${communityId}/curators/${userId}`,
         method: 'DELETE'
       }),
       invalidatesTags: (_, __, { communityId }) => [
@@ -345,8 +345,8 @@ export const {
   useUpdateCommunityMutation,
   useAddCommunityMemberMutation,
   useRemoveCommunityMemberMutation,
-  useAddCommunityStaffMutation,
-  useRemoveCommunityStaffMutation,
+  useAddCommunityCuratorMutation,
+  useRemoveCommunityCuratorMutation,
   useGetReleasesByCommunityQuery,
   useGetReleaseByIdQuery,
   useCreateReleaseMutation,

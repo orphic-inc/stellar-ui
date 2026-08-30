@@ -8662,7 +8662,7 @@ export interface paths {
         content: {
           'application/json': {
             /** @enum {string} */
-            status: 'OK' | 'WATCH' | 'LEECH_DISABLED';
+            status: 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
           };
         };
       };
@@ -13108,15 +13108,14 @@ export interface components {
         lastVisiblePostId: number | null;
       };
     };
-    CommunityStaffMember: {
+    CommunityCurator: {
       id: number;
       username: string;
     };
-    CommunityConsumer: {
-      user: {
-        id: number;
-        username: string;
-      };
+    CommunityMember: {
+      id: number;
+      username: string;
+      roles: ('consumer' | 'contributor' | 'curator' | 'leader')[];
     };
     Community: {
       id: number;
@@ -13124,11 +13123,13 @@ export interface components {
       description?: string | null;
       type?: string | null;
       registrationStatus?: string | null;
+      /** @enum {string} */
+      announceVisibility?: 'PUBLIC' | 'PRIVATE';
       image?: string | null;
       allowDuplicateFormats: boolean;
       leaderId?: number | null;
-      staff?: components['schemas']['CommunityStaffMember'][];
-      consumers?: components['schemas']['CommunityConsumer'][];
+      curators?: components['schemas']['CommunityCurator'][];
+      members?: components['schemas']['CommunityMember'][];
       _count?: {
         releases: number;
         contributors: number;
@@ -13593,10 +13594,10 @@ export interface components {
     };
     RatioPolicyState: {
       /** @enum {string} */
-      status: 'OK' | 'WATCH' | 'LEECH_DISABLED';
+      status: 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
       watchStartedAt: string | null;
       watchExpiresAt: string | null;
-      leechDisabledAt: string | null;
+      downloadDisabledAt: string | null;
       lastEvaluatedAt: string;
     };
     SiteSettings: {
@@ -13836,7 +13837,7 @@ export interface components {
       status: string;
       watchStartedAt: string | null;
       watchExpiresAt: string | null;
-      leechDisabledAt: string | null;
+      downloadDisabledAt: string | null;
       lastEvaluatedAt: string;
     };
     VanityHouseArtist: {

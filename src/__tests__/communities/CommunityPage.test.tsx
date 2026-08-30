@@ -10,8 +10,8 @@ const mockUseGetCommunityByIdQuery = jest.fn();
 const mockUseGetReleasesByCommunityQuery = jest.fn();
 const mockAddCommunityMember = jest.fn();
 const mockRemoveCommunityMember = jest.fn();
-const mockAddCommunityStaff = jest.fn();
-const mockRemoveCommunityStaff = jest.fn();
+const mockAddCommunityCurator = jest.fn();
+const mockRemoveCommunityCurator = jest.fn();
 const mockToggleBookmark = jest.fn();
 const mockDispatch = jest.fn();
 
@@ -28,12 +28,12 @@ jest.mock('../../store/services/communityApi', () => ({
     mockRemoveCommunityMember,
     { isLoading: false }
   ],
-  useAddCommunityStaffMutation: () => [
-    mockAddCommunityStaff,
+  useAddCommunityCuratorMutation: () => [
+    mockAddCommunityCurator,
     { isLoading: false }
   ],
-  useRemoveCommunityStaffMutation: () => [
-    mockRemoveCommunityStaff,
+  useRemoveCommunityCuratorMutation: () => [
+    mockRemoveCommunityCurator,
     { isLoading: false }
   ]
 }));
@@ -84,10 +84,12 @@ const makeCommunity = (overrides = {}) => ({
   description: 'All jazz, all the time.',
   image: null,
   registrationStatus: 'Open',
-  staff: [{ id: 99, username: 'staffmember' }],
-  consumers: [
-    { user: { id: 10, username: 'alice' } },
-    { user: { id: 99, username: 'staffmember' } }
+  curators: [{ id: 99, username: 'curatormember' }],
+  // ADR-0033 §Decision 4: one roster that reports its own roles, replacing the
+  // consumers[]-plus-staff-chip pair the page used to cross-reference.
+  members: [
+    { id: 10, username: 'alice', roles: ['consumer'] },
+    { id: 99, username: 'curatormember', roles: ['consumer', 'curator'] }
   ],
   _count: { consumers: 2 },
   ...overrides
@@ -180,19 +182,19 @@ describe('CommunityPage', () => {
     expect(screen.getByText('All jazz, all the time.')).toBeInTheDocument();
   });
 
-  it('surfaces the leader, resolving the username from the staff list', () => {
+  it('surfaces the leader, resolving the username from the members roster', () => {
     mockUseGetCommunityByIdQuery.mockReturnValue({
       data: makeCommunity({ leaderId: 99 }),
       isLoading: false,
       error: undefined
     });
     renderWithProviders(<CommunityPage />);
-    const leaderLink = screen.getByRole('link', { name: 'staffmember' });
-    expect(leaderLink).toHaveAttribute('href', '/user/staffmember');
+    const leaderLink = screen.getByRole('link', { name: 'curatormember' });
+    expect(leaderLink).toHaveAttribute('href', '/user/curatormember');
     expect(screen.getByText(/leader:/i)).toBeInTheDocument();
   });
 
-  it('falls back to a profile-by-id link when the leader is not in staff/consumers', () => {
+  it('falls back to a profile-by-id link when the leader is not in the members roster', () => {
     mockUseGetCommunityByIdQuery.mockReturnValue({
       data: makeCommunity({ leaderId: 555 }),
       isLoading: false,
@@ -263,7 +265,7 @@ describe('CommunityPage', () => {
   it('shows member management panel for community staff', () => {
     mockCurrentUser = {
       id: 99,
-      username: 'staffmember',
+      username: 'curatormember',
       canDownload: true,
       userRank: { permissions: {} }
     };
@@ -307,7 +309,7 @@ describe('CommunityPage', () => {
     const user = userEvent.setup();
     mockCurrentUser = {
       id: 99,
-      username: 'staffmember',
+      username: 'curatormember',
       canDownload: true,
       userRank: { permissions: {} }
     };
@@ -325,10 +327,10 @@ describe('CommunityPage', () => {
     });
   });
 
-  it('shows staff badge for staff members in list', () => {
+  it('shows the Curator chip for curators in the roster', () => {
     mockCurrentUser = {
       id: 99,
-      username: 'staffmember',
+      username: 'curatormember',
       canDownload: true,
       userRank: { permissions: {} }
     };
@@ -338,7 +340,7 @@ describe('CommunityPage', () => {
       error: undefined
     });
     renderWithProviders(<CommunityPage />);
-    expect(screen.getByText('Staff')).toBeInTheDocument();
+    expect(screen.getByText('Curator')).toBeInTheDocument();
   });
 
   it('dispatches success alert on bookmark', async () => {
@@ -412,7 +414,7 @@ describe('CommunityPage', () => {
     const user = userEvent.setup();
     mockCurrentUser = {
       id: 99,
-      username: 'staffmember',
+      username: 'curatormember',
       canDownload: true,
       userRank: { permissions: {} }
     };
@@ -424,7 +426,7 @@ describe('CommunityPage', () => {
     renderWithProviders(<CommunityPage />);
 
     await user.click(screen.getByRole('button', { name: /demote/i }));
-    expect(mockRemoveCommunityStaff).toHaveBeenCalledWith({
+    expect(mockRemoveCommunityCurator).toHaveBeenCalledWith({
       communityId: 3,
       userId: 99
     });
@@ -433,11 +435,11 @@ describe('CommunityPage', () => {
     expect(mockRemoveCommunityMember).toHaveBeenCalled();
   });
 
-  it('promotes a non-staff member to staff via Make Staff button', async () => {
+  it('promotes a plain member to curator via the Make Curator button', async () => {
     const user = userEvent.setup();
     mockCurrentUser = {
       id: 99,
-      username: 'staffmember',
+      username: 'curatormember',
       canDownload: true,
       userRank: { permissions: {} }
     };
@@ -448,9 +450,9 @@ describe('CommunityPage', () => {
     });
     renderWithProviders(<CommunityPage />);
 
-    // alice (id:10) is a non-staff member — "Make Staff" button shown for her
-    await user.click(screen.getByRole('button', { name: /make staff/i }));
-    expect(mockAddCommunityStaff).toHaveBeenCalledWith({
+    // alice (id:10) holds no curator role — "Make Curator" is shown for her
+    await user.click(screen.getByRole('button', { name: /make curator/i }));
+    expect(mockAddCommunityCurator).toHaveBeenCalledWith({
       communityId: 3,
       userId: 10
     });
@@ -470,15 +472,15 @@ describe('CommunityPage', () => {
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('shows "No members yet." when consumers list is empty', () => {
+  it('shows "No members yet." when the roster is empty', () => {
     mockCurrentUser = {
       id: 99,
-      username: 'staffmember',
+      username: 'curatormember',
       canDownload: true,
       userRank: { permissions: {} }
     };
     mockUseGetCommunityByIdQuery.mockReturnValue({
-      data: makeCommunity({ consumers: [], _count: { consumers: 0 } }),
+      data: makeCommunity({ members: [], _count: { consumers: 0 } }),
       isLoading: false,
       error: undefined
     });
@@ -569,7 +571,7 @@ describe('CommunityPage', () => {
   it('does not add member when userId input is empty (guard fires)', () => {
     mockCurrentUser = {
       id: 99,
-      username: 'staffmember',
+      username: 'curatormember',
       canDownload: true,
       userRank: { permissions: {} }
     };

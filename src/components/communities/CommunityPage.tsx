@@ -7,8 +7,8 @@ import {
   useGetReleasesByCommunityQuery,
   useAddCommunityMemberMutation,
   useRemoveCommunityMemberMutation,
-  useAddCommunityStaffMutation,
-  useRemoveCommunityStaffMutation
+  useAddCommunityCuratorMutation,
+  useRemoveCommunityCuratorMutation
 } from '../../store/services/communityApi';
 import { useToggleCommunityBookmarkMutation } from '../../store/services/bookmarkApi';
 import { addAlert } from '../../store/slices/alertSlice';
@@ -51,7 +51,7 @@ const CommunityPage = () => {
   const [addCommunityMember, { isLoading: isAdding }] =
     useAddCommunityMemberMutation();
   const [removeCommunityMember] = useRemoveCommunityMemberMutation();
-  const [addCommunityStaff] = useAddCommunityStaffMutation();
+  const [addCommunityCurator] = useAddCommunityCuratorMutation();
   const [toggleBookmark, { isLoading: bookmarking }] =
     useToggleCommunityBookmarkMutation();
 
@@ -68,7 +68,7 @@ const CommunityPage = () => {
       dispatch(addAlert('Failed to update bookmark.', 'danger'));
     }
   };
-  const [removeCommunityStaff] = useRemoveCommunityStaffMutation();
+  const [removeCommunityCurator] = useRemoveCommunityCuratorMutation();
 
   const {
     data: community,
@@ -90,18 +90,16 @@ const CommunityPage = () => {
     return <div className="p-4 text-red-400">Community not found.</div>;
   }
 
-  const isStaff = community.staff?.some((s) => s.id === user?.id) ?? false;
+  const isCurator = community.curators?.some((c) => c.id === user?.id) ?? false;
   const canManageMembers =
-    isStaff || hasAnyPermission(user, ['communities_manage', 'admin']);
+    isCurator || hasAnyPermission(user, ['communities_manage', 'admin']);
 
   // The leader (ADR-0021) is a first-class role, surfaced separately from the
-  // staff roster. The contract carries only leaderId, so resolve a username from
-  // the staff/consumer lists when possible; otherwise link the profile by id.
+  // curator roster. The contract carries only leaderId, so resolve a username
+  // from the members roster when possible; otherwise link the profile by id.
   const leader =
     community.leaderId != null
-      ? (community.staff?.find((s) => s.id === community.leaderId) ??
-        community.consumers?.find((c) => c.user.id === community.leaderId)
-          ?.user)
+      ? community.members?.find((m) => m.id === community.leaderId)
       : undefined;
 
   const handleAddMember = async (e: React.FormEvent) => {
@@ -178,45 +176,42 @@ const CommunityPage = () => {
               </button>
             </form>
           </div>
-          {community.consumers && community.consumers.length > 0 ? (
+          {community.members && community.members.length > 0 ? (
             <div data-st="list">
-              {community.consumers.map((c) => {
-                const memberIsStaff =
-                  community.staff?.some((s) => s.id === c.user.id) ?? false;
+              {community.members.map((m) => {
+                // ADR-0033 §Decision 4: the roster reports its own roles, so
+                // this no longer reconstructs one by cross-referencing lists.
+                const memberIsCurator = m.roles.includes('curator');
                 return (
-                  <div
-                    key={c.user.id}
-                    data-st="row"
-                    className="justify-between"
-                  >
+                  <div key={m.id} data-st="row" className="justify-between">
                     <div className="flex items-center gap-2">
-                      <span data-st="meta">{c.user.username}</span>
-                      {memberIsStaff && <span data-st="chip">Staff</span>}
+                      <span data-st="meta">{m.username}</span>
+                      {memberIsCurator && <span data-st="chip">Curator</span>}
                     </div>
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
                         onClick={() =>
-                          memberIsStaff
-                            ? removeCommunityStaff({
+                          memberIsCurator
+                            ? removeCommunityCurator({
                                 communityId: id,
-                                userId: c.user.id
+                                userId: m.id
                               })
-                            : addCommunityStaff({
+                            : addCommunityCurator({
                                 communityId: id,
-                                userId: c.user.id
+                                userId: m.id
                               })
                         }
                         className="text-xs text-gray-500 hover:text-indigo-400 transition-colors"
                       >
-                        {memberIsStaff ? 'Demote' : 'Make Staff'}
+                        {memberIsCurator ? 'Demote' : 'Make Curator'}
                       </button>
                       <button
                         type="button"
                         onClick={() =>
                           removeCommunityMember({
                             communityId: id,
-                            userId: c.user.id
+                            userId: m.id
                           })
                         }
                         className="text-xs text-red-500 hover:text-red-400 transition-colors"
