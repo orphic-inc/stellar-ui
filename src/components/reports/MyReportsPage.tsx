@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetMyReportsQuery } from '../../store/services/reportsApi';
 import Spinner from '../layout/Spinner';
-import { Badge } from '../ui';
+import { Badge, Pagination } from '../ui';
 import type { BadgeVariant } from '../ui';
 
 const STATUS_TONE: Record<string, BadgeVariant> = {
@@ -88,29 +88,7 @@ const MyReportsPage = () => {
         </table>
       )}
 
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-4 text-sm">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            data-st="control"
-            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
-          >
-            Previous
-          </button>
-          <span data-st="meta" className="px-3 py-1">
-            {page} / {totalPages}
-          </span>
-          <button
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            data-st="control"
-            className="px-3 py-1 rounded border border-[var(--st-border)] disabled:opacity-40"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <Pagination page={page} totalPages={totalPages} onChange={setPage} />
     </div>
   );
 };

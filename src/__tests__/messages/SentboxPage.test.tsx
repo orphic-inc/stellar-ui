@@ -54,7 +54,7 @@ describe('SentboxPage', () => {
     await user.click(screen.getByRole('button', { name: /next/i }));
     expect(mockUseGetSentboxQuery).toHaveBeenLastCalledWith({ page: 2 });
 
-    await user.click(screen.getByRole('button', { name: /previous/i }));
+    await user.click(screen.getByRole('button', { name: /prev/i }));
     expect(mockUseGetSentboxQuery).toHaveBeenLastCalledWith({ page: 1 });
   });
 

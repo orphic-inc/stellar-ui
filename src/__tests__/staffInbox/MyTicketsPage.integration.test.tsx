@@ -195,15 +195,13 @@ describe('MyTicketsPage RTK Query integration', () => {
     await user.click(screen.getByRole('button', { name: /next/i }));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /previous/i })
-      ).not.toBeDisabled();
+      expect(screen.getByRole('button', { name: /prev/i })).not.toBeDisabled();
     });
 
-    await user.click(screen.getByRole('button', { name: /previous/i }));
+    await user.click(screen.getByRole('button', { name: /prev/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /prev/i })).toBeDisabled();
     });
   });
 
@@ -213,6 +211,6 @@ describe('MyTicketsPage RTK Query integration', () => {
 
     await screen.findByText('Ticket 1');
     expect(screen.queryByRole('button', { name: /next/i })).toBeNull();
-    expect(screen.queryByRole('button', { name: /previous/i })).toBeNull();
+    expect(screen.queryByRole('button', { name: /prev/i })).toBeNull();
   });
 });

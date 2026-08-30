@@ -19,6 +19,7 @@ import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
 import { formatSize } from '../../utils';
 import type { LinkHealthStatus } from '../../types';
+import { Pagination } from '../ui';
 
 interface ContributionRow {
   id: number;
@@ -414,27 +415,11 @@ const CommunityPage = () => {
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-4 text-sm">
-          <button
-            disabled={releasePage === 1}
-            onClick={() => setReleasePage((p) => p - 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
-          >
-            Previous
-          </button>
-          <span className="px-3 py-1 text-gray-400">
-            {releasePage} / {totalPages}
-          </span>
-          <button
-            disabled={releasePage === totalPages}
-            onClick={() => setReleasePage((p) => p + 1)}
-            className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-40"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <Pagination
+        page={releasePage}
+        totalPages={totalPages}
+        onChange={setReleasePage}
+      />
 
       {reportingId !== null && (
         <ReportContributionModal

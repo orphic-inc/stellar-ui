@@ -641,7 +641,7 @@ describe('CommunityPage', () => {
     // Go to page 2 first
     await user.click(screen.getByRole('button', { name: /^next$/i }));
     // Then go back
-    await user.click(screen.getByRole('button', { name: /^previous$/i }));
+    await user.click(screen.getByRole('button', { name: /^prev$/i }));
     expect(mockUseGetReleasesByCommunityQuery).toHaveBeenLastCalledWith({
       communityId: 3,
       page: 1
