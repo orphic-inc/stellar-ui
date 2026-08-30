@@ -1,0 +1,102 @@
+
+> @stellar/ui@0.8.3 start
+> cross-env NODE_ENV=development webpack serve --no-open
+
+◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+◇ injected env (0) from .env.local // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+<i> [webpack-dev-server] Project is running at:
+<i> [webpack-dev-server] Loopback: http://localhost:9000/, http://[::1]:9000/
+<i> [webpack-dev-server] On Your Network (IPv4): http://192.168.1.65:9000/
+<i> [webpack-dev-server] Content not from webpack is served from '/private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/stylesheets' directory
+<i> [webpack-dev-server] 404s will fallback to '/index.html'
+<i> [webpack-dev-middleware] wait until bundle finished: /
+assets by chunk 2.96 MiB (auxiliary name: main) 67 assets
+assets by path stylesheets/postmod/ 729 KiB
+  assets by path stylesheets/postmod/images/*.png 6.32 KiB 5 assets
+  assets by path stylesheets/postmod/images/*.otf 113 KiB 3 assets
+  + 3 assets
+assets by path *.js 16 MiB
+  asset main-d0612105757b13e06c16.js 16 MiB [emitted] [immutable] (name: main)
+  asset preapply-theme.js 914 bytes [emitted] [from: src/preapply-theme.js] [copied]
+asset main-d0612105757b13e06c16.css 129 KiB [emitted] [immutable] (name: main)
+asset CHANGELOG.md 26.8 KiB [emitted] [from: CHANGELOG.md] [copied]
+asset LICENSE 1.06 KiB [emitted] [from: LICENSE] [copied]
+asset index.html 441 bytes [emitted]
+Entrypoint main 16.1 MiB (2.96 MiB) = main-d0612105757b13e06c16.css 129 KiB main-d0612105757b13e06c16.js 16 MiB 67 auxiliary assets
+orphan modules 1.66 MiB (javascript) 1.03 MiB (asset) 14.1 KiB (runtime) [orphan] 298 modules
+runtime modules 61 KiB 34 modules
+modules by path ./node_modules/ 4.1 MiB (javascript) 29.1 KiB (css/mini-extract) 1142 modules
+modules by path ./src/ 1.16 MiB (javascript) 3.66 MiB (asset) 100 KiB (css/mini-extract)
+  modules by path ./src/components/ 1.05 MiB 157 modules
+  modules by path ./src/store/ 93.7 KiB 37 modules
+  modules by path ./src/utils/ 14 KiB 9 modules
+  asset modules 3.66 MiB (asset) 378 bytes (javascript) 9 modules
+  modules by path ./src/*.scss 704 bytes (javascript) 82.5 KiB (css/mini-extract)
+    ./src/index.scss 704 bytes [built] [code generated]
+    css ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!./node_modules/sass-loader/dist/cjs/index.js!./src/index.scss 82.5 KiB [built] [code generated]
+  modules by path ./src/*.css 704 bytes (javascript) 17.9 KiB (css/mini-extract)
+    ./src/global.css 704 bytes [built] [code generated]
+    css ./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!./node_modules/sass-loader/dist/cjs/index.js!./src/global.css 17.9 KiB [built] [code generated]
+  ./src/index.tsx 1.34 KiB [built] [code generated]
+
+WARNING in ./src/index.scss (./src/index.scss.webpack[javascript/auto]!=!./node_modules/css-loader/dist/cjs.js!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].use[2]!./node_modules/sass-loader/dist/cjs/index.js!./src/index.scss)
+Module Warning (from ./node_modules/sass-loader/dist/cjs/index.js):
+Deprecation Warning on line 0, column 8 of file:///private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/index.scss:0:8:
+Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+
+More info and automated migrator: https://sass-lang.com/d/import
+
+0 | @import "tailwindcss";
+
+
+src/index.scss 1:9  root stylesheet
+ @ ./src/index.scss
+ @ ./src/index.tsx 7:0-22
+
+WARNING in [eslint] 
+/private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/components/admin/UserRankFormPage.tsx
+  63:24  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/components/admin/UserRankFormPage.tsx:63:24
+  61 |     });
+  62 |
+> 63 |   const displayStaff = watch('displayStaff');
+     |                        ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  64 |   const selectedForumIds = watch('permittedForumIds');
+  65 |
+  66 |   useEffect(() => {  react-hooks/incompatible-library
+
+/private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/components/pages/public/Install.tsx
+  32:20  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/components/pages/public/Install.tsx:32:20
+  30 |     formState: { errors }
+  31 |   } = useForm<FormValues>();
+> 32 |   const password = watch('password');
+     |                    ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  33 |
+  34 |   const onSubmit = async (values: FormValues) => {
+  35 |     try {  react-hooks/incompatible-library
+
+/private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/components/profile/settings/Settings.tsx
+  74:25  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+/private/tmp/claude-501/-Users-kai-git-orphic-inc-stellar-api/ee616214-e934-4957-ae38-a7b6793c3cd1/scratchpad/rel-ui/src/components/profile/settings/Settings.tsx:74:25
+  72 |   }, [profile, reset]);
+  73 |
+> 74 |   const paranoiaValue = watch('paranoia') ?? 0;
+     |                         ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  75 |
+  76 |   // Site Stylesheet slot source (ADR-0024 §4) — Personal (external URL) XOR
+  77 |   // Registry (an adopted author sheet). Mirrors the server invariant: the UI  react-hooks/incompatible-library
+
+✖ 3 problems (0 errors, 3 warnings)
+
+webpack 5.110.1 compiled with 2 warnings in 11503 ms
+<i> [webpack-dev-server] Gracefully shutting down. To force exit, press ^C again. Please wait...

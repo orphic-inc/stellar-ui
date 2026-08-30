@@ -65,6 +65,50 @@ jobs:
           done
           echo "::error::nginx never served the bundle"; docker logs ui; exit 1
 
+  dev-smoke:
+    # `npm start` is covered by no other gate: `build` is production, where
+    # devServer and ESLintPlugin are both dev-only branches, and the image serves
+    # the built bundle through nginx. A webpack-dev-server 5 breaking change
+    # therefore shipped in 0.8.3 with every check green — the dev server refused
+    # to start at all, and only a developer running it locally would find out.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Boot the dev server and prove it serves
+        run: |
+          set -uo pipefail
+          # --no-open overrides `open: true`, which would try to launch a browser
+          # on a headless runner.
+          npm start -- --no-open > dev-server.log 2>&1 &
+          DEV_PID=$!
+          served=0
+          for _ in $(seq 1 60); do
+            if curl -sf http://localhost:9000/ > /dev/null 2>&1; then served=1; break; fi
+            kill -0 "$DEV_PID" 2>/dev/null || break   # webpack exited; stop waiting
+            sleep 2
+          done
+          kill "$DEV_PID" 2>/dev/null || true
+          pkill -f "webpack serve" 2>/dev/null || true
+          # -a: the log carries ANSI colour codes, which make grep treat it as
+          # binary and suppress the context needed to diagnose a failure.
+          if grep -aqE "Invalid options object|ERROR in" dev-server.log; then
+            echo "::error::the dev server reported errors on boot"
+            grep -anE "Invalid options object|ERROR in" -A6 dev-server.log | head -30
+            exit 1
+          fi
+          if [ "$served" -ne 1 ]; then
+            echo "::error::the dev server never served http://localhost:9000/"
+            tail -40 dev-server.log
+            exit 1
+          fi
+          echo "dev server booted and served the app"
+
   publish:
     needs: [test, build]
     # This workflow's history lives in both the obrien-k fork and the canonical
