@@ -7,6 +7,8 @@ import type {
   PaginatedMeta
 } from '../../store/services/searchApi';
 import Spinner from '../layout/Spinner';
+import { withPage } from '../../utils/searchParams';
+import { PageNumbers } from '../ui';
 
 const inputCls =
   'bg-gray-800 border border-gray-700 text-gray-200 text-sm rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full';
@@ -50,32 +52,16 @@ const LogBrowsePage = () => {
     setSearchParams(next);
   };
 
-  const setPage = (p: number) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('page', String(p));
-    setSearchParams(next);
-  };
+  const setPage = (p: number) => setSearchParams(withPage(searchParams, p));
 
-  // Pagination has no contract Role (active-page paint is deferred table-era
-  // work); it stays inline Tailwind and sits below the result panel.
-  const renderPager = (meta: PaginatedMeta) =>
-    meta.totalPages > 1 ? (
-      <div className="flex gap-1 flex-wrap pt-2">
-        {Array.from({ length: meta.totalPages }, (_, i) => i + 1).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPage(p)}
-            className={`px-2.5 py-1 text-xs rounded ${
-              p === page
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
-    ) : null;
+  const renderPager = (meta: PaginatedMeta) => (
+    <PageNumbers
+      page={page}
+      totalPages={meta.totalPages}
+      onChange={setPage}
+      className="pt-2"
+    />
+  );
 
   const renderTopics = (topics: TopicSearchResult[], meta: PaginatedMeta) => (
     <>

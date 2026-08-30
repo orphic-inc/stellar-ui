@@ -4,6 +4,8 @@ import { useGetWikiPagesQuery } from '../../store/services/wikiApi';
 import { useGetMeQuery } from '../../store/services/authApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
+import { withPage } from '../../utils/searchParams';
+import { PageNumbers } from '../ui';
 
 type SortField = 'title' | 'created' | 'edited';
 
@@ -246,28 +248,12 @@ const WikiListPage = () => {
         </div>
       )}
 
-      {/* Pagination */}
-      {data && data.meta.totalPages > 1 && (
-        <div className="flex gap-2 justify-center">
-          {Array.from({ length: data.meta.totalPages }, (_, i) => i + 1).map(
-            (p) => (
-              <button
-                key={p}
-                onClick={() => {
-                  const next = new URLSearchParams(searchParams);
-                  next.set('page', String(p));
-                  setSearchParams(next);
-                }}
-                data-st="control"
-                data-st-primary={p === page ? '' : undefined}
-                className="px-3 py-1 text-sm"
-              >
-                {p}
-              </button>
-            )
-          )}
-        </div>
-      )}
+      <PageNumbers
+        page={page}
+        totalPages={data?.meta.totalPages ?? 1}
+        onChange={(p) => setSearchParams(withPage(searchParams, p))}
+        className="justify-center"
+      />
     </div>
   );
 };

@@ -5,6 +5,7 @@ export { default as Field } from './Field';
 export { default as DataTable } from './DataTable';
 export { default as Badge } from './Badge';
 export { default as Pagination } from './Pagination';
+export { default as PageNumbers } from './PageNumbers';
 export { default as SectionHeading } from './SectionHeading';
 export { default as Modal } from './Modal';
 export type { ButtonVariant } from './Button';

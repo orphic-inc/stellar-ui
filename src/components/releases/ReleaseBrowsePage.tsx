@@ -6,6 +6,8 @@ import { useGetMeQuery } from '../../store/services/authApi';
 import { hasPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import { RandomReleaseLink, RandomArtistLink } from '../search/RandomLinks';
+import { formParamSetter, withPage } from '../../utils/searchParams';
+import { PageNumbers } from '../ui';
 
 const RELEASE_TYPES = [
   'Music',
@@ -134,10 +136,7 @@ const ReleaseBrowsePage = () => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const next = new URLSearchParams();
-    const set = (k: string) => {
-      const v = fd.get(k);
-      if (v && String(v).trim()) next.set(k, String(v).trim());
-    };
+    const set = formParamSetter(fd, next);
 
     set('q');
     set('tags');
@@ -174,11 +173,7 @@ const ReleaseBrowsePage = () => {
     setSearchParams(next);
   };
 
-  const setPage = (p: number) => {
-    const next = new URLSearchParams(searchParams);
-    next.set('page', String(p));
-    setSearchParams(next);
-  };
+  const setPage = (p: number) => setSearchParams(withPage(searchParams, p));
 
   const communityList = Array.isArray(communities)
     ? communities
@@ -676,24 +671,11 @@ const ReleaseBrowsePage = () => {
             </div>
           )}
           {/* Pagination */}
-          {data.meta.totalPages > 1 && (
-            <div className="flex gap-1 flex-wrap">
-              {Array.from(
-                { length: data.meta.totalPages },
-                (_, i) => i + 1
-              ).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  data-st="control"
-                  data-st-primary={p === page ? '' : undefined}
-                  className="px-2.5 py-1 text-xs"
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          )}
+          <PageNumbers
+            page={page}
+            totalPages={data.meta.totalPages}
+            onChange={setPage}
+          />
         </>
       )}
     </div>
