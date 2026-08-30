@@ -26,6 +26,13 @@ export default [
   { files: SOURCE, ...reactPlugin.configs.flat.recommended },
   { files: SOURCE, ...jsxA11y.flatConfigs.recommended },
   { files: SOURCE, ...importPlugin.flatConfigs.recommended },
+  // react-hooks exposes both config shapes. `configs.recommended` is the
+  // eslintrc one — its `plugins` is an array of strings, which flat config
+  // rejects outright — so the flat shape must come from `configs.flat`.
+  // `flat['recommended-latest']` would additionally enable
+  // `react-hooks/void-use-memo`; staying on `flat.recommended` keeps this
+  // swap rule-for-rule identical to the hand-registration it replaces.
+  { files: SOURCE, ...reactHooks.configs.flat.recommended },
 
   {
     files: SOURCE,
@@ -36,9 +43,6 @@ export default [
       parserOptions: { ecmaFeatures: { jsx: true } },
       globals: { ...globals.browser, ...globals.node, ...globals.es2020 }
     },
-    // react-hooks is still v4, which ships no flat config export — register the
-    // plugin by hand and spread its recommended rules, which are a plain object.
-    plugins: { 'react-hooks': reactHooks },
     settings: {
       react: { version: 'detect' },
       'import/resolver': {
@@ -47,7 +51,6 @@ export default [
       }
     },
     rules: {
-      ...reactHooks.configs.recommended.rules,
       'no-undef': 'off',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
