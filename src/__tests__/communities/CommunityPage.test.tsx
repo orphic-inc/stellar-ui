@@ -327,6 +327,44 @@ describe('CommunityPage', () => {
     });
   });
 
+  it('lists a curator who holds no consumer role — the regression this exists to prevent', () => {
+    // Before ADR-0033 the roster was consumers[] with a Staff chip layered on,
+    // so a community curator without a Consumer row appeared nowhere. The union
+    // is the membership definition now, and the count reads the roster rather
+    // than _count.consumers, which still counts only the consumption relation.
+    mockCurrentUser = {
+      id: 99,
+      username: 'curatormember',
+      canDownload: true,
+      userRank: { permissions: {} }
+    };
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity({
+        // id 99 stays a curator so the viewer can still open the panel;
+        // id 77 is the case under test — curator role, no consumer role.
+        curators: [
+          { id: 99, username: 'curatormember' },
+          { id: 77, username: 'curator-only' }
+        ],
+        members: [
+          { id: 10, username: 'alice', roles: ['consumer'] },
+          { id: 99, username: 'curatormember', roles: ['consumer', 'curator'] },
+          { id: 77, username: 'curator-only', roles: ['curator'] }
+        ],
+        _count: { consumers: 2 }
+      }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+
+    expect(screen.getByText('curator-only')).toBeInTheDocument();
+    // Both curators carry the chip; the point is that 77 is present at all.
+    expect(screen.getAllByText('Curator')).toHaveLength(2);
+    // 3 members, not the 2 consumers the relation count reports.
+    expect(screen.getByText('3 total')).toBeInTheDocument();
+  });
+
   it('shows the Curator chip for curators in the roster', () => {
     mockCurrentUser = {
       id: 99,
