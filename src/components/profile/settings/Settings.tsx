@@ -259,15 +259,23 @@ const Settings = () => {
                 data-st="meta"
                 className="block text-sm mb-1"
               >
-                Avatar URL
+                Avatar
               </label>
               <input
                 id="settings-avatar"
                 type="text"
                 {...register('avatar')}
                 data-st="field"
+                placeholder="https://… or /api/asset/…"
                 className="w-full"
               />
+              <p data-st="meta" className="text-xs mt-1">
+                An <code>https://</code> address, or <code>/api/asset/…</code>
+                for an image stored on this site. Plain <code>http://</code> is
+                no longer accepted. Remember that whichever host you point at
+                sees the IP address of everyone who views your profile and posts
+                — a self-hosted image does not.
+              </p>
             </div>
 
             <div>

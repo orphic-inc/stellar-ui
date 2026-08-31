@@ -24,6 +24,16 @@ describe('avatarSrc', () => {
     expect(avatarSrc(url)).toBe(url);
   });
 
+  // stellar-api #396 added a second stored form: an avatar held in the
+  // content-addressed asset store. It is a same-origin relative path, so the
+  // passthrough arm already handles it — this pins that it is NOT mistaken for
+  // the sentinel or the empty case and swapped for a bundled asset, which would
+  // silently replace every self-hosted avatar with the default.
+  it('passes an /api/asset content address through unchanged', () => {
+    const path = `/api/asset/${'a'.repeat(64)}`;
+    expect(avatarSrc(path)).toBe(path);
+  });
+
   it('falls back to the default for null, undefined, empty, and whitespace', () => {
     const fallback = avatarSrc(null);
     expect(avatarSrc(undefined)).toBe(fallback);

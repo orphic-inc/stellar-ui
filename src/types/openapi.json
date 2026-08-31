@@ -6500,7 +6500,18 @@
                     "maximum": 3
                   },
                   "avatar": {
-                    "type": "string"
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "description": "An https:// URL, or an /api/asset/<sha256> path for an image stored in the asset store. Empty string clears the field."
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      }
+                    ]
                   },
                   "notificationMethod": {
                     "type": "string",
@@ -6942,7 +6953,7 @@
                     "anyOf": [
                       {
                         "type": "string",
-                        "format": "uri"
+                        "description": "An https:// URL, or an /api/asset/<sha256> path for an image stored in the asset store. Empty string clears the field."
                       },
                       {
                         "type": "string",
@@ -7301,7 +7312,7 @@
                     "anyOf": [
                       {
                         "type": "string",
-                        "format": "uri"
+                        "description": "An https:// URL, or an /api/asset/<sha256> path for an image stored in the asset store. Empty string clears the field."
                       },
                       {
                         "type": "string",
@@ -7329,7 +7340,7 @@
                     "anyOf": [
                       {
                         "type": "string",
-                        "format": "uri"
+                        "description": "An https:// URL, or an /api/asset/<sha256> path for an image stored in the asset store. Empty string clears the field."
                       },
                       {
                         "type": "string",
@@ -8155,6 +8166,128 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuthorStylesheet"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Stylesheets"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "source": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100000
+                  }
+                },
+                "required": [
+                  "name",
+                  "source"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Author stylesheet updated; edits propagate to adopters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorStylesheet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not your stylesheet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Stylesheets"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Author stylesheet withdrawn (soft); adopters keep rendering"
+          },
+          "403": {
+            "description": "Not your stylesheet",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
                 }
               }
             }

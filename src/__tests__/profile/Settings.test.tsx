@@ -124,7 +124,7 @@ describe('Settings', () => {
 
   it('renders appearance tab by default', () => {
     renderWithProviders(<Settings />);
-    expect(screen.getByLabelText(/avatar url/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^avatar$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/profile bio/i)).toBeInTheDocument();
   });
 
@@ -456,7 +456,7 @@ describe('Settings', () => {
       // and a field label, hence getAllByText).
       expect(screen.getAllByText(distinctive).length).toBeGreaterThan(0);
       expect(screen.queryByLabelText(/^stylesheet$/i)).not.toBeInTheDocument();
-      expect(screen.queryByLabelText(/avatar url/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/^avatar$/i)).not.toBeInTheDocument();
     }
   );
 
@@ -502,9 +502,9 @@ describe('Settings', () => {
       isLoading: false
     });
     renderWithProviders(<Settings />);
-    expect(
-      (screen.getByLabelText(/avatar url/i) as HTMLInputElement).value
-    ).toBe('https://example.com/avatar.png');
+    expect((screen.getByLabelText(/^avatar$/i) as HTMLInputElement).value).toBe(
+      'https://example.com/avatar.png'
+    );
   });
 
   it('shows unknown paranoia level with empty string fallback', async () => {

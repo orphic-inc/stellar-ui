@@ -15,7 +15,15 @@ export { defaultAvatar as DEFAULT_AVATAR };
  * Resolve a user's stored avatar value to a renderable image source.
  * - null / undefined / empty → bundled default
  * - the seeded sentinel → bundled seeded marker (visually distinct test users)
- * - anything else → a real external URL, passed through
+ * - anything else → passed through as-is
+ *
+ * The passthrough arm carries two forms since stellar-api #396: a remote
+ * `https://…` URL, and `/api/asset/<sha256>` for an avatar stored in the
+ * content-addressed asset store. The second is a same-origin relative path,
+ * which needs no handling here — the store's `baseUrl` is already `/api`, the
+ * dev server proxies `/api`, and the CSP's `img-src 'self'` covers it. It is
+ * also the only form that survives if `img-src` is ever tightened to `'self'`
+ * (stellar-api #457).
  */
 export const avatarSrc = (avatar?: string | null): string => {
   if (!avatar || !avatar.trim()) return defaultAvatar;
