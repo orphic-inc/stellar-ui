@@ -146,7 +146,7 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
               value={customIcon}
               onChange={(e) => setCustomIcon(e.target.value)}
               disabled={!perks.customIcon}
-              placeholder="https://…"
+              placeholder="https://… or /api/asset/…"
               className={inputClass + (!perks.customIcon ? ' opacity-40' : '')}
             />
             {!perks.customIcon && <LockedNote />}
@@ -215,7 +215,7 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
             value={secondAvatar}
             onChange={(e) => setSecondAvatar(e.target.value)}
             disabled={!perks.secondAvatar}
-            placeholder="https://…"
+            placeholder="https://… or /api/asset/…"
             className={inputClass + (!perks.secondAvatar ? ' opacity-40' : '')}
           />
           {!perks.secondAvatar && <LockedNote />}
