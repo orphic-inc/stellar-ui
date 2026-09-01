@@ -1,0 +1,133 @@
+name: Contract drift watch
+
+# Closes the third axis of ADR-0002's contract discipline (#271): nothing in this
+# repo ever compared the vendored `src/types/openapi.json` to stellar-api. The two
+# existing gates are both internal — `api.ts` is regenerated FROM the vendored
+# spec, and `version:check` compares the manifest TO it — so the pair is
+# self-consistent and blind to the copy going stale.
+#
+# This runs OUT OF BAND, on a schedule, and reports into a single tracking issue.
+# It is deliberately not a merge gate: a UI pull request is never wrong because
+# stellar-api moved, and blocking every open PR on a change this repo has not
+# consumed yet is how a gate gets switched off. See ADR-0002's 2026-08-31
+# amendment for the full trade.
+
+on:
+  schedule:
+    # 07:00 UTC daily. Drift is measured in days, not minutes; the point is that
+    # a resync is never discovered by a runtime bug weeks later.
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+# Never let two runs race for the same tracking issue.
+concurrency:
+  group: contract-drift
+  cancel-in-progress: false
+
+jobs:
+  drift:
+    # The tracking issue belongs on the canonical repo. The fork carries this
+    # same file, so gate it the way `publish` is gated rather than deleting it.
+    if: github.repository == 'orphic-inc/stellar-ui'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      # No `npm ci`: the checker is dependency-free by design, so the watch keeps
+      # working even when the tree does not install.
+      - name: Compare the vendored contract against stellar-api
+        id: check
+        run: |
+          # `set +e` is load-bearing: Actions starts this shell as `bash -e`, so
+          # without it the step aborts on the checker's exit 1 and the reporting
+          # steps below never run. Drift is a RESULT here, not a failure.
+          set +e
+          # The report is written to a file and read back BY PATH by the next
+          # steps. It is never piped onto another script that reads a stream —
+          # that is what broke stellar-api #461 twice.
+          node scripts/check-contract-drift.mjs --out "$RUNNER_TEMP/drift.json"
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      # Exit 2 means the upstream spec could not be read at all. That is a broken
+      # watch, not a clean result, and it must not silently close the issue.
+      - name: Fail loudly when nothing could be compared
+        if: steps.check.outputs.status == '2'
+        run: |
+          echo "::error::Could not read stellar-api's openapi.json - the drift watch did not run."
+          exit 1
+
+      - name: Open or update the tracking issue
+        if: steps.check.outputs.status == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPORT: ${{ runner.temp }}/drift.json
+        run: |
+          set -euo pipefail
+          node scripts/render-drift-issue.mjs --report "$REPORT" \
+            --body "$RUNNER_TEMP/body.md" --title "$RUNNER_TEMP/title.txt"
+          title="$(cat "$RUNNER_TEMP/title.txt")"
+          fingerprint="$(node -p "require(process.env.REPORT).fingerprint")"
+
+          # One issue, reused. Reopening the same number keeps the history of
+          # every drift in one place instead of scattering it across issues.
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" \
+            --label contract-drift --state open --limit 1 --json number \
+            --jq '.[0].number // empty')"
+
+          if [ -z "$existing" ]; then
+            existing="$(gh issue list --repo "$GITHUB_REPOSITORY" \
+              --label contract-drift --state closed --limit 1 --json number \
+              --jq '.[0].number // empty')"
+            if [ -n "$existing" ]; then
+              gh issue reopen "$existing" --repo "$GITHUB_REPOSITORY"
+            fi
+          fi
+
+          if [ -z "$existing" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "$title" --body-file "$RUNNER_TEMP/body.md" \
+              --label contract-drift
+            echo "opened a new drift issue"
+            exit 0
+          fi
+
+          # The body always reflects the CURRENT state. A comment is added only
+          # when the upstream fingerprint moves, so a drift left open for a week
+          # does not produce a week of identical comments.
+          previous="$(gh issue view "$existing" --repo "$GITHUB_REPOSITORY" \
+            --json body --jq '.body' \
+            | sed -n 's/.*<!-- drift-fingerprint: \([0-9a-f]*\) -->.*/\1/p' | head -1)"
+
+          gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" \
+            --title "$title" --body-file "$RUNNER_TEMP/body.md"
+
+          if [ "$previous" != "$fingerprint" ]; then
+            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" \
+              --body "stellar-api moved again; the report above is now $fingerprint (was ${previous:-none})."
+          fi
+          echo "updated drift issue #$existing"
+
+      - name: Close the tracking issue once the contract is back in sync
+        if: steps.check.outputs.status == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" \
+            --label contract-drift --state open --limit 1 --json number \
+            --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" \
+              --comment "The vendored contract is back in sync with stellar-api. Closed by the drift watch."
+          else
+            echo "in sync, nothing open"
+          fi
