@@ -6987,7 +6987,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/requests': {
+  '/requests': {
     parameters: {
       query?: never;
       header?: never;
@@ -7067,7 +7067,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/requests/{id}': {
+  '/requests/{id}': {
     parameters: {
       query?: never;
       header?: never;
@@ -7110,7 +7110,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/requests/{id}/bounty': {
+  '/requests/{id}/bounty': {
     parameters: {
       query?: never;
       header?: never;
@@ -7152,7 +7152,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/requests/{id}/fill': {
+  '/requests/{id}/fill': {
     parameters: {
       query?: never;
       header?: never;
