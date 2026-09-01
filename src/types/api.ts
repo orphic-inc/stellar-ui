@@ -19445,7 +19445,7 @@ export interface components {
       id: number;
       name: string;
       description: string;
-      descriptionHtml?: string;
+      descriptionHtml: string;
       userId: number;
       categoryId: number;
       tags: string[];
@@ -19481,9 +19481,9 @@ export interface components {
         id: number;
         title: string;
         image: string | null;
-        year: number | null;
-        communityId: number | null;
-        releaseType: string | null;
+        year: number;
+        releaseType: string;
+        communityId?: number | null;
         artist: {
           id: number;
           name: string;
