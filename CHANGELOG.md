@@ -6,6 +6,10 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **The vendored API contract catches up with stellar-api's registration backlog** — stellar-api [#474](https://github.com/orphic-inc/stellar-api/issues/474) registered 91 previously-invisible routes across ten slices, so the vendored `openapi.json` was **65 paths and 34 components behind** — at an _identical_ `0.9.0` version string, which is exactly the drift class that a version comparison cannot see and that [#271](https://github.com/orphic-inc/stellar-ui/issues/271) was filed about. **The contract-drift watch added in [#278](https://github.com/orphic-inc/stellar-ui/pull/278) is what surfaced it**, on its first substantive finding. Purely a re-vendor: only the two generated files move, `info.version` is unchanged so [ADR-0004](docs/adr/0004-peer-api-contract-version-coupling.md) coupling is already satisfied and no version bump is owed, and the release only **added** operations — so unlike the resync in #271 this produces **zero** type errors. `typecheck`, `lint` and the full 169-suite test run are clean against the new types. The one path that changed shape rather than being added (`/api/requests*` losing a doubled `/api` prefix) belongs to a service this repo hand-types, so nothing referenced it. **What this unblocks is the point:** six of the seven services [#277](https://github.com/orphic-inc/stellar-ui/issues/277) calls entirely hand-typed now have generated equivalents — `wikiApi`, `top10Api`, `requestApi`, `notificationApi`, `installApi` and `collageApi`, 39 hand-written declarations between them — leaving only `devToolsApi`, whose `/dev/*` routes are deliberately outside the contract.
+
 ## [0.9.0] — 2026-08-31
 
 Cut to version parity with stellar-api 0.9.0. The vendored contract body was already current, so `info.version` was the only line that moved — and this is the release in which keeping it current stops depending on somebody remembering to.
