@@ -22,6 +22,15 @@ jobs:
         # committed copy reds the build (mirrors stellar-api's OpenAPI/ERD gates,
         # ADR-0018). Re-sync deliberately with `npm run api:sync`.
         run: npm run api:generate && git diff --exit-code src/types/api.ts
+      - name: Service-layer type sources
+        if: ${{ !cancelled() }}
+        # RTK Query result types must come from the generated client, not from a
+        # hand-written interface — otherwise the repo carries a second, unchecked
+        # description of the API (#277, the same failure as #271 one layer out).
+        # Grandfathered endpoints live in service-types-baseline.json; a NEW
+        # hand-typed result fails here, and so does a baseline entry that has
+        # gone stale, so the list can only shrink.
+        run: npm run service-types:check
       - name: Version consistency
         if: ${{ !cancelled() }}
         # Internal version surfaces (lockfile, CHANGELOG) must match the manifest

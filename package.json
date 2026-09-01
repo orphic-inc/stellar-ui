@@ -11,6 +11,7 @@
     "api:generate": "npx --no-install openapi-typescript src/types/openapi.json -o src/types/api.ts && npx --no-install prettier --write src/types/api.ts",
     "api:sync": "cp ../stellar-api/openapi.json src/types/openapi.json && npm run api:generate",
     "contract:check": "node scripts/check-contract-drift.mjs",
+    "service-types:check": "node scripts/check-service-types.mjs",
     "build": "cross-env NODE_ENV=production webpack",
     "clean": "rm -rf dist",
     "start": "cross-env NODE_ENV=development webpack serve",
