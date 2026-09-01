@@ -73,46 +73,15 @@ export interface Collaborator {
 
 // ─── Requests & Bounty ──────────────────────────────────────────────────────
 
+// The status values the requests page offers as a FILTER. Deliberately narrower
+// than the response enum, which also carries `deleted` — nothing writes that
+// value and no list can return it (the list filters on `deletedAt`). ADR-0010
+// exempts query-argument types: they are legitimately the UI's own.
+//
+// The request RESPONSE shapes that used to live here — RequestItem,
+// RequestBounty, RequestsListResponse — are gone: they are read off the
+// contract in store/services/requestApi.ts (#277).
 export type RequestStatus = 'open' | 'filled';
-
-export interface RequestBounty {
-  id: number;
-  requestId: number;
-  userId: number;
-  amount: string; // BigInt serialized to string on the wire
-  createdAt: string;
-  user?: { id: number; username: string };
-}
-
-export interface RequestItem {
-  id: number;
-  communityId: number;
-  userId: number;
-  title: string;
-  description: string;
-  type: string;
-  year: number | null;
-  image: string | null;
-  status: RequestStatus;
-  fillerId: number | null;
-  filledAt: string | null;
-  filledContributionId: number | null;
-  totalBounty: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  user?: { id: number; username: string };
-  filler?: { id: number; username: string } | null;
-  community?: { id: number; name: string };
-  _count?: { bounties: number };
-  bounties?: RequestBounty[];
-  artists?: Array<{ artistId: number; artist: { id: number; name: string } }>;
-}
-
-export interface RequestsListResponse {
-  data: RequestItem[];
-  meta: { total: number; page: number; limit: number; totalPages: number };
-}
 
 // ─── Ratio ───────────────────────────────────────────────────────────────────
 

@@ -10466,7 +10466,7 @@ export interface paths {
           };
           content: {
             'application/json': {
-              bounties: components['schemas']['RequestBountyEntry'][];
+              bounties: components['schemas']['RequestBountyEntryWithUser'][];
               actions: components['schemas']['RequestActionEntry'][];
             };
           };
@@ -18991,10 +18991,27 @@ export interface components {
       userId: number;
       amount: string;
       createdAt: string;
+      user?: {
+        id: number;
+        username: string;
+      };
+    };
+    RequestBountyEntryWithUser: {
+      id: number;
+      requestId: number;
+      userId: number;
+      amount: string;
+      createdAt: string;
       user: {
         id: number;
         username: string;
       };
+    };
+    RequestArtistRef: {
+      id: number;
+      requestId: number;
+      artistId: number;
+      artist?: components['schemas']['Artist'];
     };
     Request: {
       id: number;
@@ -19030,10 +19047,11 @@ export interface components {
         name: string;
       };
       bounties?: components['schemas']['RequestBountyEntry'][];
-      artists?: unknown[];
+      artists?: components['schemas']['RequestArtistRef'][];
       filledContribution?: unknown;
     };
     RequestDetail: components['schemas']['Request'] & {
+      bounties?: components['schemas']['RequestBountyEntryWithUser'][];
       voteCount: number;
       votes: {
         userId: number;
