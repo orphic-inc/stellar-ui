@@ -15,7 +15,7 @@ npm run format           # Prettier --write src
 npm test                 # Jest unit tests (--runInBand)
 npm run test:e2e         # Playwright E2E (requires running API + UI — see below)
 npm run api:sync         # Pull ../stellar-api/openapi.json, then regenerate src/types/api.ts (api:generate alone skips the pull)
-npm run contract:check   # Is the vendored spec still what stellar-api serves? (stellar-ui ADR-0002 amendment, #271)
+npm run contract:check   # Is the vendored spec still what stellar-api serves? (Architecture Decision Record ADR-0002, amended; #271)
 ```
 
 > **The dev proxy forwards `/api` and nothing else.** Root-level API endpoints
@@ -401,7 +401,9 @@ green `tsc` (#271).
 `.github/workflows/contract-drift.yml` now watches it daily and keeps one tracking
 issue labelled `contract-drift` in sync with what it finds — opened on drift,
 closed automatically once the vendored copy catches up. It is deliberately **not**
-a merge gate: a UI pull request is never wrong because stellar-api moved. See the
+a merge gate — the drift originates in the other repo, so blocking here would red a
+diff that did not cause it. The trade, and what would justify revisiting it, is
+recorded in the
 [stellar-ui ADR-0002 amendment](docs/adr/0002-vendored-openapi-contract-and-freshness-gate.md#amendment-2026-08-31--the-third-axis-is-watched-not-gated).
 
 Run the same check yourself before assuming the vendored spec is current:
@@ -411,8 +413,9 @@ npm run contract:check                                    # against stellar-api 
 node scripts/check-contract-drift.mjs --local ../stellar-api/openapi.json
 ```
 
-Exit `0` in sync, `1` drift, `2` undetermined — a `2` means nothing was compared
-and must never be read as "in sync".
+Exit `0` in sync, `1` drift, `2` undetermined. Treat a `2` as unknown rather than
+as a pass: nothing was compared, so fix the fetch before drawing a conclusion from
+the run.
 
 **Version equality is not contract equality.** The drift that prompted #271 was
 141 lines behind at an identical `0.8.3`, so a version comparison would have passed
