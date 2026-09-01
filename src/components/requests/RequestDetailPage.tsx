@@ -198,9 +198,7 @@ const RequestDetailPage = () => {
               className="flex items-center gap-1 disabled:opacity-50"
             >
               {' '}
-              <span>
-                ▲ {(req as { voteCount?: number }).voteCount ?? 0} votes
-              </span>
+              <span>▲ {req.voteCount} votes</span>
             </button>
           )}
         </div>
@@ -382,7 +380,7 @@ const RequestDetailPage = () => {
         </button>
         {showBountyHistory && (
           <div className="px-4 py-3">
-            {bountyHistory && bountyHistory.length > 0 ? (
+            {bountyHistory && bountyHistory.bounties.length > 0 ? (
               <table data-st="grid" className="w-full text-xs">
                 <thead data-st="colhead">
                   <tr>
@@ -392,16 +390,12 @@ const RequestDetailPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {bountyHistory.map((entry) => (
+                  {bountyHistory.bounties.map((entry) => (
                     <tr key={entry.id} data-st="row">
                       <td className="py-1">
-                        {entry.user ? (
-                          <Link to={`/user/${entry.user.id}`} data-st="control">
-                            {entry.user.username}
-                          </Link>
-                        ) : (
-                          'Anonymous'
-                        )}
+                        <Link to={`/user/${entry.user.id}`} data-st="control">
+                          {entry.user.username}
+                        </Link>
                       </td>
                       <td className="py-1 text-right font-mono" data-st-num>
                         <span className="text-[var(--st-warning)]">

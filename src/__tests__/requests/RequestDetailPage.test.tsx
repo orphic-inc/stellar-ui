@@ -53,7 +53,10 @@ describe('RequestDetailPage', () => {
     jest.clearAllMocks();
     window.confirm = jest.fn(() => true);
     mockUseGetRequestBountyHistoryQuery.mockReturnValue({
-      data: [],
+      // GET /requests/:id/bounty-history answers TWO parallel lists, not an
+      // array of bounties. The old fixture was a bare array — it agreed with
+      // the old hand-written type and with nothing the API sends.
+      data: { bounties: [], actions: [] },
       isLoading: false
     });
     mockAddBounty.mockReturnValue({
@@ -151,14 +154,19 @@ describe('RequestDetailPage', () => {
       error: undefined
     });
     mockUseGetRequestBountyHistoryQuery.mockReturnValue({
-      data: [
-        {
-          id: 9,
-          amount: '104857600',
-          createdAt: '2026-05-17T12:00:00.000Z',
-          user: { id: 7, username: 'alice' }
-        }
-      ],
+      data: {
+        bounties: [
+          {
+            id: 9,
+            requestId: 12,
+            userId: 7,
+            amount: '104857600',
+            createdAt: '2026-05-17T12:00:00.000Z',
+            user: { id: 7, username: 'alice' }
+          }
+        ],
+        actions: []
+      },
       isLoading: false
     });
 
@@ -494,7 +502,7 @@ describe('RequestDetailPage', () => {
     });
   });
 
-  it('does not delete when confirm returns false; shows null filler and empty bounty history', async () => {
+  it('does not delete when confirm returns false; shows null filler and an empty bounty history', async () => {
     const user = userEvent.setup();
     const store = createTestStore();
     store.dispatch(
@@ -524,7 +532,7 @@ describe('RequestDetailPage', () => {
       error: undefined
     });
     mockUseGetRequestBountyHistoryQuery.mockReturnValue({
-      data: [{ id: 1, amount: '0', createdAt: '2026-01-01', user: null }],
+      data: { bounties: [], actions: [] },
       isLoading: false
     });
 
@@ -536,10 +544,64 @@ describe('RequestDetailPage', () => {
 
     expect(screen.getByText(/unknown user/)).toBeInTheDocument();
 
+    // This used to assert an 'Anonymous' cell, rendered from a `user: null`
+    // bounty the API cannot produce: RequestBounty.userId is a non-nullable FK,
+    // so every bounty-history row carries its pledger. The fixture was the only
+    // thing that made that branch reachable.
     await user.click(screen.getByRole('button', { name: /bounty history/i }));
     await waitFor(() => {
-      expect(screen.getByText('Anonymous')).toBeInTheDocument();
+      expect(screen.getByText('No bounty history.')).toBeInTheDocument();
     });
+  });
+
+  it('renders the bounties from the history response, not the response itself', async () => {
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(setCredentials({ id: 7, username: 'alice' } as never));
+    mockUseGetRequestQuery.mockReturnValue({
+      data: {
+        id: 12,
+        userId: 7,
+        title: 'A request',
+        description: '',
+        type: 'Music',
+        year: null,
+        status: 'open',
+        totalBounty: '104857600',
+        community: null,
+        user: null,
+        filler: null,
+        bounties: [],
+        voteCount: 0
+      },
+      isLoading: false,
+      error: undefined
+    });
+    // The route answers { bounties, actions }. Reading `.length` off that
+    // object silently rendered the empty state for every request that had one.
+    mockUseGetRequestBountyHistoryQuery.mockReturnValue({
+      data: {
+        bounties: [
+          {
+            id: 9,
+            requestId: 12,
+            userId: 7,
+            amount: '104857600',
+            createdAt: '2026-05-17T12:00:00.000Z',
+            user: { id: 7, username: 'alice' }
+          }
+        ],
+        actions: []
+      },
+      isLoading: false
+    });
+
+    renderWithProviders(<RequestDetailPage />, { store });
+    await user.click(screen.getByRole('button', { name: /bounty history/i }));
+    expect(
+      await screen.findByRole('link', { name: 'alice' })
+    ).toBeInTheDocument();
+    expect(screen.queryByText('No bounty history.')).not.toBeInTheDocument();
   });
 
   it('shows no bounty history message when history is empty', async () => {
@@ -571,7 +633,7 @@ describe('RequestDetailPage', () => {
       error: undefined
     });
     mockUseGetRequestBountyHistoryQuery.mockReturnValue({
-      data: [],
+      data: { bounties: [], actions: [] },
       isLoading: false
     });
     renderWithProviders(<RequestDetailPage />, { store });
