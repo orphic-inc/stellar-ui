@@ -74,15 +74,6 @@
     "userApi.ts#getUserRanks",
     "userApi.ts#getUserWarnings",
     "userApi.ts#updatePromotionRule",
-    "userApi.ts#updateUserRank",
-    "wikiApi.ts#compareWikiRevisions",
-    "wikiApi.ts#createWikiPage",
-    "wikiApi.ts#getWikiPage",
-    "wikiApi.ts#getWikiPageByAlias",
-    "wikiApi.ts#getWikiPages",
-    "wikiApi.ts#getWikiRevision",
-    "wikiApi.ts#getWikiRevisions",
-    "wikiApi.ts#rollbackWikiPage",
-    "wikiApi.ts#updateWikiPage"
+    "userApi.ts#updateUserRank"
   ]
 }

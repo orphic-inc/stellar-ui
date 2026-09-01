@@ -6909,7 +6909,7 @@
           "user"
         ]
       },
-      "WikiPage": {
+      "WikiPageSummary": {
         "type": "object",
         "properties": {
           "id": {
@@ -6918,12 +6918,6 @@
           "title": {
             "type": "string",
             "maxLength": 100
-          },
-          "body": {
-            "type": "string"
-          },
-          "bodyHtml": {
-            "type": "string"
           },
           "slug": {
             "type": "string",
@@ -6941,29 +6935,102 @@
           "authorId": {
             "type": "integer"
           },
+          "author": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "username": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "username"
+            ]
+          },
           "createdAt": {
             "type": "string"
           },
           "updatedAt": {
             "type": "string"
           },
-          "deletedAt": {
-            "type": "string",
-            "nullable": true
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "alias": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "integer"
+                },
+                "createdAt": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "alias",
+                "userId",
+                "createdAt"
+              ]
+            }
           }
         },
         "required": [
           "id",
           "title",
-          "body",
           "slug",
           "revision",
           "minReadLevel",
           "minEditLevel",
           "authorId",
+          "author",
           "createdAt",
           "updatedAt",
-          "deletedAt"
+          "aliases"
+        ]
+      },
+      "WikiPage": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/WikiPageSummary"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          }
+        ]
+      },
+      "WikiPageRendered": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/WikiPage"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "bodyHtml": {
+                "type": "string"
+              },
+              "deletedAt": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "bodyHtml"
+            ]
+          }
         ]
       },
       "WikiRevisionSummary": {
@@ -7068,8 +7135,7 @@
                 "type": "integer"
               },
               "body": {
-                "type": "string",
-                "nullable": true
+                "type": "string"
               }
             },
             "required": [
@@ -7084,8 +7150,7 @@
                 "type": "integer"
               },
               "body": {
-                "type": "string",
-                "nullable": true
+                "type": "string"
               }
             },
             "required": [
@@ -25042,7 +25107,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/WikiPage"
+                        "$ref": "#/components/schemas/WikiPageSummary"
                       }
                     },
                     "meta": {
@@ -25168,13 +25233,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WikiPage"
+                  "$ref": "#/components/schemas/WikiPageRendered"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient rank to view this page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "No such alias",
+            "description": "No such alias, or the page behind it is deleted",
             "content": {
               "application/json": {
                 "schema": {
@@ -25192,7 +25267,7 @@
           "Wiki"
         ],
         "summary": "One wiki page",
-        "description": "A page above the caller's read level answers 404, not 403, so the endpoint does not confirm it exists.",
+        "description": "The DIRECT page reads (this and /wiki/by-alias) answer **403** when the page is above the caller read level — they confirm the page exists and say the rank is insufficient. The HISTORY reads (revisions, revision content, compare) answer 404 for the same condition instead. The router is not uniform here; do not infer one from the other.",
         "parameters": [
           {
             "schema": {
@@ -25209,13 +25284,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WikiPage"
+                  "$ref": "#/components/schemas/WikiPageRendered"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient rank to view this page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Not found, or above the caller read level",
+            "description": "Page not found",
             "content": {
               "application/json": {
                 "schema": {
