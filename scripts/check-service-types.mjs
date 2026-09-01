@@ -82,11 +82,12 @@ const classify = (type, base, localIsSpec) => {
   return 'hand';
 };
 
-const analyseFile = (file) => {
-  const src = readFileSync(resolve(SERVICES, file), 'utf8');
-
-  // Local aliases: `type X = ...`. An alias counts as spec-derived when its
-  // right-hand side reads paths[...]/components[...]. An `interface` never can.
+/**
+ * Every type this file declares locally, mapped to whether it resolves to the
+ * generated client. A `type X = components[...]` alias does; an `interface`
+ * never can, because it has to spell the shape out.
+ */
+const collectLocalTypes = (src) => {
   const localIsSpec = new Map();
   for (const m of src.matchAll(
     /^(?:export\s+)?type\s+([A-Za-z0-9_]+)\s*=\s*([\s\S]*?);\s*$/gm
@@ -98,6 +99,12 @@ const analyseFile = (file) => {
   )) {
     if (!localIsSpec.has(m[1])) localIsSpec.set(m[1], false);
   }
+  return localIsSpec;
+};
+
+const analyseFile = (file) => {
+  const src = readFileSync(resolve(SERVICES, file), 'utf8');
+  const localIsSpec = collectLocalTypes(src);
 
   const endpoints = [];
   // `name: build.query<Result, Arg>(` — both `build` and `builder` are used.
