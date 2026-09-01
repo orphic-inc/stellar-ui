@@ -14948,7 +14948,7 @@ export interface paths {
           };
           content: {
             'application/json': {
-              data: components['schemas']['WikiPage'][];
+              data: components['schemas']['WikiPageSummary'][];
               meta: components['schemas']['PaginationMeta'];
             };
           };
@@ -15044,10 +15044,19 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['WikiPage'];
+            'application/json': components['schemas']['WikiPageRendered'];
           };
         };
-        /** @description No such alias */
+        /** @description Insufficient rank to view this page */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such alias, or the page behind it is deleted */
         404: {
           headers: {
             [name: string]: unknown;
@@ -15075,7 +15084,7 @@ export interface paths {
     };
     /**
      * One wiki page
-     * @description A page above the caller's read level answers 404, not 403, so the endpoint does not confirm it exists.
+     * @description The DIRECT page reads (this and /wiki/by-alias) answer **403** when the page is above the caller read level — they confirm the page exists and say the rank is insufficient. The HISTORY reads (revisions, revision content, compare) answer 404 for the same condition instead. The router is not uniform here; do not infer one from the other.
      */
     get: {
       parameters: {
@@ -15094,10 +15103,19 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['WikiPage'];
+            'application/json': components['schemas']['WikiPageRendered'];
           };
         };
-        /** @description Not found, or above the caller read level */
+        /** @description Insufficient rank to view this page */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Page not found */
         404: {
           headers: {
             [name: string]: unknown;
@@ -19472,19 +19490,32 @@ export interface components {
         username: string;
       };
     };
-    WikiPage: {
+    WikiPageSummary: {
       id: number;
       title: string;
-      body: string;
-      bodyHtml?: string;
       slug: string;
       revision: number;
       minReadLevel: number;
       minEditLevel: number;
       authorId: number;
+      author: {
+        id: number;
+        username: string;
+      };
       createdAt: string;
       updatedAt: string;
-      deletedAt: string | null;
+      aliases: {
+        alias: string;
+        userId: number;
+        createdAt: string;
+      }[];
+    };
+    WikiPage: components['schemas']['WikiPageSummary'] & {
+      body: string;
+    };
+    WikiPageRendered: components['schemas']['WikiPage'] & {
+      bodyHtml: string;
+      deletedAt?: string | null;
     };
     WikiRevisionSummary: {
       id: number;
@@ -19513,11 +19544,11 @@ export interface components {
       title: string;
       old: {
         revision: number;
-        body: string | null;
+        body: string;
       };
       new: {
         revision: number;
-        body: string | null;
+        body: string;
       };
     };
     EconomyGroupedItem: {

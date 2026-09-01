@@ -1,97 +1,54 @@
 import { api } from '../api';
+import type { components, paths } from '../../types/api';
 
-export interface WikiAlias {
-  alias: string;
-  userId: number;
-  createdAt: string;
-}
+// ui#277 — every result type below is derived from the vendored contract rather
+// than hand-written. The wiki router projects THREE page shapes and the
+// contract now names all three (stellar-api #487):
+//
+//   WikiPageSummary   PAGE_SELECT           the list rows; carries no `body`
+//   WikiPage          + body                what create/update/rollback echo
+//   WikiPageRendered  + bodyHtml            the two direct page reads
+//
+// `bodyHtml` is the server-rendered, sanitized transcription of the raw BBCode
+// `body` (#398). The API is the single source of transcription; the UI renders
+// this and no longer parses `body` itself. `body` is retained for the edit form,
+// which is why the reads return the rendered shape and the writes do not.
+export type WikiPage = components['schemas']['WikiPageSummary'];
+export type WikiPageWithBody = components['schemas']['WikiPageRendered'];
+export type WikiRevisionSummary = components['schemas']['WikiRevisionSummary'];
+export type WikiRevisionContent = components['schemas']['WikiRevisionContent'];
 
-export interface WikiAuthor {
-  id: number;
-  username: string;
-}
+type WikiListResponse =
+  paths['/wiki']['get']['responses'][200]['content']['application/json'];
+type WikiPageResponse =
+  paths['/wiki/{id}']['get']['responses'][200]['content']['application/json'];
+type WikiPageByAliasResponse =
+  paths['/wiki/by-alias/{alias}']['get']['responses'][200]['content']['application/json'];
+type WikiRevisionsResponse =
+  paths['/wiki/{id}/revisions']['get']['responses'][200]['content']['application/json'];
+type WikiRevisionResponse =
+  paths['/wiki/{id}/revisions/{rev}']['get']['responses'][200]['content']['application/json'];
+type WikiCompareResponse =
+  paths['/wiki/{id}/compare']['get']['responses'][200]['content']['application/json'];
+// The write echoes: PAGE_WITH_BODY_SELECT returned directly, so no `bodyHtml`.
+type CreateWikiPageResponse =
+  paths['/wiki']['post']['responses'][201]['content']['application/json'];
+type UpdateWikiPageResponse =
+  paths['/wiki/{id}']['put']['responses'][200]['content']['application/json'];
+type RollbackWikiPageResponse =
+  paths['/wiki/{id}/rollback/{rev}']['post']['responses'][200]['content']['application/json'];
 
-export interface WikiPage {
-  id: number;
-  title: string;
-  slug: string;
-  revision: number;
-  minReadLevel: number;
-  minEditLevel: number;
-  authorId: number;
-  author: WikiAuthor;
-  createdAt: string;
-  updatedAt: string;
-  aliases: WikiAlias[];
-}
+export type WikiSearchParams = NonNullable<
+  paths['/wiki']['get']['parameters']['query']
+>;
 
-export interface WikiPageWithBody extends WikiPage {
-  body: string;
-  // Server-rendered, sanitized HTML transcription of the raw BBCode `body`
-  // (#398). The API is the single source of transcription; the UI renders this
-  // and no longer parses `body` itself. `body` is retained for the edit form.
-  bodyHtml: string;
-}
-
-export interface WikiRevisionSummary {
-  id: number;
-  revision: number;
-  title: string;
-  authorId: number;
-  author: WikiAuthor;
-  createdAt: string;
-}
-
-export interface WikiRevisionContent {
-  revision: number;
-  title: string;
-  body: string;
-  authorId: number;
-  author: WikiAuthor;
-  createdAt: string;
-}
-
-export interface WikiListResponse {
-  data: WikiPage[];
-  meta: { total: number; page: number; limit: number; totalPages: number };
-}
-
-export interface WikiRevisionsResponse {
-  currentRevision: number;
-  revisions: WikiRevisionSummary[];
-}
-
-export interface WikiSearchParams {
-  q?: string;
-  type?: 'title' | 'body' | 'all';
-  order?: 'title' | 'created' | 'edited';
-  way?: 'asc' | 'desc';
-  page?: number;
-  limit?: number;
-}
-
-export interface WikiCompareResponse {
-  pageId: number;
-  title: string;
-  old: { revision: number; body: string };
-  new: { revision: number; body: string };
-}
-
-export interface CreateWikiPageArgs {
-  title: string;
-  body: string;
-  slug?: string;
-  minReadLevel?: number;
-  minEditLevel?: number;
-}
-
-export interface UpdateWikiPageArgs {
-  id: number;
-  title?: string;
-  body?: string;
-  minReadLevel?: number;
-  minEditLevel?: number;
-}
+export type CreateWikiPageArgs = NonNullable<
+  paths['/wiki']['post']['requestBody']
+>['content']['application/json'];
+type UpdateWikiPageBody = NonNullable<
+  paths['/wiki/{id}']['put']['requestBody']
+>['content']['application/json'];
+export type UpdateWikiPageArgs = UpdateWikiPageBody & { id: number };
 
 export const wikiApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -100,12 +57,12 @@ export const wikiApi = api.injectEndpoints({
       providesTags: ['WikiPage']
     }),
 
-    getWikiPage: build.query<WikiPageWithBody, number>({
+    getWikiPage: build.query<WikiPageResponse, number>({
       query: (id) => `/wiki/${id}`,
       providesTags: (_, __, id) => [{ type: 'WikiPage', id }]
     }),
 
-    getWikiPageByAlias: build.query<WikiPageWithBody, string>({
+    getWikiPageByAlias: build.query<WikiPageByAliasResponse, string>({
       query: (alias) => `/wiki/by-alias/${encodeURIComponent(alias)}`,
       providesTags: (result) =>
         result ? [{ type: 'WikiPage', id: result.id }] : ['WikiPage']
@@ -117,18 +74,18 @@ export const wikiApi = api.injectEndpoints({
     }),
 
     getWikiRevision: build.query<
-      WikiRevisionContent,
+      WikiRevisionResponse,
       { id: number; rev: number }
     >({
       query: ({ id, rev }) => `/wiki/${id}/revisions/${rev}`
     }),
 
-    createWikiPage: build.mutation<WikiPageWithBody, CreateWikiPageArgs>({
+    createWikiPage: build.mutation<CreateWikiPageResponse, CreateWikiPageArgs>({
       query: (body) => ({ url: '/wiki', method: 'POST', body }),
       invalidatesTags: ['WikiPage']
     }),
 
-    updateWikiPage: build.mutation<WikiPageWithBody, UpdateWikiPageArgs>({
+    updateWikiPage: build.mutation<UpdateWikiPageResponse, UpdateWikiPageArgs>({
       query: ({ id, ...body }) => ({ url: `/wiki/${id}`, method: 'PUT', body }),
       invalidatesTags: (_, __, { id }) => [{ type: 'WikiPage', id }, 'WikiPage']
     }),
@@ -159,7 +116,7 @@ export const wikiApi = api.injectEndpoints({
     }),
 
     rollbackWikiPage: build.mutation<
-      WikiPageWithBody,
+      RollbackWikiPageResponse,
       { id: number; rev: number }
     >({
       query: ({ id, rev }) => ({
