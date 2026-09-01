@@ -15,6 +15,7 @@ npm run format           # Prettier --write src
 npm test                 # Jest unit tests (--runInBand)
 npm run test:e2e         # Playwright E2E (requires running API + UI — see below)
 npm run api:sync         # Pull ../stellar-api/openapi.json, then regenerate src/types/api.ts (api:generate alone skips the pull)
+npm run contract:check   # Is the vendored spec still what stellar-api serves? (stellar-ui ADR-0002 amendment, #271)
 ```
 
 > **The dev proxy forwards `/api` and nothing else.** Root-level API endpoints
@@ -387,3 +388,32 @@ npm run typecheck        # verify no type regressions
 spec from `../stellar-api` first — that's the step that picks up new/changed endpoints.
 
 This is a manual step before every PR that touches API response shapes.
+
+### Knowing when a resync is owed
+
+Nothing in CI can compare the vendored spec to stellar-api — the runner checks out
+only this repo, and `api:sync` reads a sibling path. The `API contract freshness`
+gate regenerates `api.ts` **from** the vendored copy, and `version:check` compares
+the manifest **to** it, so both point at the vendored spec and neither can see it
+go stale. That axis rotted three times and shipped three runtime bugs behind a
+green `tsc` (#271).
+
+`.github/workflows/contract-drift.yml` now watches it daily and keeps one tracking
+issue labelled `contract-drift` in sync with what it finds — opened on drift,
+closed automatically once the vendored copy catches up. It is deliberately **not**
+a merge gate: a UI pull request is never wrong because stellar-api moved. See the
+[stellar-ui ADR-0002 amendment](docs/adr/0002-vendored-openapi-contract-and-freshness-gate.md#amendment-2026-08-31--the-third-axis-is-watched-not-gated).
+
+Run the same check yourself before assuming the vendored spec is current:
+
+```bash
+npm run contract:check                                    # against stellar-api main
+node scripts/check-contract-drift.mjs --local ../stellar-api/openapi.json
+```
+
+Exit `0` in sync, `1` drift, `2` undetermined — a `2` means nothing was compared
+and must never be read as "in sync".
+
+**Version equality is not contract equality.** The drift that prompted #271 was
+141 lines behind at an identical `0.8.3`, so a version comparison would have passed
+it. The watch compares content and treats the version as a separate signal.
