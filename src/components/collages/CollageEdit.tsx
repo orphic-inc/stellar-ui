@@ -5,17 +5,17 @@ import { selectCurrentUser } from '../../store/slices/authSlice';
 import {
   useGetCollageQuery,
   useUpdateCollageMutation,
-  type UpdateCollagePayload
+  type UpdateCollagePayload,
+  type CollageDetail
 } from '../../store/services/collageApi';
 import { hasAnyPermission } from '../../utils/permissions';
-import type { Collage } from '../../types';
 import Spinner from '../layout/Spinner';
 
 const CollageEditForm = ({
   collage,
   isStaff
 }: {
-  collage: Collage;
+  collage: CollageDetail;
   isStaff: boolean;
 }) => {
   const collageId = collage.id;

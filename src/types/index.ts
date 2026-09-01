@@ -151,78 +151,18 @@ export interface DownloadGrant {
 export type SiteStats = components['schemas']['SiteStats'];
 
 // ─── Collage ─────────────────────────────────────────────────────────────────
-
-export interface CollageEntryRelease {
-  id: number;
-  title: string;
-  image: string | null;
-  year: number;
-  communityId: number | null;
-  releaseType: string;
-  artist: { id: number; name: string };
-}
-
-export interface CollageEntry {
-  id: number;
-  collageId: number;
-  releaseId: number;
-  userId: number;
-  sort: number;
-  addedAt: string;
-  release?: CollageEntryRelease;
-  user?: { id: number; username: string };
-}
-
-export interface CollageCounts {
-  entries: number;
-  subscriptions: number;
-  bookmarks: number;
-}
-
-export interface Collage {
-  id: number;
-  name: string;
-  description: string;
-  // Server-transcribed, sanitized HTML of the raw BBCode `description` (#402/#207).
-  // Additive: `description` still round-trips the editor; read this for display.
-  descriptionHtml?: string;
-  userId: number;
-  categoryId: number;
-  tags: string[];
-  isLocked: boolean;
-  isDeleted: boolean;
-  maxEntries: number;
-  maxEntriesPerUser: number;
-  isFeatured: boolean;
-  numEntries: number;
-  numSubscribers: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  user?: { id: number; username: string; avatar: string | null };
-  _count?: CollageCounts;
-  entries?: CollageEntry[];
-  isSubscribed?: boolean;
-  isBookmarked?: boolean;
-}
-
-export interface CollageListResponse {
-  data: Collage[];
-  meta: { total: number; page: number; limit: number; totalPages: number };
-}
+//
+// The collage RESPONSE shapes that used to live here — Collage, CollageEntry,
+// CollageEntryRelease, CollageCounts, CollageListResponse — are gone. They are
+// read off the contract in store/services/collageApi.ts (#277), which also
+// distinguishes the list shape from the detail shape; this file's single flat
+// interface could not.
+//
+// CollageOrderBy stays: it is the browse page's sort control, a query argument,
+// which ADR-0010 leaves to the UI.
 
 export type CollageOrderBy =
   'createdAt' | 'updatedAt' | 'name' | 'numEntries' | 'numSubscribers';
-
-export interface ListCollagesQuery {
-  page?: number;
-  search?: string;
-  categoryId?: number;
-  userId?: number;
-  bookmarked?: 'true' | 'false';
-  orderBy?: CollageOrderBy;
-  order?: 'asc' | 'desc';
-}
 
 // ─── Redux state types ───────────────────────────────────────────────────────
 
