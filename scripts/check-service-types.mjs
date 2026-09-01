@@ -137,7 +137,7 @@ const readBaseline = () => {
   }
 };
 
-if (process.argv.includes('--inventory')) {
+const runInventory = () => {
   const byFile = new Map();
   for (const e of all) {
     const r = byFile.get(e.file) ?? { spec: 0, hand: 0, inline: 0 };
@@ -178,9 +178,9 @@ if (process.argv.includes('--inventory')) {
       String(T.inline).padStart(8)
   );
   process.exit(0);
-}
+};
 
-if (process.argv.includes('--write-baseline')) {
+const writeBaseline = () => {
   writeFileSync(
     BASELINE,
     `${JSON.stringify(
@@ -202,52 +202,64 @@ if (process.argv.includes('--write-baseline')) {
     `Wrote ${handTyped.length} entries to service-types-baseline.json`
   );
   process.exit(0);
-}
+};
 
-const baseline = readBaseline();
-const baselineSet = new Set(baseline);
-const present = new Set(all.map(keyOf));
-const handSet = new Set(handTyped.map(keyOf));
+const runGate = () => {
+  const baseline = readBaseline();
+  const baselineSet = new Set(baseline);
+  const present = new Set(all.map(keyOf));
+  const handSet = new Set(handTyped.map(keyOf));
 
-const newlyHandTyped = handTyped
-  .map(keyOf)
-  .filter((k) => !baselineSet.has(k))
-  .sort();
-const stale = baseline.filter((k) => !present.has(k) || !handSet.has(k)).sort();
+  const newlyHandTyped = handTyped
+    .map(keyOf)
+    .filter((k) => !baselineSet.has(k))
+    .sort();
+  const stale = baseline
+    .filter((k) => !present.has(k) || !handSet.has(k))
+    .sort();
 
-if (newlyHandTyped.length > 0) {
-  console.error(
-    `${newlyHandTyped.length} endpoint(s) declare a hand-written result type:`
-  );
-  for (const k of newlyHandTyped) {
-    const e = all.find((x) => keyOf(x) === k);
-    console.error(`  - ${k}  <${e.type}>`);
-  }
-  console.error(
-    '\nBind the result to the generated client instead — components["schemas"]["X"]',
-    '\nor paths["/route"]["get"]["responses"][200]["content"]["application/json"].',
-    '\nA hand-written response type is a second description of the API that nothing',
-    '\ncompares to the real one (#277).\n'
-  );
-}
-
-if (stale.length > 0) {
-  console.error(`${stale.length} baseline entr(ies) are stale:`);
-  for (const k of stale) {
+  if (newlyHandTyped.length > 0) {
     console.error(
-      `  - ${k}${present.has(k) ? ' (now spec-typed)' : ' (no longer exists)'}`
+      `${newlyHandTyped.length} endpoint(s) declare a hand-written result type:`
+    );
+    for (const k of newlyHandTyped) {
+      const e = all.find((x) => keyOf(x) === k);
+      console.error(`  - ${k}  <${e.type}>`);
+    }
+    console.error(
+      '\nBind the result to the generated client instead — components["schemas"]["X"]',
+      '\nor paths["/route"]["get"]["responses"][200]["content"]["application/json"].',
+      '\nA hand-written response type is a second description of the API that nothing',
+      '\ncompares to the real one (#277).\n'
     );
   }
-  console.error(
-    '\nRemove them from service-types-baseline.json. The baseline only ever shrinks.\n'
+
+  if (stale.length > 0) {
+    console.error(`${stale.length} baseline entr(ies) are stale:`);
+    for (const k of stale) {
+      console.error(
+        `  - ${k}${present.has(k) ? ' (now spec-typed)' : ' (no longer exists)'}`
+      );
+    }
+    console.error(
+      '\nRemove them from service-types-baseline.json. The baseline only ever shrinks.\n'
+    );
+  }
+
+  const spec = all.filter((e) => e.source === 'spec').length;
+  const inline = all.filter((e) => e.source === 'inline').length;
+  console.log(
+    `${all.length} endpoints: ${spec} spec-typed, ${handTyped.length} hand-typed ` +
+      `(${baseline.length} baselined), ${inline} inline/void.`
   );
-}
 
-const spec = all.filter((e) => e.source === 'spec').length;
-const inline = all.filter((e) => e.source === 'inline').length;
-console.log(
-  `${all.length} endpoints: ${spec} spec-typed, ${handTyped.length} hand-typed ` +
-    `(${baseline.length} baselined), ${inline} inline/void.`
-);
+  process.exit(newlyHandTyped.length === 0 && stale.length === 0 ? 0 : 1);
+};
 
-process.exit(newlyHandTyped.length === 0 && stale.length === 0 ? 0 : 1);
+const main = () => {
+  if (process.argv.includes('--inventory')) return runInventory();
+  if (process.argv.includes('--write-baseline')) return writeBaseline();
+  return runGate();
+};
+
+main();
