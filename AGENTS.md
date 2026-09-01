@@ -15,7 +15,7 @@ npm run format           # Prettier --write src
 npm test                 # Jest unit tests (--runInBand)
 npm run test:e2e         # Playwright E2E (requires running API + UI — see below)
 npm run api:sync         # Pull ../stellar-api/openapi.json, then regenerate src/types/api.ts (api:generate alone skips the pull)
-npm run contract:check   # Is the vendored spec still what stellar-api serves? (Architecture Decision Record ADR-0002, amended; #271)
+npm run contract:check   # Is the vendored spec still what stellar-api serves? (#271; see "Knowing when a resync is owed")
 ```
 
 > **The dev proxy forwards `/api` and nothing else.** Root-level API endpoints
