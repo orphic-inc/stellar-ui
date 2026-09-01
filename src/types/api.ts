@@ -174,6 +174,350 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/auth/password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Change the password of the authenticated member */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['ChangePasswordBody'];
+        };
+      };
+      responses: {
+        /** @description Password changed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Current password incorrect, or the new one is disallowed */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/auth/email': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Change the email of the authenticated member
+     * @description Requires the current password. The originating IP is recorded with the change.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['ChangeEmailBody'];
+        };
+      };
+      responses: {
+        /** @description Email updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Password incorrect, or the email is already in use */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/auth/recovery/request': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Request an account-recovery email
+     * @description Always answers 200 with the same generic message, whether or not the address belongs to an account. That is deliberate: a distinguishable response would make this an account-enumeration oracle. There is no 404 here by design. Rate-limited by authLimiter.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['RecoveryRequestBody'];
+        };
+      };
+      responses: {
+        /** @description Generic acknowledgement — identical for a known and an unknown address */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/auth/recovery/reset': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Reset a password using a recovery token
+     * @description Rate-limited by authLimiter.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['RecoveryResetBody'];
+        };
+      };
+      responses: {
+        /** @description Password reset */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid or expired token, or the new password is disallowed */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/auth/sessions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Active sessions for the authenticated member
+     * @description Revoked sessions are excluded, so `revokedAt` is always null here. Ordered by `lastActiveAt`, most recent first.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Active sessions */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserSession'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/auth/sessions/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Revoke one of your own sessions
+     * @description Scoped to the caller: another member's session id answers 404 rather than 403, so the endpoint does not confirm that the id exists.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Session revoked */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such session belonging to the caller */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/install': {
     parameters: {
       query?: never;
@@ -242,6 +586,1411 @@ export interface paths {
         };
         /** @description Already installed or validation error */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/install/checklist/{id}/dismiss': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Staff: dismiss one launch-checklist item
+     * @description Idempotent — the dismissed ids are held as a set, so re-dismissing the same item changes nothing. Requires the `staff` permission.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Checklist item dismissed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing the staff permission */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/by-irc-nick/{nick}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * korin: resolve a verified IRC nick to its account
+     * @description Service-key route (ADR-0013), not a member route — authenticate with the korin service key, not a session. A disabled account answers 404 exactly as an unknown nick does, so the endpoint does not reveal that a suspended member exists.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          nick: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The linked account */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['IrcNickAccount'];
+          };
+        };
+        /** @description Missing or wrong service key */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No account linked to that nick, or the account is disabled */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/irc-nick/verify': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * korin: complete an IRC nick verification
+     * @description Service-key route (ADR-0015). korin relays the authenticated IRC sender nick and the code it received over a private query. **Always answers 200** — a failed verification is a `{ verified: false, reason }` RESULT the bot relays back over IRC, not an HTTP error, so do not treat a non-2xx as the failure path here.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            nick: string;
+            code: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Verification result, successful or not */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['IrcNickVerifyResult'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing or wrong service key */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/duplicate-ips': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: accounts sharing a last-seen IP
+     * @description Requires `duplicate_ips_view`. Groups only IPs seen on more than one account, busiest first.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Shared-IP groups */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['DuplicateIpGroup'][];
+          };
+        };
+        /** @description Missing duplicate_ips_view */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/registration-log': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: accounts by registration date
+     * @description Requires `registration_log_view` — its own permission, separate from `duplicate_ips_view`. Newest first. Includes email and last IP, so it is a more sensitive read than the ordinary user list.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated registrations */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['RegistrationLogEntry'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Missing registration_log_view */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/email-history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: a user past email addresses
+     * @description Requires `users_view_email`. The stored column is `newEmail`; it is returned as `email`. Newest change first.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Email history */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              email: string;
+              changedAt: string;
+            }[];
+          };
+        };
+        /** @description Missing users_view_email */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/ip-history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: a user IP history
+     * @description Requires `users_view_ips` — a different permission from `users_view_email`, so the two histories are separately grantable.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description IP history */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              ip: string;
+              seenAt: string;
+            }[];
+          };
+        };
+        /** @description Missing users_view_ips */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/rank': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: a user rank, secondary ranks and lock state
+     * @description Requires `users_edit`. The canonical staff read of `rankLocked` — the admin rank panel initialises its toggle from here.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Rank state */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserRankState'];
+          };
+        };
+        /** @description Missing users_edit */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /**
+     * Staff: set a user rank
+     * @description Requires `users_edit`. **`secondaryRankIds` REPLACES the whole secondary set** — send the full list, not a delta, or you will strip a Donor/VIP secondary. That is exactly why rank-lock is its own route (PUT /users/{id}/rank-lock) rather than a field here. Answers 200 with a message rather than the new rank state; re-read GET /users/{id}/rank for that.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            userRankId: number;
+            /** @default [] */
+            secondaryRankIds?: number[];
+          };
+        };
+      };
+      responses: {
+        /** @description Rank updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing users_edit */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User or rank not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/snatch-list': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: what a user has downloaded
+     * @description Requires `staff`.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Snatch list */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SnatchItem'][];
+          };
+        };
+        /** @description Missing staff */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/me/snatch-list': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * What you have downloaded
+     * @description Self only, and needs no permission — the same shape the staff route returns for someone else.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Your snatch list */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['SnatchItem'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/donor-ranks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The donor rank ladder
+     * @description Readable by any authenticated member — this is the only donor route that does NOT require `donor_ranks_manage`, because the perks are member-facing. Ordered by `minDonation`, cheapest first.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Donor ranks */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['DonorRank'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    /**
+     * Create a donor rank
+     * @description Requires `donor_ranks_manage`.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+            minDonation: number;
+            expiresAfterDays?: number;
+            perks?: {
+              [key: string]: boolean;
+            };
+            color?: string;
+            badge?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Donor rank created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['DonorRank'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing donor_ranks_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/donor-ranks/{rankId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace a donor rank
+     * @description Requires `donor_ranks_manage`. **A full replace, not a partial patch** — it validates against the same schema as create, so any optional field you omit is written as its default rather than left as it was.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          rankId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+            minDonation: number;
+            expiresAfterDays?: number;
+            perks?: {
+              [key: string]: boolean;
+            };
+            color?: string;
+            badge?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated donor rank */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['DonorRank'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing donor_ranks_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Donor rank not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    /**
+     * Delete a donor rank
+     * @description Requires `donor_ranks_manage`.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          rankId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Donor rank deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing donor_ranks_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Donor rank not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/donor': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Grant donor status to a user
+     * @description Requires `donor_ranks_manage`. Omit `expiresAt` for a grant that does not lapse. `donorExpiryJob` sweeps expired grants hourly and is condition-based, so a later staff re-grant survives the sweep. Answers **201 with a message rather than the granted row** — unusual for a 201, but that is what ships.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            donorRankId: number;
+            expiresAt?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Donor status granted */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing donor_ranks_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User or donor rank not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /**
+     * Revoke a user donor status
+     * @description Requires `donor_ranks_manage`. Removes **every** donor-rank grant on that user, not just the most recent, and clears the `isDonor` flag.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Donor status revoked */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing donor_ranks_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/warnings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Warnings on a user
+     * @description Requires `users_warn`. Newest first, each carrying the staff member who issued it.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Warnings */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserWarning'][];
+          };
+        };
+        /** @description Missing users_warn */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/warn': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Warn a user
+     * @description Requires `users_warn`. Beyond creating the row this **increments the user's `warnedTimes` and stamps `warned`**, which is what the Standing tier (PRD-05/ADR-0004) reads — so a warning is a reputation event, not just a note. Omit `expiresAt` for a warning that does not lapse. The response wraps the new row as `{ warning }` and does not include `warnedBy`.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            reason: string;
+            /** Format: date-time */
+            expiresAt?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Warning issued */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              warning: components['schemas']['UserWarning'];
+            };
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing users_warn */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/warnings/{warnId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Rescind a warning
+     * @description Requires `users_warn`.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          warnId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Warning removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing users_warn */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Warning not found on that user */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/notes': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff moderation notes on a user
+     * @description Requires `users_edit` — a DIFFERENT permission from the warnings above, so a moderator who can warn cannot necessarily read notes. Newest first, each carrying its author.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Moderation notes */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['UserModerationNote'][];
+          };
+        };
+        /** @description Missing users_edit */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    /**
+     * Add a moderation note to a user
+     * @description Requires `users_edit`. Unlike a warning this is staff-internal and has no effect on the member's standing. The response wraps the new row as `{ note }` and does not include `author`.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            body: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Note added */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              note: components['schemas']['UserModerationNote'];
+            };
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing users_edit */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/notes/{noteId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete a moderation note
+     * @description Requires `users_edit`.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          noteId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Note deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing users_edit */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description That note does not exist on that user */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/disable': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Disable a user account
+     * @description Requires `users_disable` — a third permission, distinct from both `users_warn` and `users_edit`. This is the SOFT delete: it sets `disabled: true`, it does not remove the row, and the action is written to the audit log. Answers **200 with a message, not 204**.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description User disabled */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing users_disable */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/enable': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Re-enable a disabled user account
+     * @description Requires `users_disable`, the same permission that disables. Audited. Answers **200 with a message, not 204**.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description User enabled */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing users_disable */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -1039,7 +2788,39 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * List every active profile
+     * @description Active (non-disabled) users only, as a flat array. Deliberately not paginated, unlike most list endpoints.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Active profiles */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ProfileSummary'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     put?: never;
     post?: never;
     delete: {
@@ -1069,6 +2850,104 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/reputation': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * korin: the full, unfiltered Community Reputation Score
+     * @description Service-key route, and **the unfiltered view** — unlike GET /profile/me/reputation, which strips the moderation-only dimensions and therefore always reports `suspect: false`. The two share a JSON shape and differ in exposure: this one carries the invite-tree Contagion signal and a MEANINGFUL `suspect` flag, which ADR-0004 section 3 requires be kept from members so a sockpuppet ring is not tipped off. Do not bind a member-facing UI to this route. Whether CRS is member-facing at all is still open (#429); registering this documents what ships and settles nothing.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Unfiltered reputation, including the moderation signal */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CrsView'];
+          };
+        };
+        /** @description Missing or wrong service key */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/me/reputation': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Community Reputation Score for the authenticated member
+     * @description Self-view (ADR-0004 section 3): snatch-derived dimensions are included, moderation-only ones are not, and `suspect` is therefore always false here. `score` is recomputed from the visible dimensions, so a gated viewer cannot back a hidden dimension out of the total.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Reputation */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CrsView'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -1487,7 +3366,66 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    put?: never;
+    /**
+     * Staff: update a news item
+     * @description Requires the `news_manage` permission. Title and body are passed through `sanitizePlain`, so markup in either is stripped rather than stored.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title: string;
+            body: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated news item */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Announcement'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing news_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     post?: never;
     delete: {
       parameters: {
@@ -2693,6 +4631,153 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/notifications/unread-count': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** How many notifications the caller has not read */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Unread count */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              count: number;
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/read-all': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Mark every unread notification as read */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description All notifications marked read */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notifications/{id}/read': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Mark one notification as read
+     * @description Idempotent: re-reading an already-read notification is a no-op.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Notification marked read */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not the recipient */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/subscriptions': {
     parameters: {
       query?: never;
@@ -2947,7 +5032,50 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * One forum category with its forums
+     * @description Forums are ordered by `sort` and carry `lastTopic`. The list is filtered to what the caller may read (`minClassRead`), so two members can get different forums back for the same category.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Category with its readable forums */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ForumCategory'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Category not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     put: {
       parameters: {
         query?: never;
@@ -3016,6 +5144,67 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/forums/{id}/catchup': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Mark every topic in a forum as read
+     * @description Returns how many topics were marked. Only topics with a last post are counted, so `markedRead` can legitimately be 0 for an empty forum.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Topics marked read */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              markedRead: number;
+            };
+          };
+        };
+        /** @description Insufficient class for this forum */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Forum not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -4097,7 +6286,82 @@ export interface paths {
       };
     };
     put?: never;
-    post?: never;
+    /**
+     * Create a community
+     * @description Requires `communities_manage`. `leaderId` is mandatory unless `registrationStatus` is `open`.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+            description?: string;
+            /** Format: uri */
+            image?: string;
+            /** @enum {string} */
+            type:
+              | 'Music'
+              | 'Applications'
+              | 'EBooks'
+              | 'ELearningVideos'
+              | 'Audiobooks'
+              | 'Comedy'
+              | 'Comics';
+            /** @enum {string} */
+            registrationStatus: 'open' | 'invite' | 'closed';
+            /** @enum {string} */
+            announceVisibility?: 'PUBLIC' | 'PRIVATE';
+            allowDuplicateFormats?: boolean;
+            curatorIds?: number[];
+            leaderId?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Community created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Community'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Leader user not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -4142,9 +6406,118 @@ export interface paths {
         };
       };
     };
-    put?: never;
+    /**
+     * Update a community
+     * @description Gated on `communities_manage` ALONE — a community leader or curator cannot configure their own community, so everything here including `announceVisibility` is site-staff-only. That is the settled position, not an oversight: ADR-0030 section 5 was amended to match the code (PR #469).
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name?: string;
+            description?: string;
+            /** Format: uri */
+            image?: string;
+            /** @enum {string} */
+            registrationStatus?: 'open' | 'invite' | 'closed';
+            /** @enum {string} */
+            announceVisibility?: 'PUBLIC' | 'PRIVATE';
+            allowDuplicateFormats?: boolean;
+            curatorIds?: number[];
+            leaderId?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated community */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Community'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community, or the named leader user, not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     post?: never;
-    delete?: never;
+    /**
+     * Delete a community
+     * @description Requires `communities_manage`.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Community deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -4302,6 +6675,355 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{id}/members': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Add a member (consumer) to a community
+     * @description Community admin or curator only.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            userId: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Member added */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CommunityMember'];
+          };
+        };
+        /** @description Not a community admin or curator */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{id}/members/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove a member from a community
+     * @description Answers 409 when the target is the community LEADER or a CURATOR: that role has to be removed first. The leader is checked before the curator because a leader is always also a curator, so the message names the role that actually has to be reassigned.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Member removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not a community admin or curator */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The target is the community leader or a curator; remove that role first */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{id}/curators': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Promote a user to community curator
+     * @description Answers **204, not 201**, unlike POST /communities/{id}/members which answers 201. The asymmetry is existing behaviour and is documented rather than changed.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            userId: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Curator added */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not a community admin or curator */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{id}/curators/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Demote a community curator */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          userId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Curator removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not a community admin or curator */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{communityId}/releases': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a release in a community
+     * @description Requires `communities_manage`. At least one artist credit is required.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            credits: {
+              artistId: number;
+              /** @enum {string} */
+              role?:
+                | 'Main'
+                | 'Guest'
+                | 'Composer'
+                | 'Conductor'
+                | 'DJ'
+                | 'Remixer'
+                | 'Producer'
+                | 'Arranger';
+            }[];
+            title: string;
+            description: string;
+            /** @enum {string} */
+            type:
+              | 'Music'
+              | 'Applications'
+              | 'EBooks'
+              | 'ELearningVideos'
+              | 'Audiobooks'
+              | 'Comedy'
+              | 'Comics';
+            /** @enum {string} */
+            releaseType:
+              | 'Album'
+              | 'Single'
+              | 'EP'
+              | 'Anthology'
+              | 'Compilation'
+              | 'DJMix'
+              | 'Live'
+              | 'Remix'
+              | 'Bootleg'
+              | 'Interview'
+              | 'Mixtape'
+              | 'Demo'
+              | 'ConcertRecording'
+              | 'Unknown';
+            year: number;
+            /** Format: uri */
+            image?: string;
+            tagIds?: number[];
+          };
+        };
+      };
+      responses: {
+        /** @description Release created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Release'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{communityId}/releases/{releaseId}': {
     parameters: {
       query?: never;
@@ -4341,9 +7063,226 @@ export interface paths {
         };
       };
     };
-    put?: never;
+    /**
+     * Update release metadata
+     * @description Returns the release workbench view, not the bare release. **`tagIds` is accepted by the schema and then ignored** — tags are managed through the /tags routes, so sending them here succeeds and changes nothing. `editSummary` is recorded on the resulting history entry.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title?: string;
+            description?: string;
+            /** Format: uri */
+            image?: string;
+            year?: number;
+            tagIds?: number[];
+            editSummary?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated release, as the workbench view */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Release'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not permitted to edit this release */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     post?: never;
-    delete?: never;
+    /**
+     * Delete a release
+     * @description Requires `communities_manage`.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Release deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{communityId}/releases/{releaseId}/vote': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Cast or change your vote on a release
+     * @description `positive: true` is an up-vote, `false` a down-vote.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            positive: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Your vote and the new aggregate */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CommunityVoteState'];
+          };
+        };
+        /** @description Not permitted to vote in this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /**
+     * Clear your vote on a release
+     * @description Answers **200 with the new state**, not 204 — it clears a vote rather than deleting a resource, and the caller needs the updated aggregate.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Your (now cleared) vote and the new aggregate */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CommunityVoteState'];
+          };
+        };
+        /** @description Not permitted to vote in this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -4953,6 +7892,187 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/contributions/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * One contribution, with its release, collaborators and comments
+     * @description Comments carry `bodyHtml`, rendered at read time from BBCode. `sizeInBytes` is serialised as a number rather than the global BigInt-to-string default.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Contribution */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Contribution'];
+          };
+        };
+        /** @description Contribution not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/contributions/{id}/report': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Flag a dead or misleading link on a contribution
+     * @description Files a `dead_link` report AND records the report against the contribution, which is what drives the auto-warn at three reports (modules/linkHealth).
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            reason: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Report submitted */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Contribution not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/contributions/{id}/ratio-exempt': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Staff: set or clear a contribution ratio exemption
+     * @description Requires the `contributions_manage` permission. FREEPASS and NEUTRALPASS are the Freepass/Neutralpass exemptions; NONE clears them.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            /** @enum {string} */
+            ratioExempt: 'NONE' | 'FREEPASS' | 'NEUTRALPASS';
+          };
+        };
+      };
+      responses: {
+        /** @description Updated contribution */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Contribution'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing contributions_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -5943,7 +9063,41 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * One comment, with its author
+     * @description Deliberately unauthenticated — this route carries no auth middleware, unlike the PUT and DELETE beside it.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Comment */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Comment'];
+          };
+        };
+        /** @description Comment not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     put: {
       parameters: {
         query?: never;
@@ -6987,7 +10141,356 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/requests': {
+  '/requests/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get request details
+     * @description The only request response that carries `voteCount` and `votes`; the other routes return the serialized request without them.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Request detail */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['RequestDetail'];
+          };
+        };
+        /** @description Request not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /**
+     * Edit a request
+     * @description The owner, or a holder of `requests_moderate`. Only requests in the `open` status may be edited — editing a filled or deleted one answers **422**, which this router uses for STATE violations as distinct from the 400 it uses for validation.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title?: string;
+            description?: string;
+            /** @enum {string} */
+            type?:
+              | 'Music'
+              | 'Applications'
+              | 'EBooks'
+              | 'ELearningVideos'
+              | 'Audiobooks'
+              | 'Comedy'
+              | 'Comics';
+            year?: number | null;
+            image?: string | '';
+          };
+        };
+      };
+      responses: {
+        /** @description Updated request */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Request'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Neither the owner nor a request moderator */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Request not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Only open requests can be edited */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    /**
+     * Delete a request
+     * @description The owner, or a holder of `requests_moderate`.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Request deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Neither the owner nor a request moderator */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Request not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/requests/{id}/vote': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Toggle your vote on a request
+     * @description A TOGGLE despite the name: posting when you have already voted removes the vote. The response says which state you ended in. Takes no body.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Resulting vote state */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              voted: boolean;
+            };
+          };
+        };
+        /** @description Request not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/requests/{id}/unfill': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Reverse a fill on a request
+     * @description The owner, the filler, or a holder of `requests_moderate`. A request that is not currently filled answers **422**.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            reason?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description The request, back in the open status */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Request'];
+          };
+        };
+        /** @description Neither owner, filler, nor a request moderator */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Request not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Request is not filled */
+        422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/requests/{id}/bounty-history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Every bounty and lifecycle action on a request
+     * @description Two parallel lists, each newest first: the bounties pledged, and the lifecycle actions (create, add bounty, fill, unfill, delete, restore). Bounty `amount` is a BigInt column and serialises as a string.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Bounties and actions */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              bounties: components['schemas']['RequestBountyEntry'][];
+              actions: components['schemas']['RequestActionEntry'][];
+            };
+          };
+        };
+        /** @description Request not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/requests': {
     parameters: {
       query?: never;
       header?: never;
@@ -6997,19 +10500,42 @@ export interface paths {
     /** List requests */
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          q?: string;
+          artist?: string;
+          type?:
+            | 'Music'
+            | 'Applications'
+            | 'EBooks'
+            | 'ELearningVideos'
+            | 'Audiobooks'
+            | 'Comedy'
+            | 'Comics';
+          year?: number;
+          page?: number;
+          limit?: number;
+          communityId?: number;
+          status?: 'open' | 'filled' | 'deleted';
+          orderBy?: 'createdAt' | 'voteCount' | 'random';
+          order?: 'asc' | 'desc';
+        };
         header?: never;
         path?: never;
         cookie?: never;
       };
       requestBody?: never;
       responses: {
-        /** @description Success */
+        /** @description Paginated requests */
         200: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': {
+              data: components['schemas']['Request'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
         };
       };
     };
@@ -7045,19 +10571,23 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Created */
+        /** @description Request created */
         201: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': components['schemas']['Request'];
+          };
         };
-        /** @description Bad Request */
+        /** @description Validation error */
         400: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
       };
     };
@@ -7067,50 +10597,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/requests/{id}': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get request details */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Success */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-        /** @description Not Found */
-        404: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/requests/{id}/bounty': {
+  '/requests/{id}/bounty': {
     parameters: {
       query?: never;
       header?: never;
@@ -7119,7 +10606,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Add bounty to request */
+    /**
+     * Add bounty to request
+     * @description The amount is deducted from the caller's contributed balance, so an insufficient balance answers 400 rather than 403. There is a site minimum bounty; below it is also a 400.
+     */
     post: {
       parameters: {
         query?: never;
@@ -7137,12 +10627,32 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description The request, with the new bounty totalled in */
         200: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': components['schemas']['Request'];
+          };
+        };
+        /** @description Below the minimum bounty, or insufficient contributed balance */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Request not found, or not open */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -7152,7 +10662,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/requests/{id}/fill': {
+  '/requests/{id}/fill': {
     parameters: {
       query?: never;
       header?: never;
@@ -7161,7 +10671,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Fill request */
+    /**
+     * Fill request
+     * @description Nominates a contribution as the fill. The bounty is paid out and the request moves to the `filled` status; POST /requests/{id}/unfill reverses it.
+     */
     post: {
       parameters: {
         query?: never;
@@ -7179,12 +10692,50 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Success */
+        /** @description The request, now filled */
         200: {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': components['schemas']['Request'];
+          };
+        };
+        /** @description The contribution is not eligible: wrong community, wrong release type, or already the active fill for another request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description You can only fill a request with your own contribution */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Request or contribution not found, or the request is not open */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Lost a race — the request was already filled by another submission */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -7254,6 +10805,256 @@ export interface paths {
         };
         /** @description Validation error */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/messages/drafts': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Draft private messages belonging to the caller
+     * @description Newest `updatedAt` first.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Drafts */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PmDraftWithRecipient'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    /**
+     * Create a draft private message
+     * @description The recipient may be given as `toUserId` or `toUsername`; either is optional, so a draft can be saved before a recipient is chosen.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            toUserId?: number;
+            toUsername?: string;
+            subject: string;
+            body: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Draft created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PmDraft'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/messages/drafts/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update one of your drafts */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            toUserId?: number;
+            toUsername?: string;
+            subject: string;
+            body: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Draft updated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['PmDraft'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description No such draft belonging to the caller */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** Delete one of your drafts */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Draft deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description No such draft belonging to the caller */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/messages/mass': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Staff: send one message to every active member, or one rank
+     * @description Requires the `messages_mass_pm` permission. **Capped at 1000 recipients** (`take: 1000`), so a larger site silently reaches only the first 1000; the sender is skipped. Omit `targetRankId` to target every active member. The send is also recorded as a MassMessage row.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            subject: string;
+            body: string;
+            targetRankId?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description How many conversations were created */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              sentCount: number;
+            };
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing messages_mass_pm */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -7799,6 +11600,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Reply to a staff-inbox ticket
+     * @description Returns the created message. A ticket belonging to someone else is masked as **404, never 403** — the route deliberately does not confirm that another member's ticket exists.
+     */
     post: {
       parameters: {
         query?: never;
@@ -7821,10 +11626,12 @@ export interface paths {
           headers: {
             [name: string]: unknown;
           };
-          content?: never;
+          content: {
+            'application/json': components['schemas']['StaffInboxMessage'];
+          };
         };
-        /** @description Forbidden */
-        403: {
+        /** @description No such ticket, or it is not the caller's */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -8689,6 +12496,65 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/me/ratio': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Detailed ratio stats for the authenticated member
+     * @description The ratio accounting plus the current policy state, in one read. `contributed`, `consumed` and `eligibleContributionBytes` are BigInt columns and serialise as strings.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Ratio stats and policy state */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['RatioStats'] & {
+              policy: components['schemas']['RatioPolicyState'];
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -10360,6 +14226,1355 @@ export interface paths {
           content?: never;
         };
         /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Browse collages
+     * @description Personal collages (categoryId 0) are excluded from general browse unless you filter by `userId` or ask for `categoryId=0` explicitly. Deleted collages are never listed here — see GET /collages/deleted.
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          limit?: number;
+          search?: string;
+          categoryId?: number | null;
+          userId?: number;
+          bookmarked?: 'true' | 'false';
+          orderBy?:
+            | 'createdAt'
+            | 'updatedAt'
+            | 'name'
+            | 'numEntries'
+            | 'numSubscribers';
+          order?: 'asc' | 'desc';
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated collages */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['Collage'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Create a collage */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name: string;
+            description: string;
+            /** @default 1 */
+            categoryId?: number;
+            /** @default [] */
+            tags?: string[];
+          };
+        };
+      };
+      responses: {
+        /** @description Collage created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Collage'];
+          };
+        };
+        /** @description Validation error, or a creation rule rejected the request */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not permitted to create collages */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * One collage with its entries and your subscription context
+     * @description Entries are ordered by `sort`. `isSubscribed`/`isBookmarked` describe the CALLER, so this response is per-viewer and not cacheable across members. Visiting while subscribed updates your `lastVisit`. Two access rules are worth noting: a DELETED collage answers 404 to non-staff rather than 403, and a PERSONAL collage (categoryId 0) answers 403 to anyone but its owner or staff.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Collage detail */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CollageDetail'];
+          };
+        };
+        /** @description Personal collage belonging to someone else */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found, or deleted and the caller is not staff */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /**
+     * Update a collage
+     * @description `isLocked` and the two entry limits are STAFF-ONLY fields: an owner sending them gets 403, distinct from the 403 for editing a collage that is not theirs.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            name?: string;
+            description?: string;
+            tags?: string[];
+            isFeatured?: boolean;
+            isLocked?: boolean;
+            maxEntries?: number;
+            maxEntriesPerUser?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated collage */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Collage'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not the owner, or a staff-only field (isLocked, maxEntries, maxEntriesPerUser) was sent */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Collage name already taken */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    /**
+     * Delete a collage
+     * @description The deletion is NOT uniform. A PERSONAL collage (categoryId 0) is HARD deleted by its owner or staff and cannot be recovered. A PUBLIC collage is soft-deleted (sets `isDeleted`) and only staff may do it, so an owner who can delete their personal collage gets 403 on a public one; use POST /collages/{id}/recover to restore that case.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Collage deleted — hard if personal, soft if public */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Neither owner nor staff, or a public collage and the caller is not staff */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages/{id}/recover': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Staff: restore a soft-deleted collage */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Collage restored */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Collage'];
+          };
+        };
+        /** @description The collage is not deleted */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages/{id}/entries': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Reorder the entries of a collage
+     * @description Send every entry id with its new `sort`.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            entries: {
+              id: number;
+              sort: number;
+            }[];
+          };
+        };
+      };
+      responses: {
+        /** @description Entries reordered */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Only the collage owner or staff may reorder entries */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Collage not found, or deleted */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /** Add a release to a collage */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            releaseId: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Entry added */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CollageEntry'];
+          };
+        };
+        /** @description An entry limit was reached — either the collage maximum or your per-user limit */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The collage is locked, or it is personal and not yours to add to */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Collage or release not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description That release is already in the collage */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages/{id}/entries/{releaseId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove a release from a collage
+     * @description Addressed by RELEASE id, not entry id — the pair is unique per collage.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Entry removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description The collage is locked, or the entry is not the caller's */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Collage or entry not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages/{id}/subscribe': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Toggle your subscription to a collage
+     * @description A TOGGLE despite the name: posting when already subscribed unsubscribes you. The response says which state you ended in.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Resulting subscription state */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              subscribed: boolean;
+            };
+          };
+        };
+        /** @description Collage not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages/{id}/bookmark': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Toggle your bookmark on a collage
+     * @description A toggle, like /subscribe.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Resulting bookmark state */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              bookmarked: boolean;
+            };
+          };
+        };
+        /** @description Collage not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/collages/{id}/subscriptions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: who is subscribed to a collage
+     * @description Requires `collages_moderate`. Ordered by `lastVisit`, most recent first.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Subscribers */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['CollageSubscriber'][];
+          };
+        };
+        /** @description Missing collages_moderate */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Collage not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Search and list wiki pages */
+    get: {
+      parameters: {
+        query?: {
+          q?: string;
+          type?: 'title' | 'body' | 'all';
+          order?: 'title' | 'created' | 'edited';
+          way?: 'asc' | 'desc';
+          page?: number;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated pages */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['WikiPage'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    /**
+     * Create a wiki page
+     * @description Requires `wiki_edit`, or one of `wiki_manage`/`admin`/`staff`. **`minReadLevel` and `minEditLevel` are forced to 0 unless the caller can MANAGE the wiki** — a plain `wiki_edit` author cannot create a restricted page, and the values they send are ignored rather than rejected.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title: string;
+            body: string;
+            slug?: string;
+            /** @default 0 */
+            minReadLevel?: number;
+            /** @default 0 */
+            minEditLevel?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Page created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['WikiPage'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Neither wiki_edit nor a managing permission */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/by-alias/{alias}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Resolve an alias to its page
+     * @description The alias is a SLUG, not an id, and is normalised (lowercased, non-alphanumerics collapsed to hyphens) before lookup.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          alias: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The aliased page */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['WikiPage'];
+          };
+        };
+        /** @description No such alias */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * One wiki page
+     * @description A page above the caller's read level answers 404, not 403, so the endpoint does not confirm it exists.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Page */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['WikiPage'];
+          };
+        };
+        /** @description Not found, or above the caller read level */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /** Update a wiki page */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title?: string;
+            body?: string;
+            minReadLevel?: number;
+            minEditLevel?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Updated page */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['WikiPage'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Insufficient permission to edit this page */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found, or above the caller read level */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    /**
+     * Delete a wiki page
+     * @description Gated at the middleware by `wiki_manage` or `admin` — the per-page edit level does not grant deletion.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Page deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Missing wiki_manage/admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Page not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/{id}/revisions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Revision history for a page
+     * @description Requires the page EDIT level, not the read level — being able to read a page does not entitle you to its history.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description History, newest revision first */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              currentRevision: number;
+              revisions: components['schemas']['WikiRevisionSummary'][];
+            };
+          };
+        };
+        /** @description Insufficient permission to view revision history */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not found, or above the caller read level */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/{id}/revisions/{rev}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The full body of one revision
+     * @description Requires the page EDIT level. Asking for the CURRENT revision returns the live page shaped like a revision, in which case `createdAt` is the page's `updatedAt` rather than a revision row's own timestamp.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          rev: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Revision content */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['WikiRevisionContent'];
+          };
+        };
+        /** @description Insufficient permission to view revision content */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Page or revision not found, or above the caller read level */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/{id}/compare': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Compare two revisions of a page
+     * @description Requires the page EDIT level. `old` must be strictly less than `new`. Either body comes back null if that revision has no stored body.
+     */
+    get: {
+      parameters: {
+        query: {
+          old: number;
+          new: number;
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Both revision bodies */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['WikiCompare'];
+          };
+        };
+        /** @description `old` must be less than `new` */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Insufficient permission to compare revisions */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Page or either revision not found, or above the caller read level */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/{id}/rollback/{rev}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Roll a page back to an earlier revision
+     * @description Requires the page EDIT level. The rollback is written as a NEW revision rather than by rewinding, so history is never discarded.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          rev: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The page after rollback */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['WikiPage'];
+          };
+        };
+        /** @description Insufficient permission to edit this page */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Page or revision not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/{id}/aliases': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Add an alias to a page */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            alias: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Alias created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              alias: string;
+            };
+          };
+        };
+        /** @description The alias normalised to nothing usable */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Page not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description That alias is already in use */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/wiki/{id}/aliases/{alias}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove an alias from a page
+     * @description The alias is addressed by its slug, which is its primary key.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          alias: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Alias removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Page not found, or that alias is not on this page */
         404: {
           headers: {
             [name: string]: unknown;
@@ -12576,6 +17791,32 @@ export interface components {
         assetLimit?: number | null;
       };
     };
+    ChangePasswordBody: {
+      currentPassword: string;
+      newPassword: string;
+    };
+    ChangeEmailBody: {
+      /** Format: email */
+      newEmail: string;
+      password: string;
+    };
+    RecoveryRequestBody: {
+      /** Format: email */
+      email: string;
+    };
+    RecoveryResetBody: {
+      token: string;
+      newPassword: string;
+    };
+    UserSession: {
+      id: string;
+      userId: number;
+      ipAddress: string;
+      userAgent: string | null;
+      createdAt: string;
+      lastActiveAt: string;
+      revokedAt: string | null;
+    };
     PublicUser: {
       id: number;
       username: string;
@@ -12832,6 +18073,89 @@ export interface components {
       /** Format: email */
       email: string;
     };
+    IrcNickAccount: {
+      id: number;
+      username: string;
+      ircNick: string | null;
+    };
+    IrcNickVerifyResult: {
+      verified: boolean;
+      reason?: string;
+    };
+    SnatchItem: {
+      id: number;
+      release: {
+        id: number;
+        title: string;
+        communityId: number | null;
+      };
+      artist: {
+        name: string;
+      } | null;
+      downloadedAt: string;
+    };
+    DuplicateIpGroup: {
+      ip: string;
+      count: number;
+      users: {
+        id: number;
+        username: string;
+        dateRegistered: string;
+        disabled: boolean;
+        lastLogin: string | null;
+      }[];
+    };
+    RegistrationLogEntry: {
+      id: number;
+      username: string;
+      email: string;
+      dateRegistered: string;
+      disabled: boolean;
+      lastIp: string | null;
+      userRank: {
+        id: number;
+        name: string;
+      };
+    };
+    UserRankState: {
+      userRankId: number;
+      secondaryRankIds: number[];
+      rankLocked: boolean;
+    };
+    DonorRank: {
+      id: number;
+      name: string;
+      minDonation: number;
+      expiresAfterDays: number | null;
+      perks: {
+        [key: string]: boolean;
+      };
+      color: string;
+      badge: string;
+    };
+    UserWarning: {
+      id: number;
+      userId: number;
+      warnedById: number;
+      reason: string;
+      expiresAt: string | null;
+      createdAt: string;
+      warnedBy?: {
+        id: number;
+        username: string;
+      };
+    };
+    UserModerationNote: {
+      id: number;
+      userId: number;
+      authorId: number;
+      body: string;
+      createdAt: string;
+      author?: {
+        id: number;
+        username: string;
+      };
+    };
     IrcNickLinkResult: {
       msg: string;
       ircNick?: string | null;
@@ -12868,6 +18192,24 @@ export interface components {
         id: number;
         username: string;
       } | null;
+    };
+    ProfileSummary: {
+      id: number;
+      username: string;
+      avatar: string | null;
+      profile: {
+        profileTitle: string | null;
+      } | null;
+    };
+    CrsDimension: {
+      name: string;
+      subScore: number;
+      weighted: number;
+    };
+    CrsView: {
+      score: number;
+      dimensions: components['schemas']['CrsDimension'][];
+      suspect: boolean;
     };
     DonorRewards: {
       rewards: {
@@ -13505,6 +18847,10 @@ export interface components {
       sortOrder: number;
       members: components['schemas']['StaffMember'][];
     };
+    CommunityVoteState: {
+      myVote: number | null;
+      voteAggregate: number;
+    };
     Comment: {
       id: number;
       page: string;
@@ -13621,6 +18967,72 @@ export interface components {
         username: string;
       };
     };
+    RequestBountyEntry: {
+      id: number;
+      requestId: number;
+      userId: number;
+      amount: string;
+      createdAt: string;
+      user: {
+        id: number;
+        username: string;
+      };
+    };
+    Request: {
+      id: number;
+      communityId: number;
+      userId: number;
+      title: string;
+      description: string;
+      type: string;
+      year: number | null;
+      image: string | null;
+      /** @enum {string} */
+      status: 'open' | 'filled' | 'deleted';
+      fillerId: number | null;
+      filledAt: string | null;
+      filledContributionId: number | null;
+      totalBounty: string;
+      createdAt: string;
+      updatedAt: string;
+      deletedAt: string | null;
+      _count: {
+        bounties: number;
+      };
+      user?: {
+        id: number;
+        username: string;
+      };
+      filler?: {
+        id: number;
+        username: string;
+      } | null;
+      community?: {
+        id: number;
+        name: string;
+      };
+      bounties?: components['schemas']['RequestBountyEntry'][];
+      artists?: unknown[];
+      filledContribution?: unknown;
+    };
+    RequestDetail: components['schemas']['Request'] & {
+      voteCount: number;
+      votes: {
+        userId: number;
+      }[];
+    };
+    RequestActionEntry: {
+      id: number;
+      requestId: number;
+      actorId: number;
+      /** @enum {string} */
+      action:
+        'CREATE' | 'ADD_BOUNTY' | 'FILL' | 'UNFILL' | 'DELETE' | 'RESTORE';
+      metadata: {
+        [key: string]: unknown;
+      } | null;
+      createdAt: string;
+    };
     PrivateMessage: {
       id: number;
       conversationId: number;
@@ -13653,6 +19065,21 @@ export interface components {
       pageSize: number;
       conversations: components['schemas']['PrivateConversation'][];
     };
+    PmDraft: {
+      id: number;
+      userId: number;
+      toUserId: number | null;
+      subject: string;
+      body: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+    PmDraftWithRecipient: components['schemas']['PmDraft'] & {
+      toUser: {
+        id: number;
+        username: string;
+      } | null;
+    };
     StaffInboxTicket: {
       id: number;
       subject: string;
@@ -13677,6 +19104,12 @@ export interface components {
       pageSize: number;
       conversations: components['schemas']['StaffInboxTicket'][];
     };
+    StaffInboxMessage: {
+      id: number;
+      body: string;
+      createdAt: string;
+      sender: components['schemas']['AuthorRef'] & unknown;
+    };
     StaffInboxResponse: {
       id: number;
       name: string;
@@ -13691,6 +19124,20 @@ export interface components {
       watchExpiresAt: string | null;
       downloadDisabledAt: string | null;
       lastEvaluatedAt: string;
+    };
+    RatioStats: {
+      ratio: number;
+      contributed: string;
+      consumed: string;
+      bracket: {
+        label: string;
+        maxRequired: number;
+        minRequired: number;
+      };
+      eligibleContributionBytes: string;
+      contributionCoverage: number;
+      requiredRatio: number;
+      meetsRequirement: boolean;
     };
     SiteSettings: {
       id: number;
@@ -13957,6 +19404,121 @@ export interface components {
       };
       deletedAt: string | null;
       createdAt: string;
+    };
+    Collage: {
+      id: number;
+      name: string;
+      description: string;
+      descriptionHtml?: string;
+      userId: number;
+      categoryId: number;
+      tags: string[];
+      isLocked: boolean;
+      isDeleted: boolean;
+      maxEntries: number;
+      maxEntriesPerUser: number;
+      isFeatured: boolean;
+      numEntries: number;
+      numSubscribers: number;
+      createdAt: string;
+      updatedAt: string;
+      deletedAt: string | null;
+      user: {
+        id: number;
+        username: string;
+        avatar: string | null;
+      };
+      _count: {
+        entries: number;
+        subscriptions: number;
+        bookmarks: number;
+      };
+    };
+    CollageEntry: {
+      id: number;
+      collageId: number;
+      releaseId: number;
+      userId: number;
+      sort: number;
+      addedAt: string;
+      release: {
+        id: number;
+        title: string;
+        image: string | null;
+        year: number | null;
+        communityId: number | null;
+        releaseType: string | null;
+        artist: {
+          id: number;
+          name: string;
+        } | null;
+      };
+      user: {
+        id: number;
+        username: string;
+      };
+    };
+    CollageDetail: components['schemas']['Collage'] & {
+      entries: components['schemas']['CollageEntry'][];
+      isSubscribed: boolean;
+      isBookmarked: boolean;
+    };
+    CollageSubscriber: {
+      userId: number;
+      collageId: number;
+      lastVisit: string | null;
+      user: {
+        id: number;
+        username: string;
+      };
+    };
+    WikiPage: {
+      id: number;
+      title: string;
+      body: string;
+      bodyHtml?: string;
+      slug: string;
+      revision: number;
+      minReadLevel: number;
+      minEditLevel: number;
+      authorId: number;
+      createdAt: string;
+      updatedAt: string;
+      deletedAt: string | null;
+    };
+    WikiRevisionSummary: {
+      id: number;
+      revision: number;
+      title: string;
+      authorId: number;
+      author: {
+        id: number;
+        username: string;
+      };
+      createdAt: string;
+    };
+    WikiRevisionContent: {
+      revision: number;
+      title: string;
+      body: string;
+      authorId: number;
+      author: {
+        id: number;
+        username: string;
+      };
+      createdAt: string;
+    };
+    WikiCompare: {
+      pageId: number;
+      title: string;
+      old: {
+        revision: number;
+        body: string | null;
+      };
+      new: {
+        revision: number;
+        body: string | null;
+      };
     };
     EconomyGroupedItem: {
       reason: string;
