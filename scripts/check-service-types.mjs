@@ -58,13 +58,29 @@ const EXEMPT = new Set(['devToolsApi.ts']);
 
 /** A result type that needs no checking: void, a primitive, or an inline shape. */
 const isInline = (t) =>
-  /^(void|unknown|never|string|number|boolean|null|undefined)(\[\])?$/.test(t) ||
+  /^(void|unknown|never|string|number|boolean|null|undefined)(\[\])?$/.test(
+    t
+  ) ||
   t.startsWith('{') ||
   t.startsWith('Blob') ||
   t.startsWith('ArrayBuffer');
 
 /** Does this type expression read the generated client? */
 const readsSpec = (t) => /\b(paths|components)\s*\[/.test(t);
+
+/**
+ * Where did this result type come from?
+ *
+ * A type imported from elsewhere (types/index.ts and friends) counts as
+ * hand-written: those modules are exactly where the duplicate declarations
+ * live, so assuming otherwise would suppress the finding.
+ */
+const classify = (type, base, localIsSpec) => {
+  if (isInline(base)) return 'inline';
+  if (readsSpec(type)) return 'spec';
+  if (localIsSpec.has(base)) return localIsSpec.get(base) ? 'spec' : 'hand';
+  return 'hand';
+};
 
 const analyseFile = (file) => {
   const src = readFileSync(resolve(SERVICES, file), 'utf8');
@@ -77,7 +93,9 @@ const analyseFile = (file) => {
   )) {
     localIsSpec.set(m[1], readsSpec(m[2]));
   }
-  for (const m of src.matchAll(/^(?:export\s+)?interface\s+([A-Za-z0-9_]+)/gm)) {
+  for (const m of src.matchAll(
+    /^(?:export\s+)?interface\s+([A-Za-z0-9_]+)/gm
+  )) {
     if (!localIsSpec.has(m[1])) localIsSpec.set(m[1], false);
   }
 
@@ -90,15 +108,13 @@ const analyseFile = (file) => {
     const type = rawType.trim();
     const base = type.replace(/\[\]$/, '').trim();
 
-    let source;
-    if (isInline(base)) source = 'inline';
-    else if (readsSpec(type)) source = 'spec';
-    else if (localIsSpec.has(base)) source = localIsSpec.get(base) ? 'spec' : 'hand';
-    // Imported from elsewhere (types/index.ts and friends) — those modules are
-    // where the 52 duplicate declarations live, so treat as hand-written.
-    else source = 'hand';
-
-    endpoints.push({ file, name, kind, type, source });
+    endpoints.push({
+      file,
+      name,
+      kind,
+      type,
+      source: classify(type, base, localIsSpec)
+    });
   }
   return endpoints;
 };
@@ -131,22 +147,35 @@ if (process.argv.includes('--inventory')) {
   const rows = [...byFile.entries()].sort((a, b) => b[1].hand - a[1].hand);
   const T = { spec: 0, hand: 0, inline: 0 };
   console.log(
-    'file'.padEnd(24) + 'eps'.padStart(5) + 'spec'.padStart(6) + 'hand'.padStart(6) + 'inline'.padStart(8)
+    'file'.padEnd(24) +
+      'eps'.padStart(5) +
+      'spec'.padStart(6) +
+      'hand'.padStart(6) +
+      'inline'.padStart(8)
   );
   for (const [f, r] of rows) {
     const n = r.spec + r.hand + r.inline;
     const mark = EXEMPT.has(f) ? '  (exempt)' : '';
     console.log(
-      f.padEnd(24) + String(n).padStart(5) + String(r.spec).padStart(6) +
-        String(r.hand).padStart(6) + String(r.inline).padStart(8) + mark
+      f.padEnd(24) +
+        String(n).padStart(5) +
+        String(r.spec).padStart(6) +
+        String(r.hand).padStart(6) +
+        String(r.inline).padStart(8) +
+        mark
     );
-    T.spec += r.spec; T.hand += r.hand; T.inline += r.inline;
+    T.spec += r.spec;
+    T.hand += r.hand;
+    T.inline += r.inline;
   }
   const total = T.spec + T.hand + T.inline;
   console.log('-'.repeat(49));
   console.log(
-    'TOTAL'.padEnd(24) + String(total).padStart(5) + String(T.spec).padStart(6) +
-      String(T.hand).padStart(6) + String(T.inline).padStart(8)
+    'TOTAL'.padEnd(24) +
+      String(total).padStart(5) +
+      String(T.spec).padStart(6) +
+      String(T.hand).padStart(6) +
+      String(T.inline).padStart(8)
   );
   process.exit(0);
 }
@@ -169,7 +198,9 @@ if (process.argv.includes('--write-baseline')) {
       2
     )}\n`
   );
-  console.log(`Wrote ${handTyped.length} entries to service-types-baseline.json`);
+  console.log(
+    `Wrote ${handTyped.length} entries to service-types-baseline.json`
+  );
   process.exit(0);
 }
 
@@ -178,10 +209,11 @@ const baselineSet = new Set(baseline);
 const present = new Set(all.map(keyOf));
 const handSet = new Set(handTyped.map(keyOf));
 
-const newlyHandTyped = handTyped.map(keyOf).filter((k) => !baselineSet.has(k)).sort();
-const stale = baseline
-  .filter((k) => !present.has(k) || !handSet.has(k))
+const newlyHandTyped = handTyped
+  .map(keyOf)
+  .filter((k) => !baselineSet.has(k))
   .sort();
+const stale = baseline.filter((k) => !present.has(k) || !handSet.has(k)).sort();
 
 if (newlyHandTyped.length > 0) {
   console.error(
@@ -202,7 +234,9 @@ if (newlyHandTyped.length > 0) {
 if (stale.length > 0) {
   console.error(`${stale.length} baseline entr(ies) are stale:`);
   for (const k of stale) {
-    console.error(`  - ${k}${present.has(k) ? ' (now spec-typed)' : ' (no longer exists)'}`);
+    console.error(
+      `  - ${k}${present.has(k) ? ' (now spec-typed)' : ' (no longer exists)'}`
+    );
   }
   console.error(
     '\nRemove them from service-types-baseline.json. The baseline only ever shrinks.\n'
