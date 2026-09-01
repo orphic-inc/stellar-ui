@@ -16,6 +16,7 @@ npm test                 # Jest unit tests (--runInBand)
 npm run test:e2e         # Playwright E2E (requires running API + UI — see below)
 npm run api:sync         # Pull ../stellar-api/openapi.json, then regenerate src/types/api.ts (api:generate alone skips the pull)
 npm run contract:check   # Is the vendored spec still what stellar-api serves? (#271; see "Knowing when a resync is owed")
+npm run service-types:check # Do RTK Query result types come from the generated client? (#277, stellar-ui ADR-0010)
 ```
 
 > **The dev proxy forwards `/api` and nothing else.** Root-level API endpoints
