@@ -9,44 +9,25 @@ export type RulesTreeResponse =
 export type RuleNode = RulesTreeResponse['rules'][number];
 export type SubRuleNode = RuleNode['subRules'][number];
 
-export interface RulesPageAuthor {
-  id: number;
-  username: string;
-}
+// All four page-returning rules routes project the same `pageSelect`, so one
+// shape covers the index rows, the slug read and both write echoes.
+export type RulesPage =
+  paths['/rules/{slug}']['get']['responses'][200]['content']['application/json'];
+export type RulesPageAuthor = RulesPage['author'];
+export type RulesIndex =
+  paths['/rules']['get']['responses'][200]['content']['application/json'];
 
-export interface RulesPage {
-  id: number;
-  slug: string;
-  title: string;
-  body: string;
-  isMain: boolean;
-  sortOrder: number;
-  authorId: number;
-  author: RulesPageAuthor;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface RulesIndex {
-  main: RulesPage | null;
-  pages: RulesPage[];
-}
-
-export interface CreateRulesPageArgs {
-  title: string;
-  slug?: string;
-  body: string;
-  isMain?: boolean;
-  sortOrder?: number;
-}
-
-export interface UpdateRulesPageArgs {
-  id: number;
-  title?: string;
-  body?: string;
-  isMain?: boolean;
-  sortOrder?: number;
-}
+// Request bodies, so the admin editor's form fields cannot drift from what the
+// route validates. `id` is a path param, not part of the body — same shape as
+// reportsApi's resolveReport args.
+type CreatedRulesPage =
+  paths['/rules']['post']['responses'][201]['content']['application/json'];
+export type CreateRulesPageArgs = NonNullable<
+  paths['/rules']['post']['requestBody']
+>['content']['application/json'];
+export type UpdateRulesPageArgs = { id: number } & NonNullable<
+  paths['/rules/{id}']['put']['requestBody']
+>['content']['application/json'];
 
 export const rulesApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -62,7 +43,7 @@ export const rulesApi = api.injectEndpoints({
       query: (slug) => `/rules/${slug}`,
       providesTags: (_result, _err, slug) => [{ type: 'RulesPage', id: slug }]
     }),
-    createRulesPage: build.mutation<RulesPage, CreateRulesPageArgs>({
+    createRulesPage: build.mutation<CreatedRulesPage, CreateRulesPageArgs>({
       query: (body) => ({ url: '/rules', method: 'POST', body }),
       invalidatesTags: ['RulesPage']
     }),

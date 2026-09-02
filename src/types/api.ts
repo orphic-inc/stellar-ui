@@ -13260,8 +13260,26 @@ export interface paths {
             'application/json': components['schemas']['RulesPage'];
           };
         };
+        /** @description Validation failed */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description A main rules page already exists */
+        409: {
           headers: {
             [name: string]: unknown;
           };
