@@ -1,4 +1,5 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -60,20 +61,9 @@ export interface TopVoteItem {
   positivePercent: number;
 }
 
-export interface HistorySnapshotEntry {
-  rank: number;
-  releaseId: number | null;
-  releaseTitle: string;
-  tagString: string;
-  deleted: boolean;
-}
-
-export interface HistorySnapshot {
-  snapshotId: number;
-  type: 'Daily' | 'Weekly';
-  date: string;
-  entries: HistorySnapshotEntry[];
-}
+export type HistorySnapshot =
+  paths['/top10/history']['get']['responses'][200]['content']['application/json'];
+export type HistorySnapshotEntry = HistorySnapshot['entries'][number];
 
 // ─── Query params ─────────────────────────────────────────────────────────────
 

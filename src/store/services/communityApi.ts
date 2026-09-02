@@ -1,20 +1,13 @@
 import { api } from '../api';
 import type { components, paths } from '../../types/api';
-import type { DncEntry } from './adminApi';
+// Read off the contract rather than adminApi's hand-written copy — this is the
+// same route, and adminApi's version is still baselined under #277.
+type DncEntry =
+  paths['/communities/{communityId}/dnc']['get']['responses'][200]['content']['application/json'][number];
 
-export interface VoteAggregate {
-  releaseId: number;
-  ups: number;
-  total: number;
-  score: number;
-}
-
-export type MyVote = 'up' | 'down' | null;
-
-export interface VoteResponse {
-  myVote: MyVote;
-  voteAggregate: VoteAggregate | null;
-}
+export type VoteResponse = components['schemas']['CommunityVoteState'];
+export type VoteAggregate = NonNullable<VoteResponse['voteAggregate']>;
+export type MyVote = VoteResponse['myVote'];
 
 export type ReleaseTag = components['schemas']['ReleaseTagEnriched'];
 export type ReleaseHistoryEntry = components['schemas']['ReleaseHistoryEntry'];

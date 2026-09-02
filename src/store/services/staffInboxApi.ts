@@ -8,6 +8,10 @@ type ResponsesResponse =
 type CreateResponseBody = NonNullable<
   paths['/staff-inbox/responses']['post']['requestBody']
 >['content']['application/json'];
+type CreatedResponse =
+  paths['/staff-inbox/responses']['post']['responses'][201]['content']['application/json'];
+type UpdatedResponse =
+  paths['/staff-inbox/responses/{id}']['put']['responses'][200]['content']['application/json'];
 type UpdateResponseBody = NonNullable<
   paths['/staff-inbox/responses/{id}']['put']['requestBody']
 >['content']['application/json'];
@@ -45,10 +49,7 @@ export const staffInboxApi = api.injectEndpoints({
       providesTags: ['StaffInboxResponse']
     }),
 
-    createCannedResponse: build.mutation<
-      ResponsesResponse[number],
-      CreateResponseBody
-    >({
+    createCannedResponse: build.mutation<CreatedResponse, CreateResponseBody>({
       query: (body) => ({
         url: '/staff-inbox/responses',
         method: 'POST',
@@ -58,7 +59,7 @@ export const staffInboxApi = api.injectEndpoints({
     }),
 
     updateCannedResponse: build.mutation<
-      ResponsesResponse[number],
+      UpdatedResponse,
       { id: number } & UpdateResponseBody
     >({
       query: ({ id, ...body }) => ({

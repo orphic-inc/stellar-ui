@@ -83,36 +83,6 @@ export interface Collaborator {
 // contract in store/services/requestApi.ts (#277).
 export type RequestStatus = 'open' | 'filled';
 
-// ─── Ratio ───────────────────────────────────────────────────────────────────
-
-export type RatioPolicyStatus = 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
-
-export interface PolicyStateView {
-  status: RatioPolicyStatus;
-  watchStartedAt: string | null;
-  watchExpiresAt: string | null;
-  downloadDisabledAt: string | null;
-  lastEvaluatedAt: string;
-}
-
-export interface RatioBracket {
-  label: string;
-  maxRequired: number;
-  minRequired: number;
-}
-
-export interface RatioStats {
-  ratio: number;
-  contributed: string;
-  consumed: string;
-  bracket: RatioBracket;
-  eligibleContributionBytes: string;
-  contributionCoverage: number;
-  requiredRatio: number;
-  meetsRequirement: boolean;
-  policy: PolicyStateView;
-}
-
 // ─── Link health ─────────────────────────────────────────────────────────────
 
 export type LinkHealthStatus = 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL';

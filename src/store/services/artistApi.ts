@@ -27,6 +27,14 @@ type AddSimilarArtistArgs = NonNullable<
 type AddArtistAliasArgs = NonNullable<
   paths['/artists/alias']['post']['requestBody']
 >['content']['application/json'];
+// The three join routes echo the raw row from an upsert/create; stellar-api#495
+// registered the real shapes in place of `z.record(z.unknown())`.
+type AddSimilarArtistResponse =
+  paths['/artists/similar']['post']['responses'][200]['content']['application/json'];
+type AddArtistAliasResponse =
+  paths['/artists/alias']['post']['responses'][201]['content']['application/json'];
+type TagArtistResponse =
+  paths['/artists/tag']['post']['responses'][200]['content']['application/json'];
 type TagArtistArgs = NonNullable<
   paths['/artists/tag']['post']['requestBody']
 >['content']['application/json'];
@@ -71,7 +79,7 @@ export const artistApi = api.injectEndpoints({
       query: (id) => `/artists/${id}/similar`
     }),
     addSimilarArtist: build.mutation<
-      Record<string, unknown>,
+      AddSimilarArtistResponse,
       AddSimilarArtistArgs
     >({
       query: (data) => ({
@@ -81,17 +89,15 @@ export const artistApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Artist']
     }),
-    addArtistAlias: build.mutation<Record<string, unknown>, AddArtistAliasArgs>(
-      {
-        query: (data) => ({
-          url: '/artists/alias',
-          method: 'POST',
-          body: data
-        }),
-        invalidatesTags: ['Artist']
-      }
-    ),
-    tagArtist: build.mutation<Record<string, unknown>, TagArtistArgs>({
+    addArtistAlias: build.mutation<AddArtistAliasResponse, AddArtistAliasArgs>({
+      query: (data) => ({
+        url: '/artists/alias',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['Artist']
+    }),
+    tagArtist: build.mutation<TagArtistResponse, TagArtistArgs>({
       query: (data) => ({ url: '/artists/tag', method: 'POST', body: data }),
       invalidatesTags: (_, __, { artistId }) => [
         { type: 'Artist', id: artistId }

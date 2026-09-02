@@ -1,27 +1,14 @@
 import { api } from '../api';
-import type { AuthUser } from '../../types';
+import type { paths } from '../../types/api';
 
-export interface LaunchChecklistItem {
-  id: string;
-  message: string;
-}
-
-interface InstallStatus {
-  installed: boolean;
-  registrationStatus: 'open' | 'invite' | 'closed';
-  configWarnings: string[];
-  setupChecklist: LaunchChecklistItem[];
-}
-
-interface InstallArgs {
-  username: string;
-  email: string;
-  password: string;
-}
-
-interface InstallResponse {
-  user: AuthUser;
-}
+type InstallStatus =
+  paths['/install']['get']['responses'][200]['content']['application/json'];
+export type LaunchChecklistItem = InstallStatus['setupChecklist'][number];
+type InstallArgs = NonNullable<
+  paths['/install']['post']['requestBody']
+>['content']['application/json'];
+type InstallResponse =
+  paths['/install']['post']['responses'][201]['content']['application/json'];
 
 export const installApi = api.injectEndpoints({
   endpoints: (build) => ({

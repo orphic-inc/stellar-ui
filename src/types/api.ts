@@ -9065,7 +9065,7 @@ export interface paths {
     };
     /**
      * One comment, with its author
-     * @description Deliberately unauthenticated — this route carries no auth middleware, unlike the PUT and DELETE beside it.
+     * @description Deliberately unauthenticated — this route carries no auth middleware, unlike the PUT and DELETE beside it. It also does NOT filter `deletedAt`, so unlike GET /comments it can serve a soft-deleted comment; `deletedAt` is non-null in that case.
      */
     get: {
       parameters: {
@@ -9115,13 +9115,13 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Comment updated */
+        /** @description Comment updated — scalars only, no author/editor relation */
         200: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['Comment'];
+            'application/json': components['schemas']['CommentUpdated'];
           };
         };
         /** @description Not authorized */
@@ -9576,7 +9576,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['SimilarArtist'][];
+            'application/json': components['schemas']['SimilarArtistEntry'][];
           };
         };
       };
@@ -9620,9 +9620,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': {
-              [key: string]: unknown;
-            };
+            'application/json': components['schemas']['SimilarArtist'];
           };
         };
       };
@@ -9664,9 +9662,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': {
-              [key: string]: unknown;
-            };
+            'application/json': components['schemas']['ArtistAlias'];
           };
         };
       };
@@ -9708,9 +9704,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': {
-              [key: string]: unknown;
-            };
+            'application/json': components['schemas']['ArtistTag'];
           };
         };
       };
@@ -17918,6 +17912,7 @@ export interface components {
       createdAt: string;
       lastActiveAt: string;
       revokedAt: string | null;
+      isCurrent: boolean;
     };
     PublicUser: {
       id: number;
@@ -18429,6 +18424,7 @@ export interface components {
     };
     Notification: {
       id: number;
+      userId: number;
       /** @enum {string} */
       type:
         | 'forum_quote'
@@ -18457,6 +18453,7 @@ export interface components {
         forumId?: number;
         releaseId?: number;
         communityId?: number;
+        url?: string;
       } | null;
     };
     Subscription: {
@@ -18952,20 +18949,97 @@ export interface components {
       members: components['schemas']['StaffMember'][];
     };
     CommunityVoteState: {
-      myVote: number | null;
-      voteAggregate: number;
+      /** @enum {string|null} */
+      myVote: 'up' | 'down' | null;
+      voteAggregate: {
+        id: number;
+        releaseId: number;
+        ups: number;
+        total: number;
+        score: number;
+        updatedAt: string;
+      } | null;
     };
     Comment: {
       id: number;
-      page: string;
-      body: string;
-      bodyHtml?: string;
+      /** @enum {string} */
+      page:
+        | 'artist'
+        | 'collages'
+        | 'contributions'
+        | 'requests'
+        | 'communities'
+        | 'release';
       authorId: number;
+      body: string;
+      bodyHtml: string;
+      editedUserId: number | null;
+      editedAt: string | null;
+      artistId: number | null;
+      communityId: number | null;
+      contributionId: number | null;
+      requestId: number | null;
+      releaseId: number | null;
+      collageId: number | null;
       createdAt: string;
-      author?: components['schemas']['AuthorRef'];
+      deletedAt: string | null;
+      author: components['schemas']['AuthorRef'];
+    };
+    CommentWithEditor: {
+      id: number;
+      /** @enum {string} */
+      page:
+        | 'artist'
+        | 'collages'
+        | 'contributions'
+        | 'requests'
+        | 'communities'
+        | 'release';
+      authorId: number;
+      body: string;
+      bodyHtml: string;
+      editedUserId: number | null;
+      editedAt: string | null;
+      artistId: number | null;
+      communityId: number | null;
+      contributionId: number | null;
+      requestId: number | null;
+      releaseId: number | null;
+      collageId: number | null;
+      createdAt: string;
+      deletedAt: string | null;
+      author: components['schemas']['AuthorRef'];
+      editedUser: {
+        id: number;
+        username: string;
+      } | null;
+    };
+    CommentUpdated: {
+      id: number;
+      /** @enum {string} */
+      page:
+        | 'artist'
+        | 'collages'
+        | 'contributions'
+        | 'requests'
+        | 'communities'
+        | 'release';
+      authorId: number;
+      body: string;
+      bodyHtml: string;
+      editedUserId: number | null;
+      editedAt: string | null;
+      artistId: number | null;
+      communityId: number | null;
+      contributionId: number | null;
+      requestId: number | null;
+      releaseId: number | null;
+      collageId: number | null;
+      createdAt: string;
+      deletedAt: string | null;
     };
     PaginatedComments: {
-      data: components['schemas']['Comment'][];
+      data: components['schemas']['CommentWithEditor'][];
       meta: components['schemas']['PaginationMeta'];
     };
     PromotionRule: {
@@ -19035,10 +19109,31 @@ export interface components {
       };
     };
     SimilarArtist: {
+      id: number;
+      artistId: number;
+      similarArtistId: number;
+      score: number;
+      votes?: unknown;
+    };
+    SimilarArtistEntry: components['schemas']['SimilarArtist'] & {
       similarArtist: {
         id: number;
         name: string;
       };
+    };
+    ArtistAlias: {
+      id: number;
+      artistId: number;
+      redirectId: number;
+      userId: number | null;
+    };
+    ArtistTag: {
+      id: number;
+      artistId: number;
+      tagId: number;
+      positiveVotes: number;
+      negativeVotes: number;
+      userId: number | null;
     };
     PostComment: {
       id: number;

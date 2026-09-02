@@ -11,13 +11,10 @@ type LoginResponse =
 type RegisterResponse =
   paths['/auth/register']['post']['responses'][200]['content']['application/json'];
 
-export interface SessionItem {
-  id: string;
-  ipAddress: string;
-  userAgent: string;
-  lastActiveAt: string;
-  isCurrent: boolean;
-}
+// `isCurrent` is computed server-side — the session id lives in the HttpOnly
+// token, so the client cannot derive it (stellar-api#495).
+export type SessionItem =
+  paths['/auth/sessions']['get']['responses'][200]['content']['application/json'][number];
 
 const getRejectedStatus = (err: unknown): number | undefined => {
   if (typeof err !== 'object' || err === null) return undefined;

@@ -1,6 +1,5 @@
 import { api } from '../api';
 import type { paths, components } from '../../types/api';
-import type { RatioStats } from '../../types';
 
 type MyProfileResponse =
   paths['/profile/me']['get']['responses'][200]['content']['application/json'];
@@ -19,6 +18,9 @@ export type DonorRewardsResponse = components['schemas']['DonorRewards'];
 type UpdateDonorRewardsArgs = NonNullable<
   paths['/profile/me/donor-rewards']['put']['requestBody']
 >['content']['application/json'];
+// The route answers RatioStats plus the policy state (an allOf that ADDS).
+type MyRatioStatsResponse =
+  paths['/profile/me/ratio']['get']['responses'][200]['content']['application/json'];
 type UpdateDonorForumTitleArgs = NonNullable<
   paths['/profile/me/donor-title']['put']['requestBody']
 >['content']['application/json'];
@@ -49,7 +51,7 @@ export const profileApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Profile']
     }),
-    getMyRatioStats: build.query<RatioStats, void>({
+    getMyRatioStats: build.query<MyRatioStatsResponse, void>({
       query: () => '/profile/me/ratio',
       providesTags: ['Profile']
     }),
