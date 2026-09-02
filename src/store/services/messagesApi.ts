@@ -24,14 +24,8 @@ type ReplyResponse =
 type UnreadCountResponse =
   paths['/messages/unread-count']['get']['responses'][200]['content']['application/json'];
 
-export interface MessageDraft {
-  id: number;
-  toUserId: number | null;
-  subject: string;
-  body: string;
-  updatedAt: string;
-  toUser: { id: number; username: string } | null;
-}
+export type MessageDraft =
+  paths['/messages/drafts']['get']['responses'][200]['content']['application/json'][number];
 
 export const messagesApi = api.injectEndpoints({
   endpoints: (build) => ({

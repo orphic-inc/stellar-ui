@@ -1,42 +1,11 @@
 import { api } from '../api';
+import type { paths } from '../../types/api';
 
-export type NotificationType =
-  | 'forum_quote'
-  | 'forum_sub'
-  | 'request_filled'
-  | 'collage_updated'
-  | 'comment_sub'
-  | 'artist_release'
-  | 'site_news'
-  | 'global_notice';
-
-export interface NotificationActor {
-  id: number;
-  username: string;
-  avatar: string | null;
-}
-
-export interface NotificationSource {
-  title: string;
-  forumId?: number;
-  releaseId?: number;
-  communityId?: number;
-  url?: string;
-}
-
-export interface Notification {
-  id: number;
-  userId: number;
-  type: NotificationType;
-  actorId: number | null;
-  actor: NotificationActor | null;
-  page: string;
-  pageId: number;
-  postId: number | null;
-  readAt: string | null;
-  createdAt: string;
-  source: NotificationSource | null;
-}
+export type Notification =
+  paths['/notifications']['get']['responses'][200]['content']['application/json'][number];
+export type NotificationType = Notification['type'];
+export type NotificationActor = NonNullable<Notification['actor']>;
+export type NotificationSource = NonNullable<Notification['source']>;
 
 export const notificationApi = api.injectEndpoints({
   endpoints: (build) => ({
