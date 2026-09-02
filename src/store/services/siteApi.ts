@@ -1,51 +1,14 @@
 import { api } from '../api';
 import type { paths } from '../../types/api';
 
-interface SiteStatsResponse {
-  maxUsers: number;
-  totalUsers: number;
-  enabledUsers: number;
-  activeToday: number;
-  activeThisWeek: number;
-  activeThisMonth: number;
-  communities: number;
-  releases: number;
-  artists: number;
-  contributedLinks: number;
-  contributedLinkDownloads: number;
-  announcements: number;
-  blogPosts: number;
-  comments: number;
-}
-
-export interface SiteStatSnapshot {
-  id: number;
-  capturedAt: string;
-  maxUsers: number;
-  totalUsers: number;
-  enabledUsers: number;
-  activeToday: number;
-  activeThisWeek: number;
-  activeThisMonth: number;
-  communities: number;
-  releases: number;
-  artists: number;
-  blogPosts: number;
-  announcements: number;
-  comments: number;
-  contributedLinks: number;
-  contributedLinkDownloads: number;
-}
-
-export interface UserStatSnapshot {
-  id: number;
-  userId: number;
-  period: 'Daily' | 'Monthly' | 'Yearly';
-  capturedAt: string;
-  contributed: string | null;
-  consumed: string | null;
-  contributionCount: number;
-}
+type SiteStatsResponse =
+  paths['/stats']['get']['responses'][200]['content']['application/json'];
+// Still exported: UserStatsHistoryPage builds its chart data off the element
+// type, so it needs the row, not the array.
+export type SiteStatSnapshot =
+  paths['/stats/history']['get']['responses'][200]['content']['application/json'][number];
+export type UserStatSnapshot =
+  paths['/users/{id}/stats/history']['get']['responses'][200]['content']['application/json'][number];
 type VersionResponse =
   paths['/version']['get']['responses'][200]['content']['application/json'];
 type StylesheetsResponse =
@@ -57,20 +20,11 @@ type UpdateStylesheetBody = NonNullable<
 >['content']['application/json'];
 type UpdateStylesheetResponse =
   paths['/stylesheet/{id}']['put']['responses'][200]['content']['application/json'];
-export interface SiteSettingsResponse {
-  id: number;
-  approvedDomains: string[];
-  registrationStatus: 'open' | 'invite' | 'closed';
-  maxUsers: number;
-  dismissedLaunchChecklist: string[];
-  updatedAt: string;
-}
-interface UpdateSettingsBody {
-  approvedDomains?: string[];
-  registrationStatus?: 'open' | 'invite' | 'closed';
-  maxUsers?: number;
-  dismissedLaunchChecklist?: string[];
-}
+export type SiteSettingsResponse =
+  paths['/settings']['get']['responses'][200]['content']['application/json'];
+type UpdateSettingsBody = NonNullable<
+  paths['/settings']['put']['requestBody']
+>['content']['application/json'];
 
 export const siteApi = api.injectEndpoints({
   endpoints: (build) => ({

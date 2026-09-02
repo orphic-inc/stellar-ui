@@ -8,6 +8,7 @@ import {
   useResolveReportMutation,
   useAddReportNoteMutation
 } from '../../store/services/reportsApi';
+import type { ResolutionAction } from '../../store/services/reportsApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
@@ -16,7 +17,7 @@ import { canUseReportActions } from '../staff/staffAffordances';
 import { Badge } from '../ui';
 import type { BadgeVariant } from '../ui';
 
-const RESOLUTION_ACTIONS = [
+const RESOLUTION_ACTIONS: { value: ResolutionAction; label: string }[] = [
   { value: 'Dismissed', label: 'Dismissed — no action taken' },
   { value: 'ContentRemoved', label: 'Content removed' },
   { value: 'UserWarned', label: 'User warned' },
@@ -57,7 +58,8 @@ const ReportDetailPage = () => {
 
   const [noteBody, setNoteBody] = useState('');
   const [resolution, setResolution] = useState('');
-  const [resolutionAction, setResolutionAction] = useState('Dismissed');
+  const [resolutionAction, setResolutionAction] =
+    useState<ResolutionAction>('Dismissed');
   const [showResolveForm, setShowResolveForm] = useState(false);
 
   const handleClaim = async () => {
@@ -280,7 +282,9 @@ const ReportDetailPage = () => {
             <select
               id="resolution-action"
               value={resolutionAction}
-              onChange={(e) => setResolutionAction(e.target.value)}
+              onChange={(e) =>
+                setResolutionAction(e.target.value as ResolutionAction)
+              }
               data-st="field"
               className="w-full px-3 py-2 text-sm"
             >
