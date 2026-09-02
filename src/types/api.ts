@@ -12141,14 +12141,66 @@ export interface paths {
       };
       requestBody?: {
         content: {
-          'application/json': {
-            targetType: string;
-            targetId: number;
-            category?: string;
-            releaseCategory?: string;
-            reason: string;
-            evidence?: string;
-          };
+          'application/json':
+            | {
+                /** @enum {string} */
+                targetType: 'Release';
+                targetId: number;
+                /** @enum {string} */
+                releaseCategory:
+                  | 'Dupe'
+                  | 'Trump'
+                  | 'BadFileNamesTrump'
+                  | 'BadFolderNameTrump'
+                  | 'TagTrump'
+                  | 'VinylTrump'
+                  | 'AudienceRecording'
+                  | 'BadFileNames'
+                  | 'BadFolderNames'
+                  | 'BadTagNoTag'
+                  | 'BonusTracksOnly'
+                  | 'DisallowedFormat'
+                  | 'DiscsMissing'
+                  | 'Discography'
+                  | 'MqaBanned'
+                  | 'EditedLog'
+                  | 'InaccurateBitrate'
+                  | 'LogRescoreRequest'
+                  | 'LossyMasterApprovalRequest'
+                  | 'ContributionContestApprovalRequest'
+                  | 'LowBitrate'
+                  | 'MuttRip'
+                  | 'NoLineageInfo'
+                  | 'Other'
+                  | 'RadioTvFmWebRip'
+                  | 'SkipsEncodeErrors'
+                  | 'SpecificallyBanned'
+                  | 'TracksMissing'
+                  | 'Transcode'
+                  | 'UnsplitAlbumRip'
+                  | 'Urgent'
+                  | 'UserCompilation'
+                  | 'WrongSpecifiedFormat'
+                  | 'WrongSpecifiedMedia';
+                reason: string;
+                evidence?: string;
+              }
+            | {
+                /** @enum {string} */
+                targetType:
+                  | 'User'
+                  | 'Artist'
+                  | 'Contribution'
+                  | 'ForumTopic'
+                  | 'ForumPost'
+                  | 'Comment'
+                  | 'Collage'
+                  | 'Post';
+                targetId: number;
+                category: string;
+                reason: string;
+                evidence?: string;
+              };
         };
       };
       responses: {
@@ -12428,7 +12480,15 @@ export interface paths {
         content: {
           'application/json': {
             resolution: string;
-            resolutionAction: string;
+            /** @enum {string} */
+            resolutionAction:
+              | 'Dismissed'
+              | 'ContentRemoved'
+              | 'UserWarned'
+              | 'UserDisabled'
+              | 'MetadataFixed'
+              | 'MarkedDuplicate'
+              | 'Other';
           };
         };
       };
@@ -12692,6 +12752,7 @@ export interface paths {
             /** @enum {string} */
             registrationStatus?: 'open' | 'invite' | 'closed';
             maxUsers?: number;
+            dismissedLaunchChecklist?: string[];
           };
         };
       };
@@ -15906,7 +15967,8 @@ export interface paths {
         content: {
           'application/json': {
             name: string;
-            comment: string;
+            /** @default  */
+            comment?: string;
           };
         };
       };
@@ -17260,7 +17322,7 @@ export interface paths {
       requestBody?: {
         content: {
           'application/json': {
-            reason: string;
+            reason?: string;
           };
         };
       };
@@ -17343,9 +17405,13 @@ export interface paths {
           'application/json': {
             userId: number;
             amount: number;
+            /** Format: email */
             email: string;
+            /** Format: date-time */
             donatedAt: string;
+            /** @default USD */
             currency?: string;
+            /** @default  */
             source?: string;
             reason: string;
           };
@@ -18299,6 +18365,7 @@ export interface components {
       blogPosts: components['schemas']['BlogPost'][];
     };
     SiteStats: {
+      maxUsers: number;
       totalUsers: number;
       enabledUsers: number;
       activeToday: number;
@@ -18315,6 +18382,7 @@ export interface components {
     };
     SiteStatSnapshot: {
       id: number;
+      bucketAt: string;
       capturedAt: string;
       maxUsers: number;
       totalUsers: number;
@@ -19181,6 +19249,8 @@ export interface components {
       /** @enum {string} */
       registrationStatus: 'open' | 'invite' | 'closed';
       maxUsers: number;
+      dismissedLaunchChecklist: string[];
+      installedAt: string | null;
       updatedAt: string;
     };
     Top10Tag: {

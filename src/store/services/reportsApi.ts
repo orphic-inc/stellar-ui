@@ -13,6 +13,9 @@ type FileReportResponse =
 type ResolveBody = NonNullable<
   paths['/reports/{id}/resolve']['post']['requestBody']
 >['content']['application/json'];
+// The resolution vocabulary is the contract's, not ours — exported so the
+// picker's option list fails to compile if stellar-api's enum moves.
+export type ResolutionAction = ResolveBody['resolutionAction'];
 type AddNoteBody = NonNullable<
   paths['/reports/{id}/notes']['post']['requestBody']
 >['content']['application/json'];
