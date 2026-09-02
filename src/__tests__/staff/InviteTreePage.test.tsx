@@ -16,13 +16,16 @@ jest.mock('react-router-dom', () => ({
   )
 }));
 
+// Mirrors what GET /users/invite-tree actually returns: a flat InviteTree row
+// (id, userId, inviterId, createdAt) plus the two included user refs. The old
+// fixture carried treeId/treeLevel/treePosition, which the API has never sent.
 const makeRow = (id: number) => ({
   id,
+  userId: id,
+  inviterId: id + 100,
+  createdAt: '2026-03-04T00:00:00.000Z',
   user: { id, username: `user${id}` },
-  inviter: { id: id + 100, username: `inviter${id}` },
-  treeId: id,
-  treeLevel: 1,
-  treePosition: id
+  inviter: { id: id + 100, username: `inviter${id}` }
 });
 
 describe('InviteTreePage', () => {
@@ -48,6 +51,15 @@ describe('InviteTreePage', () => {
       'href',
       '/user/1'
     );
+    // The Invited column reads a real column. Its three predecessors — Tree,
+    // Level and Position — rendered `undefined` for every row because the API
+    // never sent those fields; nothing asserted on them, so nothing caught it.
+    expect(
+      screen.getByRole('columnheader', { name: 'Invited' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('columnheader', { name: 'Level' })
+    ).not.toBeInTheDocument();
   });
 
   it('does not crash when meta is missing (guarded pagination)', () => {

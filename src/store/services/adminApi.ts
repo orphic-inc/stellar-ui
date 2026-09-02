@@ -10,109 +10,36 @@ export type EmailBlacklistEntry =
 export type Donation =
   paths['/donations']['get']['responses'][200]['content']['application/json']['data'][number];
 
-export interface DuplicateIpUser {
-  id: number;
-  username: string;
-  dateRegistered: string;
-  disabled: boolean;
-  lastLogin: string | null;
-}
+// Every admin result type below is read off the generated contract. The
+// `paths[...]` expressions are spelled out rather than wrapped in a local
+// generic helper: the service-types guard looks for a literal `paths[` read, so
+// a helper would satisfy the type checker while reading as hand-written to the
+// gate — outsmarting the guard rather than meeting it.
+export type DuplicateIpGroup =
+  paths['/users/duplicate-ips']['get']['responses'][200]['content']['application/json'][number];
+export type DuplicateIpUser = DuplicateIpGroup['users'][number];
 
-export interface DuplicateIpGroup {
-  ip: string;
-  count: number;
-  users: DuplicateIpUser[];
-}
+export type RegistrationLogUser =
+  paths['/users/registration-log']['get']['responses'][200]['content']['application/json']['data'][number];
 
-export interface RegistrationLogUser {
-  id: number;
-  username: string;
-  email: string | null;
-  dateRegistered: string;
-  disabled: boolean;
-  lastIp: string | null;
-  userRank: { id: number; name: string } | null;
-}
+export type SessionItem =
+  paths['/users/sessions']['get']['responses'][200]['content']['application/json']['data'][number];
+export type UserRef = SessionItem['user'];
 
-interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
+export type InviteItem =
+  paths['/users/invites']['get']['responses'][200]['content']['application/json']['data'][number];
+export type InviteTreeItem =
+  paths['/users/invite-tree']['get']['responses'][200]['content']['application/json']['data'][number];
+export type RatioWatchItem =
+  paths['/users/ratio-watch']['get']['responses'][200]['content']['application/json']['data'][number];
+export type VanityHouseArtist =
+  paths['/artists/vanity-house']['get']['responses'][200]['content']['application/json']['data'][number];
 
-export interface UserRef {
-  id: number;
-  username: string;
-}
+export type FeaturedAlbumItem =
+  paths['/announcements/album-of-month']['get']['responses'][200]['content']['application/json'][number];
 
-export interface SessionItem {
-  id: string;
-  user: UserRef;
-  ipAddress: string;
-  userAgent: string | null;
-  createdAt: string;
-  lastActiveAt: string;
-  revokedAt: string | null;
-}
-
-export interface InviteItem {
-  id: number;
-  inviter: UserRef;
-  email: string;
-  expires: string;
-  reason: string;
-  status: string;
-}
-
-export interface InviteTreeItem {
-  id: number;
-  userId: number;
-  user: UserRef;
-  inviterId: number;
-  inviter: UserRef | null;
-  treeId: number;
-  treeLevel: number;
-  treePosition: number;
-}
-
-export interface RatioWatchItem {
-  userId: number;
-  user: UserRef;
-  status: string;
-  watchStartedAt: string | null;
-  watchExpiresAt: string | null;
-  downloadDisabledAt: string | null;
-  lastEvaluatedAt: string;
-}
-
-export interface VanityHouseArtist {
-  id: number;
-  name: string;
-  vanityHouse: boolean;
-  _count: { releases: number };
-}
-
-export interface FeaturedAlbumItem {
-  id: number;
-  groupId: number;
-  threadId: number;
-  title: string;
-  image: string;
-  started: string;
-  ended: string;
-}
-
-export interface DeletedCollageItem {
-  id: number;
-  name: string;
-  user: UserRef;
-  deletedAt: string | null;
-  createdAt: string;
-}
+export type DeletedCollageItem =
+  paths['/collages/deleted']['get']['responses'][200]['content']['application/json']['data'][number];
 
 export interface EconomyGroupedItem {
   reason: string;
@@ -128,51 +55,17 @@ export interface EconomyTransactionItem {
   createdAt: string;
 }
 
-export interface ReleaseStatsItem {
-  releases: number;
-  contributions: number;
-  artists: number;
-  byType: { type: string; _count: number }[];
-  byLinkStatus: { linkStatus: string; _count: number }[];
-}
+export type ReleaseStatsItem =
+  paths['/stats/releases']['get']['responses'][200]['content']['application/json'];
+export type ClientStatsItem =
+  paths['/stats/clients']['get']['responses'][200]['content']['application/json'][number];
+export type UserFlowData =
+  paths['/stats/user-flow']['get']['responses'][200]['content']['application/json'];
+export type SiteInfoData =
+  paths['/stats/site-info']['get']['responses'][200]['content']['application/json'];
 
-export interface ClientStatsItem {
-  userAgent: string | null;
-  count: number;
-}
-
-export interface UserFlowData {
-  inviteFunnel: { status: string; _count: number }[];
-  snapshots: {
-    bucketAt: string;
-    totalUsers: number;
-    activeThisMonth: number;
-  }[];
-}
-
-export interface SiteInfoData {
-  totalUsers: number;
-  enabledUsers: number;
-  disabledUsers: number;
-  releases: number;
-  artists: number;
-  contributions: number;
-  communities: number;
-  forumTopics: number;
-  forumPosts: number;
-  collages: number;
-  wikiPages: number;
-}
-
-export interface DncEntry {
-  id: number;
-  name: string;
-  comment: string;
-  communityId: number;
-  userId: number;
-  createdAt: string;
-  addedBy: UserRef | null;
-}
+export type DncEntry =
+  paths['/communities/{communityId}/dnc']['get']['responses'][200]['content']['application/json'][number];
 
 export const adminApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -213,7 +106,7 @@ export const adminApi = api.injectEndpoints({
 
     // Donations
     getDonations: build.query<
-      PaginatedResponse<Donation>,
+      paths['/donations']['get']['responses'][200]['content']['application/json'],
       { page?: number; userId?: number } | void
     >({
       query: (args) => {
@@ -251,7 +144,7 @@ export const adminApi = api.injectEndpoints({
 
     // Registration Log (read-only, paginated)
     getRegistrationLog: build.query<
-      PaginatedResponse<RegistrationLogUser>,
+      paths['/users/registration-log']['get']['responses'][200]['content']['application/json'],
       number | void
     >({
       query: (page = 1) => `/users/registration-log?page=${page}`
@@ -259,7 +152,7 @@ export const adminApi = api.injectEndpoints({
 
     // Login Watch
     getSessions: build.query<
-      PaginatedResponse<SessionItem>,
+      paths['/users/sessions']['get']['responses'][200]['content']['application/json'],
       { page?: number; userId?: number } | void
     >({
       query: (args) => {
@@ -273,7 +166,7 @@ export const adminApi = api.injectEndpoints({
 
     // Invite Pool
     getInvites: build.query<
-      PaginatedResponse<InviteItem>,
+      paths['/users/invites']['get']['responses'][200]['content']['application/json'],
       { page?: number; status?: string } | void
     >({
       query: (args) => {
@@ -287,7 +180,7 @@ export const adminApi = api.injectEndpoints({
 
     // Invite Tree
     getInviteTree: build.query<
-      PaginatedResponse<InviteTreeItem>,
+      paths['/users/invite-tree']['get']['responses'][200]['content']['application/json'],
       number | void
     >({
       query: (page = 1) => `/users/invite-tree?page=${page}`,
@@ -296,7 +189,7 @@ export const adminApi = api.injectEndpoints({
 
     // Ratio Watch
     getRatioWatch: build.query<
-      PaginatedResponse<RatioWatchItem>,
+      paths['/users/ratio-watch']['get']['responses'][200]['content']['application/json'],
       number | void
     >({
       query: (page = 1) => `/users/ratio-watch?page=${page}`,
@@ -305,14 +198,14 @@ export const adminApi = api.injectEndpoints({
 
     // Vanity House
     getVanityHouseArtists: build.query<
-      PaginatedResponse<VanityHouseArtist>,
+      paths['/artists/vanity-house']['get']['responses'][200]['content']['application/json'],
       number | void
     >({
       query: (page = 1) => `/artists/vanity-house?page=${page}`,
       providesTags: ['VanityHouse']
     }),
     setVanityHouse: build.mutation<
-      VanityHouseArtist,
+      paths['/artists/{id}/vanity-house']['put']['responses'][200]['content']['application/json'],
       { id: number; vanityHouse: boolean }
     >({
       query: ({ id, vanityHouse }) => ({
@@ -356,7 +249,7 @@ export const adminApi = api.injectEndpoints({
 
     // Deleted Collages
     getDeletedCollages: build.query<
-      PaginatedResponse<DeletedCollageItem>,
+      paths['/collages/deleted']['get']['responses'][200]['content']['application/json'],
       number | void
     >({
       query: (page = 1) => `/collages/deleted?page=${page}`,

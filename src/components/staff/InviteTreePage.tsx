@@ -1,22 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useGetInviteTreeQuery } from '../../store/services/adminApi';
+import {
+  useGetInviteTreeQuery,
+  type InviteTreeItem
+} from '../../store/services/adminApi';
 import { PageShell, DataTable, Pagination, type Column } from '../ui';
-
-type InviteTreeRow = {
-  id: number;
-  user: { id: number; username: string };
-  inviter?: { id: number; username: string } | null;
-  treeId: number;
-  treeLevel: number;
-  treePosition: number;
-};
 
 const InviteTreePage = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading } = useGetInviteTreeQuery(page);
 
-  const columns: Column<InviteTreeRow>[] = [
+  const columns: Column<InviteTreeItem>[] = [
     {
       header: 'User',
       cell: (row) => (
@@ -37,20 +31,16 @@ const InviteTreePage = () => {
         )
     },
     {
-      header: 'Tree',
-      numeric: true,
-      tdClassName: 'font-mono text-xs',
-      cell: (row) => row.treeId
-    },
-    { header: 'Level', numeric: true, cell: (row) => row.treeLevel },
-    { header: 'Position', numeric: true, cell: (row) => row.treePosition }
+      header: 'Invited',
+      cell: (row) => new Date(row.createdAt).toLocaleDateString()
+    }
   ];
 
   return (
     <PageShell title="Invite Tree" width="xl">
       <DataTable
         columns={columns}
-        rows={data?.data as InviteTreeRow[] | undefined}
+        rows={data?.data}
         rowKey={(row) => row.id}
         isLoading={isLoading}
         empty="No invite tree data."

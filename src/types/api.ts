@@ -19540,6 +19540,7 @@ export interface components {
     InviteTreeItem: {
       id: number;
       userId: number;
+      createdAt: string;
       user: {
         id: number;
         username: string;
@@ -19611,6 +19612,7 @@ export interface components {
       groupId: number;
       threadId: number;
       title: string;
+      image: string;
       started: string;
       ended: string;
     };
