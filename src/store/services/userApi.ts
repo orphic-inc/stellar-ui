@@ -26,7 +26,6 @@ type MemberInviteTreeResponse =
   paths['/users/{id}/invite-tree']['get']['responses'][200]['content']['application/json'];
 type PromotionRulesResponse =
   paths['/tools/promotion-rules']['get']['responses'][200]['content']['application/json'];
-type PromotionRule = PromotionRulesResponse[number];
 type CreatePromotionRuleArgs = NonNullable<
   paths['/tools/promotion-rules']['post']['requestBody']
 >['content']['application/json'];
@@ -38,29 +37,41 @@ type StaffGroupsResponse =
   paths['/tools/staff-groups']['get']['responses'][200]['content']['application/json'];
 type PermissionCatalogResponse =
   paths['/tools/user-ranks/permissions']['get']['responses'][200]['content']['application/json'];
+type UserRanksResponse =
+  paths['/tools/user-ranks']['get']['responses'][200]['content']['application/json'];
+type UserRankResponse =
+  paths['/tools/user-ranks/{id}']['get']['responses'][200]['content']['application/json'];
+type CreateUserRankResponse =
+  paths['/tools/user-ranks']['post']['responses'][201]['content']['application/json'];
+type UpdateUserRankResponse =
+  paths['/tools/user-ranks/{id}']['put']['responses'][200]['content']['application/json'];
+type CreatePromotionRuleResponse =
+  paths['/tools/promotion-rules']['post']['responses'][201]['content']['application/json'];
+type UpdatePromotionRuleResponse =
+  paths['/tools/promotion-rules/{id}']['put']['responses'][200]['content']['application/json'];
+type UserRankAssignmentResponse =
+  paths['/users/{id}/rank']['get']['responses'][200]['content']['application/json'];
+type UserWarningsResponse =
+  paths['/users/{id}/warnings']['get']['responses'][200]['content']['application/json'];
+type UserNotesResponse =
+  paths['/users/{id}/notes']['get']['responses'][200]['content']['application/json'];
+type UserIpHistoryResponse =
+  paths['/users/{id}/ip-history']['get']['responses'][200]['content']['application/json'];
+type UserEmailHistoryResponse =
+  paths['/users/{id}/email-history']['get']['responses'][200]['content']['application/json'];
+type SnatchListResponse =
+  paths['/users/me/snatch-list']['get']['responses'][200]['content']['application/json'];
+type UserSnatchListResponse =
+  paths['/users/{id}/snatch-list']['get']['responses'][200]['content']['application/json'];
+type DonorRanksResponse =
+  paths['/users/donor-ranks']['get']['responses'][200]['content']['application/json'];
 
-export interface UserRankRecord {
-  id: number;
-  name: string;
-  level: number;
-  permissions: Record<string, boolean> | null;
-  secondary?: boolean;
-  permittedForumIds?: number[];
-  color?: string | null;
-  badge?: string | null;
-  personalCollageLimit?: number | null;
-  displayStaff?: boolean;
-  staffGroupId?: number | null;
-  primaryUserCount?: number;
-  secondaryUserCount?: number;
-  userCount?: number;
-}
-
-export interface UserRankAssignment {
-  userRankId: number;
-  secondaryRankIds: number[];
-  rankLocked: boolean;
-}
+// The four /tools/user-ranks routes all project the same `formatRank()` helper
+// server-side, so one spec-derived alias covers the list rows, the single read
+// and both mutation echoes. Exported because components type their own props
+// with it; it is no longer a second description of the API.
+export type UserRankRecord = UserRanksResponse[number];
+export type UserRankAssignment = UserRankAssignmentResponse;
 
 type SetUserRankArgs = {
   id: number;
@@ -101,24 +112,18 @@ export const userApi = api.injectEndpoints({
     }),
 
     // UserRanks (UserRank)
-    getUserRanks: build.query<UserRankRecord[], void>({
+    getUserRanks: build.query<UserRanksResponse, void>({
       query: () => '/tools/user-ranks',
       providesTags: ['UserRank']
     }),
     getPermissionCatalog: build.query<PermissionCatalogResponse, void>({
       query: () => '/tools/user-ranks/permissions'
     }),
-    getUserRankById: build.query<UserRankRecord, number | string>({
+    getUserRankById: build.query<UserRankResponse, number | string>({
       query: (id) => `/tools/user-ranks/${id}`,
       providesTags: (_, __, id) => [{ type: 'UserRank', id: Number(id) }]
     }),
-    createUserRank: build.mutation<
-      UserRankRecord,
-      CreateUserRankArgs & {
-        secondary?: boolean;
-        permittedForumIds?: number[];
-      }
-    >({
+    createUserRank: build.mutation<CreateUserRankResponse, CreateUserRankArgs>({
       query: (data) => ({
         url: '/tools/user-ranks',
         method: 'POST',
@@ -126,13 +131,7 @@ export const userApi = api.injectEndpoints({
       }),
       invalidatesTags: ['UserRank']
     }),
-    updateUserRank: build.mutation<
-      UserRankRecord,
-      UpdateUserRankArgs & {
-        secondary?: boolean;
-        permittedForumIds?: number[];
-      }
-    >({
+    updateUserRank: build.mutation<UpdateUserRankResponse, UpdateUserRankArgs>({
       query: ({ id, ...data }) => ({
         url: `/tools/user-ranks/${id}`,
         method: 'PUT',
@@ -150,26 +149,28 @@ export const userApi = api.injectEndpoints({
       query: () => '/tools/promotion-rules',
       providesTags: ['PromotionRule']
     }),
-    createPromotionRule: build.mutation<PromotionRule, CreatePromotionRuleArgs>(
-      {
-        query: (data) => ({
-          url: '/tools/promotion-rules',
-          method: 'POST',
-          body: data
-        }),
-        invalidatesTags: ['PromotionRule']
-      }
-    ),
-    updatePromotionRule: build.mutation<PromotionRule, UpdatePromotionRuleArgs>(
-      {
-        query: ({ id, ...data }) => ({
-          url: `/tools/promotion-rules/${id}`,
-          method: 'PUT',
-          body: data
-        }),
-        invalidatesTags: ['PromotionRule']
-      }
-    ),
+    createPromotionRule: build.mutation<
+      CreatePromotionRuleResponse,
+      CreatePromotionRuleArgs
+    >({
+      query: (data) => ({
+        url: '/tools/promotion-rules',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['PromotionRule']
+    }),
+    updatePromotionRule: build.mutation<
+      UpdatePromotionRuleResponse,
+      UpdatePromotionRuleArgs
+    >({
+      query: ({ id, ...data }) => ({
+        url: `/tools/promotion-rules/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+      invalidatesTags: ['PromotionRule']
+    }),
     deletePromotionRule: build.mutation<void, number>({
       query: (id) => ({
         url: `/tools/promotion-rules/${id}`,
@@ -190,28 +191,11 @@ export const userApi = api.injectEndpoints({
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
-    getUserWarnings: build.query<
-      Array<{
-        id: number;
-        reason: string;
-        expiresAt: string | null;
-        createdAt: string;
-        warnedBy: { id: number; username: string } | null;
-      }>,
-      number
-    >({
+    getUserWarnings: build.query<UserWarningsResponse, number>({
       query: (id) => `/users/${id}/warnings`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),
-    getUserNotes: build.query<
-      Array<{
-        id: number;
-        body: string;
-        createdAt: string;
-        author: { id: number; username: string } | null;
-      }>,
-      number
-    >({
+    getUserNotes: build.query<UserNotesResponse, number>({
       query: (id) => `/users/${id}/notes`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),
@@ -246,7 +230,7 @@ export const userApi = api.injectEndpoints({
         'Profile'
       ]
     }),
-    getUserRankAssignment: build.query<UserRankAssignment, number>({
+    getUserRankAssignment: build.query<UserRankAssignmentResponse, number>({
       query: (id) => `/users/${id}/rank`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),
@@ -269,48 +253,23 @@ export const userApi = api.injectEndpoints({
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
-    getUserIpHistory: build.query<
-      Array<{ ip: string; seenAt: string }>,
-      number
-    >({
+    getUserIpHistory: build.query<UserIpHistoryResponse, number>({
       query: (id) => `/users/${id}/ip-history`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),
-    getUserEmailHistory: build.query<
-      Array<{ email: string; changedAt: string }>,
-      number
-    >({
+    getUserEmailHistory: build.query<UserEmailHistoryResponse, number>({
       query: (id) => `/users/${id}/email-history`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),
 
     // Snatch list
-    getSnatchList: build.query<
-      Array<{
-        id: number;
-        release: { id: number; title: string; communityId: number | null };
-        artist: { name: string } | null;
-        downloadedAt: string;
-      }>,
-      void
-    >({
+    getSnatchList: build.query<SnatchListResponse, void>({
       query: () => '/users/me/snatch-list',
       providesTags: ['User']
     }),
 
     // Donor ranks
-    getDonorRanks: build.query<
-      Array<{
-        id: number;
-        name: string;
-        minDonation: number;
-        badge: string | null;
-        color: string | null;
-        expiresAfterDays: number | null;
-        perks: Record<string, boolean> | null;
-      }>,
-      void
-    >({
+    getDonorRanks: build.query<DonorRanksResponse, void>({
       query: () => '/users/donor-ranks',
       providesTags: ['User']
     }),
@@ -387,15 +346,7 @@ export const userApi = api.injectEndpoints({
       },
       providesTags: ['Warning']
     }),
-    getSnatchListByUserId: build.query<
-      Array<{
-        id: number;
-        release: { id: number; title: string; communityId: number | null };
-        artist: { name: string } | null;
-        downloadedAt: string;
-      }>,
-      number
-    >({
+    getSnatchListByUserId: build.query<UserSnatchListResponse, number>({
       query: (id) => `/users/${id}/snatch-list`,
       providesTags: (_, __, id) => [{ type: 'User', id }]
     }),

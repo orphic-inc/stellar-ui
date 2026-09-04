@@ -1,20 +1,5 @@
 {
-  "$comment": "Grandfathered hand-typed RTK Query result types (#277). This list only ever SHRINKS: bind an endpoint to the generated client, then delete its line. A stale entry \u2014 now spec-typed, or no longer present \u2014 fails the check, so the list cannot rot into a permanent mute. Regenerate with `npm run service-types:check -- --write-baseline`.",
-  "generated": "2026-09-01",
-  "handTyped": [
-    "userApi.ts#createPromotionRule",
-    "userApi.ts#createUserRank",
-    "userApi.ts#getDonorRanks",
-    "userApi.ts#getSnatchList",
-    "userApi.ts#getSnatchListByUserId",
-    "userApi.ts#getUserEmailHistory",
-    "userApi.ts#getUserIpHistory",
-    "userApi.ts#getUserNotes",
-    "userApi.ts#getUserRankAssignment",
-    "userApi.ts#getUserRankById",
-    "userApi.ts#getUserRanks",
-    "userApi.ts#getUserWarnings",
-    "userApi.ts#updatePromotionRule",
-    "userApi.ts#updateUserRank"
-  ]
+  "$comment": "Grandfathered hand-typed RTK Query result types (#277). NOW EMPTY \u2014 the backlog is cleared and every non-exempt endpoint reads its result type from the generated client. The gate stays: a NEW hand-typed result type fails immediately, and this list may not grow again without a deliberate edit here. It only ever SHRANK, and there is nothing left to shrink. Regenerate with `npm run service-types:check -- --write-baseline`.",
+  "generated": "2026-09-04",
+  "handTyped": []
 }

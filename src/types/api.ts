@@ -18915,17 +18915,21 @@ export interface components {
       id: number;
       name: string;
       level: number;
-      permissions?: {
+      permissions: {
         [key: string]: boolean;
       };
-      color?: string;
-      badge?: string;
-      personalCollageLimit?: number;
-      authorStylesheetLimit?: number;
-      assetLimit?: number | null;
-      displayStaff?: boolean;
-      staffGroupId?: number | null;
-      userCount?: number;
+      secondary: boolean;
+      permittedForumIds: number[];
+      color: string;
+      badge: string;
+      personalCollageLimit: number;
+      authorStylesheetLimit: number;
+      assetLimit: number | null;
+      displayStaff: boolean;
+      staffGroupId: number | null;
+      primaryUserCount: number;
+      secondaryUserCount: number;
+      userCount: number;
     };
     StaffGroup: {
       id: number;

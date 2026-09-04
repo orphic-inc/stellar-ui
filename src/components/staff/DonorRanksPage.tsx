@@ -243,7 +243,7 @@ const DonorRanksPage = () => {
       color: rank.color ?? '',
       expiresAfterDays:
         rank.expiresAfterDays != null ? String(rank.expiresAfterDays) : '',
-      perks: (rank.perks as Record<string, boolean>) ?? {}
+      perks: rank.perks
     });
   };
 

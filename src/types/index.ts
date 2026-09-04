@@ -87,34 +87,12 @@ export type RequestStatus = 'open' | 'filled';
 
 export type LinkHealthStatus = 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL';
 
-export interface ContributionWithHealth {
-  id: number;
-  userId: number;
-  releaseId: number;
-  contributorId: number;
-  releaseDescription: string | null;
-  sizeInBytes: number | null;
-  approvedAccountingBytes: string | null;
-  linkStatus: LinkHealthStatus;
-  linkCheckedAt: string | null;
-  type: string;
-  createdAt: string;
-  updatedAt: string;
-  user?: { id: number; username: string };
-  collaborators?: Array<{ id: number; name: string }>;
-}
-
-// ─── Downloads ───────────────────────────────────────────────────────────────
-
-export type DownloadGrantStatus = 'COMPLETED' | 'REVERSED';
-
-export interface DownloadGrant {
-  grantId: number;
-  downloadUrl: string;
-  amountBytes: string;
-  status: DownloadGrantStatus;
-  createdAt: string;
-}
+// ContributionWithHealth, DownloadGrant and DownloadGrantStatus used to live
+// here. All three were hand-written RESPONSE shapes with no remaining
+// reference anywhere in src/ — dead duplicates of contract components — so
+// they are deleted rather than bound (#277: a hand-written type that no longer
+// exists cannot drift). LinkHealthStatus stays: it is still read in eight
+// places as a display/filter vocabulary.
 
 // ─── Site stats ─────────────────────────────────────────────────────────────
 

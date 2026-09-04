@@ -92,8 +92,7 @@ const DonatePage = () => {
         ) : ranks && ranks.length > 0 ? (
           <div className="mt-4 space-y-4">
             {ranks.map((rank) => {
-              const perks =
-                (rank.perks as Record<string, boolean> | null) ?? {};
+              const perks = rank.perks;
               const enabledPerks = Object.entries(perks)
                 .filter(([, enabled]) => enabled)
                 .map(([key]) => PERK_LABELS[key] ?? key);
