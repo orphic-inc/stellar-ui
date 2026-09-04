@@ -22,7 +22,7 @@ type CommunitiesResponse =
 type CommunityResponse =
   paths['/communities/{id}']['get']['responses'][200]['content']['application/json'];
 type CommunityReleasesResponse =
-  paths['/communities/{id}/releases']['get']['responses'][200]['content']['application/json'];
+  paths['/communities/{communityId}/releases']['get']['responses'][200]['content']['application/json'];
 export type ReleaseResponse =
   paths['/communities/{communityId}/releases/{releaseId}']['get']['responses'][200]['content']['application/json'];
 type ReleaseHistoryResponse =
