@@ -16707,7 +16707,22 @@ export interface paths {
                 title: string;
                 year: number | null;
                 type: string;
-                releaseType: string;
+                /** @enum {string} */
+                releaseType:
+                  | 'Album'
+                  | 'Single'
+                  | 'EP'
+                  | 'Anthology'
+                  | 'Compilation'
+                  | 'DJMix'
+                  | 'Live'
+                  | 'Remix'
+                  | 'Bootleg'
+                  | 'Interview'
+                  | 'Mixtape'
+                  | 'Demo'
+                  | 'ConcertRecording'
+                  | 'Unknown';
                 communityId: number | null;
                 description: string;
                 createdAt: string;
@@ -18838,7 +18853,22 @@ export interface components {
       communityId: number | null;
       year?: number | null;
       type?: string | null;
-      releaseType?: string | null;
+      /** @enum {string} */
+      releaseType:
+        | 'Album'
+        | 'Single'
+        | 'EP'
+        | 'Anthology'
+        | 'Compilation'
+        | 'DJMix'
+        | 'Live'
+        | 'Remix'
+        | 'Bootleg'
+        | 'Interview'
+        | 'Mixtape'
+        | 'Demo'
+        | 'ConcertRecording'
+        | 'Unknown';
       image?: string | null;
       description?: string | null;
       descriptionHtml?: string;
@@ -19092,7 +19122,22 @@ export interface components {
         title: string;
         year?: number | null;
         type?: string;
-        releaseType?: string;
+        /** @enum {string} */
+        releaseType:
+          | 'Album'
+          | 'Single'
+          | 'EP'
+          | 'Anthology'
+          | 'Compilation'
+          | 'DJMix'
+          | 'Live'
+          | 'Remix'
+          | 'Bootleg'
+          | 'Interview'
+          | 'Mixtape'
+          | 'Demo'
+          | 'ConcertRecording'
+          | 'Unknown';
         communityId?: number | null;
         community?: {
           id: number;
@@ -19381,7 +19426,22 @@ export interface components {
       artistId: number;
       artistName: string;
       type: string;
-      releaseType: string;
+      /** @enum {string} */
+      releaseType:
+        | 'Album'
+        | 'Single'
+        | 'EP'
+        | 'Anthology'
+        | 'Compilation'
+        | 'DJMix'
+        | 'Live'
+        | 'Remix'
+        | 'Bootleg'
+        | 'Interview'
+        | 'Mixtape'
+        | 'Demo'
+        | 'ConcertRecording'
+        | 'Unknown';
       tags: components['schemas']['Top10Tag'][];
       consumerCount: number;
       totalBytesConsumed: string;
@@ -19670,7 +19730,22 @@ export interface components {
         title: string;
         image: string | null;
         year: number;
-        releaseType: string;
+        /** @enum {string} */
+        releaseType:
+          | 'Album'
+          | 'Single'
+          | 'EP'
+          | 'Anthology'
+          | 'Compilation'
+          | 'DJMix'
+          | 'Live'
+          | 'Remix'
+          | 'Bootleg'
+          | 'Interview'
+          | 'Mixtape'
+          | 'Demo'
+          | 'ConcertRecording'
+          | 'Unknown';
         communityId?: number | null;
         artist: {
           id: number;
