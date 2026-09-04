@@ -23,13 +23,7 @@ const CommunityRow = ({ community }: Props) => (
       )}
     </td>
     <td className="py-3 pr-3 whitespace-nowrap">
-      {community.type ? (
-        <Badge>{community.type}</Badge>
-      ) : (
-        <span data-st="meta" className="text-xs">
-          —
-        </span>
-      )}
+      <Badge>{community.type}</Badge>
     </td>
     <td data-st-num className="py-3 pr-3">
       {community._count?.releases ?? 0}

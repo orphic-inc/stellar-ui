@@ -12,6 +12,12 @@ All notable changes to stellar-ui are documented here.
 
 ### Changed
 
+- **Re-vendored the contract's final enum sweep, and it deleted an unreachable branch here** — [stellar-api #503](https://github.com/orphic-inc/stellar-api/pull/503) narrowed the last thirteen stringly-typed enum fields. Unlike the two sweeps before it, this one **did not type-check cleanly**, and the failure was the useful part: `CommunitiesTable`'s fixture declared `type: null` for a community, and `CommunityRow` rendered a `—` fallback for that case.
+
+  **`Community.type` is `CommunityType` `NOT NULL` and every route returns the whole row**, so the API has never been able to send null. The fallback branch was unreachable and its test could only reach it by fabricating a response that cannot occur — the "fixture agrees with the type rather than the API" pattern this whole migration keeps turning up, this time caught by the contract instead of by reading. The branch is gone, the fixture carries a real `CommunityType`, and the test now asserts both rows badge their type.
+
+  Everything else was generated-only. `AssetUploadResponse.kind` is worth knowing about as a consumer: it is the **full** `AssetKind`, not the two values the upload query accepts, because the store is content-addressed and returns the existing row on a hash hit.
+
 - **Re-vendored again: `type` is now a seven-member union too** — [stellar-api #502](https://github.com/orphic-inc/stellar-api/pull/502) gave `ReleaseType` the same treatment as `ReleaseCategory` at six sites. The two are the pair that sits on every release-shaped response: **`type` is the medium** (Music, EBooks, Comics…), **`releaseType` is the edition kind** (Album, Single, Live…). Generated-only again, and again no code change was needed — narrowing a response field only strengthens what a reader is promised.
 
 - **Re-vendored the contract: `releaseType` is now a fourteen-member union instead of `string`** — [stellar-api #501](https://github.com/orphic-inc/stellar-api/pull/501) replaced `z.string()` at five registry sites (which carried three different nullabilities between them) with the real `ReleaseCategory` enum. **No code change was needed here**, which is the expected result: narrowing a _response_ field only strengthens what a reader is promised, so `tsc` and all 169 suites pass untouched. The generated type is a clean union rather than the `Base & Record<string, never>` an ill-formed narrowing produces — checked, because that trap has bitten before.
