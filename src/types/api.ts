@@ -11990,10 +11990,21 @@ export interface paths {
               pageSize: number;
               reports: {
                 id: number;
-                targetType: string;
+                /** @enum {string} */
+                targetType:
+                  | 'User'
+                  | 'Release'
+                  | 'Artist'
+                  | 'Contribution'
+                  | 'ForumTopic'
+                  | 'ForumPost'
+                  | 'Comment'
+                  | 'Collage'
+                  | 'Post';
                 targetId: number;
                 category: string;
-                status: string;
+                /** @enum {string} */
+                status: 'Open' | 'Claimed' | 'Resolved';
                 createdAt: string;
                 resolvedAt: string | null;
                 resolution: string | null;
@@ -13960,7 +13971,7 @@ export interface paths {
       parameters: {
         query?: {
           page?: string;
-          status?: string;
+          status?: 'pending' | 'accepted' | 'rejected';
         };
         header?: never;
         path?: never;
@@ -16876,7 +16887,8 @@ export interface paths {
                   | 'Comedy'
                   | 'Comics';
                 year: number | null;
-                status: string;
+                /** @enum {string} */
+                status: 'open' | 'filled' | 'deleted';
                 voteCount: number;
                 communityId: number;
                 createdAt: string;
@@ -17278,7 +17290,8 @@ export interface paths {
               grantId: number;
               downloadUrl: string;
               amountBytes: string;
-              status: string;
+              /** @enum {string} */
+              status: 'COMPLETED' | 'REVERSED';
               createdAt: string;
             };
           };
@@ -17319,7 +17332,8 @@ export interface paths {
               grantId: number;
               downloadUrl: string;
               amountBytes: string;
-              status: string;
+              /** @enum {string} */
+              status: 'COMPLETED' | 'REVERSED';
               createdAt: string;
             };
           };
@@ -18541,7 +18555,8 @@ export interface components {
       url: string;
       mime: string;
       size: number;
-      kind: string;
+      /** @enum {string} */
+      kind: 'ThemeImage' | 'ThemeFont' | 'Avatar';
     };
     Forum: {
       id: number;
@@ -18686,7 +18701,15 @@ export interface components {
       id: number;
       name: string;
       description?: string | null;
-      type?: string | null;
+      /** @enum {string} */
+      type:
+        | 'Music'
+        | 'Applications'
+        | 'EBooks'
+        | 'ELearningVideos'
+        | 'Audiobooks'
+        | 'Comedy'
+        | 'Comics';
       registrationStatus?: string | null;
       /** @enum {string} */
       announceVisibility?: 'PUBLIC' | 'PRIVATE';
@@ -18715,7 +18738,32 @@ export interface components {
         id: number;
         username: string;
       };
-      type: string;
+      /** @enum {string} */
+      type:
+        | 'mp3'
+        | 'flac'
+        | 'wav'
+        | 'ogg'
+        | 'aac'
+        | 'm4a'
+        | 'm4b'
+        | 'mp4'
+        | 'mkv'
+        | 'avi'
+        | 'mov'
+        | 'zip'
+        | 'exe'
+        | 'dmg'
+        | 'apk'
+        | 'pdf'
+        | 'epub'
+        | 'mobi'
+        | 'cbz'
+        | 'cbr'
+        | 'jpg'
+        | 'png'
+        | 'gif'
+        | 'txt';
       downloadUrl: string;
       sizeInBytes?: number | null;
       collaborators: {
@@ -18736,7 +18784,32 @@ export interface components {
         title: string;
         communityId?: number | null;
       };
-      type: string;
+      /** @enum {string} */
+      type:
+        | 'mp3'
+        | 'flac'
+        | 'wav'
+        | 'ogg'
+        | 'aac'
+        | 'm4a'
+        | 'm4b'
+        | 'mp4'
+        | 'mkv'
+        | 'avi'
+        | 'mov'
+        | 'zip'
+        | 'exe'
+        | 'dmg'
+        | 'apk'
+        | 'pdf'
+        | 'epub'
+        | 'mobi'
+        | 'cbz'
+        | 'cbr'
+        | 'jpg'
+        | 'png'
+        | 'gif'
+        | 'txt';
       downloadUrl: string;
       sizeInBytes?: number | null;
       /** @enum {string} */
@@ -18803,7 +18876,32 @@ export interface components {
       linkCheckedAt: string | null;
       /** @enum {string} */
       ratioExempt: 'NONE' | 'FREEPASS' | 'NEUTRALPASS';
-      type: string;
+      /** @enum {string} */
+      type:
+        | 'mp3'
+        | 'flac'
+        | 'wav'
+        | 'ogg'
+        | 'aac'
+        | 'm4a'
+        | 'm4b'
+        | 'mp4'
+        | 'mkv'
+        | 'avi'
+        | 'mov'
+        | 'zip'
+        | 'exe'
+        | 'dmg'
+        | 'apk'
+        | 'pdf'
+        | 'epub'
+        | 'mobi'
+        | 'cbz'
+        | 'cbr'
+        | 'jpg'
+        | 'png'
+        | 'gif'
+        | 'txt';
       createdAt: string;
       updatedAt: string;
       user: {
@@ -19646,7 +19744,8 @@ export interface components {
       email: string;
       expires: string;
       reason: string;
-      status: string;
+      /** @enum {string} */
+      status: 'pending' | 'accepted' | 'rejected';
     };
     InviteTreeItem: {
       id: number;
@@ -19704,7 +19803,8 @@ export interface components {
         id: number;
         username: string;
       };
-      status: string;
+      /** @enum {string} */
+      status: 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
       watchStartedAt: string | null;
       watchExpiresAt: string | null;
       downloadDisabledAt: string | null;
@@ -19947,7 +20047,8 @@ export interface components {
       checked: number;
       coverage: number | null;
       pulse: number | null;
-      status: string;
+      /** @enum {string} */
+      status: 'Healthy' | 'Ailing' | 'Critical' | 'Unknown';
     };
   };
   responses: never;

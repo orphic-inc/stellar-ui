@@ -15,7 +15,7 @@ const mockCommunities = [
     id: 1,
     name: 'Jazz Archive',
     description: 'A collection of jazz recordings',
-    type: 'Music',
+    type: 'Music' as const,
     allowDuplicateFormats: false,
     _count: { releases: 120, contributors: 15, consumers: 80 }
   },
@@ -23,7 +23,11 @@ const mockCommunities = [
     id: 2,
     name: 'Film Noir',
     description: null,
-    type: null,
+    // A real CommunityType, not null: the column is `CommunityType` NOT NULL
+    // and every route returns the whole row, so the API cannot send null here.
+    // The fixture used to say null and the row rendered a `—` for it — a
+    // fallback for a response that does not exist. Both are gone.
+    type: 'ELearningVideos' as const,
     allowDuplicateFormats: false,
     _count: { releases: 45, contributors: 8, consumers: 30 }
   }
@@ -51,10 +55,10 @@ describe('CommunitiesTable', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows type or dash when null', () => {
+  it('badges the community type for every row', () => {
     renderWithProviders(<CommunitiesTable communities={mockCommunities} />);
     expect(screen.getByText('Music')).toBeInTheDocument();
-    expect(screen.getByText('—')).toBeInTheDocument();
+    expect(screen.getByText('ELearningVideos')).toBeInTheDocument();
   });
 
   it('shows release and contributor counts', () => {
