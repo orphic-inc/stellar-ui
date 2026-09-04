@@ -6635,7 +6635,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/communities/{id}/releases': {
+  '/communities/{communityId}/releases': {
     parameters: {
       query?: never;
       header?: never;
@@ -6647,7 +6647,7 @@ export interface paths {
         query?: never;
         header?: never;
         path: {
-          id: string;
+          communityId: string;
         };
         cookie?: never;
       };
@@ -6668,7 +6668,99 @@ export interface paths {
       };
     };
     put?: never;
-    post?: never;
+    /**
+     * Create a release in a community
+     * @description Requires `communities_manage`. At least one artist credit is required.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            credits: {
+              artistId: number;
+              /** @enum {string} */
+              role?:
+                | 'Main'
+                | 'Guest'
+                | 'Composer'
+                | 'Conductor'
+                | 'DJ'
+                | 'Remixer'
+                | 'Producer'
+                | 'Arranger';
+            }[];
+            title: string;
+            description: string;
+            /** @enum {string} */
+            type:
+              | 'Music'
+              | 'Applications'
+              | 'EBooks'
+              | 'ELearningVideos'
+              | 'Audiobooks'
+              | 'Comedy'
+              | 'Comics';
+            /** @enum {string} */
+            releaseType:
+              | 'Album'
+              | 'Single'
+              | 'EP'
+              | 'Anthology'
+              | 'Compilation'
+              | 'DJMix'
+              | 'Live'
+              | 'Remix'
+              | 'Bootleg'
+              | 'Interview'
+              | 'Mixtape'
+              | 'Demo'
+              | 'ConcertRecording'
+              | 'Unknown';
+            year: number;
+            /** Format: uri */
+            image?: string;
+            tagIds?: number[];
+          };
+        };
+      };
+      responses: {
+        /** @description Release created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['Release'];
+          };
+        };
+        /** @description Validation error */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -6911,114 +7003,6 @@ export interface paths {
         };
       };
     };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/communities/{communityId}/releases': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Create a release in a community
-     * @description Requires `communities_manage`. At least one artist credit is required.
-     */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          communityId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: {
-        content: {
-          'application/json': {
-            credits: {
-              artistId: number;
-              /** @enum {string} */
-              role?:
-                | 'Main'
-                | 'Guest'
-                | 'Composer'
-                | 'Conductor'
-                | 'DJ'
-                | 'Remixer'
-                | 'Producer'
-                | 'Arranger';
-            }[];
-            title: string;
-            description: string;
-            /** @enum {string} */
-            type:
-              | 'Music'
-              | 'Applications'
-              | 'EBooks'
-              | 'ELearningVideos'
-              | 'Audiobooks'
-              | 'Comedy'
-              | 'Comics';
-            /** @enum {string} */
-            releaseType:
-              | 'Album'
-              | 'Single'
-              | 'EP'
-              | 'Anthology'
-              | 'Compilation'
-              | 'DJMix'
-              | 'Live'
-              | 'Remix'
-              | 'Bootleg'
-              | 'Interview'
-              | 'Mixtape'
-              | 'Demo'
-              | 'ConcertRecording'
-              | 'Unknown';
-            year: number;
-            /** Format: uri */
-            image?: string;
-            tagIds?: number[];
-          };
-        };
-      };
-      responses: {
-        /** @description Release created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['Release'];
-          };
-        };
-        /** @description Validation error */
-        400: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['ValidationError'];
-          };
-        };
-        /** @description Missing communities_manage */
-        403: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-      };
-    };
-    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -13007,7 +12991,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Trigger a history snapshot (admin/cron) */
+    /**
+     * Trigger a history snapshot (admin/cron)
+     * @description `type` selects the WINDOW the snapshot captures, not merely the label it is filed under: **Daily is the last 24 hours, Weekly the last 7 days**. Omit the body entirely for a Daily snapshot. Before #491 the window was hardcoded to daily and `type` was stored as a label only, so rows labelled Weekly held daily data.
+     */
     post: {
       parameters: {
         query?: never;
@@ -13018,7 +13005,10 @@ export interface paths {
       requestBody?: {
         content: {
           'application/json': {
-            /** @enum {string} */
+            /**
+             * @default Daily
+             * @enum {string}
+             */
             type?: 'Daily' | 'Weekly';
           };
         };
@@ -13033,6 +13023,15 @@ export interface paths {
             'application/json': {
               msg: string;
             };
+          };
+        };
+        /** @description type is not one of Daily | Weekly */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
       };
