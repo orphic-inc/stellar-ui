@@ -16706,7 +16706,15 @@ export interface paths {
                 id: number;
                 title: string;
                 year: number | null;
-                type: string;
+                /** @enum {string} */
+                type:
+                  | 'Music'
+                  | 'Applications'
+                  | 'EBooks'
+                  | 'ELearningVideos'
+                  | 'Audiobooks'
+                  | 'Comedy'
+                  | 'Comics';
                 /** @enum {string} */
                 releaseType:
                   | 'Album'
@@ -16858,7 +16866,15 @@ export interface paths {
                 id: number;
                 title: string;
                 description: string;
-                type: string;
+                /** @enum {string} */
+                type:
+                  | 'Music'
+                  | 'Applications'
+                  | 'EBooks'
+                  | 'ELearningVideos'
+                  | 'Audiobooks'
+                  | 'Comedy'
+                  | 'Comics';
                 year: number | null;
                 status: string;
                 voteCount: number;
@@ -18852,7 +18868,15 @@ export interface components {
       title: string;
       communityId: number | null;
       year?: number | null;
-      type?: string | null;
+      /** @enum {string} */
+      type:
+        | 'Music'
+        | 'Applications'
+        | 'EBooks'
+        | 'ELearningVideos'
+        | 'Audiobooks'
+        | 'Comedy'
+        | 'Comics';
       /** @enum {string} */
       releaseType:
         | 'Album'
@@ -19121,7 +19145,15 @@ export interface components {
         id: number;
         title: string;
         year?: number | null;
-        type?: string;
+        /** @enum {string} */
+        type:
+          | 'Music'
+          | 'Applications'
+          | 'EBooks'
+          | 'ELearningVideos'
+          | 'Audiobooks'
+          | 'Comedy'
+          | 'Comics';
         /** @enum {string} */
         releaseType:
           | 'Album'
@@ -19248,7 +19280,15 @@ export interface components {
       userId: number;
       title: string;
       description: string;
-      type: string;
+      /** @enum {string} */
+      type:
+        | 'Music'
+        | 'Applications'
+        | 'EBooks'
+        | 'ELearningVideos'
+        | 'Audiobooks'
+        | 'Comedy'
+        | 'Comics';
       year: number | null;
       image: string | null;
       /** @enum {string} */
@@ -19425,7 +19465,15 @@ export interface components {
       year: number;
       artistId: number;
       artistName: string;
-      type: string;
+      /** @enum {string} */
+      type:
+        | 'Music'
+        | 'Applications'
+        | 'EBooks'
+        | 'ELearningVideos'
+        | 'Audiobooks'
+        | 'Comedy'
+        | 'Comics';
       /** @enum {string} */
       releaseType:
         | 'Album'
