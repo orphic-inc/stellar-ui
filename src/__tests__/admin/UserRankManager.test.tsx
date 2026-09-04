@@ -1,8 +1,9 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import UserRankManager from '../../components/admin/UserRankManager';
+import type { UserRankRecord } from '../../store/services/userApi';
 
 const mockUseGetUserRanksQuery = jest.fn();
 const mockDeleteUserRank = jest.fn();
@@ -12,11 +13,33 @@ jest.mock('../../store/services/userApi', () => ({
   useDeleteUserRankMutation: () => [mockDeleteUserRank, { isLoading: false }]
 }));
 
-const makeRank = (id: number, name: string, level: number) => ({
+// Mirrors what formatRank() actually sends (stellar-api routes/api/tools.ts):
+// every field unconditionally, `secondary` and `permittedForumIds` included.
+// The old fixture omitted both, so the Type and Forum Overrides columns below
+// rendered their undefined fallbacks and nothing ever asserted on them.
+const makeRank = (
+  id: number,
+  name: string,
+  level: number,
+  overrides: Partial<UserRankRecord> = {}
+): UserRankRecord => ({
   id,
   name,
   level,
-  userCount: id * 10
+  permissions: {},
+  secondary: false,
+  permittedForumIds: [],
+  color: '',
+  badge: '',
+  personalCollageLimit: 0,
+  authorStylesheetLimit: 0,
+  assetLimit: 0,
+  displayStaff: false,
+  staffGroupId: null,
+  primaryUserCount: id * 10,
+  secondaryUserCount: 0,
+  userCount: id * 10,
+  ...overrides
 });
 
 describe('UserRankManager', () => {
@@ -69,6 +92,28 @@ describe('UserRankManager', () => {
     expect(
       screen.getByRole('link', { name: /\+ new user rank/i })
     ).toBeInTheDocument();
+  });
+
+  it('renders the Type and Forum Overrides columns off the real fields', () => {
+    mockUseGetUserRanksQuery.mockReturnValue({
+      data: [
+        makeRank(1, 'Member', 100),
+        makeRank(2, 'Donor', 500, {
+          secondary: true,
+          permittedForumIds: [7, 9]
+        })
+      ],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserRankManager />);
+    const rows = document.querySelectorAll('table[data-st="grid"] tbody tr');
+    expect(rows).toHaveLength(2);
+    // Member: primary, no forum overrides.
+    expect(rows[0]).toHaveTextContent('Primary');
+    // Donor: secondary, two forum overrides.
+    expect(rows[1]).toHaveTextContent('Secondary');
+    expect(within(rows[1] as HTMLElement).getByText('2')).toBeInTheDocument();
   });
 
   it('renders ranks on the grid table (kit hooks present)', () => {

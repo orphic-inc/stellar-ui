@@ -25,12 +25,6 @@ interface FormValues {
   staffGroupId: number | '';
 }
 
-type ForumCategory = {
-  id: number;
-  name: string;
-  forums?: Array<{ id: number; name: string; minClassRead?: number | null }>;
-};
-
 const UserRankFormPage = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
@@ -225,48 +219,46 @@ const UserRankFormPage = () => {
               level would normally be too low.
             </p>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {(forumCategories as ForumCategory[] | undefined)?.map(
-                (category) => (
-                  <div
-                    key={category.id}
-                    className="rounded border border-gray-700 bg-gray-900/40 p-3"
-                  >
-                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                      {category.name}
-                    </h4>
-                    <div className="space-y-2">
-                      {category.forums?.length ? (
-                        category.forums.map((forum) => (
-                          <label
-                            key={forum.id}
-                            aria-label={forum.name}
-                            className="flex items-start gap-3 cursor-pointer rounded border border-gray-800 px-3 py-2 hover:border-gray-700"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedForumIds.includes(forum.id)}
-                              onChange={() => togglePermittedForum(forum.id)}
-                              className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
-                            />
-                            <span className="min-w-0">
-                              <span className="block text-sm text-gray-200">
-                                {forum.name}
-                              </span>
-                              <span className="block text-xs text-gray-500">
-                                Read level {forum.minClassRead ?? 0}
-                              </span>
+              {forumCategories?.map((category) => (
+                <div
+                  key={category.id}
+                  className="rounded border border-gray-700 bg-gray-900/40 p-3"
+                >
+                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    {category.name}
+                  </h4>
+                  <div className="space-y-2">
+                    {category.forums?.length ? (
+                      category.forums.map((forum) => (
+                        <label
+                          key={forum.id}
+                          aria-label={forum.name}
+                          className="flex items-start gap-3 cursor-pointer rounded border border-gray-800 px-3 py-2 hover:border-gray-700"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedForumIds.includes(forum.id)}
+                            onChange={() => togglePermittedForum(forum.id)}
+                            className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+                          />
+                          <span className="min-w-0">
+                            <span className="block text-sm text-gray-200">
+                              {forum.name}
                             </span>
-                          </label>
-                        ))
-                      ) : (
-                        <p className="text-xs text-gray-500">
-                          No forums in this category.
-                        </p>
-                      )}
-                    </div>
+                            <span className="block text-xs text-gray-500">
+                              Read level {forum.minClassRead ?? 0}
+                            </span>
+                          </span>
+                        </label>
+                      ))
+                    ) : (
+                      <p className="text-xs text-gray-500">
+                        No forums in this category.
+                      </p>
+                    )}
                   </div>
-                )
-              )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
