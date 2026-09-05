@@ -235,7 +235,13 @@ describe('NotificationCorner', () => {
         createdAt: '2024-01-06',
         readAt: null,
         pageId: 60,
-        page: 'unknown',
+        // `global_notices` with no `url`: a REAL SubscriptionPage value that
+        // still yields no link (`source?.url ?? null`), so it exercises the
+        // unlinked-label path the way the API can actually produce it. This
+        // said `page: 'unknown'` — not a member of the enum, and the switch in
+        // NotificationCorner is exhaustive over all nine, so that branch was
+        // unreachable from any real response (stellar-api #505).
+        page: 'global_notices',
         postId: null,
         source: { title: 'Who Knows' },
         actor: { id: 15, username: 'frank', avatar: null }
@@ -269,7 +275,7 @@ describe('NotificationCorner', () => {
     expect(
       screen.getByRole('link', { name: /eve commented on Jazz Heads/i })
     ).toHaveAttribute('href', '/communities/50');
-    expect(screen.getByText(/unknown #60/i)).toBeInTheDocument();
+    expect(screen.getByText(/global_notices #60/i)).toBeInTheDocument();
     expect(screen.getByText(/forums #70/i)).toBeInTheDocument();
   });
 

@@ -41,19 +41,13 @@ export type FeaturedAlbumItem =
 export type DeletedCollageItem =
   paths['/collages/deleted']['get']['responses'][200]['content']['application/json']['data'][number];
 
-export interface EconomyGroupedItem {
-  reason: string;
-  _sum: { amount: string | null };
-  _count: number;
-}
+export type EconomyStatsResponse =
+  paths['/stats/economy']['get']['responses'][200]['content']['application/json'];
 
-export interface EconomyTransactionItem {
-  id: number;
-  user: UserRef;
-  amount: string;
-  reason: string;
-  createdAt: string;
-}
+// Kept as NAMES because components type their props with them — but each is now
+// a slice of the generated client rather than a second description (#293).
+export type EconomyGroupedItem = EconomyStatsResponse['grouped'][number];
+export type EconomyTransactionItem = EconomyStatsResponse['recent'][number];
 
 export type ReleaseStatsItem =
   paths['/stats/releases']['get']['responses'][200]['content']['application/json'];
@@ -284,10 +278,7 @@ export const adminApi = api.injectEndpoints({
     }),
 
     // Stats
-    getEconomyStats: build.query<
-      { grouped: EconomyGroupedItem[]; recent: EconomyTransactionItem[] },
-      void
-    >({
+    getEconomyStats: build.query<EconomyStatsResponse, void>({
       query: () => '/stats/economy',
       providesTags: ['EconomyStats']
     }),

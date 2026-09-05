@@ -18487,7 +18487,17 @@ export interface components {
         username: string;
         avatar?: string | null;
       } | null;
-      page: string;
+      /** @enum {string} */
+      page:
+        | 'forums'
+        | 'artist'
+        | 'collages'
+        | 'requests'
+        | 'communities'
+        | 'contributions'
+        | 'release'
+        | 'news'
+        | 'global_notices';
       pageId: number;
       postId?: number | null;
       readAt?: string | null;
@@ -18710,7 +18720,8 @@ export interface components {
         | 'Audiobooks'
         | 'Comedy'
         | 'Comics';
-      registrationStatus?: string | null;
+      /** @enum {string} */
+      registrationStatus: 'open' | 'invite' | 'closed';
       /** @enum {string} */
       announceVisibility?: 'PUBLIC' | 'PRIVATE';
       image?: string | null;
@@ -19981,7 +19992,19 @@ export interface components {
       };
     };
     EconomyGroupedItem: {
-      reason: string;
+      /** @enum {string} */
+      reason:
+        | 'REQUEST_CREATE'
+        | 'REQUEST_VOTE'
+        | 'REQUEST_FILL'
+        | 'REQUEST_UNFILL'
+        | 'REQUEST_REFUND'
+        | 'DOWNLOAD_DEBIT'
+        | 'DOWNLOAD_CREDIT'
+        | 'STAFF_REVERSAL'
+        | 'CRS_STYLESHEET_ADOPTION'
+        | 'FREEPASS_GRANT'
+        | 'NEUTRALPASS_GRANT';
       _sum: {
         amount: string | null;
       };
@@ -19989,12 +20012,28 @@ export interface components {
     };
     EconomyTransactionItem: {
       id: number;
+      userId: number;
       user: {
         id: number;
         username: string;
       };
       amount: string;
-      reason: string;
+      /** @enum {string} */
+      reason:
+        | 'REQUEST_CREATE'
+        | 'REQUEST_VOTE'
+        | 'REQUEST_FILL'
+        | 'REQUEST_UNFILL'
+        | 'REQUEST_REFUND'
+        | 'DOWNLOAD_DEBIT'
+        | 'DOWNLOAD_CREDIT'
+        | 'STAFF_REVERSAL'
+        | 'CRS_STYLESHEET_ADOPTION'
+        | 'FREEPASS_GRANT'
+        | 'NEUTRALPASS_GRANT';
+      contextId: number | null;
+      contextType: string | null;
+      actorUserId: number | null;
       createdAt: string;
     };
     DncEntry: {
