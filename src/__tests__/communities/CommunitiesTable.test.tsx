@@ -16,6 +16,9 @@ const mockCommunities = [
     name: 'Jazz Archive',
     description: 'A collection of jazz recordings',
     type: 'Music' as const,
+    // Required for the same reason `type` is: a `RegistrationStatus` NOT NULL
+    // column on a whole-row read (stellar-api #505).
+    registrationStatus: 'open' as const,
     allowDuplicateFormats: false,
     _count: { releases: 120, contributors: 15, consumers: 80 }
   },
@@ -28,6 +31,7 @@ const mockCommunities = [
     // The fixture used to say null and the row rendered a `—` for it — a
     // fallback for a response that does not exist. Both are gone.
     type: 'ELearningVideos' as const,
+    registrationStatus: 'invite' as const,
     allowDuplicateFormats: false,
     _count: { releases: 45, contributors: 8, consumers: 30 }
   }

@@ -56,7 +56,7 @@ const BASELINE = resolve(root, 'service-types-baseline.json');
 // Files with no contract to bind to.
 const EXEMPT = new Set(['devToolsApi.ts']);
 
-/** A result type that needs no checking: void, a primitive, or an inline shape. */
+/** A result type that needs no checking: void, a primitive, or a trivial shape. */
 const isInline = (t) =>
   /^(void|unknown|never|string|number|boolean|null|undefined)(\[\])?$/.test(
     t
@@ -64,6 +64,50 @@ const isInline = (t) =>
   t.startsWith('{') ||
   t.startsWith('Blob') ||
   t.startsWith('ArrayBuffer');
+
+/**
+ * Type constructors that carry no shape of their own, so seeing one inside an
+ * inline object says nothing about whether the object is hand-written.
+ */
+const TS_BUILTINS = new Set([
+  'Array',
+  'ArrayBuffer',
+  'Blob',
+  'Date',
+  'Exclude',
+  'Extract',
+  'Map',
+  'NonNullable',
+  'Omit',
+  'Partial',
+  'Pick',
+  'Promise',
+  'Readonly',
+  'Record',
+  'ReturnType',
+  'Set'
+]);
+
+/**
+ * Named types an expression references — capitalised identifiers only, which is
+ * what distinguishes a type from a field name or a primitive.
+ */
+const referencedTypes = (t) =>
+  [...t.matchAll(/\b([A-Z][A-Za-z0-9_]*)\b/g)]
+    .map((m) => m[1])
+    .filter((id) => !TS_BUILTINS.has(id));
+
+/**
+ * An inline object that WRAPS a named type is not the trivial shape the inline
+ * exemption was written for (#293).
+ *
+ * `build.query<{ items: TopReleaseItem[] }, …>` put a twelve-field hand-written
+ * interface behind a brace, and the checker skipped it because the expression
+ * starts with `{` — so `top10Api.ts` reported as fully bound while carrying a
+ * second description of five endpoints. The exemption is for `{ msg: string }`,
+ * and it still applies to that: only a reference to a NAMED type disqualifies.
+ */
+const wrapsNamedType = (t) => t.startsWith('{') && referencedTypes(t).length > 0;
 
 /** Does this type expression read the generated client? */
 const readsSpec = (t) => /\b(paths|components)\s*\[/.test(t);
@@ -76,6 +120,14 @@ const readsSpec = (t) => /\b(paths|components)\s*\[/.test(t);
  * live, so assuming otherwise would suppress the finding.
  */
 const classify = (type, base, localIsSpec) => {
+  // Look INSIDE an inline object before exempting it: a brace is not a promise
+  // that the shape is trivial (#293).
+  if (wrapsNamedType(base)) {
+    const named = referencedTypes(base);
+    // Bound if every named type it references resolves to the generated client.
+    const allSpec = named.every((id) => localIsSpec.get(id) === true);
+    return allSpec ? 'spec' : 'hand';
+  }
   if (isInline(base)) return 'inline';
   if (readsSpec(type)) return 'spec';
   if (localIsSpec.has(base)) return localIsSpec.get(base) ? 'spec' : 'hand';
