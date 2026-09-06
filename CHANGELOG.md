@@ -6,6 +6,12 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **The vendored API contract catches up with stellar-api's security fixes** — six paths moved. Two are new: `/bad-passwords` and `/bad-passwords/{id}`, the staff denylist surface from stellar-api [#536](https://github.com/orphic-inc/stellar-api/issues/536). Four changed shape: `/email-blacklist` and `/ip-bans` each gained the **400** they could always answer and never declared ([#540](https://github.com/orphic-inc/stellar-api/issues/540)), and `/tools/user-ranks` plus `/tools/user-ranks/{id}` moved because the permission vocabulary gained `bad_passwords_manage`.
+
+  **Purely additive — 482 insertions, no deletions.** No existing shape narrowed, so no service result type changes and nothing downstream breaks; `service-types:check` stays at 227 spec-typed, 0 hand-typed. This is the re-vendor that keeps `contract:check` green, not a UI change: none of these surfaces has a UI consumer yet.
+
 ## [0.9.1] — 2026-09-06
 
 ### Added
