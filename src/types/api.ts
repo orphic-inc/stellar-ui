@@ -9423,6 +9423,7 @@ export interface paths {
               site_history_manage?: boolean;
               ip_bans_manage?: boolean;
               email_blacklist_manage?: boolean;
+              bad_passwords_manage?: boolean;
               donor_ranks_manage?: boolean;
               donation_log_view?: boolean;
               messages_mass_pm?: boolean;
@@ -9674,6 +9675,7 @@ export interface paths {
               site_history_manage?: boolean;
               ip_bans_manage?: boolean;
               email_blacklist_manage?: boolean;
+              bad_passwords_manage?: boolean;
               donor_ranks_manage?: boolean;
               donation_log_view?: boolean;
               messages_mass_pm?: boolean;
@@ -21202,6 +21204,189 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/bad-passwords': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated password denylist */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: {
+                id: number;
+                password: string;
+                /** @enum {string} */
+                source: 'SEEDED' | 'STAFF';
+              }[];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing bad_passwords_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            password: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Created entry */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              id: number;
+              password: string;
+              /** @enum {string} */
+              source: 'SEEDED' | 'STAFF';
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing bad_passwords_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Password is already denied */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/bad-passwords/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: number;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Entry removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing bad_passwords_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Entry not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/email-blacklist': {
     parameters: {
       query?: never;
@@ -21283,6 +21468,15 @@ export interface paths {
               addedAt: string;
               comment: string;
             };
+          };
+        };
+        /** @description Entry is neither an email address nor a domain */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -21450,6 +21644,15 @@ export interface paths {
               fromIp: string;
               toIp: string;
             };
+          };
+        };
+        /** @description Invalid IP address, reversed bounds, or a range spanning both address families */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -22806,6 +23009,7 @@ export interface components {
       | 'site_history_manage'
       | 'ip_bans_manage'
       | 'email_blacklist_manage'
+      | 'bad_passwords_manage'
       | 'donor_ranks_manage'
       | 'donation_log_view'
       | 'messages_mass_pm'
