@@ -2222,6 +2222,15 @@ export interface paths {
             'application/json': components['schemas']['PublicUser'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -3590,6 +3599,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['AnnouncementsResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -10541,6 +10559,15 @@ export interface paths {
             'application/json': components['schemas']['PaginatedComments'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -11970,6 +11997,15 @@ export interface paths {
             'application/json': components['schemas']['RequestDetail'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Request not found */
         404: {
           headers: {
@@ -12378,6 +12414,15 @@ export interface paths {
               data: components['schemas']['Request'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };

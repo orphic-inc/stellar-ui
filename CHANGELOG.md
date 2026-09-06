@@ -8,6 +8,16 @@ All notable changes to stellar-ui are documented here.
 
 ### Changed
 
+- **The vendored contract catches up with stellar-api's `security` derivation and five newly-gated reads** — 228 paths changed shape, almost all of them because stellar-api [#520](https://github.com/orphic-inc/stellar-api/issues/520) stopped hand-declaring `security` and now derives it from the middleware that enforces each route. Before that, `components.securitySchemes` was absent entirely while 112 operations referenced schemes by name, and 70 of those named `bearerAuth` on cookie-gated routes. The vendored spec now carries **both schemes defined** (`cookieAuth`, `serviceKey`) and **zero dangling references**.
+
+  Five operations also gained a `401` — `GET /announcements`, `/comments`, `/requests`, `/requests/{id}` and `/users/{id}` now require a session ([#547](https://github.com/orphic-inc/stellar-api/issues/547)); they previously served content with none.
+
+  **`src/types/api.ts` moves +45 / −0.** `openapi-typescript` ignores `security` entirely, so the whole generated-type change is those five 401 responses — no existing shape narrowed, no service result type affected, and `service-types:check` stays at 227 spec-typed, 0 hand-typed. Paths and schemas are unchanged at 269 and 174, verified rather than assumed.
+
+  **None of the five newly-gated endpoints is read before login.** The public surface calls `GET /install` and nothing else; announcements are consumed by `PrivateHomepage`. So this is contract bookkeeping, not a UI change.
+
+### Changed
+
 - **The vendored API contract catches up with stellar-api's security fixes** — six paths moved. Two are new: `/bad-passwords` and `/bad-passwords/{id}`, the staff denylist surface from stellar-api [#536](https://github.com/orphic-inc/stellar-api/issues/536). Four changed shape: `/email-blacklist` and `/ip-bans` each gained the **400** they could always answer and never declared ([#540](https://github.com/orphic-inc/stellar-api/issues/540)), and `/tools/user-ranks` plus `/tools/user-ranks/{id}` moved because the permission vocabulary gained `bad_passwords_manage`.
 
   **Purely additive — 482 insertions, no deletions.** No existing shape narrowed, so no service result type changes and nothing downstream breaks; `service-types:check` stays at 227 spec-typed, 0 hand-typed. This is the re-vendor that keeps `contract:check` green, not a UI change: none of these surfaces has a UI consumer yet.
