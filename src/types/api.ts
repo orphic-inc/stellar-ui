@@ -9155,7 +9155,16 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Contribution not found */
+        /** @description Not a member of the release’s community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Contribution not found, or its community does not exist */
         404: {
           headers: {
             [name: string]: unknown;
@@ -10597,7 +10606,7 @@ export interface paths {
     };
     /**
      * One comment, with its author
-     * @description Deliberately unauthenticated — this route carries no auth middleware, unlike the PUT and DELETE beside it. It also does NOT filter `deletedAt`, so unlike GET /comments it can serve a soft-deleted comment; `deletedAt` is non-null in that case.
+     * @description Requires a session, and never serves a soft-deleted comment — it filters `deletedAt` exactly as GET /comments does. Both were absent until #509 F4: the route was the only comment route with no auth middleware, and soft-deleted bodies (which `deleteComment` retains verbatim) were readable with no session by guessing an integer id.
      */
     get: {
       parameters: {
@@ -10619,7 +10628,16 @@ export interface paths {
             'application/json': components['schemas']['Comment'];
           };
         };
-        /** @description Comment not found */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Comment not found, or soft-deleted */
         404: {
           headers: {
             [name: string]: unknown;
@@ -10912,6 +10930,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -10944,6 +10971,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -11751,7 +11787,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not authorized */
+        /** @description Missing forums_moderate */
         403: {
           headers: {
             [name: string]: unknown;
@@ -11822,7 +11858,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not authorized */
+        /** @description Missing forums_moderate */
         403: {
           headers: {
             [name: string]: unknown;
@@ -19188,6 +19224,24 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not a member of this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };

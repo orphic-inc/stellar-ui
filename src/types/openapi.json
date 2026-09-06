@@ -18428,8 +18428,18 @@
               }
             }
           },
+          "403": {
+            "description": "Not a member of the release’s community",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Contribution not found",
+            "description": "Contribution not found, or its community does not exist",
             "content": {
               "application/json": {
                 "schema": {
@@ -20321,7 +20331,7 @@
           "Comments"
         ],
         "summary": "One comment, with its author",
-        "description": "Deliberately unauthenticated — this route carries no auth middleware, unlike the PUT and DELETE beside it. It also does NOT filter `deletedAt`, so unlike GET /comments it can serve a soft-deleted comment; `deletedAt` is non-null in that case.",
+        "description": "Requires a session, and never serves a soft-deleted comment — it filters `deletedAt` exactly as GET /comments does. Both were absent until #509 F4: the route was the only comment route with no auth middleware, and soft-deleted bodies (which `deleteComment` retains verbatim) were readable with no session by guessing an integer id.",
         "parameters": [
           {
             "schema": {
@@ -20343,8 +20353,18 @@
               }
             }
           },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "404": {
-            "description": "Comment not found",
+            "description": "Comment not found, or soft-deleted",
             "content": {
               "application/json": {
                 "schema": {
@@ -20687,6 +20707,16 @@
               }
             }
           },
+          "403": {
+            "description": "Missing communities_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not found",
             "content": {
@@ -20719,6 +20749,16 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing admin",
             "content": {
               "application/json": {
                 "schema": {
@@ -21573,7 +21613,7 @@
             }
           },
           "403": {
-            "description": "Not authorized",
+            "description": "Missing forums_moderate",
             "content": {
               "application/json": {
                 "schema": {
@@ -21646,7 +21686,7 @@
             }
           },
           "403": {
-            "description": "Not authorized",
+            "description": "Missing forums_moderate",
             "content": {
               "application/json": {
                 "schema": {
@@ -30711,6 +30751,26 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not a member of this community",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found",
             "content": {
               "application/json": {
                 "schema": {
