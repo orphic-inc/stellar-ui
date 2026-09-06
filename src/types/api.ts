@@ -632,6 +632,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Missing the staff permission */
         403: {
           headers: {
@@ -3014,6 +3023,15 @@ export interface paths {
             'application/json': components['schemas']['PublicProfile'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Profile not found */
         404: {
           headers: {
@@ -3241,6 +3259,15 @@ export interface paths {
               inviteKey: string;
               emailSent: boolean;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description No invites remaining */
@@ -4101,6 +4128,15 @@ export interface paths {
             'application/json': components['schemas']['SiteStats'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -4135,6 +4171,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['SiteStatSnapshot'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -4173,7 +4218,16 @@ export interface paths {
           };
           content?: never;
         };
-        /** @description Forbidden */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
         403: {
           headers: {
             [name: string]: unknown;
@@ -4306,6 +4360,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -4347,6 +4410,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -4382,6 +4454,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['AuthorStylesheet'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not found */
@@ -4431,6 +4512,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not your stylesheet */
         403: {
           headers: {
@@ -4469,6 +4559,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not your stylesheet */
         403: {
@@ -4524,6 +4623,15 @@ export interface paths {
             'application/json': components['schemas']['AdoptionResult'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -4566,6 +4674,15 @@ export interface paths {
           };
           content: {
             'text/css': string;
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not found */
@@ -4733,6 +4850,15 @@ export interface paths {
             'application/json': components['schemas']['Stylesheet'][];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -4774,6 +4900,24 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -4805,6 +4949,24 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['StylesheetStat'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -4842,6 +5004,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Stylesheet'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not found */
@@ -4893,6 +5064,24 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -4925,6 +5114,24 @@ export interface paths {
         };
         /** @description Cannot delete the default stylesheet */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -4973,6 +5180,15 @@ export interface paths {
             'application/json': components['schemas']['Notification'][];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -5010,6 +5226,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the recipient */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
@@ -5148,6 +5382,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not the recipient */
         403: {
           headers: {
@@ -5199,6 +5442,15 @@ export interface paths {
             'application/json': components['schemas']['Subscription'][];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -5241,6 +5493,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -5294,6 +5555,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -5339,6 +5609,15 @@ export interface paths {
             'application/json': {
               subscribed: boolean;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -8666,6 +8945,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -8801,6 +9089,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Community not found */
         404: {
           headers: {
@@ -8847,6 +9144,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Contribution'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Contribution not found */
@@ -8916,6 +9222,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Contribution not found */
         404: {
           headers: {
@@ -8979,6 +9294,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Missing contributions_manage */
@@ -10332,7 +10656,16 @@ export interface paths {
             'application/json': components['schemas']['CommentUpdated'];
           };
         };
-        /** @description Not authorized */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the comment author */
         403: {
           headers: {
             [name: string]: unknown;
@@ -10371,7 +10704,16 @@ export interface paths {
           };
           content?: never;
         };
-        /** @description Not authorized */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the comment author and missing reports_manage */
         403: {
           headers: {
             [name: string]: unknown;
@@ -11083,6 +11425,15 @@ export interface paths {
             'application/json': components['schemas']['Post'][];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -11122,6 +11473,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -11157,6 +11517,15 @@ export interface paths {
             'application/json': components['schemas']['Post'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -11188,7 +11557,16 @@ export interface paths {
           };
           content?: never;
         };
-        /** @description Not authorized */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the post author */
         403: {
           headers: {
             [name: string]: unknown;
@@ -11248,6 +11626,15 @@ export interface paths {
             'application/json': components['schemas']['PostComment'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Post not found */
         404: {
           headers: {
@@ -11294,7 +11681,16 @@ export interface paths {
           };
           content?: never;
         };
-        /** @description Not authorized */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the comment author */
         403: {
           headers: {
             [name: string]: unknown;
@@ -11598,6 +11994,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Neither the owner nor a request moderator */
         403: {
           headers: {
@@ -11650,7 +12055,16 @@ export interface paths {
           };
           content?: never;
         };
-        /** @description Neither the owner nor a request moderator */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Neither the owner nor a request moderator, or the request is filled and the caller is not a request moderator */
         403: {
           headers: {
             [name: string]: unknown;
@@ -11710,6 +12124,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Request not found */
         404: {
           headers: {
@@ -11764,6 +12187,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Request'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Neither owner, filler, nor a request moderator */
@@ -11833,6 +12265,15 @@ export interface paths {
               bounties: components['schemas']['RequestBountyEntryWithUser'][];
               actions: components['schemas']['RequestActionEntry'][];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Request not found */
@@ -11953,6 +12394,24 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing requests_create */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -12002,6 +12461,15 @@ export interface paths {
         };
         /** @description Below the minimum bounty, or insufficient contributed balance */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
           headers: {
             [name: string]: unknown;
           };
@@ -12074,6 +12542,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description You can only fill a request with your own contribution */
         403: {
           headers: {
@@ -12137,6 +12614,15 @@ export interface paths {
             'application/json': components['schemas']['PaginatedConversations'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -12169,6 +12655,15 @@ export interface paths {
         };
         /** @description Validation error */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
           headers: {
             [name: string]: unknown;
           };
@@ -12265,6 +12760,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -12320,6 +12824,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description No such draft belonging to the caller */
         404: {
           headers: {
@@ -12350,6 +12863,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description No such draft belonging to the caller */
         404: {
@@ -12417,6 +12939,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Missing messages_mass_pm */
         403: {
           headers: {
@@ -12461,6 +12992,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -12494,6 +13034,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['PaginatedConversations'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -12539,6 +13088,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -12574,6 +13132,15 @@ export interface paths {
             'application/json': components['schemas']['PrivateConversation'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -12605,6 +13172,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -12633,6 +13209,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -12671,6 +13256,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['PrivateMessage'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not a participant */
@@ -13516,6 +14110,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing reports_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -13552,6 +14164,24 @@ export interface paths {
               open: number;
               claimed: number;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing reports_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -13613,6 +14243,15 @@ export interface paths {
                 sourceUrl: string | null;
               }[];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -13718,6 +14357,24 @@ export interface paths {
                 sourceUrl: string | null;
               }[];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing reports_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -13869,6 +14526,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -13969,6 +14635,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the reporter and missing reports_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -14006,6 +14690,24 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing reports_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -14040,6 +14742,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing reports_manage, or the report is claimed by another staff member */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -14090,6 +14810,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing reports_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -14143,6 +14881,24 @@ export interface paths {
               body: string;
               createdAt: string;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing reports_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -14239,6 +14995,24 @@ export interface paths {
             'application/json': components['schemas']['RatioPolicyState'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing ratio_policy_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -14285,6 +15059,24 @@ export interface paths {
             'application/json': components['schemas']['RatioPolicyState'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing ratio_policy_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description User not found */
         404: {
           headers: {
@@ -14327,6 +15119,15 @@ export interface paths {
             'application/json': components['schemas']['SiteSettings'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put: {
@@ -14355,6 +15156,24 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['SiteSettings'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -14406,6 +15225,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -14452,6 +15280,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -14491,6 +15328,15 @@ export interface paths {
             'application/json': {
               items: components['schemas']['Top10TagItem'][];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -14535,6 +15381,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -14572,6 +15427,24 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Top10Snapshot'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing staff */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description No snapshot found */
@@ -14647,6 +15520,24 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -14686,6 +15577,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -14722,6 +15622,15 @@ export interface paths {
               main: components['schemas']['RulesPage'] & unknown;
               pages: components['schemas']['RulesPage'][];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -14766,6 +15675,24 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing rules_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Conflict */
         409: {
           headers: {
@@ -14808,6 +15735,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['RulesPage'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not found */
@@ -14875,6 +15811,24 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing rules_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -14916,6 +15870,24 @@ export interface paths {
         };
         /** @description Cannot delete main page */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing rules_manage */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -15145,6 +16117,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description User not found */
         404: {
           headers: {
@@ -15230,6 +16211,15 @@ export interface paths {
             'application/json': components['schemas']['FriendEntry'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description No pending request from this user */
         404: {
           headers: {
@@ -15270,6 +16260,15 @@ export interface paths {
       responses: {
         /** @description Request rejected */
         200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
           headers: {
             [name: string]: unknown;
           };
@@ -15338,6 +16337,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Friend not found */
         404: {
           headers: {
@@ -15386,6 +16394,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing tags_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -15421,6 +16447,24 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing tags_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Canonical tag not found */
@@ -15475,6 +16519,24 @@ export interface paths {
             'application/json': components['schemas']['TagAliasItem'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing tags_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -15504,6 +16566,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing tags_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
@@ -16152,6 +17232,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -16192,6 +17281,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not permitted to create collages */
@@ -16240,6 +17338,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CollageDetail'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Personal collage belonging to someone else */
@@ -16307,7 +17414,16 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
-        /** @description Not the owner, or a staff-only field (isLocked, maxEntries, maxEntriesPerUser) was sent */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the owner or collage staff, or a staff-only field was sent by a non-staff caller (isLocked, maxEntries, maxEntriesPerUser, or name on a public collage) */
         403: {
           headers: {
             [name: string]: unknown;
@@ -16349,6 +17465,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Neither owner nor staff, or a public collage and the caller is not staff */
         403: {
@@ -16414,6 +17539,24 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing collages_moderate */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -16470,6 +17613,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Only the collage owner or staff may reorder entries */
         403: {
           headers: {
@@ -16519,6 +17671,15 @@ export interface paths {
         };
         /** @description An entry limit was reached — either the collage maximum or your per-user limit */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
           headers: {
             [name: string]: unknown;
           };
@@ -16594,7 +17755,16 @@ export interface paths {
           };
           content?: never;
         };
-        /** @description The collage is locked, or the entry is not the caller's */
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The collage is locked, or the caller is neither the collage owner, the member who added the entry, nor collage staff */
         403: {
           headers: {
             [name: string]: unknown;
@@ -16654,6 +17824,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Collage not found */
         404: {
           headers: {
@@ -16706,6 +17885,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Collage not found */
         404: {
           headers: {
@@ -16752,6 +17940,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CollageSubscriber'][];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Missing collages_moderate */
@@ -16818,6 +18015,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -16862,6 +18068,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Neither wiki_edit nor a managing permission */
@@ -16910,6 +18125,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['WikiPageRendered'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Insufficient rank to view this page */
@@ -16971,6 +18195,15 @@ export interface paths {
             'application/json': components['schemas']['WikiPageRendered'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Insufficient rank to view this page */
         403: {
           headers: {
@@ -17030,6 +18263,15 @@ export interface paths {
             'application/json': components['schemas']['ValidationError'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Insufficient permission to edit this page */
         403: {
           headers: {
@@ -17072,6 +18314,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Missing wiki_manage/admin */
         403: {
@@ -17132,6 +18383,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Insufficient permission to view revision history */
         403: {
           headers: {
@@ -17190,6 +18450,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['WikiRevisionContent'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Insufficient permission to view revision content */
@@ -17263,6 +18532,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Insufficient permission to compare revisions */
         403: {
           headers: {
@@ -17323,6 +18601,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['WikiPage'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Insufficient permission to edit this page */
@@ -17398,6 +18685,24 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Insufficient permission to edit this page */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Page not found */
         404: {
           headers: {
@@ -17457,6 +18762,24 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Insufficient permission to edit this page */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Page not found, or that alias is not on this page */
         404: {
           headers: {
@@ -17503,6 +18826,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing collages_moderate */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -17539,6 +18880,24 @@ export interface paths {
               grouped: components['schemas']['EconomyGroupedItem'][];
               recent: components['schemas']['EconomyTransactionItem'][];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -17588,6 +18947,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -17624,6 +19001,24 @@ export interface paths {
               userAgent: string | null;
               count: number;
             }[];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -17671,6 +19066,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -17716,6 +19129,24 @@ export interface paths {
               collages: number;
               wikiPages: number;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -17909,6 +19340,15 @@ export interface paths {
             }[];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -17950,6 +19390,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -17969,6 +19418,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -18017,6 +19475,15 @@ export interface paths {
             }[];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -18058,6 +19525,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -18077,6 +19553,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -18120,6 +19605,15 @@ export interface paths {
             }[];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -18161,6 +19655,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -18180,6 +19683,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -18220,6 +19732,15 @@ export interface paths {
                 title: string;
               };
             }[];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -18263,6 +19784,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -18282,6 +19812,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -18318,6 +19857,15 @@ export interface paths {
             'application/json': {
               removed: number;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -18359,6 +19907,15 @@ export interface paths {
                 name: string;
               };
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description No releases found */
@@ -18406,6 +19963,15 @@ export interface paths {
               id: number;
               name: string;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description No artists found */
@@ -18589,6 +20155,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -18647,6 +20222,15 @@ export interface paths {
               }[];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -18740,6 +20324,15 @@ export interface paths {
               }[];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -18845,6 +20438,15 @@ export interface paths {
                 };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -18904,6 +20506,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -18950,6 +20561,15 @@ export interface paths {
             }[];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -18983,6 +20603,24 @@ export interface paths {
               createdAt: string;
               updatedAt: string;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing site_history_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -19035,6 +20673,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing site_history_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Not found */
         404: {
           headers: {
@@ -19064,6 +20720,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing site_history_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
@@ -19123,6 +20797,15 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -19163,6 +20846,15 @@ export interface paths {
               status: 'COMPLETED' | 'REVERSED';
               createdAt: string;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description No recent grant */
@@ -19222,6 +20914,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing staff or admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -19271,6 +20981,24 @@ export interface paths {
               }[];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -19323,6 +21051,24 @@ export interface paths {
             };
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description User not found */
         404: {
           headers: {
@@ -19367,6 +21113,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing admin */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
@@ -19415,6 +21179,24 @@ export interface paths {
             }[];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing email_blacklist_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -19447,6 +21229,24 @@ export interface paths {
               addedAt: string;
               comment: string;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing email_blacklist_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -19484,6 +21284,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing email_blacklist_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
@@ -19530,6 +21348,24 @@ export interface paths {
             }[];
           };
         };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing ip_bans_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -19560,6 +21396,24 @@ export interface paths {
               fromIp: string;
               toIp: string;
             };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing ip_bans_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -19597,6 +21451,24 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing ip_bans_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
         /** @description Not found */
         404: {
