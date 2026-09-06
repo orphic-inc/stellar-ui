@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.1] — 2026-09-06
+
 ### Added
 
 - **CI now checks that RTK Query result types come from the generated contract** ([stellar-ui ADR-0010](docs/adr/0010-service-result-types-come-from-the-contract.md), [#277](https://github.com/orphic-inc/stellar-ui/issues/277)) — where an endpoint's result type is a hand-written `interface` rather than a read of `paths[...]`/`components[...]`, the repo holds a **second, parallel description of the API's response shapes with nothing comparing it to the real one**. That is [#271](https://github.com/orphic-inc/stellar-ui/issues/271)'s failure one layer further out, and its conclusion applies verbatim: a green typecheck against a stale type is worse than no typecheck, because it actively asserts correctness — three runtime bugs shipped that way with `tsc` clean throughout. `npm run service-types:check` classifies all **324** endpoints: **136 spec-typed, 82 hand-typed, 99 inline or `void`**. The 82 are grandfathered in `service-types-baseline.json`, which is a **ratchet rather than a mute**: a hand-typed endpoint absent from the baseline fails immediately, so new drift is blocked from day one; a baselined endpoint that has since been bound to the contract fails as stale; and so does one that no longer exists. The list can only shrink. **The guard lands before the migration, not after** — #277 sequenced it last, but stellar-api #474 showed that a baseline ratchet landing first closes the door while the backlog burns down, instead of leaving it open for however long that takes. Three things are deliberately not flagged: `void` and inline shapes (a `void` is correct for a 204, and an inline `{ msg: string }` duplicates `MsgResponse` only trivially), query-argument types (payload and query-param helpers are legitimately the UI's own — only response shapes are the API's to describe), and `devToolsApi.ts`, whose `/dev/*` routes are deliberately outside the contract and have nothing to bind to.
@@ -29,8 +31,6 @@ All notable changes to stellar-ui are documented here.
   **Five description changes came with it**, four on responses and one on an operation. The operation-level one is worth reading: `GET /comments/{id}` previously described itself as _"Deliberately unauthenticated … it can serve a soft-deleted comment"_. That text documented a defect rather than a decision — the route retained soft-deleted bodies verbatim and served them with no session — and now describes the fixed behaviour. Two `403`s under `/forums/topic-notes` went from `Not authorized` to `Missing forums_moderate` when a bespoke local gate was replaced by the shared `requirePermission`.
 
   **What this does not change:** nothing in this repo. Every moved path gains error responses a consumer could always receive but was never told about, and `GET /contributions/{id}` and `GET /comments/{id}` are not read by any service here — `commentApi` uses `/comments` plus `PUT`/`DELETE`, and `contributionApi` uses the list, `/access` and `/report`.
-
-### Changed
 
 - **Re-vendored the contract: the last 160 operations now declare the 401/403 their middleware answers, and stellar-api's auth-coverage baseline is empty** — [api#494](https://github.com/orphic-inc/stellar-api/issues/494)'s sixth guarded axis is finished. Thirteen further slices ([api#514](https://github.com/orphic-inc/stellar-api/pull/514), [#516](https://github.com/orphic-inc/stellar-api/pull/516), [#518](https://github.com/orphic-inc/stellar-api/pull/518), [#519](https://github.com/orphic-inc/stellar-api/pull/519), [#521–#529](https://github.com/orphic-inc/stellar-api/pull/521)) covering `/stylesheets`, `/reports`, `/collages`, `/bookmarks`, `/messages`, `/stats`, `/wiki`, `/rules`, `/requests`, `/tag-aliases`, `/top10`, staff tooling and twelve member surfaces took the remaining baseline **203 gaps to 0**: `361 contract routes, 347 gated, 347 fully documented, 0 gap(s) (0 baselined)`. This is the re-vendor of that work — **208 response codes added across 160 operations, every one `MsgResponse`**: all 160 gained a `401`, and 48 of those also gained a `403`. No operation gained a `403` without a `401`.
 
@@ -403,7 +403,9 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.3...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.0...v0.9.1
+[0.9.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.3...v0.9.0
 [0.8.3]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.0...v0.8.1
