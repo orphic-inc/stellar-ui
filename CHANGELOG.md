@@ -40,6 +40,14 @@ All notable changes to stellar-ui are documented here.
 
   **The section markers are built with `new RegExp` rather than written as literals**, which is not a style choice. Lizard, the complexity analyser Codacy runs, reads a `#` inside a regex _literal_ as the start of a line comment, swallows the rest of that line including its closing paren, and then loses function boundaries for the remainder of the file. It reported a 29-line function here as **57 lines with a complexity of 12** and failed CI on the invented number, having named a function that was never at fault. Keeping the `#` inside a string keeps it out of that token stream; with the fix, every function in the file is bounded correctly and the worst real numbers are 31 lines and a complexity of 7.
 
+- **The vendored contract catches up with the derived rate-limit failures** — stellar-api [#553](https://github.com/orphic-inc/stellar-api/issues/553) stopped leaving the `429` its rate limiters answer undeclared and now derives it from the limiters themselves. **205 operations gain a `429`**, taking the total from 2 to 207.
+
+  **Every mutation under `/api` was already rate limited and only two said so.** The site-wide write limiter runs for `POST`/`PUT`/`PATCH`/`DELETE`, so the real surface was **208 mutating operations**, not the 8 route-level mounts the upstream issue counted. Reads are untouched: a `GET` is never write-limited, and none of the 156 gained a `429`.
+
+  **`src/types/api.ts` moves +1873 / −0 in effect — purely additive.** Verified structurally rather than by reading the diff: **0 response codes lost, 0 existing responses altered, 0 `security` blocks changed**, and the only codes gained are the 205 `429`s. No existing shape narrows, so no service result type changes and `service-types:check` holds at **227 spec-typed, 0 hand-typed**. Paths and schemas are unchanged at 269 and 174.
+
+  **Nothing in the UI handles a 429 today**, so this is contract bookkeeping rather than a behaviour change. It does make the failure visible to every generated mutation type, which is where retry or back-off handling would go if we add it.
+
 ## [0.9.1] — 2026-09-06
 
 ### Added
