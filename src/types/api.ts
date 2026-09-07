@@ -641,7 +641,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Missing the staff permission */
+        /** @description Missing staff */
         403: {
           headers: {
             [name: string]: unknown;
@@ -2372,7 +2372,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Missing users_edit permission */
+        /** @description Missing users_edit */
         403: {
           headers: {
             [name: string]: unknown;
@@ -2622,7 +2622,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Forbidden */
+        /** @description Missing recovery_manage */
         403: {
           headers: {
             [name: string]: unknown;
@@ -2680,7 +2680,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Forbidden */
+        /** @description Missing recovery_manage */
         403: {
           headers: {
             [name: string]: unknown;
@@ -2811,7 +2811,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Forbidden */
+        /** @description Missing recovery_manage */
         403: {
           headers: {
             [name: string]: unknown;
@@ -4251,9 +4251,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            'application/json': {
-              msg: string;
-            };
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
       };
@@ -18407,7 +18405,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Missing wiki_manage/admin */
+        /** @description Missing wiki_manage or admin */
         403: {
           headers: {
             [name: string]: unknown;
