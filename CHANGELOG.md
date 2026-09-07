@@ -16,11 +16,17 @@ All notable changes to stellar-ui are documented here.
 
   **None of the five newly-gated endpoints is read before login.** The public surface calls `GET /install` and nothing else; announcements are consumed by `PrivateHomepage`. So this is contract bookkeeping, not a UI change.
 
-### Changed
-
 - **The vendored API contract catches up with stellar-api's security fixes** — six paths moved. Two are new: `/bad-passwords` and `/bad-passwords/{id}`, the staff denylist surface from stellar-api [#536](https://github.com/orphic-inc/stellar-api/issues/536). Four changed shape: `/email-blacklist` and `/ip-bans` each gained the **400** they could always answer and never declared ([#540](https://github.com/orphic-inc/stellar-api/issues/540)), and `/tools/user-ranks` plus `/tools/user-ranks/{id}` moved because the permission vocabulary gained `bad_passwords_manage`.
 
   **Purely additive — 482 insertions, no deletions.** No existing shape narrowed, so no service result type changes and nothing downstream breaks; `service-types:check` stays at 227 spec-typed, 0 hand-typed. This is the re-vendor that keeps `contract:check` green, not a UI change: none of these surfaces has a UI consumer yet.
+
+- **The vendored contract catches up with the 401/403 derivation** — stellar-api [#517](https://github.com/orphic-inc/stellar-api/issues/517) stopped hand-writing the `401` and `403` a route's gates imply and now derives them from the same middleware stamps `security` already reads, deleting **493 blocks**. Seven paths moved here, and six of them read better for it: three vague `Forbidden`s become `Missing recovery_manage`, `Missing the staff permission` and `Missing users_edit permission` lose their trailing noise, and `Missing wiki_manage/admin` becomes `Missing wiki_manage or admin` — the `or` matters, since **any** of a gate's permissions satisfies it.
+
+  **`src/types/api.ts` moves +7 / −9, and none of it is a shape change.** Six are `@description` comments. The seventh is `POST /stats/snapshot`, whose `403` stopped carrying an inline `{ msg: string }` and now references `components['schemas']['MsgResponse']` — structurally identical and assignable both ways, so no consumer changes. Paths and schemas hold at 269 and 174; `service-types:check` stays at **227 spec-typed, 0 hand-typed**.
+
+  This is the re-vendor that keeps `contract:check` green, not a UI change.
+
+  **The two `### Changed` blocks under `[Unreleased]` are coalesced into one** while adding this. Both entries keep the type they were authored with; only the duplicate heading goes. stellar-api gated this shape in [#537](https://github.com/orphic-inc/stellar-api/issues/537) after a release-day hand-coalesce of twelve scrambled blocks misfiled eight entries — this repo has no such gate, so the coalesce is by hand and worth doing while the section is small.
 
 ## [0.9.1] — 2026-09-06
 
