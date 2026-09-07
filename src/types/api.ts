@@ -83,6 +83,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -133,6 +142,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -165,6 +183,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
         };
       };
     };
@@ -215,6 +242,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -275,6 +311,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -511,6 +556,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -586,6 +640,15 @@ export interface paths {
         };
         /** @description Already installed or validation error */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -766,6 +829,15 @@ export interface paths {
         };
         /** @description Missing or wrong service key */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -1150,6 +1222,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -1369,6 +1450,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -1458,6 +1548,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -1503,6 +1602,15 @@ export interface paths {
         };
         /** @description Donor rank not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -1593,6 +1701,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     /**
@@ -1637,6 +1754,15 @@ export interface paths {
         };
         /** @description User not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -1789,6 +1915,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -1850,6 +1985,15 @@ export interface paths {
         };
         /** @description Warning not found on that user */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -1984,6 +2128,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -2045,6 +2198,15 @@ export interface paths {
         };
         /** @description That note does not exist on that user */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -2119,6 +2281,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -2180,6 +2351,15 @@ export interface paths {
         };
         /** @description User not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -2311,6 +2491,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -2383,6 +2572,15 @@ export interface paths {
         };
         /** @description User not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -2500,6 +2698,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -2566,6 +2773,15 @@ export interface paths {
         };
         /** @description Missing users_edit */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -2707,6 +2923,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -2829,6 +3054,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Email delivery not configured */
         502: {
           headers: {
@@ -2942,6 +3176,15 @@ export interface paths {
         };
         /** @description Profile not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -3127,6 +3370,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -3297,6 +3549,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -3413,6 +3674,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -3476,6 +3746,15 @@ export interface paths {
         };
         /** @description Perk not enabled for this rank */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -3665,6 +3944,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -3748,6 +4036,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -3789,6 +4086,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -3864,6 +4170,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -3920,6 +4235,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -4051,6 +4375,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -4107,6 +4440,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -4254,6 +4596,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -4378,6 +4729,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -4555,6 +4915,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -4596,6 +4965,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -4650,6 +5028,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -4833,6 +5220,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -4927,6 +5323,15 @@ export interface paths {
         };
         /** @description Missing admin */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -5107,6 +5512,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -5157,6 +5571,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -5270,6 +5693,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -5359,6 +5791,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -5418,6 +5859,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -5519,6 +5969,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -5573,6 +6032,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -5735,6 +6203,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -5848,6 +6325,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -5889,6 +6375,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -5958,6 +6453,15 @@ export interface paths {
         };
         /** @description Forum not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -6068,6 +6572,15 @@ export interface paths {
         };
         /** @description Missing forums_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -6190,6 +6703,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -6231,6 +6753,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -6326,6 +6857,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -6503,6 +7043,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -6536,6 +7085,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -6600,6 +7158,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -6698,6 +7265,15 @@ export interface paths {
         };
         /** @description Topic locked */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -6808,6 +7384,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -6842,6 +7427,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -7032,6 +7626,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -7079,6 +7682,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -7140,6 +7752,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -7228,6 +7849,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -7366,6 +7996,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -7497,6 +8136,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -7542,6 +8190,15 @@ export interface paths {
         };
         /** @description Community not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -7828,6 +8485,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -7895,6 +8561,15 @@ export interface paths {
         };
         /** @description User not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -7979,6 +8654,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -8050,6 +8734,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -8099,6 +8792,15 @@ export interface paths {
         };
         /** @description Not a community admin or curator */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -8234,6 +8936,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -8280,6 +8991,15 @@ export interface paths {
         };
         /** @description Release not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -8361,6 +9081,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     /**
@@ -8408,6 +9137,15 @@ export interface paths {
         };
         /** @description Release not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -8557,6 +9295,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -8612,6 +9359,15 @@ export interface paths {
         };
         /** @description Release already has this tag */
         409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -8684,6 +9440,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -8740,6 +9505,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -8918,6 +9692,15 @@ export interface paths {
         };
         /** @description Release not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -9123,6 +9906,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -9265,6 +10057,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -9332,6 +10133,15 @@ export interface paths {
         };
         /** @description Missing contributions_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -9512,6 +10322,15 @@ export interface paths {
         };
         /** @description Staff group not found */
         422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -9770,6 +10589,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -9820,6 +10648,15 @@ export interface paths {
         };
         /** @description Rank still assigned to users */
         409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -9950,6 +10787,15 @@ export interface paths {
         };
         /** @description fromRank or toRank not found */
         422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -10100,6 +10946,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -10141,6 +10996,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -10262,6 +11126,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -10341,6 +11214,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -10391,6 +11273,15 @@ export interface paths {
         };
         /** @description Ranks still assigned */
         409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -10512,6 +11403,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -10609,6 +11509,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -10728,6 +11637,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -10769,6 +11687,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -10859,6 +11786,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -10975,6 +11911,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -11016,6 +11961,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -11111,6 +12065,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -11137,6 +12100,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -11256,6 +12228,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -11353,6 +12334,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -11404,6 +12394,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -11448,6 +12447,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -11538,6 +12546,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -11647,6 +12664,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -11700,6 +12726,15 @@ export interface paths {
         };
         /** @description Post not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -11764,6 +12799,15 @@ export interface paths {
         };
         /** @description Comment not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -11894,6 +12938,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -11950,6 +13003,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -12102,6 +13164,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -12147,6 +13218,15 @@ export interface paths {
         };
         /** @description Request not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -12207,6 +13287,15 @@ export interface paths {
         };
         /** @description Request not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -12290,6 +13379,15 @@ export interface paths {
         };
         /** @description Request is not filled */
         422: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -12493,6 +13591,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -12560,6 +13667,15 @@ export interface paths {
         };
         /** @description Request not found, or not open */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -12659,6 +13775,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -12745,6 +13870,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -12850,6 +13984,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -12923,6 +14066,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -12956,6 +14108,15 @@ export interface paths {
         };
         /** @description No such draft belonging to the caller */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -13031,6 +14192,15 @@ export interface paths {
         };
         /** @description Missing messages_mass_pm */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -13178,6 +14348,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -13262,6 +14441,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -13293,6 +14481,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -13350,6 +14547,15 @@ export interface paths {
         };
         /** @description Not a participant */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -13429,6 +14635,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -13657,6 +14872,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -13786,6 +15010,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -13823,6 +15056,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -13883,6 +15125,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -13936,6 +15187,15 @@ export interface paths {
         };
         /** @description Missing staff_inbox_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -14040,6 +15300,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -14110,6 +15379,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -14142,6 +15420,15 @@ export interface paths {
         };
         /** @description Missing staff_inbox_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -14616,6 +15903,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -14789,6 +16085,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -14835,6 +16140,15 @@ export interface paths {
         };
         /** @description Missing reports_manage, or the report is claimed by another staff member */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -14910,6 +16224,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -14975,6 +16298,15 @@ export interface paths {
         };
         /** @description Missing reports_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -15167,6 +16499,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -15250,6 +16591,15 @@ export interface paths {
         };
         /** @description Missing admin */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -15619,6 +16969,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -15783,6 +17142,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -15928,6 +17296,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -15978,6 +17355,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -16225,6 +17611,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     /** Remove a friend or cancel a request */
@@ -16248,6 +17643,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -16310,6 +17714,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -16359,6 +17772,15 @@ export interface paths {
         };
         /** @description No pending request from this user */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -16429,6 +17851,15 @@ export interface paths {
         };
         /** @description Friend not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -16557,6 +17988,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -16627,6 +18067,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -16668,6 +18117,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -17093,6 +18551,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -17197,6 +18664,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -17253,6 +18729,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -17375,6 +18860,15 @@ export interface paths {
         };
         /** @description Not permitted to create collages */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -17522,6 +19016,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -17567,6 +19070,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -17640,6 +19152,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -17721,6 +19242,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     /** Add a release to a collage */
@@ -17788,6 +19318,15 @@ export interface paths {
         };
         /** @description That release is already in the collage */
         409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -17863,6 +19402,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     options?: never;
@@ -17916,6 +19464,15 @@ export interface paths {
         };
         /** @description Collage not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -17977,6 +19534,15 @@ export interface paths {
         };
         /** @description Collage not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -18162,6 +19728,15 @@ export interface paths {
         };
         /** @description Neither wiki_edit nor a managing permission */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -18371,6 +19946,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -18416,6 +20000,15 @@ export interface paths {
         };
         /** @description Page not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -18711,6 +20304,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -18802,6 +20404,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -18863,6 +20474,15 @@ export interface paths {
         };
         /** @description Page not found, or that alias is not on this page */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -19343,6 +20963,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -19391,6 +21020,15 @@ export interface paths {
         };
         /** @description Missing dnc_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -19498,6 +21136,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -19520,6 +21167,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -19633,6 +21289,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -19655,6 +21320,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -19763,6 +21437,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -19785,6 +21468,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -19892,6 +21584,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete: {
@@ -19914,6 +21615,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -19960,6 +21670,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -20722,6 +22441,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -20799,6 +22527,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     post?: never;
@@ -20840,6 +22577,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -20898,6 +22644,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -21024,6 +22779,15 @@ export interface paths {
         };
         /** @description Missing staff or admin */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -21177,6 +22941,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -21233,6 +23006,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -21360,6 +23142,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -21416,6 +23207,15 @@ export interface paths {
         };
         /** @description Entry not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -21540,6 +23340,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -21596,6 +23405,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -21716,6 +23534,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -21772,6 +23599,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -21841,6 +23677,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
