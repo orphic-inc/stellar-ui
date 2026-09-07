@@ -38,6 +38,8 @@ All notable changes to stellar-ui are documented here.
 
   A `no-changelog` label is the escape hatch, and `labeled`/`unlabeled` join the workflow's trigger types so applying it takes effect without a manual re-run.
 
+  **The section markers are built with `new RegExp` rather than written as literals**, which is not a style choice. Lizard, the complexity analyser Codacy runs, reads a `#` inside a regex _literal_ as the start of a line comment, swallows the rest of that line including its closing paren, and then loses function boundaries for the remainder of the file. It reported a 29-line function here as **57 lines with a complexity of 12** and failed CI on the invented number, having named a function that was never at fault. Keeping the `#` inside a string keeps it out of that token stream; with the fix, every function in the file is bounded correctly and the worst real numbers are 31 lines and a complexity of 7.
+
 ## [0.9.1] — 2026-09-06
 
 ### Added

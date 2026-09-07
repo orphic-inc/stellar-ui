@@ -125,6 +125,25 @@ export function checkChangelogGate(changedFiles) {
 // bullet moves section while staying in the file. Coalescing duplicate headings
 // passes for the same reason. Only actual disappearance fails.
 
+/**
+ * The section markers, built with `new RegExp` rather than written as literals.
+ *
+ * NOT STYLE. Lizard — the complexity analyser Codacy runs — treats `#` inside a
+ * regex LITERAL as the start of a line comment, swallows the rest of the line
+ * including its closing paren, and then loses function boundaries for the whole
+ * remainder of the file. It reported a 29-line function here as 57 lines with a
+ * complexity of 12 and failed CI on the invented number, while the function it
+ * named was never the one at fault.
+ *
+ * Keeping the `#` inside a string keeps it out of that token stream. Verified
+ * by measuring: with literals, `python3 -m lizard` sees one function spanning
+ * 375 lines and cannot see `extractUnreleasedEntries` at all; with these, every
+ * function is bounded correctly.
+ */
+const UNRELEASED_SECTION = new RegExp('^## \\[Unreleased\\]', 'i');
+const NEXT_SECTION = new RegExp('^## ');
+const SUBHEADING = new RegExp('^### +(.+?) *$');
+
 /** Collapse so reflowing, re-indenting or a case change is not a deletion. */
 const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase();
 
@@ -137,12 +156,12 @@ const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase();
  */
 export function extractUnreleasedEntries(changelog) {
   const lines = changelog.split('\n');
-  const start = lines.findIndex((line) => /^## \[Unreleased\]/i.test(line));
+  const start = lines.findIndex((line) => UNRELEASED_SECTION.test(line));
   if (start === -1) return [];
 
   const entries = [];
   for (const line of lines.slice(start + 1)) {
-    if (/^## /.test(line)) break;
+    if (NEXT_SECTION.test(line)) break;
     if (!/^[-*] /.test(line)) continue;
 
     // Entries are written `- **Lead** — …`, and the bold lead is what names the
@@ -190,13 +209,13 @@ export function checkUnreleasedPreserved(baseChangelog, headChangelog) {
  */
 export function extractUnreleasedHeadings(changelog) {
   const lines = changelog.split('\n');
-  const start = lines.findIndex((line) => /^## \[Unreleased\]/i.test(line));
+  const start = lines.findIndex((line) => UNRELEASED_SECTION.test(line));
   if (start === -1) return [];
 
   const headings = [];
   for (let i = start + 1; i < lines.length; i += 1) {
-    if (/^## /.test(lines[i])) break;
-    const match = /^### +(.+?) *$/.exec(lines[i]);
+    if (NEXT_SECTION.test(lines[i])) break;
+    const match = SUBHEADING.exec(lines[i]);
     if (match) headings.push({ name: match[1], line: i + 1 });
   }
   return headings;
@@ -473,35 +492,47 @@ const reportHeadings = (headings) => {
   );
 };
 
-const reportSuccess = (result, preserved, headings) => {
-  console.log(
-    result.triggeringPaths.length === 0
-      ? 'Changelog gate not engaged (no shipping-code changes).'
-      : `Changelog updated alongside ${result.triggeringPaths.length} shipping-code change(s).`
-  );
-  console.log(
-    preserved.checked === 0
-      ? 'No [Unreleased] entries on the base branch to preserve.'
-      : `All ${preserved.checked} [Unreleased] entries from the base branch are still present.`
-  );
+const entryLine = (result) =>
+  result.triggeringPaths.length === 0
+    ? 'Changelog gate not engaged (no shipping-code changes).'
+    : `Changelog updated alongside ${result.triggeringPaths.length} shipping-code change(s).`;
 
-  // Distinguish "clean" from "no worse than the base". The ratchet passes on
-  // inherited surplus, and reporting that as one per type would be a check
-  // announcing a property it never established.
-  const distinctTypes = [...new Set(headings.headHeadings.map((h) => h.name))];
+const preservedLine = (preserved) =>
+  preserved.checked === 0
+    ? 'No [Unreleased] entries on the base branch to preserve.'
+    : `All ${preserved.checked} [Unreleased] entries from the base branch are still present.`;
+
+/** `2 × Changed, 3 × Fixed` — the surplus, spelled out. */
+const describeSurplus = (surplus) =>
+  surplus.map((x) => `${x.count} \u00d7 ${x.name}`).join(', ');
+
+/**
+ * The heading line, which says one of three DIFFERENT things.
+ *
+ * "Clean" and "no worse than the base" are not the same claim, and collapsing
+ * them is how a check ends up announcing a property it never established: the
+ * ratchet passes on inherited surplus, so a green run can still be carrying
+ * duplicates somebody else introduced.
+ */
+const headingLine = (headings) => {
   if (headings.headHeadings.length === 0) {
-    console.log('No [Unreleased] headings to check.');
-  } else if (headings.surplus.length === 0) {
-    console.log(
-      `[Unreleased] headings are one per type (${distinctTypes.join(', ')}).`
-    );
-  } else {
-    console.log(
+    return 'No [Unreleased] headings to check.';
+  }
+  if (headings.surplus.length > 0) {
+    return (
       '[Unreleased] carries surplus headings from the base branch, not introduced here: ' +
-        `${headings.surplus.map((x) => `${x.count} × ${x.name}`).join(', ')}. ` +
-        'They will need coalescing before the next release cut.'
+      `${describeSurplus(headings.surplus)}. ` +
+      'They will need coalescing before the next release cut.'
     );
   }
+  const distinctTypes = [...new Set(headings.headHeadings.map((h) => h.name))];
+  return `[Unreleased] headings are one per type (${distinctTypes.join(', ')}).`;
+};
+
+const reportSuccess = (result, preserved, headings) => {
+  console.log(entryLine(result));
+  console.log(preservedLine(preserved));
+  console.log(headingLine(headings));
 };
 
 function main() {
