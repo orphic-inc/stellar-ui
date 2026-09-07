@@ -28,6 +28,16 @@ All notable changes to stellar-ui are documented here.
 
   **The two `### Changed` blocks under `[Unreleased]` are coalesced into one** while adding this. Both entries keep the type they were authored with; only the duplicate heading goes. stellar-api gated this shape in [#537](https://github.com/orphic-inc/stellar-api/issues/537) after a release-day hand-coalesce of twelve scrambled blocks misfiled eight entries — this repo has no such gate, so the coalesce is by hand and worth doing while the section is small.
 
+- **CI gates the changelog itself** — `npm run changelog:check`, ported from stellar-api ([#386](https://github.com/orphic-inc/stellar-api/issues/386), [#537](https://github.com/orphic-inc/stellar-api/issues/537)). Three independent checks, each failing for a different reason: a change under `src/`, `scripts/` or `.github/workflows/` must come with a CHANGELOG entry; every `[Unreleased]` entry on the merge base must still be **somewhere** in the file; and each `### <type>` may appear **at most once** under `[Unreleased]`.
+
+  **The `release` job publishes a version's section verbatim as the Release notes**, so anything missing, dropped, or filed under a duplicate heading here is that way in the published record permanently. Nothing checked that until now. This repo had already accumulated two `### Changed` blocks under `[Unreleased]`; in stellar-api the hand coalesce of twelve such blocks on release day is what misfiled eight entries at its 0.9.1 cut.
+
+  **All three are shrink-only ratchets against the merge base**, like every other guard in both repos: a branch fails for what it introduced and never for what it inherited. An absolute heading check would have failed the open Renovate PRs over a file none of them touches. The heading set is **closed** (`Added`, `Changed`, `Fixed`, `Security`, `Docs`, `Removed`, `Internal`) because a typo'd `### Fixes` appears once — a duplicate rule cannot see it, and it would ship as a section nobody meant to write.
+
+  **`scripts/` obliges an entry where stellar-api lists `prisma/`**, and it is the one deliberate divergence. stellar-api includes `.github/workflows/` because CI changes are exactly what slips through unrecorded; here the CI logic lives in `scripts/*.mjs` and the workflow only calls it, so gating the workflow alone would miss where the behaviour is. This entry exists because the gate caught its own PR.
+
+  A `no-changelog` label is the escape hatch, and `labeled`/`unlabeled` join the workflow's trigger types so applying it takes effect without a manual re-run.
+
 ## [0.9.1] — 2026-09-06
 
 ### Added
