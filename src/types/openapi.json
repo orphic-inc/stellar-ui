@@ -3,7 +3,7 @@
   "info": {
     "title": "Stellar API",
     "version": "0.9.1",
-    "description": "REST API for the Stellar community tracker. All routes under `/api/*`. Authentication uses JWT cookies (`token` cookie set on login)."
+    "description": "REST API for the Stellar community tracker. All routes under `/api/*`. Authentication uses JWT cookies (`token` cookie set on login). Separately from any per-operation failure documented below, **every** endpoint can answer `403` with `{ msg: \"Access from this network is not permitted\" }` when the caller's IP is banned: that check runs before routing and applies even to endpoints needing no session."
   },
   "servers": [
     {
@@ -8342,6 +8342,8 @@
         "tags": [
           "Auth"
         ],
+        "summary": "Public self-registration",
+        "description": "Ungated — no session, no permission — so the 403 here is the handler speaking, not middleware: it is the site's registration policy refusing, and every branch of it concerns the invite. The 400 is the submission itself being unusable. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -8371,7 +8373,17 @@
             }
           },
           "400": {
-            "description": "User already exists",
+            "description": "Username or email already taken, the password is on the denylist, or the address is not accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Registration is closed, or the invite key is missing, invalid, already used, or issued for a different email address",
             "content": {
               "application/json": {
                 "schema": {
@@ -8565,7 +8577,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -8696,6 +8708,16 @@
         "responses": {
           "204": {
             "description": "Session revoked"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -8849,7 +8871,17 @@
             }
           },
           "400": {
-            "description": "Already installed or validation error",
+            "description": "A user with that username or email already exists. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Application already installed",
             "content": {
               "application/json": {
                 "schema": {
@@ -8948,6 +8980,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or wrong service key",
             "content": {
@@ -9020,7 +9062,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -9139,6 +9181,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -9206,6 +9258,16 @@
                       "changedAt"
                     ]
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -9281,6 +9343,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -9333,6 +9405,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserRankState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -9430,7 +9512,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -9514,6 +9596,16 @@
                   "items": {
                     "$ref": "#/components/schemas/SnatchItem"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -9682,7 +9774,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -9799,7 +9891,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -9874,6 +9966,16 @@
         "responses": {
           "204": {
             "description": "Donor rank deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -9974,7 +10076,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -10049,6 +10151,16 @@
         "responses": {
           "204": {
             "description": "Donor status revoked"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -10125,6 +10237,16 @@
                   "items": {
                     "$ref": "#/components/schemas/UserWarning"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -10216,7 +10338,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -10302,6 +10424,16 @@
           "204": {
             "description": "Warning removed"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -10377,6 +10509,16 @@
                   "items": {
                     "$ref": "#/components/schemas/UserModerationNote"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -10462,7 +10604,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -10548,6 +10690,16 @@
           "204": {
             "description": "Note deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -10620,6 +10772,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -10700,6 +10862,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -10774,6 +10946,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -10844,6 +11026,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/IrcNickLinkResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -10940,7 +11132,7 @@
             }
           },
           "400": {
-            "description": "Validation failed",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -11139,6 +11331,16 @@
                       }
                     }
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -11345,6 +11547,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -11395,6 +11607,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -11506,6 +11728,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -11556,6 +11788,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -11770,6 +12012,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -11838,6 +12090,16 @@
                   "items": {
                     "$ref": "#/components/schemas/CrsSnapshot"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -12016,6 +12278,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Missing or wrong service key",
             "content": {
@@ -12116,6 +12388,16 @@
                     "inviteKey",
                     "emailSent"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -12320,7 +12602,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -12406,7 +12688,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -12604,7 +12886,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -12703,7 +12985,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -12776,6 +13058,16 @@
         "responses": {
           "204": {
             "description": "Announcement deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -12865,7 +13157,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -12930,6 +13222,16 @@
         "responses": {
           "204": {
             "description": "Blog post deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -13070,7 +13372,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -13135,6 +13437,16 @@
         "responses": {
           "204": {
             "description": "Notice deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -13347,6 +13659,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -13406,6 +13728,7 @@
         "tags": [
           "Stylesheets"
         ],
+        "description": "Two further conditions answer 400 beyond body validation, and the declared schema shows only the validator's. Exceeding the caller's rank quota answers `{ msg }`; CSS that violates the ADR-0031 boundary answers `{ errors: { source: [...] } }`, one entry per violation with its location — the same envelope a validation failure uses.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -13443,7 +13766,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -13541,6 +13864,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -13581,6 +13914,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuthorStylesheet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -13663,7 +14006,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -13736,6 +14079,16 @@
         "responses": {
           "204": {
             "description": "Author stylesheet withdrawn (soft); adopters keep rendering"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -13811,6 +14164,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -13871,6 +14234,16 @@
               "text/css": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -14070,6 +14443,7 @@
         "tags": [
           "Stylesheets"
         ],
+        "description": "A `cssUrl` naming a `/css` delivery target that does not resolve to an existing authored stylesheet answers 400 with `{ msg }`, beyond the body validation the declared schema covers.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -14114,7 +14488,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -14234,6 +14608,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -14313,7 +14697,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -14501,6 +14885,16 @@
           "204": {
             "description": "Notification removed"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -14651,6 +15045,16 @@
           "204": {
             "description": "Notification marked read"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -14772,6 +15176,16 @@
           "204": {
             "description": "Subscription updated"
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -14850,6 +15264,16 @@
         "responses": {
           "204": {
             "description": "Comment subscription updated"
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -14934,6 +15358,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -14957,6 +15391,7 @@
         "tags": [
           "Forums"
         ],
+        "description": "Categories the caller may read, each with its readable forums. `?all=true` skips both the class filter and the empty-category filter and is checked in the handler, not by a gate — hence the 403 no middleware declares.",
         "responses": {
           "200": {
             "description": "All categories with forums",
@@ -14973,6 +15408,16 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "?all=true without forums_manage, rank_permissions_manage or admin",
             "content": {
               "application/json": {
                 "schema": {
@@ -15025,7 +15470,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -15096,6 +15541,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -15173,6 +15628,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -15237,6 +15702,16 @@
         "responses": {
           "204": {
             "description": "Category deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -15318,6 +15793,16 @@
                   "required": [
                     "markedRead"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -15479,7 +15964,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -15548,6 +16033,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Forum"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -15646,6 +16141,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -15710,6 +16215,16 @@
         "responses": {
           "204": {
             "description": "Forum deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -15793,8 +16308,38 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient class to read this forum",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Forum not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -15867,7 +16412,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -15878,6 +16423,26 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient class to create topics in this forum",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Forum not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -15942,6 +16507,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumTopicSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -16014,6 +16589,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumTopic"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -16100,6 +16685,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -16162,6 +16757,16 @@
         "responses": {
           "204": {
             "description": "Topic removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -16231,6 +16836,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumTopic"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -16340,8 +16955,38 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient class to read this forum",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Forum not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -16404,6 +17049,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -16484,6 +17139,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumPost"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -16574,6 +17239,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -16644,6 +17319,16 @@
         "responses": {
           "204": {
             "description": "Post removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -16736,6 +17421,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -16796,6 +17491,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumPoll"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -16874,7 +17579,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -16885,6 +17590,26 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not the topic author, and missing forums_moderate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such topic, or it is deleted",
             "content": {
               "application/json": {
                 "schema": {
@@ -16933,6 +17658,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumPoll"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -17011,6 +17746,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ForumPollVote"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -17130,7 +17875,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -17141,6 +17886,26 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient class to read this forum",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such post in that topic, or either is deleted",
             "content": {
               "application/json": {
                 "schema": {
@@ -17194,6 +17959,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -17305,7 +18080,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -17384,6 +18159,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Community"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -17498,7 +18283,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -17574,6 +18359,16 @@
           "204": {
             "description": "Community deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -17644,6 +18439,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommunityHealthPulse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -17728,6 +18533,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -17807,8 +18622,38 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not a member of this community",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -17958,7 +18803,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -17979,6 +18824,16 @@
           },
           "403": {
             "description": "Missing communities_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -18048,6 +18903,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommunityMember"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -18128,6 +18993,16 @@
         "responses": {
           "204": {
             "description": "Member removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -18227,6 +19102,16 @@
           "204": {
             "description": "Curator added"
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -18302,6 +19187,16 @@
         "responses": {
           "204": {
             "description": "Curator removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -18419,7 +19314,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -18503,6 +19398,16 @@
           "204": {
             "description": "Release deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -18579,6 +19484,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Release"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -18664,6 +19579,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -18742,6 +19667,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CommunityVoteState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -18843,6 +19778,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -18919,6 +19864,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Release"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -19034,6 +19989,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -19106,6 +20071,16 @@
         "responses": {
           "204": {
             "description": "Tag removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -19218,6 +20193,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -19289,6 +20274,16 @@
                   "items": {
                     "$ref": "#/components/schemas/ReleaseContributionDetail"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -19462,7 +20457,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -19536,6 +20531,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -19784,7 +20789,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -19855,6 +20860,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Contribution"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -19945,7 +20960,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -20043,7 +21058,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -20064,6 +21079,16 @@
           },
           "403": {
             "description": "Missing contributions_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contribution not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -20350,7 +21375,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -20521,6 +21546,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserRank"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -20780,6 +21815,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -20864,6 +21909,16 @@
         "responses": {
           "204": {
             "description": "User rank deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -21037,7 +22092,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -21126,6 +22181,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PromotionRule"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -21240,6 +22305,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -21324,6 +22399,16 @@
         "responses": {
           "204": {
             "description": "Promotion rule deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -21458,7 +22543,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -21560,6 +22645,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -21634,6 +22729,16 @@
         "responses": {
           "204": {
             "description": "Staff group deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -21783,6 +22888,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -21897,6 +23012,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -21989,6 +23114,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22041,6 +23176,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -22115,6 +23260,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22179,6 +23334,16 @@
         "responses": {
           "204": {
             "description": "Comment deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -22259,6 +23424,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22313,7 +23488,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -22372,6 +23547,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Artist"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -22449,6 +23634,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22513,6 +23708,16 @@
         "responses": {
           "204": {
             "description": "Artist deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -22596,6 +23801,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22642,6 +23857,16 @@
                   "required": [
                     "subscribed"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -22716,6 +23941,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22773,6 +24008,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22825,6 +24070,16 @@
                     "msg",
                     "artist"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -22906,6 +24161,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -22961,6 +24226,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SimilarArtist"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -23034,6 +24309,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -23099,6 +24384,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ArtistTag"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -23217,7 +24512,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -23280,6 +24575,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -23324,6 +24629,16 @@
         "responses": {
           "204": {
             "description": "Post deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -23417,6 +24732,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -23481,6 +24806,16 @@
         "responses": {
           "204": {
             "description": "Comment deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -23559,6 +24894,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -23628,7 +24973,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -23693,6 +25038,16 @@
         "responses": {
           "204": {
             "description": "Note deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -23823,7 +25178,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -23909,6 +25264,16 @@
           "204": {
             "description": "Request deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -23983,6 +25348,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -24043,6 +25418,16 @@
                   "required": [
                     "voted"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -24124,6 +25509,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Request"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -24228,6 +25623,16 @@
                     "bounties",
                     "actions"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -24405,6 +25810,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -24514,7 +25929,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -24806,6 +26221,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -24873,7 +26298,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Cannot message yourself. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show",
             "content": {
               "application/json": {
                 "schema": {
@@ -24884,6 +26309,26 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such recipient",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Recipient is disabled, or has private messages turned off",
             "content": {
               "application/json": {
                 "schema": {
@@ -24996,7 +26441,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -25007,6 +26452,16 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user with that username",
             "content": {
               "application/json": {
                 "schema": {
@@ -25091,7 +26546,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -25155,6 +26610,16 @@
         "responses": {
           "204": {
             "description": "Draft deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -25248,7 +26713,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -25353,6 +26818,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -25412,6 +26887,16 @@
           "204": {
             "description": "Bulk action applied"
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -25462,6 +26947,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PrivateConversation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -25528,8 +27023,28 @@
           "204": {
             "description": "Flags updated"
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such conversation, or it is not the caller's, or the caller has already deleted it from both boxes",
             "content": {
               "application/json": {
                 "schema": {
@@ -25573,8 +27088,28 @@
           "204": {
             "description": "Conversation soft-deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such conversation, or it is not the caller's",
             "content": {
               "application/json": {
                 "schema": {
@@ -25645,6 +27180,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -25695,6 +27240,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PaginatedTickets"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -25751,6 +27306,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StaffInboxTicket"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -25894,6 +27459,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26025,6 +27600,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26085,6 +27670,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StaffInboxTicket"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -26163,6 +27758,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26230,8 +27835,38 @@
           "204": {
             "description": "Resolved"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such ticket, or it is not the caller's",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ticket already resolved",
             "content": {
               "application/json": {
                 "schema": {
@@ -26277,6 +27912,16 @@
           "204": {
             "description": "Unresolved"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26289,6 +27934,26 @@
           },
           "403": {
             "description": "Missing staff_inbox_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such ticket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ticket is not resolved",
             "content": {
               "application/json": {
                 "schema": {
@@ -26356,6 +28021,16 @@
           "204": {
             "description": "Assigned"
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26368,6 +28043,26 @@
           },
           "403": {
             "description": "Missing staff_inbox_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such ticket, or no such assignee",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The named assignee lacks staff_inbox_manage",
             "content": {
               "application/json": {
                 "schema": {
@@ -26479,6 +28174,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26563,6 +28268,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26628,6 +28343,16 @@
           "204": {
             "description": "Response deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -26640,6 +28365,16 @@
           },
           "403": {
             "description": "Missing staff_inbox_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Response not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -26903,6 +28638,16 @@
                     "pageSize",
                     "reports"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -27183,6 +28928,16 @@
                     "pageSize",
                     "reports"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -27571,6 +29326,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -27848,6 +29613,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -27860,6 +29635,16 @@
           },
           "403": {
             "description": "Not the reporter and missing reports_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -27895,6 +29680,16 @@
           "204": {
             "description": "Claimed"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -27907,6 +29702,36 @@
           },
           "403": {
             "description": "Missing reports_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already claimed by another staff member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Already resolved, so there is nothing to claim",
             "content": {
               "application/json": {
                 "schema": {
@@ -27952,6 +29777,16 @@
           "204": {
             "description": "Unclaimed"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -27964,6 +29799,26 @@
           },
           "403": {
             "description": "Missing reports_manage, or the report is claimed by another staff member",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Not claimed, so there is nothing to release",
             "content": {
               "application/json": {
                 "schema": {
@@ -28040,6 +29895,16 @@
           "204": {
             "description": "Resolved"
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -28052,6 +29917,26 @@
           },
           "403": {
             "description": "Missing reports_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Already resolved",
             "content": {
               "application/json": {
                 "schema": {
@@ -28167,6 +30052,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -28179,6 +30074,16 @@
           },
           "403": {
             "description": "Missing reports_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -28292,6 +30197,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -28364,6 +30279,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RatioPolicyState"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -28501,6 +30426,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -28611,6 +30546,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -28683,6 +30628,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -28748,6 +30703,16 @@
                   "required": [
                     "items"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -28826,6 +30791,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -28879,6 +30854,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Top10Snapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -29184,7 +31169,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -29263,6 +31248,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RulesPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -29349,7 +31344,7 @@
             }
           },
           "400": {
-            "description": "Validation failed",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -29545,6 +31540,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -29617,6 +31622,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -29677,6 +31692,16 @@
                     "status",
                     "isFriend"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -29812,6 +31837,16 @@
           "204": {
             "description": "Friendship/request removed"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -29863,6 +31898,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FriendEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -29928,6 +31973,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -30016,7 +32071,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -30104,6 +32159,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -30172,7 +32237,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -30280,6 +32345,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -30344,6 +32419,16 @@
         "responses": {
           "204": {
             "description": "Tag alias deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -30442,6 +32527,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -30524,6 +32619,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -30589,6 +32694,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -30662,6 +32777,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -30727,6 +32852,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -30800,6 +32935,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -30867,6 +33012,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/VanityHouseArtist"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -31036,6 +33191,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -31092,6 +33257,16 @@
         "responses": {
           "204": {
             "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -31267,6 +33442,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -31417,6 +33602,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -31526,7 +33721,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -31601,6 +33796,16 @@
         "responses": {
           "204": {
             "description": "Collage deleted — hard if personal, soft if public"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -31904,6 +34109,16 @@
           "204": {
             "description": "Entries reordered"
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -31980,6 +34195,16 @@
         "responses": {
           "204": {
             "description": "Entry removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -32065,6 +34290,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -32139,6 +34374,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -32204,6 +34449,16 @@
                   "items": {
                     "$ref": "#/components/schemas/CollageSubscriber"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -32351,6 +34606,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -32427,7 +34692,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -32568,6 +34833,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -32662,7 +34937,7 @@
             }
           },
           "400": {
-            "description": "Validation error",
+            "description": "Invalid path parameters or request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -32737,6 +35012,16 @@
         "responses": {
           "204": {
             "description": "Page deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -32829,6 +35114,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -32899,6 +35194,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WikiRevisionContent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -33069,6 +35374,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/WikiPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -33273,6 +35588,16 @@
           "204": {
             "description": "Alias removed"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -33358,6 +35683,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -33821,6 +36156,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -33905,6 +36250,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -33917,6 +36272,16 @@
           },
           "403": {
             "description": "Missing dnc_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -33970,6 +36335,16 @@
           "204": {
             "description": "Deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -33982,6 +36357,16 @@
           },
           "403": {
             "description": "Missing dnc_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No DNC entry with that id in this community",
             "content": {
               "application/json": {
                 "schema": {
@@ -34115,6 +36500,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -34159,6 +36554,16 @@
         "responses": {
           "204": {
             "description": "Removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -34320,6 +36725,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -34364,6 +36779,16 @@
         "responses": {
           "204": {
             "description": "Removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -34504,6 +36929,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -34548,6 +36983,16 @@
         "responses": {
           "204": {
             "description": "Removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -34684,6 +37129,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -34728,6 +37183,16 @@
         "responses": {
           "204": {
             "description": "Removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -35413,6 +37878,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -35603,6 +38078,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -35900,6 +38385,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -36270,6 +38765,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -36441,6 +38946,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -36603,6 +39118,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -36716,6 +39241,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -36781,6 +39316,16 @@
           "204": {
             "description": "Deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -36834,6 +39379,7 @@
         "tags": [
           "Downloads"
         ],
+        "description": "Grants download access and debits the ratio ledger, so most of what can go wrong is accounting rather than addressing. Two conditions answer 400 beyond body validation, both `{ msg }`: the contribution has no approved accounting size, and the caller has insufficient contributed balance. A FREEPASS or NEUTRALPASS exemption skips the balance check entirely. Repeating the call inside the idempotency window returns the existing grant rather than charging twice.",
         "parameters": [
           {
             "schema": {
@@ -36898,8 +39444,48 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Cannot consume your own contribution, or download access is disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contribution not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Balance changed concurrently — retry",
             "content": {
               "application/json": {
                 "schema": {
@@ -36976,6 +39562,16 @@
                     "status",
                     "createdAt"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -37061,6 +39657,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -37073,6 +39679,26 @@
           },
           "403": {
             "description": "Missing staff or admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Grant not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Grant is not in COMPLETED state — already reversed",
             "content": {
               "application/json": {
                 "schema": {
@@ -37188,6 +39814,16 @@
                     "data",
                     "meta"
                   ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
                 }
               }
             }
@@ -37334,6 +39970,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -37400,6 +40046,16 @@
         "responses": {
           "204": {
             "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -37522,6 +40178,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -37603,6 +40269,16 @@
               }
             }
           },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -37671,6 +40347,16 @@
         "responses": {
           "204": {
             "description": "Entry removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",
@@ -37917,6 +40603,16 @@
           "204": {
             "description": "Deleted"
           },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Not authenticated",
             "content": {
@@ -38144,6 +40840,16 @@
         "responses": {
           "204": {
             "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
           },
           "401": {
             "description": "Not authenticated",

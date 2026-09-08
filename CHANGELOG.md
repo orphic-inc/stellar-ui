@@ -8,6 +8,18 @@ All notable changes to stellar-ui are documented here.
 
 ### Changed
 
+- **One re-vendor covers stellar-api's whole failure-coverage burn-down** ([api#517](https://github.com/orphic-inc/stellar-api/issues/517)) — deliberately deferred across fourteen api slices rather than run per slice, because each sync costs a PR, a review and a CI round while the drift blocks nothing: `contract:check` is not in `publish.yml`, it runs out of band and reports to a tracking issue. This is that single catch-up.
+
+  **270 responses added across 235 operations, and none removed.** By code: `400` × 225, `404` × 25, `403` × 9, `422` × 7, `409` × 4. The 225 `400`s are one change, not 225 — api [#568](https://github.com/orphic-inc/stellar-api/issues/568) derives the validation `400` from the `validate`/`validateQuery`/`validateParams` a route mounts, so every validated operation now declares it. The 45 others are handler-thrown codes the burn-down read out of the handlers one surface at a time.
+
+  **No existing response changed body type, and none was removed** — verified by comparing the two vendored documents operation by operation, not inferred from the diff size. That was the live risk: an operation whose `400` flipped between `MsgResponse` and `ValidationError` would have propagated a service result type asserting `errors` does or does not exist. Zero did. Paths and schemas are unchanged at **269** and **174**.
+
+  **`src/types/api.ts` moves +2503 / −65, and the 65 are not losses.** Fifty-six are `@description` doc comments replaced by more specific ones — `Validation error` becoming `Invalid request body` or `Invalid path parameters`, and two corrected outright where the old text named the wrong failure (`Already installed or validation error` on `POST /install`, which is a `409`). The remaining nine are reorderings, where inserting a `400` ahead of an existing `401` shifts the emitted lines; the occurrence counts of every affected token are identical before and after.
+
+  `service-types:check` stays at **227 spec-typed, 0 hand-typed**. `typecheck`, `lint`, `build` and the full suite (169 files, 1496 tests) all pass unchanged.
+
+  **Nothing in the app handles the new codes yet, and that is [#308](https://github.com/orphic-inc/stellar-ui/issues/308)'s territory** — this change makes the contract describe them, not the UI react to them. `baseQueryWithLogout` still handles only `401`.
+
 - **The vendored contract catches up with stellar-api's `security` derivation and five newly-gated reads** — 228 paths changed shape, almost all of them because stellar-api [#520](https://github.com/orphic-inc/stellar-api/issues/520) stopped hand-declaring `security` and now derives it from the middleware that enforces each route. Before that, `components.securitySchemes` was absent entirely while 112 operations referenced schemes by name, and 70 of those named `bearerAuth` on cookie-gated routes. The vendored spec now carries **both schemes defined** (`cookieAuth`, `serviceKey`) and **zero dangling references**.
 
   Five operations also gained a `401` — `GET /announcements`, `/comments`, `/requests`, `/requests/{id}` and `/users/{id}` now require a session ([#547](https://github.com/orphic-inc/stellar-api/issues/547)); they previously served content with none.

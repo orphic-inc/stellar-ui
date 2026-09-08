@@ -109,6 +109,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Public self-registration
+     * @description Ungated — no session, no permission — so the 403 here is the handler speaking, not middleware: it is the site's registration policy refusing, and every branch of it concerns the invite. The 400 is the submission itself being unusable. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show.
+     */
     post: {
       parameters: {
         query?: never;
@@ -133,8 +137,17 @@ export interface paths {
             };
           };
         };
-        /** @description User already exists */
+        /** @description Username or email already taken, the password is on the denylist, or the address is not accepted */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Registration is closed, or the invite key is missing, invalid, already used, or issued for a different email address */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -371,7 +384,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -538,6 +551,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -638,8 +660,17 @@ export interface paths {
             };
           };
         };
-        /** @description Already installed or validation error */
+        /** @description A user with that username or email already exists. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show */
         400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Application already installed */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -752,6 +783,15 @@ export interface paths {
             'application/json': components['schemas']['IrcNickAccount'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Missing or wrong service key */
         401: {
           headers: {
@@ -818,7 +858,7 @@ export interface paths {
             'application/json': components['schemas']['IrcNickVerifyResult'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -942,6 +982,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -1002,6 +1051,15 @@ export interface paths {
               email: string;
               changedAt: string;
             }[];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -1066,6 +1124,15 @@ export interface paths {
             }[];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -1123,6 +1190,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['UserRankState'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -1186,7 +1262,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -1269,6 +1345,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['SnatchItem'][];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -1423,7 +1508,7 @@ export interface paths {
             'application/json': components['schemas']['DonorRank'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -1512,7 +1597,7 @@ export interface paths {
             'application/json': components['schemas']['DonorRank'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -1581,6 +1666,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -1665,7 +1759,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -1733,6 +1827,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -1808,6 +1911,15 @@ export interface paths {
             'application/json': components['schemas']['UserWarning'][];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -1879,7 +1991,7 @@ export interface paths {
             };
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -1965,6 +2077,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -2039,6 +2160,15 @@ export interface paths {
             'application/json': components['schemas']['UserModerationNote'][];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -2092,7 +2222,7 @@ export interface paths {
             };
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -2178,6 +2308,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -2252,6 +2391,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -2331,6 +2479,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -2402,6 +2559,15 @@ export interface paths {
             'application/json': components['schemas']['PublicUser'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -2462,6 +2628,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['IrcNickLinkResult'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -2543,7 +2718,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Validation failed */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -2678,6 +2853,15 @@ export interface paths {
             'application/json': components['schemas']['UserSettings'] & {
               avatar?: string;
             };
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -2829,6 +3013,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -2885,6 +3078,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -2970,6 +3172,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -3025,6 +3236,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -3165,6 +3385,15 @@ export interface paths {
             'application/json': components['schemas']['MyProfile'];
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -3227,6 +3456,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CrsSnapshot'][];
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -3417,6 +3655,15 @@ export interface paths {
             'application/json': components['schemas']['CrsView'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Missing or wrong service key */
         401: {
           headers: {
@@ -3520,6 +3767,15 @@ export interface paths {
               inviteKey: string;
               emailSent: boolean;
             };
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -3647,7 +3903,7 @@ export interface paths {
             'application/json': components['schemas']['DonorRewards'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -3726,7 +3982,7 @@ export interface paths {
             'application/json': components['schemas']['DonorForumTitle'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -3917,7 +4173,7 @@ export interface paths {
             'application/json': components['schemas']['Announcement'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -4000,7 +4256,7 @@ export interface paths {
             'application/json': components['schemas']['Announcement'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -4065,6 +4321,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -4143,7 +4408,7 @@ export interface paths {
             'application/json': components['schemas']['BlogPost'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -4214,6 +4479,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -4348,7 +4622,7 @@ export interface paths {
             'application/json': components['schemas']['GlobalNotice'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -4419,6 +4693,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -4643,6 +4926,15 @@ export interface paths {
             'application/json': components['schemas']['UserStatSnapshot'][];
           };
         };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -4693,6 +4985,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /** @description Two further conditions answer 400 beyond body validation, and the declared schema shows only the validator's. Exceeding the caller's rank quota answers `{ msg }`; CSS that violates the ADR-0031 boundary answers `{ errors: { source: [...] } }`, one entry per violation with its location — the same envelope a validation failure uses. */
     post: {
       parameters: {
         query?: never;
@@ -4718,7 +5011,7 @@ export interface paths {
             'application/json': components['schemas']['AuthorStylesheet'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -4786,6 +5079,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -4830,6 +5132,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['AuthorStylesheet'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -4879,7 +5190,7 @@ export interface paths {
             'application/json': components['schemas']['AuthorStylesheet'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -4944,6 +5255,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -5017,6 +5337,15 @@ export interface paths {
             'application/json': components['schemas']['AdoptionResult'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -5077,6 +5406,15 @@ export interface paths {
           };
           content: {
             'text/css': string;
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -5274,6 +5612,7 @@ export interface paths {
       };
     };
     put?: never;
+    /** @description A `cssUrl` naming a `/css` delivery target that does not resolve to an existing authored stylesheet answers 400 with `{ msg }`, beyond the body validation the declared schema covers. */
     post: {
       parameters: {
         query?: never;
@@ -5303,7 +5642,7 @@ export interface paths {
             'application/json': components['schemas']['Stylesheet'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -5427,6 +5766,15 @@ export interface paths {
             'application/json': components['schemas']['Stylesheet'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -5476,7 +5824,7 @@ export interface paths {
             'application/json': components['schemas']['Stylesheet'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -5666,6 +6014,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -5839,6 +6196,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -5960,6 +6326,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -6030,6 +6405,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -6095,6 +6479,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -6121,6 +6514,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description Categories the caller may read, each with its readable forums. `?all=true` skips both the class filter and the empty-category filter and is checked in the handler, not by a gate — hence the 403 no middleware declares. */
     get: {
       parameters: {
         query?: never;
@@ -6141,6 +6535,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description ?all=true without forums_manage, rank_permissions_manage or admin */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -6176,7 +6579,7 @@ export interface paths {
             'application/json': components['schemas']['ForumCategory'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -6251,6 +6654,15 @@ export interface paths {
             'application/json': components['schemas']['ForumCategory'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -6296,6 +6708,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumCategory'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -6354,6 +6775,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -6431,6 +6861,15 @@ export interface paths {
             'application/json': {
               markedRead: number;
             };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -6552,7 +6991,7 @@ export interface paths {
             'application/json': components['schemas']['Forum'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -6623,6 +7062,15 @@ export interface paths {
             'application/json': components['schemas']['Forum'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -6674,6 +7122,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Forum'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -6732,6 +7189,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -6805,8 +7271,35 @@ export interface paths {
             'application/json': components['schemas']['PaginatedForumTopics'];
           };
         };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Insufficient class to read this forum */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Forum not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -6846,7 +7339,7 @@ export interface paths {
             'application/json': components['schemas']['ForumTopic'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -6857,6 +7350,24 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Insufficient class to create topics in this forum */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Forum not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -6909,6 +7420,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumTopicSession'];
+          };
+        };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -6976,6 +7496,15 @@ export interface paths {
             'application/json': components['schemas']['ForumTopic'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -7023,6 +7552,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumTopic'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7073,6 +7611,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -7136,6 +7683,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumTopic'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7215,8 +7771,35 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Insufficient class to read this forum */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Forum not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -7252,6 +7835,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumPost'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7318,6 +7910,15 @@ export interface paths {
             'application/json': components['schemas']['ForumPost'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -7364,6 +7965,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumPost'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7415,6 +8025,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -7481,6 +8100,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -7543,6 +8171,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumPoll'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7608,7 +8245,7 @@ export interface paths {
             'application/json': components['schemas']['ForumPoll'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -7619,6 +8256,24 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not the topic author, and missing forums_moderate */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such topic, or it is deleted */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -7669,6 +8324,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumPoll'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7739,6 +8403,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ForumPollVote'];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7838,7 +8511,7 @@ export interface paths {
             'application/json': components['schemas']['ForumLastReadTopic'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -7849,6 +8522,24 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Insufficient class to read this forum */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such post in that topic, or either is deleted */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -7899,6 +8590,15 @@ export interface paths {
               data: components['schemas']['Community'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -7960,7 +8660,7 @@ export interface paths {
             'application/json': components['schemas']['Community'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -8040,6 +8740,15 @@ export interface paths {
             'application/json': components['schemas']['Community'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -8100,7 +8809,7 @@ export interface paths {
             'application/json': components['schemas']['Community'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -8169,6 +8878,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -8240,6 +8958,15 @@ export interface paths {
             'application/json': components['schemas']['CommunityHealthPulse'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -8304,6 +9031,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CommunityHealthSnapshot'][];
+          };
+        };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -8373,8 +9109,35 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not a member of this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -8458,7 +9221,7 @@ export interface paths {
             'application/json': components['schemas']['Release'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -8478,6 +9241,15 @@ export interface paths {
         };
         /** @description Missing communities_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -8539,6 +9311,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CommunityMember'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -8617,6 +9398,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -8707,6 +9497,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -8781,6 +9580,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -8843,6 +9651,15 @@ export interface paths {
             'application/json': components['schemas']['Release'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -8900,7 +9717,7 @@ export interface paths {
             'application/json': components['schemas']['Release'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -8970,6 +9787,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -9054,6 +9880,15 @@ export interface paths {
             'application/json': components['schemas']['CommunityVoteState'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -9115,6 +9950,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CommunityVoteState'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -9191,6 +10035,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -9257,6 +10110,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Release'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -9348,6 +10210,15 @@ export interface paths {
             'application/json': components['schemas']['ReleaseTag'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -9412,6 +10283,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -9494,6 +10374,15 @@ export interface paths {
             'application/json': components['schemas']['ReleaseTagEnriched'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -9555,6 +10444,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ReleaseContributionDetail'][];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -9672,7 +10570,7 @@ export interface paths {
             'application/json': components['schemas']['Contribution'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -9742,6 +10640,15 @@ export interface paths {
               data: components['schemas']['Contribution'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -9879,7 +10786,7 @@ export interface paths {
             'application/json': components['schemas']['Contribution'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -9952,6 +10859,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Contribution'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -10030,7 +10946,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -10113,7 +11029,7 @@ export interface paths {
             'application/json': components['schemas']['Contribution'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -10133,6 +11049,15 @@ export interface paths {
         };
         /** @description Missing contributions_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Contribution not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -10284,7 +11209,7 @@ export interface paths {
             'application/json': components['schemas']['UserRank'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -10434,6 +11359,15 @@ export interface paths {
             'application/json': components['schemas']['UserRank'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -10544,6 +11478,15 @@ export interface paths {
             'application/json': components['schemas']['UserRank'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -10618,6 +11561,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -10749,7 +11701,7 @@ export interface paths {
             'application/json': components['schemas']['PromotionRule'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -10838,6 +11790,15 @@ export interface paths {
             'application/json': components['schemas']['PromotionRule'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -10899,6 +11860,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['PromotionRule'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -10975,6 +11945,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -11090,7 +12069,7 @@ export interface paths {
             'application/json': components['schemas']['StaffGroup'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -11178,6 +12157,15 @@ export interface paths {
             'application/json': components['schemas']['StaffGroup'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -11243,6 +12231,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -11376,6 +12373,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -11457,6 +12463,15 @@ export interface paths {
             'application/json': components['schemas']['PaginatedComments'];
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -11505,6 +12520,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Comment'];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -11564,6 +12588,15 @@ export interface paths {
             'application/json': components['schemas']['Comment'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -11608,6 +12641,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CommentUpdated'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -11666,6 +12708,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -11738,6 +12789,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -11775,7 +12835,7 @@ export interface paths {
             'application/json': components['schemas']['Artist'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -11837,6 +12897,15 @@ export interface paths {
             'application/json': components['schemas']['Artist'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -11882,6 +12951,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Artist'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -11940,6 +13018,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -12013,6 +13100,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -12045,6 +13141,15 @@ export interface paths {
             'application/json': {
               subscribed: boolean;
             };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -12096,6 +13201,15 @@ export interface paths {
             'application/json': {
               subscribed: boolean;
             };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -12150,6 +13264,15 @@ export interface paths {
             'application/json': components['schemas']['ArtistHistory'][];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -12199,6 +13322,15 @@ export interface paths {
               msg: string;
               artist: components['schemas']['Artist'];
             };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -12272,6 +13404,15 @@ export interface paths {
             'application/json': components['schemas']['SimilarArtistEntry'][];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -12323,6 +13464,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['SimilarArtist'];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -12385,6 +13535,15 @@ export interface paths {
             'application/json': components['schemas']['ArtistAlias'];
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -12443,6 +13602,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['ArtistTag'];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -12535,7 +13703,7 @@ export interface paths {
             'application/json': components['schemas']['Post'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -12597,6 +13765,15 @@ export interface paths {
             'application/json': components['schemas']['Post'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -12636,6 +13813,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -12715,6 +13901,15 @@ export interface paths {
             'application/json': components['schemas']['PostComment'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -12778,6 +13973,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -12849,6 +14053,15 @@ export interface paths {
             'application/json': components['schemas']['ForumTopicNote'][];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -12911,7 +14124,7 @@ export interface paths {
             'application/json': components['schemas']['ForumTopicNote'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -12982,6 +14195,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -13057,6 +14279,15 @@ export interface paths {
             'application/json': components['schemas']['RequestDetail'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -13119,7 +14350,7 @@ export interface paths {
             'application/json': components['schemas']['Request'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -13197,6 +14428,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -13276,6 +14516,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -13348,6 +14597,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Request'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -13437,6 +14695,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -13512,6 +14779,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -13564,7 +14840,7 @@ export interface paths {
             'application/json': components['schemas']['Request'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -13820,6 +15096,15 @@ export interface paths {
             'application/json': components['schemas']['PaginatedConversations'];
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -13859,7 +15144,7 @@ export interface paths {
             'application/json': components['schemas']['PrivateConversation'];
           };
         };
-        /** @description Validation error */
+        /** @description Cannot message yourself. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show */
         400: {
           headers: {
             [name: string]: unknown;
@@ -13870,6 +15155,24 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such recipient */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Recipient is disabled, or has private messages turned off */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -13966,7 +15269,7 @@ export interface paths {
             'application/json': components['schemas']['PmDraft'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -13977,6 +15280,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No user with that username */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -14039,7 +15351,7 @@ export interface paths {
             'application/json': components['schemas']['PmDraft'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -14096,6 +15408,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -14172,7 +15493,7 @@ export interface paths {
             };
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -14287,6 +15608,15 @@ export interface paths {
             'application/json': components['schemas']['PaginatedConversations'];
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -14338,6 +15668,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -14392,6 +15731,15 @@ export interface paths {
             'application/json': components['schemas']['PrivateConversation'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -14432,8 +15780,26 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such conversation, or it is not the caller's */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -14479,8 +15845,26 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such conversation, or it is not the caller's, or the caller has already deleted it from both boxes */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -14534,6 +15918,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['PrivateMessage'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -14596,6 +15989,15 @@ export interface paths {
             'application/json': components['schemas']['PaginatedTickets'];
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -14631,6 +16033,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['StaffInboxTicket'];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -14733,6 +16144,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['PaginatedTickets'];
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -14854,6 +16274,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -14914,6 +16343,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['StaffInboxTicket'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -14981,6 +16419,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['StaffInboxMessage'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -15054,8 +16501,35 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such ticket, or it is not the caller's */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Ticket already resolved */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -15107,6 +16581,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -15118,6 +16601,24 @@ export interface paths {
         };
         /** @description Missing staff_inbox_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such ticket */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Ticket is not resolved */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -15176,6 +16677,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -15187,6 +16697,24 @@ export interface paths {
         };
         /** @description Missing staff_inbox_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such ticket, or no such assignee */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The named assignee lacks staff_inbox_manage */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -15282,6 +16810,15 @@ export interface paths {
             'application/json': components['schemas']['StaffInboxResponse'];
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -15352,6 +16889,15 @@ export interface paths {
             'application/json': components['schemas']['StaffInboxResponse'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -15409,6 +16955,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -15420,6 +16975,15 @@ export interface paths {
         };
         /** @description Missing staff_inbox_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Response not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -15613,6 +17177,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -15725,6 +17298,15 @@ export interface paths {
                 sourceUrl: string | null;
               }[];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -15894,6 +17476,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16012,6 +17603,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16023,6 +17623,15 @@ export interface paths {
         };
         /** @description Not the reporter and missing reports_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Report not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -16067,6 +17676,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16078,6 +17696,33 @@ export interface paths {
         };
         /** @description Missing reports_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Report not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Already claimed by another staff member */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Already resolved, so there is nothing to claim */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -16129,6 +17774,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16140,6 +17794,24 @@ export interface paths {
         };
         /** @description Missing reports_manage, or the report is claimed by another staff member */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Report not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not claimed, so there is nothing to release */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -16206,6 +17878,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16217,6 +17898,24 @@ export interface paths {
         };
         /** @description Missing reports_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Report not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Already resolved */
+        422: {
           headers: {
             [name: string]: unknown;
           };
@@ -16287,6 +17986,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16298,6 +18006,15 @@ export interface paths {
         };
         /** @description Missing reports_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Report not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -16408,6 +18125,15 @@ export interface paths {
             'application/json': components['schemas']['RatioPolicyState'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16470,6 +18196,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['RatioPolicyState'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -16580,6 +18315,15 @@ export interface paths {
             'application/json': components['schemas']['SiteSettings'];
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16656,6 +18400,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16711,6 +18464,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16759,6 +18521,15 @@ export interface paths {
             'application/json': {
               items: components['schemas']['Top10TagItem'][];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -16812,6 +18583,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -16858,6 +18638,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['Top10Snapshot'];
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -17106,7 +18895,7 @@ export interface paths {
             'application/json': components['schemas']['RulesPage'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -17186,6 +18975,15 @@ export interface paths {
             'application/json': components['schemas']['RulesPage'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -17251,7 +19049,7 @@ export interface paths {
             'application/json': components['schemas']['RulesPage'];
           };
         };
-        /** @description Validation failed */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -17410,6 +19208,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -17459,6 +19266,15 @@ export interface paths {
               data: components['schemas']['FriendRequest'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -17515,6 +19331,15 @@ export interface paths {
                 | 'rejected';
               isFriend: boolean;
             };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -17641,6 +19466,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -17694,6 +19528,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['FriendEntry'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -17759,6 +19602,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -17831,7 +19683,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -17906,6 +19758,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -17952,7 +19813,7 @@ export interface paths {
             'application/json': components['schemas']['TagAliasItem'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -18040,6 +19901,15 @@ export interface paths {
             'application/json': components['schemas']['TagAliasItem'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -18096,6 +19966,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -18171,6 +20050,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -18228,6 +20116,15 @@ export interface paths {
               data: components['schemas']['InviteItem'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -18288,6 +20185,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -18344,6 +20250,15 @@ export interface paths {
               tree: components['schemas']['MemberInviteTreeNode'][];
               summary: components['schemas']['InviteTreeSummary'];
             };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -18404,6 +20319,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -18460,6 +20384,15 @@ export interface paths {
               data: components['schemas']['VanityHouseArtist'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -18522,6 +20455,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['VanityHouseArtist'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -18646,6 +20588,15 @@ export interface paths {
             'application/json': components['schemas']['FeaturedAlbumItem'];
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -18708,6 +20659,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -18796,6 +20756,15 @@ export interface paths {
               data: components['schemas']['Collage'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -18915,6 +20884,15 @@ export interface paths {
             'application/json': components['schemas']['CollageDetail'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -18980,7 +20958,7 @@ export interface paths {
             'application/json': components['schemas']['Collage'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -19049,6 +21027,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -19215,6 +21202,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -19375,6 +21371,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -19453,6 +21458,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -19523,6 +21537,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -19587,6 +21610,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['CollageSubscriber'][];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -19662,6 +21694,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -19708,7 +21749,7 @@ export interface paths {
             'application/json': components['schemas']['WikiPage'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -19851,6 +21892,15 @@ export interface paths {
             'application/json': components['schemas']['WikiPageRendered'];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -19910,7 +21960,7 @@ export interface paths {
             'application/json': components['schemas']['WikiPage'];
           };
         };
-        /** @description Validation error */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -19979,6 +22029,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -20057,6 +22116,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -20124,6 +22192,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['WikiRevisionContent'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -20275,6 +22352,15 @@ export interface paths {
           };
           content: {
             'application/json': components['schemas']['WikiPage'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -20454,6 +22540,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -20525,6 +22620,15 @@ export interface paths {
               data: components['schemas']['DeletedCollageItem'][];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -20887,6 +22991,15 @@ export interface paths {
             'application/json': components['schemas']['DncEntry'][];
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -20945,6 +23058,15 @@ export interface paths {
             'application/json': components['schemas']['DncEntry'];
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -20956,6 +23078,15 @@ export interface paths {
         };
         /** @description Missing dnc_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -21009,6 +23140,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -21020,6 +23160,15 @@ export interface paths {
         };
         /** @description Missing dnc_manage */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No DNC entry with that id in this community */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -21127,6 +23276,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -21164,6 +23322,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -21280,6 +23447,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -21317,6 +23493,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -21428,6 +23613,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -21465,6 +23659,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -21575,6 +23778,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -21612,6 +23824,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -21973,6 +24194,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -22040,6 +24270,15 @@ export interface paths {
               }[];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -22142,6 +24381,15 @@ export interface paths {
               }[];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -22256,6 +24504,15 @@ export interface paths {
                 };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -22322,6 +24579,15 @@ export interface paths {
               }[];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -22423,6 +24689,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -22500,6 +24775,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -22557,6 +24841,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -22609,6 +24902,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /** @description Grants download access and debits the ratio ledger, so most of what can go wrong is accounting rather than addressing. Two conditions answer 400 beyond body validation, both `{ msg }`: the contribution has no approved accounting size, and the caller has insufficient contributed balance. A FREEPASS or NEUTRALPASS exemption skips the balance check entirely. Repeating the call inside the idempotency window returns the existing grant rather than charging twice. */
     post: {
       parameters: {
         query?: never;
@@ -22642,8 +24936,44 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Cannot consume your own contribution, or download access is disabled */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Contribution not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Balance changed concurrently — retry */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -22700,6 +25030,15 @@ export interface paths {
               status: 'COMPLETED' | 'REVERSED';
               createdAt: string;
             };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -22768,6 +25107,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -22779,6 +25127,24 @@ export interface paths {
         };
         /** @description Missing staff or admin */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Grant not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Grant is not in COMPLETED state — already reversed */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -22844,6 +25210,15 @@ export interface paths {
               }[];
               meta: components['schemas']['PaginationMeta'];
             };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -22912,6 +25287,15 @@ export interface paths {
                 username: string;
               };
             };
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -22985,6 +25369,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -23065,6 +25458,15 @@ export interface paths {
             };
           };
         };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -23113,6 +25515,15 @@ export interface paths {
               /** @enum {string} */
               source: 'SEEDED' | 'STAFF';
             };
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
           };
         };
         /** @description Not authenticated */
@@ -23186,6 +25597,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
@@ -23385,6 +25805,15 @@ export interface paths {
           };
           content?: never;
         };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
         /** @description Not authenticated */
         401: {
           headers: {
@@ -23578,6 +26007,15 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
         };
         /** @description Not authenticated */
         401: {
