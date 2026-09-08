@@ -60,7 +60,11 @@ const BBCodeContent = ({
 }: BBCodeContentProps) => {
   const navigate = useNavigate();
   const currentUser = useAppSelector(selectCurrentUser);
-  const userId = currentUser?.id ?? null;
+  // Coerced rather than trusted: this value is interpolated into markup that is
+  // injected without a further sanitize pass, so the guarantee should hold at
+  // runtime and not only in the type. A non-numeric id yields no link at all.
+  const rawId = currentUser?.id;
+  const userId = Number.isInteger(rawId) ? (rawId as number) : null;
 
   const rendered = useMemo(() => {
     const clean = DOMPurify.sanitize(html ?? '', {
@@ -92,6 +96,12 @@ const BBCodeContent = ({
   };
 
   return (
+    // `dangerouslySetInnerHTML` is the point of this component, not an oversight,
+    // and consolidating it here is what makes it reviewable: six call sites did
+    // this individually before. The markup is sanitized twice — once by the API
+    // before it ships (#398/#402), once above on inject with the mirrored
+    // allowlist — and the only thing this file adds to it is an anchor built
+    // from a checked integer.
     <Tag
       className={className ? `bbcode-content ${className}` : 'bbcode-content'}
       onClick={onClick}
