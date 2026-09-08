@@ -129,6 +129,61 @@
   margin: 0.25rem 0;
 }
 
+/* Disclosure tags — [hide] and an OPEN-able [mature] both render as <details>.
+   They had no rules at all, so they fell back to the browser default: a bare
+   triangle with no affordance that the summary is clickable. Tokens rather than
+   the literal rgb() the older rules above use, so a user theme repaints them
+   (ADR-0003). */
+.bbcode-content details.bbcode-hide,
+.bbcode-content details.bbcode-mature {
+  border: 1px solid var(--st-border);
+  border-radius: var(--st-radius-sm);
+  background: var(--st-raised);
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.75rem;
+
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--st-text-muted);
+    padding: 0.25rem 0;
+  }
+
+  &[open] summary {
+    border-bottom: 1px solid var(--st-border-subtle);
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* The gated-content notice (api#400). Deliberately NOT a <details>: when the
+   viewer has opted out there is nothing to disclose — the API omits the content
+   from `bodyHtml` entirely rather than shipping it collapsed.
+
+   The trailing link is injected client-side by BBCodeContent, because the API
+   ships a class and no URL: it does not own this app's routing (ui#311). */
+.bbcode-content div.bbcode-mature-hidden {
+  border: 1px dashed var(--st-border-strong);
+  border-radius: var(--st-radius-sm);
+  background: var(--st-raised);
+  color: var(--st-text-muted);
+  font-size: 0.8125rem;
+  font-style: italic;
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+}
+
+.bbcode-content a.bbcode-mature-settings {
+  color: var(--st-link);
+  font-style: normal;
+  font-weight: 600;
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--st-link-hover);
+  }
+}
+
 /* Bare inputs (no Tailwind class) inside dark-themed layouts get dark styling */
 .bg-gray-950,
 .bg-gray-900 {

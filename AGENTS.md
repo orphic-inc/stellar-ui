@@ -49,6 +49,27 @@ The Playwright users must exist in the running stellar-api instance before `npm 
 
 ## Architecture
 
+### Every member surface is behind a session
+
+An anonymous visitor reaches only `/install`, `/login`, `/register`, `/recovery`
+and the public landing page — `components/App.tsx` mounts those five in
+`PublicLayout`, and `HomeGate` arbitrates `/` between the public landing and the
+private homepage. Everything else requires a session. **No member prose surface
+renders for a logged-out viewer.**
+
+Two consequences worth knowing before you reason about a logged-out state:
+
+- A component behind the session may assume `selectCurrentUser` is populated.
+  Handle the null arm defensively, but do not design a member-facing experience
+  around it — `BBCodeContent` is the pattern: no viewer id means it renders the
+  mature notice as plain text rather than linking it nowhere.
+- **A stellar-api gate keyed on `req.user` may fail CLOSED for an anonymous
+  caller with no member-visible effect**, because no UI reaches it that way.
+  `resolveViewer` in the API's `modules/bbcodeRender.ts` does exactly this.
+  "Anonymous callers see less" is not automatically a regression here — check
+  whether any route can reach the surface anonymously at all. This statement is
+  canonical; stellar-api's `AGENTS.md` points at it.
+
 ```
 src/
   index.tsx                   # React root (createRoot), Redux Provider, Router; webpack entry

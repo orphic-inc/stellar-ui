@@ -80,7 +80,8 @@ const makeProfile = () => ({
     showLastSeen: true,
     showContributedStats: true,
     showConsumedStats: true,
-    showRatioStats: true
+    showRatioStats: true,
+    showMatureContent: true
   }
 });
 
@@ -556,6 +557,61 @@ describe('Settings', () => {
     renderWithProviders(<Settings />);
     await user.click(screen.getByRole('button', { name: /security/i }));
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  // ── showMatureContent (ui#311 / stellar-api #400) ────────────────────────
+  //
+  // These assert the control WORKS, not that it renders. stellar-api #400
+  // shipped this field writable by a module but stripped by the validator in
+  // front of it, so a checkbox wired against that API saved cleanly and changed
+  // nothing. A render-only test passes against exactly that.
+  it('submits showMatureContent, the value the API actually persists', async () => {
+    const updateFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      updateFn,
+      { isLoading: false }
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByLabelText(/show mature content/i));
+    await user.click(screen.getByRole('button', { name: /save settings/i }));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(updateFn).toHaveBeenCalledWith(
+      expect.objectContaining({ showMatureContent: false })
+    );
+  });
+
+  it('reflects the saved value rather than defaulting the box', async () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        ...makeProfile(),
+        userSettings: {
+          ...makeProfile().userSettings,
+          showMatureContent: false
+        }
+      },
+      isLoading: false
+    });
+    renderWithProviders(<Settings />);
+    expect(screen.getByLabelText(/show mature content/i)).not.toBeChecked();
+  });
+
+  it('lives on Appearance, not Privacy — it governs what YOU see', async () => {
+    // Paranoia governs what OTHERS see of you and cascades onto five flags;
+    // this one is deliberately excluded from that cascade (stellar-api #400).
+    // Placing it beside the paranoia radio would imply the coupling that
+    // exclusion exists to deny.
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    expect(screen.getByLabelText(/show mature content/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /privacy/i }));
+    expect(screen.getByText(/paranoia level/i)).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/show mature content/i)
+    ).not.toBeInTheDocument();
   });
 
   it('defaults to Personal and nulls the registry pointer on save (radio mirror)', async () => {

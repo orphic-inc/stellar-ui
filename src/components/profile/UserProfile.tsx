@@ -2,12 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { formatBytes, ordinalSuffix } from '../../utils';
-import DOMPurify from 'dompurify';
-import {
-  BBCODE_ALLOWED_TAGS,
-  BBCODE_ALLOWED_ATTR
-} from '../../utils/bbcodeSanitize';
-import { Modal } from '../ui';
+import { Modal, BBCodeContent } from '../ui';
 
 import {
   useGetMyRatioStatsQuery,
@@ -1250,17 +1245,13 @@ const UserProfile = () => {
               <div data-st="colhead" data-st-title>
                 <span>Profile</span>
               </div>
-              <div
+              {/* Was the one BBCode surface rendering WITHOUT `.bbcode-content`,
+                  so its quotes, code blocks and lists went unstyled. The shared
+                  component owns the wrapper, which is how that stops recurring. */}
+              <BBCodeContent
                 data-st="prose"
                 className="p-4 text-sm"
-                dangerouslySetInnerHTML={{
-                  // Render the API's server-transcribed HTML (#398/#402);
-                  // mirrored-allowlist DOMPurify is the second net.
-                  __html: DOMPurify.sanitize(profile.profile.profileInfoHtml, {
-                    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
-                    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
-                  })
-                }}
+                html={profile.profile.profileInfoHtml}
               />
             </div>
           )}

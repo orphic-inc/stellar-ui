@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import DOMPurify from 'dompurify';
 import Time from '../layout/Time';
 import {
   useLazyGetPostEditHistoryQuery,
@@ -8,10 +7,7 @@ import {
   useDeletePostMutation
 } from '../../store/services/forumApi';
 import { quotePost } from '../../utils/quoteBBCode';
-import {
-  BBCODE_ALLOWED_TAGS,
-  BBCODE_ALLOWED_ATTR
-} from '../../utils/bbcodeSanitize';
+import { BBCodeContent } from '../ui';
 import { avatarSrc, onAvatarError } from '../../utils/avatar';
 import type { ForumPost, ForumPostEdit } from '../../types';
 
@@ -63,14 +59,6 @@ const ForumTopicPost = ({
   const handleQuote = () => {
     onQuote?.(quotePost(author?.username ?? 'unknown', body));
   };
-
-  // The API transcribes BBCode → sanitized HTML server-side (#398/#402); render
-  // its `bodyHtml` rather than parsing the raw `body` here. DOMPurify with the
-  // mirrored allowlist is the second net over the already-sanitized markup.
-  const renderedBody = DOMPurify.sanitize(post.bodyHtml ?? '', {
-    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
-    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
-  });
 
   const renderedEdits: ForumPostEdit[] = editHistory?.data ?? [];
 
@@ -181,10 +169,10 @@ const ForumTopicPost = ({
               className="w-16 h-16 rounded object-cover"
             />
           </div>
-          <div
+          <BBCodeContent
             data-st="prose"
-            className="flex-1 text-sm bbcode-content"
-            dangerouslySetInnerHTML={{ __html: renderedBody }}
+            className="flex-1 text-sm"
+            html={post.bodyHtml}
           />
         </div>
       )}

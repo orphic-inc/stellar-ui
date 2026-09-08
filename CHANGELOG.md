@@ -6,6 +6,45 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **Members can turn off `[mature]` content, and the notice links them back to
+  the setting** ([#311](https://github.com/orphic-inc/stellar-ui/issues/311)) —
+  a `Show mature content` checkbox on Settings → **Appearance**, in its own
+  `Content` panel. It sits there rather than on Privacy deliberately: the five
+  `show*` settings on Privacy govern what _others_ see of you, this governs what
+  _you_ see, and stellar-api excludes it from the paranoia cascade for the same
+  reason ([api#400](https://github.com/orphic-inc/stellar-api/issues/400)).
+  Appearance is also the default tab, so the notice's link needs no tab param.
+
+  Default is **on** — members opt out, and nothing changes for anyone who does
+  not. It is a display preference, not an access control: the API omits the
+  gated text from `bodyHtml` but the raw `body` still ships, so the copy does not
+  claim the content is withheld.
+
+- **`<BBCodeContent>` — one seam for every BBCode surface** — owns the DOMPurify
+  second-net call, the `.bbcode-content` wrapper and the mature-notice link.
+  Six sites each inlined the identical three-line sanitize call, and
+  `UserProfile` rendered **without** the wrapper, so profile-info quotes, code
+  blocks and lists were unstyled. Migrating all six collapses the duplication and
+  fixes that as a side effect; `utils/bbcodeSanitize` now has one consumer.
+
+  The notice arrives from the API as a bare `<div class="bbcode-mature-hidden">`
+  carrying no URL — deliberately, since the API does not own this app's routing.
+  The component turns that class into a **real `<a>`** at the viewer's own
+  settings, tab-focusable and right-click-openable, with the click intercepted
+  for SPA navigation. Matched on the class, not the copy, so the API may reword
+  the notice without silently breaking the link.
+
+### Fixed
+
+- **The BBCode disclosure and gated-notice classes had no styles at all** — the
+  app styled no `bbcode-*` class outside `.bbcode-content` typography, so
+  `[hide]` and an opened `[mature]` fell back to a bare browser `<details>` and
+  the gated notice had no rule to find. All three now use `--st-*` tokens rather
+  than the literal `rgb()` the older rules use, so a user theme repaints them
+  (ADR-0003).
+
 ## [0.9.2] — 2026-09-08
 
 ### Changed

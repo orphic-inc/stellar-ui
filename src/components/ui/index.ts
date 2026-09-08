@@ -13,3 +13,4 @@ export type { PageWidth } from './PageShell';
 export type { Column } from './DataTable';
 export type { BadgeVariant } from './Badge';
 export type { ModalSize } from './Modal';
+export { default as BBCodeContent } from './BBCodeContent';
