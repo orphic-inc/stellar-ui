@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import DOMPurify from 'dompurify';
 import { useSelector } from 'react-redux';
 import {
   type CommentPage,
@@ -10,10 +9,7 @@ import {
 } from '../../store/services/commentApi';
 import { useSubscribeCommentsMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import {
-  BBCODE_ALLOWED_TAGS,
-  BBCODE_ALLOWED_ATTR
-} from '../../utils/bbcodeSanitize';
+import { BBCodeContent } from '../ui';
 import Time from './Time';
 
 const SUBSCRIBABLE_PAGES: CommentPage[] = [
@@ -131,17 +127,10 @@ const CommentsSection = ({
                   <Time date={c.createdAt} />
                 </span>
               </div>
-              <div
+              <BBCodeContent
                 data-st="prose"
-                className="leading-relaxed break-words bbcode-content"
-                dangerouslySetInnerHTML={{
-                  // Render the API's server-transcribed HTML (#398/#402);
-                  // DOMPurify with the mirrored allowlist is the second net.
-                  __html: DOMPurify.sanitize(c.bodyHtml ?? '', {
-                    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
-                    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
-                  })
-                }}
+                className="leading-relaxed break-words"
+                html={c.bodyHtml}
               />
               <div className="flex gap-2 mt-1">
                 {currentUser && currentUser.id !== c.authorId && (

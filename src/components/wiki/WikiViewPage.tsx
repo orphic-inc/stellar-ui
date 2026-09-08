@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import DOMPurify from 'dompurify';
 import {
   useGetWikiPageQuery,
   useDeleteWikiPageMutation,
@@ -12,10 +11,7 @@ import { useGetMeQuery } from '../../store/services/authApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
-import {
-  BBCODE_ALLOWED_TAGS,
-  BBCODE_ALLOWED_ATTR
-} from '../../utils/bbcodeSanitize';
+import { BBCodeContent } from '../ui';
 import Spinner from '../layout/Spinner';
 
 const WikiViewPage = () => {
@@ -44,14 +40,6 @@ const WikiViewPage = () => {
     canManage ||
     (hasAnyPermission(user, ['wiki_edit']) &&
       userRankLevel >= page.minEditLevel);
-
-  // The API transcribes BBCode → sanitized HTML server-side (#398); render its
-  // `bodyHtml` rather than parsing the raw `body` here. DOMPurify with the
-  // mirrored allowlist is the second net over the already-sanitized markup.
-  const renderedBody = DOMPurify.sanitize(page.bodyHtml ?? '', {
-    ALLOWED_TAGS: BBCODE_ALLOWED_TAGS,
-    ALLOWED_ATTR: BBCODE_ALLOWED_ATTR
-  });
 
   const handleDelete = async () => {
     if (!confirm(`Delete "${page.title}"? This cannot be undone.`)) return;
@@ -151,10 +139,10 @@ const WikiViewPage = () => {
       </div>
 
       {/* Body */}
-      <div
+      <BBCodeContent
         data-st="panel"
-        className="bbcode-content max-w-none p-6 text-[var(--st-text)] leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: renderedBody }}
+        className="max-w-none p-6 text-[var(--st-text)] leading-relaxed"
+        html={page.bodyHtml}
       />
 
       {/* Aliases */}

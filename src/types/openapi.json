@@ -545,6 +545,9 @@
           "showRatioStats": {
             "type": "boolean"
           },
+          "showMatureContent": {
+            "type": "boolean"
+          },
           "ircNick": {
             "type": "string",
             "nullable": true
@@ -560,7 +563,8 @@
           "showLastSeen",
           "showContributedStats",
           "showConsumedStats",
-          "showRatioStats"
+          "showRatioStats",
+          "showMatureContent"
         ]
       },
       "ProfileStats": {
@@ -11306,6 +11310,9 @@
                   },
                   "showRatioStats": {
                     "type": "boolean"
+                  },
+                  "showMatureContent": {
+                    "type": "boolean"
                   }
                 }
               }
@@ -11994,6 +12001,9 @@
                     "type": "boolean"
                   },
                   "showRatioStats": {
+                    "type": "boolean"
+                  },
+                  "showMatureContent": {
                     "type": "boolean"
                   }
                 }

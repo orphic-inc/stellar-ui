@@ -53,7 +53,8 @@ const toProfileForm = (profile: MyProfileResponse): ProfileForm => ({
   externalStylesheet: profile.userSettings.externalStylesheet ?? '',
   styledTooltips: profile.userSettings.styledTooltips,
   paranoia: profile.userSettings.paranoia,
-  notificationMethod: profile.userSettings.notificationMethod
+  notificationMethod: profile.userSettings.notificationMethod,
+  showMatureContent: profile.userSettings.showMatureContent
 });
 
 const Settings = () => {
@@ -428,6 +429,45 @@ const Settings = () => {
                 Styled tooltips
               </label>
             </div>
+          </div>
+
+          {/* Its own panel, and on Appearance rather than Privacy, because this
+              governs what YOU see. The five show* settings on Privacy govern
+              what OTHERS see of you, and the API keeps the two apart on purpose
+              — `paranoiaToVisibility` deliberately excludes this field, so
+              raising paranoia cannot silently change what you are shown
+              (stellar-api #400). Sitting it beside the paranoia radio would
+              imply exactly the coupling that comment exists to deny. */}
+          <div data-st="panel" className="p-5 space-y-4">
+            <h3
+              data-st="prose"
+              data-st-strong
+              className="text-sm uppercase tracking-wider"
+            >
+              Content
+            </h3>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="showMatureContent"
+                {...register('showMatureContent')}
+                data-st="field"
+              />
+              <label
+                htmlFor="showMatureContent"
+                data-st="meta"
+                className="text-sm"
+              >
+                Show mature content
+              </label>
+            </div>
+            <p data-st="meta" className="text-xs">
+              On by default. Turn it off and anything an author marked as mature
+              is replaced by a notice wherever you read — posts, comments,
+              profiles and the wiki. This changes what you see, not what other
+              members see.
+            </p>
           </div>
 
           <button

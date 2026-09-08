@@ -2840,6 +2840,7 @@ export interface paths {
             showContributedStats?: boolean;
             showConsumedStats?: boolean;
             showRatioStats?: boolean;
+            showMatureContent?: boolean;
           };
         };
       };
@@ -3372,6 +3373,7 @@ export interface paths {
             showContributedStats?: boolean;
             showConsumedStats?: boolean;
             showRatioStats?: boolean;
+            showMatureContent?: boolean;
           };
         };
       };
@@ -26289,6 +26291,7 @@ export interface components {
       showContributedStats: boolean;
       showConsumedStats: boolean;
       showRatioStats: boolean;
+      showMatureContent: boolean;
       ircNick?: string | null;
     };
     ProfileStats: {
