@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.2] — 2026-09-08
+
 ### Changed
 
 - **One re-vendor covers stellar-api's whole failure-coverage burn-down** ([api#517](https://github.com/orphic-inc/stellar-api/issues/517)) — deliberately deferred across fourteen api slices rather than run per slice, because each sync costs a PR, a review and a CI round while the drift blocks nothing: `contract:check` is not in `publish.yml`, it runs out of band and reports to a tracking issue. This is that single catch-up.
@@ -457,7 +459,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.2...HEAD
+[0.9.2]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.3...v0.9.0
 [0.8.3]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.2...v0.8.3
