@@ -13165,6 +13165,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Artist not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
@@ -13268,6 +13277,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Artist not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -13322,6 +13340,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Artist not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -13462,6 +13489,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Artist not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -27024,7 +27060,7 @@ export interface components {
       lastTopic?: {
         id: number;
         title: string;
-      };
+      } | null;
     };
     ForumCategory: {
       id: number;

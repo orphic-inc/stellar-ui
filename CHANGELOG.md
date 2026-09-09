@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.3] — 2026-09-09
+
 ### Added
 
 - **Members can turn off `[mature]` content, and the notice links them back to
@@ -70,6 +72,39 @@ All notable changes to stellar-ui are documented here.
   since these arrived as undeclared `500`s before, but it does make #308 a bigger
   and better-specified job than it was: the failures it has to route are now
   named in the contract instead of hiding inside a generic server error.
+
+- **Re-vendored the contract at 0.9.3: four `404`s on the artist relation reads,
+  and `Forum.lastTopic` is now declared nullable**
+  ([api#597](https://github.com/orphic-inc/stellar-api/pull/597),
+  [api#599](https://github.com/orphic-inc/stellar-api/pull/599)) — stellar-api
+  applied the `deletedAt` invariant to relation reads and writes, so operations
+  that could always answer `404` for a withdrawn artist now say so.
+
+  **Additive, and small.** Paths hold at **269** and schemas at **174**; nothing
+  added, nothing removed. Three path bodies changed in place — `GET` and
+  `DELETE /artists/{id}/subscribe`, `GET /artists/history/{artistId}`,
+  `GET /artists/{id}/similar` — each gaining one `404 Artist not found`.
+  `service-types:check` holds at 227 spec-typed, 0 hand-typed, and contract
+  coupling stays at `0.9`.
+
+  **One of the four is reachable from this app, not none.** Checked hook by hook
+  rather than by endpoint definition: `useGetArtistHistoryQuery` and
+  `useGetSimilarArtistsQuery` have no consumers, and `GET /subscribe`'s
+  `useGetArtistSubscriptionQuery` has none either. But
+  `useUnsubscribeArtistMutation` is live in `ArtistPage.tsx`, so
+  `DELETE /artists/{id}/subscribe` can genuinely answer `404` — a narrow race, as
+  the page only renders once `useGetArtistByIdQuery` has resolved the artist, but
+  a real one. Nothing routes it yet; that is still
+  [#308](https://github.com/orphic-inc/stellar-ui/issues/308)'s territory.
+
+  **`Forum.lastTopic` gains `nullable: true`, and the app was already right.**
+  `ForumCategoryPage` has always branched on `forum.lastTopic ? … : …` and its
+  test already covered the null case; the declaration caught up with the
+  component rather than the other way round. The change sits behind a `$ref`, so
+  every path body referencing it is byte-identical and `contract:check` counted
+  it without ever naming it — which is
+  [#314](https://github.com/orphic-inc/stellar-ui/issues/314), filed against this
+  sync.
 
 ### Fixed
 
@@ -533,7 +568,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.2...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.8.3...v0.9.0
