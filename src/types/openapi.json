@@ -9807,6 +9807,16 @@
               }
             }
           },
+          "409": {
+            "description": "A donor rank with that name already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -9926,6 +9936,16 @@
           },
           "404": {
             "description": "Donor rank not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A donor rank with that name already exists",
             "content": {
               "application/json": {
                 "schema": {
@@ -13025,7 +13045,7 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "No announcement with that id",
             "content": {
               "application/json": {
                 "schema": {
@@ -13100,7 +13120,7 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "No announcement with that id",
             "content": {
               "application/json": {
                 "schema": {
@@ -13264,7 +13284,7 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "No blog post with that id",
             "content": {
               "application/json": {
                 "schema": {
@@ -13479,7 +13499,7 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "No global notice with that id",
             "content": {
               "application/json": {
                 "schema": {
@@ -18129,6 +18149,16 @@
               }
             }
           },
+          "409": {
+            "description": "A community with that name already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -18324,6 +18354,16 @@
           },
           "404": {
             "description": "Community, or the named leader user, not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "A community with that name already exists",
             "content": {
               "application/json": {
                 "schema": {
@@ -19220,6 +19260,16 @@
           },
           "403": {
             "description": "Not a community admin or curator",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community or user not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -24260,6 +24310,16 @@
               }
             }
           },
+          "409": {
+            "description": "That similarity is already recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -24410,6 +24470,16 @@
           },
           "401": {
             "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Tag vote already being recorded, retry",
             "content": {
               "application/json": {
                 "schema": {
@@ -32286,6 +32356,16 @@
               }
             }
           },
+          "409": {
+            "description": "That tag alias already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -32387,6 +32467,16 @@
           },
           "404": {
             "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "That tag alias already exists",
             "content": {
               "application/json": {
                 "schema": {
@@ -33566,6 +33656,16 @@
               }
             }
           },
+          "409": {
+            "description": "A collage with that name already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -33752,6 +33852,16 @@
           },
           "403": {
             "description": "Not the owner or collage staff, or a staff-only field was sent by a non-staff caller (isLocked, maxEntries, maxEntriesPerUser, or name on a public collage)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Collage not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -34731,6 +34841,16 @@
               }
             }
           },
+          "409": {
+            "description": "A page with this slug already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -34978,6 +35098,16 @@
           },
           "404": {
             "description": "Not found, or above the caller read level",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The page changed while you were editing, reload",
             "content": {
               "application/json": {
                 "schema": {
@@ -35420,6 +35550,16 @@
           },
           "404": {
             "description": "Page or revision not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The page changed while you were rolling back, reload",
             "content": {
               "application/json": {
                 "schema": {
@@ -36530,6 +36670,9 @@
               }
             }
           },
+          "404": {
+            "description": "No artist with that id"
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -36755,6 +36898,9 @@
               }
             }
           },
+          "404": {
+            "description": "No release with that id"
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -36959,6 +37105,9 @@
               }
             }
           },
+          "404": {
+            "description": "No communitie with that id"
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -37158,6 +37307,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "No request with that id"
           },
           "429": {
             "description": "Rate limited",

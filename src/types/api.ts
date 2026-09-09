@@ -1535,6 +1535,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A donor rank with that name already exists */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -1626,6 +1635,15 @@ export interface paths {
         };
         /** @description Donor rank not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description A donor rank with that name already exists */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -4285,7 +4303,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not found */
+        /** @description No announcement with that id */
         404: {
           headers: {
             [name: string]: unknown;
@@ -4351,7 +4369,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not found */
+        /** @description No announcement with that id */
         404: {
           headers: {
             [name: string]: unknown;
@@ -4509,7 +4527,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not found */
+        /** @description No blog post with that id */
         404: {
           headers: {
             [name: string]: unknown;
@@ -4723,7 +4741,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not found */
+        /** @description No global notice with that id */
         404: {
           headers: {
             [name: string]: unknown;
@@ -8698,6 +8716,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A community with that name already exists */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -8840,6 +8867,15 @@ export interface paths {
         };
         /** @description Community, or the named leader user, not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description A community with that name already exists */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -9602,6 +9638,15 @@ export interface paths {
         };
         /** @description Not a community admin or curator */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community or user not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -13486,6 +13531,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description That similarity is already recorded */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -13617,6 +13671,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Tag vote already being recorded, retry */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -19851,6 +19914,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description That tag alias already exists */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -19932,6 +20004,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description That tag alias already exists */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -20838,6 +20919,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A collage with that name already exists */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -20980,6 +21070,15 @@ export interface paths {
         };
         /** @description Not the owner or collage staff, or a staff-only field was sent by a non-staff caller (isLocked, maxEntries, maxEntriesPerUser, or name on a public collage) */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Collage not found */
+        404: {
           headers: {
             [name: string]: unknown;
           };
@@ -21778,6 +21877,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A page with this slug already exists */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -21991,6 +22099,15 @@ export interface paths {
         };
         /** @description Not found, or above the caller read level */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The page changed while you were editing, reload */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -22385,6 +22502,15 @@ export interface paths {
         };
         /** @description Page or revision not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The page changed while you were rolling back, reload */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -23296,6 +23422,13 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description No artist with that id */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -23467,6 +23600,13 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description No release with that id */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -23633,6 +23773,13 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description No communitie with that id */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -23797,6 +23944,13 @@ export interface paths {
           content: {
             'application/json': components['schemas']['MsgResponse'];
           };
+        };
+        /** @description No request with that id */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
         };
         /** @description Rate limited */
         429: {

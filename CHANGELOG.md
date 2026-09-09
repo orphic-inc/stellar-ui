@@ -36,6 +36,35 @@ All notable changes to stellar-ui are documented here.
   for SPA navigation. Matched on the class, not the copy, so the API may reword
   the notice without silently breaking the link.
 
+### Changed
+
+- **Re-vendored the contract: eighteen constraint violations that used to arrive
+  as `500`s are now declared** ([api#564](https://github.com/orphic-inc/stellar-api/issues/564))
+  — stellar-api finished guarding every gated route mutation against Prisma
+  constraint errors, so an operation that could always answer `404` or `409` now
+  says so. **21 paths moved**, and this is the single catch-up for the whole
+  eight-PR burn-down rather than a sync per slice.
+
+  **Purely additive — 18 response codes added, none removed.** Twelve `409`s
+  (`/collages`, `/communities`, `/tag-aliases`, `/wiki`, `/artists/similar`,
+  `/artists/tag`, `/users/donor-ranks` and their `{id}` forms) and six `404`s
+  (the four `/bookmarks/*` toggles, `PUT /collages/{id}`, and
+  `DELETE /communities/{id}/curators/{userId}`). Verified operation by operation
+  against the previous vendored document rather than inferred from the diff:
+  **zero responses removed, zero body types changed**, paths and schemas hold at
+  **269** and **174**, operations at **364**. `service-types:check` stays at 227
+  spec-typed, 0 hand-typed, and contract coupling stays at `0.9`.
+
+  Four `/announcements` `404`s also lose their bare `Not found` for the id they
+  actually mean — a description rewrite, not a shape change.
+
+  **Nothing in the app handles the new codes**, which is still
+  [#308](https://github.com/orphic-inc/stellar-ui/issues/308)'s territory —
+  `baseQueryWithLogout` handles `401` and nothing else. That is not a regression,
+  since these arrived as undeclared `500`s before, but it does make #308 a bigger
+  and better-specified job than it was: the failures it has to route are now
+  named in the contract instead of hiding inside a generic server error.
+
 ### Fixed
 
 - **The BBCode disclosure and gated-notice classes had no styles at all** — the
