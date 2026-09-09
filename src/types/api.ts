@@ -23773,7 +23773,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description No communitie with that id */
+        /** @description No community with that id */
         404: {
           headers: {
             [name: string]: unknown;

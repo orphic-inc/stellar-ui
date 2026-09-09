@@ -58,6 +58,12 @@ All notable changes to stellar-ui are documented here.
   Four `/announcements` `404`s also lose their bare `Not found` for the id they
   actually mean — a description rewrite, not a shape change.
 
+  The `/bookmarks/communities` `404` reads `No community with that id` rather
+  than the `No communitie` a noun-deriving helper produced upstream; vendoring
+  this contract is what surfaced it, and
+  [api#595](https://github.com/orphic-inc/stellar-api/pull/595) fixed it at the
+  source before this landed rather than owing a second sync.
+
   **Nothing in the app handles the new codes**, which is still
   [#308](https://github.com/orphic-inc/stellar-ui/issues/308)'s territory —
   `baseQueryWithLogout` handles `401` and nothing else. That is not a regression,
