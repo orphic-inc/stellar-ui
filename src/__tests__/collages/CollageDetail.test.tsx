@@ -74,42 +74,58 @@ const makeContribution = (overrides: Record<string, unknown> = {}) => ({
   ...overrides
 });
 
+const defaultCollage = () => ({
+  id: 8,
+  userId: 7,
+  name: 'Synth Pop',
+  categoryId: 1,
+  isLocked: false,
+  isDeleted: false,
+  isSubscribed: false,
+  isBookmarked: false,
+  numEntries: 1,
+  numVisibleEntries: 1,
+  numSubscribers: 4,
+  description: 'A collage',
+  tags: ['electronic'],
+  user: { username: 'alice' },
+  entries: [
+    {
+      id: 1,
+      releaseId: 55,
+      userId: 7,
+      user: { username: 'alice' },
+      release: {
+        title: 'Release',
+        image: null,
+        communityId: 2,
+        artist: { name: 'Artist' }
+      }
+    }
+  ]
+});
+
+// One collage entry, for the cover-preference cases. Only `group` and `release`
+// vary between them, so spelling out the rest per entry buries what differs.
+const coverEntry = (
+  id: number,
+  releaseId: number,
+  overrides: Record<string, unknown>
+) => ({
+  id,
+  releaseId,
+  userId: 7,
+  user: { id: 7, username: 'alice' },
+  ...overrides
+});
+
 describe('CollageDetail', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.confirm = jest.fn(() => true);
     window.alert = jest.fn();
     mockUseGetCollageQuery.mockReturnValue({
-      data: {
-        id: 8,
-        userId: 7,
-        name: 'Synth Pop',
-        categoryId: 1,
-        isLocked: false,
-        isDeleted: false,
-        isSubscribed: false,
-        isBookmarked: false,
-        numEntries: 1,
-        numVisibleEntries: 1,
-        numSubscribers: 4,
-        description: 'A collage',
-        tags: ['electronic'],
-        user: { username: 'alice' },
-        entries: [
-          {
-            id: 1,
-            releaseId: 55,
-            userId: 7,
-            user: { username: 'alice' },
-            release: {
-              title: 'Release',
-              image: null,
-              communityId: 2,
-              artist: { name: 'Artist' }
-            }
-          }
-        ]
-      },
+      data: defaultCollage(),
       isLoading: false,
       error: undefined
     });
@@ -608,41 +624,22 @@ describe('CollageDetail', () => {
   it('uses the group cover in the mosaic and the row, including where the release has none', () => {
     mockUseGetCollageQuery.mockReturnValue({
       data: {
-        id: 8,
-        userId: 7,
-        name: 'Synth Pop',
-        categoryId: 1,
-        isLocked: false,
-        isDeleted: false,
-        isSubscribed: false,
-        isBookmarked: false,
+        ...defaultCollage(),
         numEntries: 2,
         numVisibleEntries: 2,
-        numSubscribers: 0,
-        description: null,
-        tags: [],
-        user: { username: 'alice' },
         entries: [
-          {
-            id: 1,
-            releaseId: 55,
-            userId: 7,
-            user: { id: 7, username: 'alice' },
+          coverEntry(1, 55, {
             group: { id: 3, title: 'Kid A', image: 'https://e/group.jpg' },
             release: { title: 'Kid A', image: null, communityId: 2 }
-          },
-          {
-            id: 2,
-            releaseId: 56,
-            userId: 7,
-            user: { id: 7, username: 'alice' },
+          }),
+          coverEntry(2, 56, {
             group: { id: 4, title: 'Amnesiac', image: null },
             release: {
               title: 'Amnesiac',
               image: 'https://e/own.jpg',
               communityId: 2
             }
-          }
+          })
         ]
       },
       isLoading: false,
