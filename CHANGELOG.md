@@ -30,6 +30,29 @@ All notable changes to stellar-ui are documented here.
   The panel does not render for an ungrouped release, and fires no request for
   one — which is most of them, since grouping is opt-in and never backfilled.
 
+- **A collage row that stands for two entries says so, and removing it removes
+  the album** ([#319](https://github.com/orphic-inc/stellar-ui/issues/319)) —
+  `GET /collages/{id}` now collapses entries that are the same album catalogued
+  in two communities. The surviving row carries a copy-count chip, and expanding
+  it lists the absorbed copies above the edition stack, each linking into **its
+  own** community.
+
+  **`×` now means "remove the album", not "remove this row".** Deleting only the
+  representative left the absorbed copy behind, to resurface as its own row on
+  the next load. The deletable copies are computed **before** anything is sent,
+  from the same per-row permission the button itself uses — the collage owner,
+  that row's own adder, or collage staff — so the confirm states the outcome up
+  front ("you can remove 1 — the rest were added by other members and will
+  stay") and **no request is fired that is already known to be refused.**
+
+  Deletions run one at a time and stop on a `429` rather than firing the
+  remainder into the same rate limit. The catch is kept regardless: `403` also
+  covers a locked collage, which the client-side predicate cannot see.
+
+  The absorbed copies are shown by title and linked by community id. The collage
+  response carries no community **name** — for the entry or its copies — and
+  naming them would cost a request per expanded row.
+
 ### Changed
 
 - **The vendored contract picks up the whole `ReleaseGroup` surface** — nine

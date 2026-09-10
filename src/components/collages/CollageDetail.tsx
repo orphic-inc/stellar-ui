@@ -10,6 +10,7 @@ import {
   useAddCollageEntryMutation,
   useRemoveCollageEntryMutation
 } from '../../store/services/collageApi';
+import type { CollageEntry } from '../../store/services/collageApi';
 import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import { releaseCover } from '../../utils/releaseCover';
@@ -164,12 +165,75 @@ const CollageDetail = () => {
     }
   };
 
-  const handleRemoveEntry = async (releaseId: number) => {
-    if (!confirm('Remove this release from the collage?')) return;
-    try {
-      await removeEntry({ id: collageId, releaseId }).unwrap();
-    } catch {
-      alert('Failed to remove entry.');
+  // Delete permission is per ROW: the collage owner, that row's own adder, or
+  // collage staff. Two entries collapsed onto one line can have two different
+  // adders, so this is asked once per copy rather than once per row.
+  const canRemoveRow = (addedByUserId: number) =>
+    isOwner || isStaff || addedByUserId === user?.id;
+
+  /**
+   * Remove "the album", not "this row" (#319).
+   *
+   * A collapsed row stands for every entry in `groupedWith` as well as itself.
+   * Deleting only the representative leaves the absorbed copy behind, and it
+   * resurfaces as its own row on the next load — correct api behaviour, and a
+   * surprising thing for a UI to do.
+   *
+   * The deletable subset is computed BEFORE anything is sent, using the same
+   * predicate that decides whether to show this button, so the confirm can
+   * state the outcome and no request is fired that is already known to 403.
+   * That matters twice over: `DELETE …/entries/{releaseId}` is rate-limited,
+   * and deliberately-doomed calls would spend that budget to learn what the
+   * response already told us.
+   *
+   * The catch stays regardless — `403` also covers "the collage is locked",
+   * which this predicate cannot see, and a row can vanish between render and
+   * click.
+   */
+  const handleRemoveEntry = async (entry: CollageEntry) => {
+    const copies = [
+      { releaseId: entry.releaseId, userId: entry.userId },
+      ...(entry.groupedWith ?? []).map((m) => ({
+        releaseId: m.releaseId,
+        userId: m.userId
+      }))
+    ];
+    const removable = copies.filter((c) => canRemoveRow(c.userId));
+    if (removable.length === 0) return;
+
+    const title = entry.release?.title ?? `Release #${entry.releaseId}`;
+    let msg: string;
+    if (copies.length === 1) {
+      msg = 'Remove this release from the collage?';
+    } else if (removable.length === copies.length) {
+      msg =
+        `Remove “${title}” from the collage?\n\n` +
+        `It is held here under ${copies.length} releases — all ${copies.length} will be removed.`;
+    } else {
+      msg =
+        `Remove “${title}” from the collage?\n\n` +
+        `It is held here under ${copies.length} releases. You can remove ` +
+        `${removable.length} — the rest were added by other members and will stay.`;
+    }
+    if (!confirm(msg)) return;
+
+    // Sequential, not parallel: the endpoint is rate-limited, and a 429 partway
+    // through should stop rather than fire the remainder into the same limit.
+    for (const copy of removable) {
+      try {
+        await removeEntry({
+          id: collageId,
+          releaseId: copy.releaseId
+        }).unwrap();
+      } catch (err: unknown) {
+        const e = err as { status?: number };
+        alert(
+          e?.status === 429
+            ? 'Too many requests — some copies were not removed. Try again shortly.'
+            : 'Failed to remove entry.'
+        );
+        return;
+      }
     }
   };
 
@@ -322,6 +386,19 @@ const CollageDetail = () => {
                   const communityId = entry.release?.communityId ?? null;
                   const cover = releaseCover(entry.group, entry.release);
                   const isExpanded = expandedId === entry.releaseId;
+                  // Entries the api folded into this one because they share a
+                  // release group (#319). Empty for almost every row — it only
+                  // fills when one collage holds the same album under two
+                  // communities' releases.
+                  const absorbed = entry.groupedWith ?? [];
+                  const copyCount = absorbed.length + 1;
+                  // Shown when the viewer may remove ANY copy, not only the
+                  // representative: two collapsed entries can have two adders,
+                  // and "remove the album" is still meaningful when only one of
+                  // them is yours.
+                  const canRemoveAny =
+                    canRemoveRow(entry.userId) ||
+                    absorbed.some((m) => canRemoveRow(m.userId));
                   return (
                     <div key={entry.id}>
                       <div
@@ -336,7 +413,7 @@ const CollageDetail = () => {
                         <span className="text-xs text-gray-600 w-6 shrink-0 text-right">
                           {i + 1}
                         </span>
-                        {communityId != null && (
+                        {(communityId != null || absorbed.length > 0) && (
                           <button
                             type="button"
                             aria-expanded={isExpanded}
@@ -377,18 +454,56 @@ const CollageDetail = () => {
                             </div>
                           )}
                         </div>
+                        {absorbed.length > 0 && (
+                          <span data-st="chip" className="shrink-0 text-xs">
+                            {copyCount} copies
+                          </span>
+                        )}
                         <span className="text-xs text-gray-600 shrink-0">
                           added by {entry.user?.username ?? '—'}
                         </span>
-                        {(isOwner || isStaff || entry.userId === user?.id) && (
+                        {canRemoveAny && (
                           <button
-                            onClick={() => handleRemoveEntry(entry.releaseId)}
+                            onClick={() => handleRemoveEntry(entry)}
                             className="text-xs text-red-600 hover:text-red-400 shrink-0"
                           >
                             [X]
                           </button>
                         )}
                       </div>
+                      {isExpanded && absorbed.length > 0 && (
+                        <div data-st="list" data-testid="grouped-with">
+                          <div data-st="meta" className="px-3 py-1 text-xs">
+                            Other copies in this collage
+                          </div>
+                          {absorbed.map((m) => (
+                            <div
+                              key={m.id}
+                              data-st="row"
+                              className="px-3 py-1 text-xs"
+                            >
+                              {/* Linked by title and community id — the collage
+                                  response carries no community NAME for either
+                                  the entry or its absorbed copies, and naming
+                                  them would cost a second request per row. */}
+                              <Link
+                                to={`/communities/${
+                                  m.communityId ?? 0
+                                }/releases/${m.releaseId}`}
+                                data-st="title"
+                                className="flex-1 min-w-0 truncate"
+                              >
+                                {m.title}
+                              </Link>
+                              {!canRemoveRow(m.userId) && (
+                                <span data-st="meta" className="shrink-0">
+                                  not yours to remove
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       {isExpanded && communityId != null && (
                         <EntryEditions
                           communityId={communityId}
