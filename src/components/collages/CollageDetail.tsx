@@ -11,12 +11,11 @@ import {
   useRemoveCollageEntryMutation
 } from '../../store/services/collageApi';
 import type { CollageEntry } from '../../store/services/collageApi';
-import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import { releaseCover } from '../../utils/releaseCover';
+import CollageEntryRow from './CollageEntryRow';
 import Spinner from '../layout/Spinner';
 import CommentsSection from '../layout/CommentsSection';
-import EditionStack from '../communities/EditionStack';
 
 const CATEGORY_LABELS: Record<number, string> = {
   0: 'Personal',
@@ -26,38 +25,6 @@ const CATEGORY_LABELS: Record<number, string> = {
   4: 'Charts',
   5: 'Staff Picks',
   6: 'Other'
-};
-
-// Lazy edition disclosure for one collage entry — fetches the release's
-// contributions only once its row is expanded (this component mounts on
-// expand), then renders the read-only edition stack. Downloads/reports live on
-// the release page, so no actions here.
-const EntryEditions = ({
-  communityId,
-  releaseId
-}: {
-  communityId: number;
-  releaseId: number;
-}) => {
-  const { data, isFetching } = useGetReleaseContributionsQuery({
-    communityId,
-    releaseId
-  });
-  if (isFetching && !data) {
-    return (
-      <div data-st="meta" className="px-3 py-2 text-xs">
-        Loading editions…
-      </div>
-    );
-  }
-  if (!data || data.length === 0) {
-    return (
-      <div data-st="meta" className="px-3 py-2 text-xs">
-        No files contributed yet.
-      </div>
-    );
-  }
-  return <EditionStack contributions={data} />;
 };
 
 const CollageDetail = () => {
@@ -382,137 +349,22 @@ const CollageDetail = () => {
               <p className="px-4 py-4 text-sm text-gray-500">No entries yet.</p>
             ) : (
               <div data-st="list">
-                {collage.entries.map((entry, i) => {
-                  const communityId = entry.release?.communityId ?? null;
-                  const cover = releaseCover(entry.group, entry.release);
-                  const isExpanded = expandedId === entry.releaseId;
-                  // Entries the api folded into this one because they share a
-                  // release group (#319). Empty for almost every row — it only
-                  // fills when one collage holds the same album under two
-                  // communities' releases.
-                  const absorbed = entry.groupedWith ?? [];
-                  const copyCount = absorbed.length + 1;
-                  // Shown when the viewer may remove ANY copy, not only the
-                  // representative: two collapsed entries can have two adders,
-                  // and "remove the album" is still meaningful when only one of
-                  // them is yours.
-                  const canRemoveAny =
-                    canRemoveRow(entry.userId) ||
-                    absorbed.some((m) => canRemoveRow(m.userId));
-                  return (
-                    <div key={entry.id}>
-                      <div
-                        id={`entry-${entry.releaseId}`}
-                        data-st="row"
-                        className={
-                          highlightedId === entry.releaseId
-                            ? 'bg-indigo-900/30'
-                            : undefined
-                        }
-                      >
-                        <span className="text-xs text-gray-600 w-6 shrink-0 text-right">
-                          {i + 1}
-                        </span>
-                        {(communityId != null || absorbed.length > 0) && (
-                          <button
-                            type="button"
-                            aria-expanded={isExpanded}
-                            aria-label={`${
-                              isExpanded ? 'Hide' : 'Show'
-                            } editions`}
-                            onClick={() =>
-                              setExpandedId(isExpanded ? null : entry.releaseId)
-                            }
-                            className="text-xs text-gray-500 hover:text-gray-300 shrink-0 w-4"
-                          >
-                            {isExpanded ? '−' : '+'}
-                          </button>
-                        )}
-                        {cover ? (
-                          <img
-                            src={cover}
-                            alt=""
-                            className="w-8 h-8 object-cover rounded shrink-0"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 bg-gray-800 rounded shrink-0" />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <Link
-                            to={`/communities/${
-                              communityId ?? 0
-                            }/releases/${entry.releaseId}`}
-                            data-st="title"
-                            className="block truncate"
-                          >
-                            {entry.release?.title ??
-                              `Release #${entry.releaseId}`}
-                          </Link>
-                          {entry.release?.artist?.name && (
-                            <div data-st="meta" data-st-em className="text-xs">
-                              {entry.release.artist.name}
-                            </div>
-                          )}
-                        </div>
-                        {absorbed.length > 0 && (
-                          <span data-st="chip" className="shrink-0 text-xs">
-                            {copyCount} copies
-                          </span>
-                        )}
-                        <span className="text-xs text-gray-600 shrink-0">
-                          added by {entry.user?.username ?? '—'}
-                        </span>
-                        {canRemoveAny && (
-                          <button
-                            onClick={() => handleRemoveEntry(entry)}
-                            className="text-xs text-red-600 hover:text-red-400 shrink-0"
-                          >
-                            [X]
-                          </button>
-                        )}
-                      </div>
-                      {isExpanded && absorbed.length > 0 && (
-                        <div data-st="list" data-testid="grouped-with">
-                          <div data-st="meta" className="px-3 py-1 text-xs">
-                            Other copies in this collage
-                          </div>
-                          {absorbed.map((m) => (
-                            <div
-                              key={m.id}
-                              data-st="row"
-                              className="px-3 py-1 text-xs"
-                            >
-                              {/* Linked by title and community id — the collage
-                                  response carries no community NAME for either
-                                  the entry or its absorbed copies, and naming
-                                  them would cost a second request per row. */}
-                              <Link
-                                to={`/communities/${
-                                  m.communityId ?? 0
-                                }/releases/${m.releaseId}`}
-                                data-st="title"
-                                className="flex-1 min-w-0 truncate"
-                              >
-                                {m.title}
-                              </Link>
-                              {!canRemoveRow(m.userId) && (
-                                <span data-st="meta" className="shrink-0">
-                                  not yours to remove
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {isExpanded && communityId != null && (
-                        <EntryEditions
-                          communityId={communityId}
-                          releaseId={entry.releaseId}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                {collage.entries.map((entry, i) => (
+                  <CollageEntryRow
+                    key={entry.id}
+                    entry={entry}
+                    index={i}
+                    isExpanded={expandedId === entry.releaseId}
+                    isHighlighted={highlightedId === entry.releaseId}
+                    onToggleExpand={() =>
+                      setExpandedId(
+                        expandedId === entry.releaseId ? null : entry.releaseId
+                      )
+                    }
+                    canRemoveRow={canRemoveRow}
+                    onRemove={() => handleRemoveEntry(entry)}
+                  />
+                ))}
               </div>
             )}
           </div>
