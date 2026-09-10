@@ -600,4 +600,73 @@ describe('CollageDetail', () => {
     expect(stats).not.toBeNull();
     expect(stats).toHaveTextContent(/Entries\s*12/);
   });
+
+  // #318 — the entry has NO release art and a group cover. The previous
+  // `filter(e => e.release?.image)` dropped it from the mosaic before any
+  // fallback could run, so resolving the cover before filtering is the
+  // behaviour under test, not just the preference order.
+  it('uses the group cover in the mosaic and the row, including where the release has none', () => {
+    mockUseGetCollageQuery.mockReturnValue({
+      data: {
+        id: 8,
+        userId: 7,
+        name: 'Synth Pop',
+        categoryId: 1,
+        isLocked: false,
+        isDeleted: false,
+        isSubscribed: false,
+        isBookmarked: false,
+        numEntries: 2,
+        numVisibleEntries: 2,
+        numSubscribers: 0,
+        description: null,
+        tags: [],
+        user: { username: 'alice' },
+        entries: [
+          {
+            id: 1,
+            releaseId: 55,
+            userId: 7,
+            user: { id: 7, username: 'alice' },
+            group: { id: 3, title: 'Kid A', image: 'https://e/group.jpg' },
+            release: { title: 'Kid A', image: null, communityId: 2 }
+          },
+          {
+            id: 2,
+            releaseId: 56,
+            userId: 7,
+            user: { id: 7, username: 'alice' },
+            group: { id: 4, title: 'Amnesiac', image: null },
+            release: {
+              title: 'Amnesiac',
+              image: 'https://e/own.jpg',
+              communityId: 2
+            }
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CollageDetail />);
+
+    // Scoped to the mosaic, NOT every <img> on the page: the row thumbnail
+    // renders the same URL, so a document-wide query passes whether or not the
+    // mosaic kept the entry — it cannot tell the two sites apart. Verified by
+    // restoring the old filter-then-map order, which this catches and a
+    // document-wide query did not.
+    const mosaic = [
+      ...document.querySelectorAll('[data-st="coverart-cell"] img')
+    ].map((i) => i.getAttribute('src'));
+    // The group cover survives an entry whose own release art is null...
+    expect(mosaic).toContain('https://e/group.jpg');
+    // ...and a group with no cover art falls through to the release's own.
+    expect(mosaic).toContain('https://e/own.jpg');
+
+    const rowThumbs = [...document.querySelectorAll('[data-st="row"] img')].map(
+      (i) => i.getAttribute('src')
+    );
+    expect(rowThumbs).toContain('https://e/group.jpg');
+    expect(rowThumbs).toContain('https://e/own.jpg');
+  });
 });
