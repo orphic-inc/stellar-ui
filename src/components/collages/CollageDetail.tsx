@@ -13,6 +13,11 @@ import {
 import type { CollageEntry } from '../../store/services/collageApi';
 import { hasAnyPermission } from '../../utils/permissions';
 import { releaseCover } from '../../utils/releaseCover';
+import {
+  collapsedCopies,
+  removalConfirmMessage,
+  removalFailureMessage
+} from '../../utils/collageRemoval';
 import CollageEntryRow from './CollageEntryRow';
 import Spinner from '../layout/Spinner';
 import CommentsSection from '../layout/CommentsSection';
@@ -158,31 +163,16 @@ const CollageDetail = () => {
    * click.
    */
   const handleRemoveEntry = async (entry: CollageEntry) => {
-    const copies = [
-      { releaseId: entry.releaseId, userId: entry.userId },
-      ...(entry.groupedWith ?? []).map((m) => ({
-        releaseId: m.releaseId,
-        userId: m.userId
-      }))
-    ];
+    const copies = collapsedCopies(entry);
     const removable = copies.filter((c) => canRemoveRow(c.userId));
     if (removable.length === 0) return;
 
     const title = entry.release?.title ?? `Release #${entry.releaseId}`;
-    let msg: string;
-    if (copies.length === 1) {
-      msg = 'Remove this release from the collage?';
-    } else if (removable.length === copies.length) {
-      msg =
-        `Remove “${title}” from the collage?\n\n` +
-        `It is held here under ${copies.length} releases — all ${copies.length} will be removed.`;
-    } else {
-      msg =
-        `Remove “${title}” from the collage?\n\n` +
-        `It is held here under ${copies.length} releases. You can remove ` +
-        `${removable.length} — the rest were added by other members and will stay.`;
+    if (
+      !confirm(removalConfirmMessage(title, copies.length, removable.length))
+    ) {
+      return;
     }
-    if (!confirm(msg)) return;
 
     // Sequential, not parallel: the endpoint is rate-limited, and a 429 partway
     // through should stop rather than fire the remainder into the same limit.
@@ -193,12 +183,7 @@ const CollageDetail = () => {
           releaseId: copy.releaseId
         }).unwrap();
       } catch (err: unknown) {
-        const e = err as { status?: number };
-        alert(
-          e?.status === 429
-            ? 'Too many requests — some copies were not removed. Try again shortly.'
-            : 'Failed to remove entry.'
-        );
+        alert(removalFailureMessage(err));
         return;
       }
     }

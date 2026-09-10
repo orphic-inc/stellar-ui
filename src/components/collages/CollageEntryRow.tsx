@@ -65,6 +65,111 @@ const EntryActions = ({
   </>
 );
 
+/**
+ * What the row DISPLAYS. Every optional chain here is one field of the entry
+ * being absent on the wire; none of them is a decision.
+ */
+const describeDisplay = (entry: CollageEntry) => {
+  // Every chain here is load-bearing against this repo's own tests, not the
+  // contract. `CollageEntry` marks `release` and `user` required and
+  // non-nullable, but two pre-existing tests contradict it — one named for
+  // rendering "with null user", one whose entries carry no `release` at all —
+  // so the guards stay. `communityId` and `artist` need theirs on the
+  // contract's own terms: the first is absent from the required set, the
+  // second is nullable.
+  const communityId = entry.release?.communityId ?? null;
+  return {
+    communityId,
+    cover: releaseCover(entry.group, entry.release),
+    href: `/communities/${communityId ?? 0}/releases/${entry.releaseId}`,
+    title: entry.release?.title ?? `Release #${entry.releaseId}`,
+    artist: entry.release?.artist?.name ?? null,
+    addedBy: entry.user?.username ?? '—'
+  };
+};
+
+/**
+ * What the row STANDS FOR. A row is not always one entry: where the api
+ * collapsed entries sharing a release group (#319) it stands for every copy in
+ * `groupedWith` too, and these three are the decisions that follow from it.
+ */
+const describeCollapse = (
+  entry: CollageEntry,
+  hasCommunity: boolean,
+  canRemoveRow: (addedByUserId: number) => boolean
+) => {
+  const absorbed = entry.groupedWith ?? [];
+  return {
+    absorbed,
+    // null rather than 0, so the render never asks "is this a collapsed row?"
+    copyCount: absorbed.length > 0 ? absorbed.length + 1 : null,
+    // Something to disclose: editions (which need a community) or absorbed
+    // copies (which do not), so a collapsed row opens either way.
+    hasDisclosure: hasCommunity || absorbed.length > 0,
+    // The viewer may remove ANY copy, not only the representative: two
+    // collapsed entries can have two adders, and "remove the album" is still
+    // meaningful when only one of them is yours.
+    canRemoveAny:
+      canRemoveRow(entry.userId) || absorbed.some((m) => canRemoveRow(m.userId))
+  };
+};
+
+const describeEntry = (
+  entry: CollageEntry,
+  canRemoveRow: (addedByUserId: number) => boolean
+) => {
+  const display = describeDisplay(entry);
+  return {
+    ...display,
+    ...describeCollapse(entry, display.communityId !== null, canRemoveRow)
+  };
+};
+
+/**
+ * The +/- disclosure. Present whenever the row has something to disclose:
+ * editions (which need a community) or absorbed copies (which do not) — so a
+ * collapsed row is openable even where the representative has no community.
+ */
+const EntryDisclosure = ({
+  isExpanded,
+  onToggle
+}: {
+  isExpanded: boolean;
+  onToggle: () => void;
+}) => (
+  <button
+    type="button"
+    aria-expanded={isExpanded}
+    aria-label={`${isExpanded ? 'Hide' : 'Show'} editions`}
+    onClick={onToggle}
+    className="text-xs text-gray-500 hover:text-gray-300 shrink-0 w-4"
+  >
+    {isExpanded ? '−' : '+'}
+  </button>
+);
+
+/** The release link and its artist line. */
+const EntryTitle = ({
+  href,
+  title,
+  artist
+}: {
+  href: string;
+  title: string;
+  artist: string | null;
+}) => (
+  <div className="flex-1 min-w-0">
+    <Link to={href} data-st="title" className="block truncate">
+      {title}
+    </Link>
+    {artist && (
+      <div data-st="meta" data-st-em className="text-xs">
+        {artist}
+      </div>
+    )}
+  </div>
+);
+
 const CollageEntryRow = ({
   entry,
   index,
@@ -82,14 +187,7 @@ const CollageEntryRow = ({
   canRemoveRow: (addedByUserId: number) => boolean;
   onRemove: () => void;
 }) => {
-  const communityId = entry.release?.communityId ?? null;
-  const cover = releaseCover(entry.group, entry.release);
-  const absorbed = entry.groupedWith ?? [];
-  // Shown when the viewer may remove ANY copy, not only the representative:
-  // two collapsed entries can have two adders, and "remove the album" is still
-  // meaningful when only one of them is yours.
-  const canRemoveAny =
-    canRemoveRow(entry.userId) || absorbed.some((m) => canRemoveRow(m.userId));
+  const view = describeEntry(entry, canRemoveRow);
 
   return (
     <div>
@@ -101,43 +199,25 @@ const CollageEntryRow = ({
         <span className="text-xs text-gray-600 w-6 shrink-0 text-right">
           {index + 1}
         </span>
-        {(communityId != null || absorbed.length > 0) && (
-          <button
-            type="button"
-            aria-expanded={isExpanded}
-            aria-label={`${isExpanded ? 'Hide' : 'Show'} editions`}
-            onClick={onToggleExpand}
-            className="text-xs text-gray-500 hover:text-gray-300 shrink-0 w-4"
-          >
-            {isExpanded ? '−' : '+'}
-          </button>
+        {view.hasDisclosure && (
+          <EntryDisclosure isExpanded={isExpanded} onToggle={onToggleExpand} />
         )}
-        <EntryCover src={cover} />
-        <div className="flex-1 min-w-0">
-          <Link
-            to={`/communities/${communityId ?? 0}/releases/${entry.releaseId}`}
-            data-st="title"
-            className="block truncate"
-          >
-            {entry.release?.title ?? `Release #${entry.releaseId}`}
-          </Link>
-          {entry.release?.artist?.name && (
-            <div data-st="meta" data-st-em className="text-xs">
-              {entry.release.artist.name}
-            </div>
-          )}
-        </div>
+        <EntryCover src={view.cover} />
+        <EntryTitle href={view.href} title={view.title} artist={view.artist} />
         <EntryActions
-          copyCount={absorbed.length > 0 ? absorbed.length + 1 : null}
-          addedBy={entry.user?.username ?? '—'}
-          onRemove={canRemoveAny ? onRemove : null}
+          copyCount={view.copyCount}
+          addedBy={view.addedBy}
+          onRemove={view.canRemoveAny ? onRemove : null}
         />
       </div>
-      {isExpanded && absorbed.length > 0 && (
-        <AbsorbedCopies absorbed={absorbed} canRemoveRow={canRemoveRow} />
+      {isExpanded && view.copyCount !== null && (
+        <AbsorbedCopies absorbed={view.absorbed} canRemoveRow={canRemoveRow} />
       )}
-      {isExpanded && communityId != null && (
-        <EntryEditions communityId={communityId} releaseId={entry.releaseId} />
+      {isExpanded && view.communityId !== null && (
+        <EntryEditions
+          communityId={view.communityId}
+          releaseId={entry.releaseId}
+        />
       )}
     </div>
   );
