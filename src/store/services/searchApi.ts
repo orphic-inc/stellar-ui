@@ -49,6 +49,25 @@ export type SearchUsersParams = NonNullable<
 export type UserSearchResult =
   paths['/search/users']['get']['responses'][200]['content']['application/json']['data'][number];
 
+// ── Release-group search ──────────────────────────────────────────────────────
+
+/**
+ * `/search/release-groups` takes the same filters as `/search/releases` but a
+ * DIFFERENT sort vocabulary, and the difference is not cosmetic: `consumers`,
+ * `contributors` and `random` are release properties with no group analogue,
+ * and passing one produces a 400. See `GROUP_ORDER_BY` in ReleaseBrowsePage,
+ * which reconciles the two rather than letting a toggle send an invalid value.
+ *
+ * There is deliberately no member-count ordering: the api can only count a
+ * group's whole relation, not the part this viewer may see, so ranking by it
+ * would expose a number including members they cannot reach.
+ */
+export type SearchReleaseGroupsParams = NonNullable<
+  paths['/search/release-groups']['get']['parameters']['query']
+>;
+export type ReleaseGroupSearchResult =
+  paths['/search/release-groups']['get']['responses'][200]['content']['application/json']['data'][number];
+
 // ── Random ────────────────────────────────────────────────────────────────────
 
 export type RandomRelease =
@@ -66,6 +85,14 @@ export const searchApi = api.injectEndpoints({
     >({
       query: (params) => ({ url: '/search/releases', params }),
       providesTags: [{ type: 'Release', id: 'SEARCH' }]
+    }),
+
+    searchReleaseGroups: build.query<
+      { data: ReleaseGroupSearchResult[]; meta: PaginatedMeta },
+      SearchReleaseGroupsParams
+    >({
+      query: (params) => ({ url: '/search/release-groups', params }),
+      providesTags: [{ type: 'ReleaseGroup', id: 'SEARCH' }]
     }),
 
     searchArtists: build.query<
@@ -108,6 +135,7 @@ export const searchApi = api.injectEndpoints({
 
 export const {
   useSearchReleasesQuery,
+  useSearchReleaseGroupsQuery,
   useSearchArtistsQuery,
   useSearchRequestsQuery,
   useSearchLogQuery,
