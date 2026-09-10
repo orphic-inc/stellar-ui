@@ -6,6 +6,35 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **The vendored contract picks up the whole `ReleaseGroup` surface** — nine
+  paths and seven schemas that stellar-api has shipped and this repo could not
+  see. `/release-groups/{id}` and its merge/split/cover/log routes arrived with
+  [api#265](https://github.com/orphic-inc/stellar-api/issues/265);
+  `/search/release-groups` and the additive fields arrived with
+  [api#605](https://github.com/orphic-inc/stellar-api/issues/605) and
+  [ADR-0037](https://github.com/orphic-inc/stellar-api/blob/main/docs/adr/0037-group-dedup-is-a-read-time-projection.md).
+
+  Three existing schemas gain fields: `Release` gains `group` and
+  `releaseGroupId`, `CollageEntry` gains `group` and `groupedWith`, and
+  `CollageDetail` gains a required `numVisibleEntries`. **`releaseGroupId` is the
+  reason this was owed rather than merely late** — the API has always emitted it,
+  but the hand-authored `Release` schema did not list it, so the release-group
+  panel was unbuildable against the contract rather than against the server.
+
+  The sync is **purely additive**: no path, schema or property was removed or
+  narrowed, and `info.version` is `0.9.3` on both sides, so no parity cut is owed
+  under [ADR-0004](docs/adr/0004-peer-api-contract-version-coupling.md).
+
+  **Nothing in the app consumes any of it yet.** That is
+  [#316](https://github.com/orphic-inc/stellar-ui/issues/316),
+  [#317](https://github.com/orphic-inc/stellar-ui/issues/317),
+  [#318](https://github.com/orphic-inc/stellar-ui/issues/318),
+  [#319](https://github.com/orphic-inc/stellar-ui/issues/319) and
+  [#320](https://github.com/orphic-inc/stellar-ui/issues/320), which land next
+  and all needed this first.
+
 ## [0.9.3] — 2026-09-09
 
 ### Added
