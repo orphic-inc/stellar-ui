@@ -10051,6 +10051,861 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/release-groups/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Resolve a release group for the current viewer
+     * @description Returns the group identity plus **only the member releases this viewer may see** — a group edge never widens visibility (ADR-0023).
+     *
+     *     The `404` covers two cases deliberately: the group does not exist, and the group exists but the viewer can see none of its members. They are indistinguishable on purpose. Telling them apart would make this an existence oracle for private community catalogues, which is the leak this whole surface is designed against. There is no staff bypass.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The group, with the viewer-visible member releases */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseGroupDetail'];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release group not found, or no member is visible to you */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    /**
+     * Change a group's canonical identity
+     * @description Recomputing the identity can land on one another group already holds. That is structurally a **merge** — two identities becoming one — so this refuses with **409 naming the other group** rather than folding into it. An edit that silently destroyed a row, with no undo, would be more power than a rename should carry; call `merge` deliberately instead.
+     *
+     *     A no-op edit returns 200 without writing a log entry.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title: string;
+            artistId?: number | null;
+            year?: number | null;
+          };
+        };
+      };
+      responses: {
+        /** @description The updated identity */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseGroupIdentity'];
+          };
+        };
+        /** @description No live artist with that id */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing contributions_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release group not found, or no member is visible to you */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Another release group already holds that identity */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/release-groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a release group, or return the one that already matches
+     * @description Find-or-create on a normalized identity derived from `title`, `artistId` and `year`: **201** when a new identity is minted, **200** when an existing group already carries it. Matching ignores case and surrounding or repeated whitespace, so `Greatest Hits` and `greatest  hits` are one identity, not two.
+     *
+     *     Open to any authenticated member: a bare identity node has no members until a release is attached through the community-gated route, so it reveals nothing about any catalogue.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            title: string;
+            artistId?: number | null;
+            year?: number | null;
+          };
+        };
+      };
+      responses: {
+        /** @description A group with this identity already existed */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseGroupIdentity'];
+          };
+        };
+        /** @description Group created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseGroupIdentity'];
+          };
+        };
+        /** @description No live artist with that id — including an artist that has been withdrawn */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/release-groups/{id}/merge': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Fold another group into this one
+     * @description **There is no undo.** The group log is the record, and a two-step confirmation belongs in the UI rather than in this call.
+     *
+     *     The source's releases, covers and log entries all move here, and the source group is deleted. A cover this group already carries is dropped rather than failing the merge on a duplicate image.
+     *
+     *     **Both groups must resolve for you.** Merge reuses the same viewer filter every read uses instead of a moderator bypass, so a `contributions_manage` holder still cannot reach a group whose every member sits in a community they cannot see. A consequence worth knowing: you cannot merge into a memberless group, because a memberless group resolves for nobody — rename that group instead.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            sourceGroupId: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Merged */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              id: number;
+              title: string;
+              mergedFrom: number;
+              movedReleases: number;
+            };
+          };
+        };
+        /** @description A group cannot be merged into itself */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing contributions_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Either group is unknown, or not visible to you */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/release-groups/{id}/split': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Move selected releases out to another identity
+     * @description Takes the target **identity**, not just a release list: the target is found or created by the same normalized key `POST /release-groups` uses, so a split can move releases into an existing group rather than only ever minting a new one. Deriving the title from a moved release would be wrong more often than right — the release being split out is the one that was mis-grouped.
+     *
+     *     Only releases actually in this group move; an id from elsewhere is ignored rather than quietly re-grouped. An emptied source group is left in place, because a memberless group is not an anomaly here.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            releaseIds: number[];
+            title: string;
+            artistId?: number | null;
+            year?: number | null;
+          };
+        };
+      };
+      responses: {
+        /** @description The target identity and how many releases moved */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              id: number;
+              title: string;
+              movedReleases: number;
+            };
+          };
+        };
+        /** @description None of those releases belong to this group, the target identity is this group, or the artist id names no live artist */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing contributions_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release group not found, or no member is visible to you */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/release-groups/{id}/log': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The group's identity history
+     * @description Merges, splits and identity edits, newest first. Rows flagged `hidden` are returned only to `contributions_manage` holders.
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: string;
+          limit?: string;
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated log entries */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['ReleaseGroupLogEntry'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release group not found, or no member is visible to you */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/release-groups/{id}/covers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The group's cover art
+     * @description Group-level covers describe the shared identity; `Release.image` remains the release-local fallback.
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: string;
+          limit?: string;
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated covers */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['ReleaseGroupCover'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release group not found, or no member is visible to you */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    /**
+     * Add a cover to a group
+     * @description Curation, not moderation: reaching the group is the only requirement, exactly as with attaching a release. The URL must be `https` — a cover renders in every viewer's browser, so a plain-http source is a mixed-content failure rather than a stylistic preference.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            /** Format: uri */
+            image: string;
+            summary?: string | null;
+          };
+        };
+      };
+      responses: {
+        /** @description Cover added */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseGroupCover'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release group not found, or no member is visible to you */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description This group already carries that cover */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/release-groups/{id}/covers/{coverId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove a cover
+     * @description The member who added a cover may remove it; removing anyone else's needs `contributions_manage`.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+          coverId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Cover removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Only the member who added this cover may remove it */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release group or cover not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{communityId}/releases/{releaseId}/release-group': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Attach a release to a release group, or detach it
+     * @description Pass `releaseGroupId: null` to detach. Named `release-group` rather than `group` because in the community routes "group" already means a release, inherited from the legacy vocabulary.
+     *
+     *     Gated by **community access, not a permission**, and it refuses rather than filtering: the path names one community, so the caller is owed a straight answer. You may only group releases you can already reach.
+     */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            releaseGroupId: number | null;
+          };
+        };
+      };
+      responses: {
+        /** @description The release and its new group id */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              id: number;
+              releaseGroupId: number | null;
+            };
+          };
+        };
+        /** @description No release group with that id */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not a member of this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community not found, or no such release in it */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{communityId}/releases/{releaseId}/history': {
     parameters: {
       query?: never;
@@ -20707,7 +21562,7 @@ export interface paths {
             'application/json': components['schemas']['FeaturedAlbumItem'];
           };
         };
-        /** @description Invalid request body */
+        /** @description Validation error, or groupId names no release in a public community. Featuring is an act of publication (ADR-0036 §4), so a private-community release is refused at set time rather than filtered at read time — and 400 rather than 404 because the route exists and it is the body id that does not resolve. Covers a dangling groupId too: FeaturedAlbum.groupId carries no foreign key. */
         400: {
           headers: {
             [name: string]: unknown;
@@ -24381,7 +25236,163 @@ export interface paths {
                   consumers: number;
                   contributors: number;
                 };
+                group: components['schemas']['ReleaseGroupRef'];
               }[];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/search/release-groups': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Search release groups, deduping "the same album" across communities
+     * @description Where `/search/releases` ATTACHES a group to each hit and keeps its own pagination, this endpoint makes the group the row — so `total` counts albums rather than releases, and a cross-community duplicate is one result (ADR-0037 §4).
+     *
+     *     Takes every filter `/search/releases` takes; those decide which GROUPS match. Each result carries the members this viewer may see, which is not the same set — a group matched by one release still shows every version of that album the viewer can reach.
+     *
+     *     Returns only releases that have been grouped. `releaseGroupId` is never backfilled, so an uncurated catalogue returns nothing here and `/search/releases` remains the complete list.
+     *
+     *     Orders by group fields only. Ordering by member count is deliberately absent: only the whole relation can be counted, not its visible part, so it would rank groups by a number including members the caller cannot see.
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          limit?: number;
+          q?: string;
+          tags?: string;
+          tagMode?: 'any' | 'all';
+          orderBy?: 'title' | 'year' | 'createdAt';
+          order?: 'asc' | 'desc';
+          communityId?: number | number[];
+          artist?: string;
+          title?: string;
+          recordLabel?: string;
+          catalogueNumber?: string;
+          year?: number;
+          yearTo?: number;
+          description?: string;
+          type?:
+            | 'Music'
+            | 'Applications'
+            | 'EBooks'
+            | 'ELearningVideos'
+            | 'Audiobooks'
+            | 'Comedy'
+            | 'Comics';
+          releaseType?:
+            | 'Album'
+            | 'Single'
+            | 'EP'
+            | 'Anthology'
+            | 'Compilation'
+            | 'DJMix'
+            | 'Live'
+            | 'Remix'
+            | 'Bootleg'
+            | 'Interview'
+            | 'Mixtape'
+            | 'Demo'
+            | 'ConcertRecording'
+            | 'Unknown';
+          format?:
+            | 'mp3'
+            | 'flac'
+            | 'wav'
+            | 'ogg'
+            | 'aac'
+            | 'm4a'
+            | 'm4b'
+            | 'mp4'
+            | 'mkv'
+            | 'avi'
+            | 'mov'
+            | 'zip'
+            | 'exe'
+            | 'dmg'
+            | 'apk'
+            | 'pdf'
+            | 'epub'
+            | 'mobi'
+            | 'cbz'
+            | 'cbr'
+            | 'jpg'
+            | 'png'
+            | 'gif'
+            | 'txt';
+          bitrate?:
+            | 'Lossless'
+            | 'Lossless24'
+            | 'Kbps320'
+            | 'Kbps256'
+            | 'KbpsV0'
+            | 'Kbps192'
+            | 'KbpsV2'
+            | 'Kbps128'
+            | 'Other';
+          media?:
+            | 'CD'
+            | 'WEB'
+            | 'Vinyl'
+            | 'SACD'
+            | 'DVD'
+            | 'Cassette'
+            | 'BluRay'
+            | 'DAT'
+            | 'Soundboard'
+            | 'Other';
+          hasLog?: boolean | null;
+          hasCue?: boolean | null;
+          isScene?: boolean | null;
+          vanityHouse?: boolean | null;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Release group search results */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['ReleaseGroupSearchItem'][];
               meta: components['schemas']['PaginationMeta'];
             };
           };
@@ -27447,6 +28458,18 @@ export interface components {
         username: string;
       };
     };
+    ReleaseGroupIdentity: {
+      id: number;
+      title: string;
+      artist: {
+        id: number;
+        name: string;
+      } | null;
+      year: number | null;
+    };
+    ReleaseGroupRef: components['schemas']['ReleaseGroupIdentity'] & {
+      image: string | null;
+    };
     Release: {
       id: number;
       title: string;
@@ -27493,6 +28516,8 @@ export interface components {
       } | null;
       contributions?: components['schemas']['ReleaseContribution'][];
       isContributor?: boolean;
+      releaseGroupId?: number | null;
+      group?: components['schemas']['ReleaseGroupRef'];
     };
     /** @enum {string} */
     PermissionKey:
@@ -27600,6 +28625,45 @@ export interface components {
         total: number;
         score: number;
         updatedAt: string;
+      } | null;
+    };
+    ReleaseGroupMember: {
+      id: number;
+      title: string;
+      year: number;
+      image: string | null;
+      communityId: number | null;
+      community?: {
+        id: number;
+        name: string;
+      } | null;
+      artist: {
+        id: number;
+        name: string;
+      } | null;
+    };
+    ReleaseGroupDetail: components['schemas']['ReleaseGroupIdentity'] & {
+      releases: components['schemas']['ReleaseGroupMember'][];
+    };
+    ReleaseGroupCover: {
+      id: number;
+      image: string;
+      summary: string | null;
+      userId: number;
+      addedAt: string;
+      user: {
+        id: number;
+        username: string;
+      } | null;
+    };
+    ReleaseGroupLogEntry: {
+      id: number;
+      info: string;
+      hidden: boolean;
+      loggedAt: string;
+      user: {
+        id: number;
+        username: string;
       } | null;
     };
     Comment: {
@@ -28353,6 +29417,14 @@ export interface components {
         bookmarks: number;
       };
     };
+    AbsorbedCollageEntry: {
+      id: number;
+      releaseId: number;
+      communityId: number | null;
+      title: string;
+      userId: number;
+      addedAt: string;
+    };
     CollageEntry: {
       id: number;
       collageId: number;
@@ -28391,9 +29463,12 @@ export interface components {
         id: number;
         username: string;
       };
+      group?: components['schemas']['ReleaseGroupRef'];
+      groupedWith?: components['schemas']['AbsorbedCollageEntry'][];
     };
     CollageDetail: components['schemas']['Collage'] & {
       entries: components['schemas']['CollageEntry'][];
+      numVisibleEntries: number;
       isSubscribed: boolean;
       isBookmarked: boolean;
     };
@@ -28523,6 +29598,9 @@ export interface components {
         id: number;
         username: string;
       } | null;
+    };
+    ReleaseGroupSearchItem: components['schemas']['ReleaseGroupRef'] & {
+      releases: components['schemas']['ReleaseGroupMember'][];
     };
     CrsSnapshot: {
       capturedAt: string;

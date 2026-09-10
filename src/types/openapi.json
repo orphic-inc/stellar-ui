@@ -4128,6 +4128,62 @@
           "actor"
         ]
       },
+      "ReleaseGroupIdentity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "artist": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "year": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "artist",
+          "year"
+        ]
+      },
+      "ReleaseGroupRef": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ReleaseGroupIdentity"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "image": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "image"
+            ]
+          }
+        ]
+      },
       "Release": {
         "type": "object",
         "properties": {
@@ -4249,6 +4305,13 @@
           },
           "isContributor": {
             "type": "boolean"
+          },
+          "releaseGroupId": {
+            "type": "number",
+            "nullable": true
+          },
+          "group": {
+            "$ref": "#/components/schemas/ReleaseGroupRef"
           }
         },
         "required": [
@@ -4560,6 +4623,174 @@
         "required": [
           "myVote",
           "voteAggregate"
+        ]
+      },
+      "ReleaseGroupMember": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "year": {
+            "type": "number"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "communityId": {
+            "type": "number",
+            "nullable": true
+          },
+          "community": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          },
+          "artist": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "year",
+          "image",
+          "communityId",
+          "artist"
+        ]
+      },
+      "ReleaseGroupDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ReleaseGroupIdentity"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "releases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReleaseGroupMember"
+                }
+              }
+            },
+            "required": [
+              "releases"
+            ]
+          }
+        ]
+      },
+      "ReleaseGroupCover": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "image": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "number"
+          },
+          "addedAt": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "username": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "username"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "image",
+          "summary",
+          "userId",
+          "addedAt",
+          "user"
+        ]
+      },
+      "ReleaseGroupLogEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "info": {
+            "type": "string"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "loggedAt": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "username": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "username"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "info",
+          "hidden",
+          "loggedAt",
+          "user"
         ]
       },
       "Comment": {
@@ -7459,6 +7690,38 @@
           "_count"
         ]
       },
+      "AbsorbedCollageEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "releaseId": {
+            "type": "integer"
+          },
+          "communityId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer"
+          },
+          "addedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "releaseId",
+          "communityId",
+          "title",
+          "userId",
+          "addedAt"
+        ]
+      },
       "CollageEntry": {
         "type": "object",
         "properties": {
@@ -7559,6 +7822,15 @@
               "id",
               "username"
             ]
+          },
+          "group": {
+            "$ref": "#/components/schemas/ReleaseGroupRef"
+          },
+          "groupedWith": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AbsorbedCollageEntry"
+            }
           }
         },
         "required": [
@@ -7586,6 +7858,9 @@
                   "$ref": "#/components/schemas/CollageEntry"
                 }
               },
+              "numVisibleEntries": {
+                "type": "integer"
+              },
               "isSubscribed": {
                 "type": "boolean"
               },
@@ -7595,6 +7870,7 @@
             },
             "required": [
               "entries",
+              "numVisibleEntries",
               "isSubscribed",
               "isBookmarked"
             ]
@@ -8052,6 +8328,27 @@
           "userId",
           "createdAt",
           "addedBy"
+        ]
+      },
+      "ReleaseGroupSearchItem": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ReleaseGroupRef"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "releases": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReleaseGroupMember"
+                }
+              }
+            },
+            "required": [
+              "releases"
+            ]
+          }
         ]
       },
       "CrsSnapshot": {
@@ -19764,6 +20061,1079 @@
           },
           "404": {
             "description": "Release not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/release-groups/{id}": {
+      "get": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "Resolve a release group for the current viewer",
+        "description": "Returns the group identity plus **only the member releases this viewer may see** — a group edge never widens visibility (ADR-0023). \n\nThe `404` covers two cases deliberately: the group does not exist, and the group exists but the viewer can see none of its members. They are indistinguishable on purpose. Telling them apart would make this an existence oracle for private community catalogues, which is the leak this whole surface is designed against. There is no staff bypass.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The group, with the viewer-visible member releases",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseGroupDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release group not found, or no member is visible to you",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "Change a group's canonical identity",
+        "description": "Recomputing the identity can land on one another group already holds. That is structurally a **merge** — two identities becoming one — so this refuses with **409 naming the other group** rather than folding into it. An edit that silently destroyed a row, with no undo, would be more power than a rename should carry; call `merge` deliberately instead.\n\nA no-op edit returns 200 without writing a log entry.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "artistId": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "year": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1000,
+                    "maximum": 2999
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated identity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseGroupIdentity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No live artist with that id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing contributions_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release group not found, or no member is visible to you",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another release group already holds that identity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/release-groups": {
+      "post": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "Create a release group, or return the one that already matches",
+        "description": "Find-or-create on a normalized identity derived from `title`, `artistId` and `year`: **201** when a new identity is minted, **200** when an existing group already carries it. Matching ignores case and surrounding or repeated whitespace, so `Greatest Hits` and `greatest  hits` are one identity, not two.\n\nOpen to any authenticated member: a bare identity node has no members until a release is attached through the community-gated route, so it reveals nothing about any catalogue.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "artistId": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "year": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1000,
+                    "maximum": 2999
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A group with this identity already existed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseGroupIdentity"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Group created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseGroupIdentity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No live artist with that id — including an artist that has been withdrawn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/release-groups/{id}/merge": {
+      "post": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "Fold another group into this one",
+        "description": "**There is no undo.** The group log is the record, and a two-step confirmation belongs in the UI rather than in this call.\n\nThe source's releases, covers and log entries all move here, and the source group is deleted. A cover this group already carries is dropped rather than failing the merge on a duplicate image.\n\n**Both groups must resolve for you.** Merge reuses the same viewer filter every read uses instead of a moderator bypass, so a `contributions_manage` holder still cannot reach a group whose every member sits in a community they cannot see. A consequence worth knowing: you cannot merge into a memberless group, because a memberless group resolves for nobody — rename that group instead.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sourceGroupId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                },
+                "required": [
+                  "sourceGroupId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Merged",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "mergedFrom": {
+                      "type": "number"
+                    },
+                    "movedReleases": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "mergedFrom",
+                    "movedReleases"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A group cannot be merged into itself",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing contributions_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Either group is unknown, or not visible to you",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/release-groups/{id}/split": {
+      "post": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "Move selected releases out to another identity",
+        "description": "Takes the target **identity**, not just a release list: the target is found or created by the same normalized key `POST /release-groups` uses, so a split can move releases into an existing group rather than only ever minting a new one. Deriving the title from a moved release would be wrong more often than right — the release being split out is the one that was mis-grouped.\n\nOnly releases actually in this group move; an id from elsewhere is ignored rather than quietly re-grouped. An emptied source group is left in place, because a memberless group is not an anomaly here.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "releaseIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "minItems": 1,
+                    "maxItems": 200
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "artistId": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "year": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1000,
+                    "maximum": 2999
+                  }
+                },
+                "required": [
+                  "releaseIds",
+                  "title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The target identity and how many releases moved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "movedReleases": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "movedReleases"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "None of those releases belong to this group, the target identity is this group, or the artist id names no live artist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing contributions_manage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release group not found, or no member is visible to you",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/release-groups/{id}/log": {
+      "get": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "The group's identity history",
+        "description": "Merges, splits and identity edits, newest first. Rows flagged `hidden` are returned only to `contributions_manage` holders.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated log entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReleaseGroupLogEntry"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release group not found, or no member is visible to you",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/release-groups/{id}/covers": {
+      "get": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "The group's cover art",
+        "description": "Group-level covers describe the shared identity; `Release.image` remains the release-local fallback.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated covers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReleaseGroupCover"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release group not found, or no member is visible to you",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "Add a cover to a group",
+        "description": "Curation, not moderation: reaching the group is the only requirement, exactly as with attaching a release. The URL must be `https` — a cover renders in every viewer's browser, so a plain-http source is a mixed-content failure rather than a stylistic preference.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "maxLength": 2000,
+                    "format": "uri"
+                  },
+                  "summary": {
+                    "type": "string",
+                    "nullable": true,
+                    "maxLength": 500
+                  }
+                },
+                "required": [
+                  "image"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cover added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseGroupCover"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release group not found, or no member is visible to you",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "This group already carries that cover",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/release-groups/{id}/covers/{coverId}": {
+      "delete": {
+        "tags": [
+          "Release Groups"
+        ],
+        "summary": "Remove a cover",
+        "description": "The member who added a cover may remove it; removing anyone else's needs `contributions_manage`.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "coverId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Cover removed"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Only the member who added this cover may remove it",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release group or cover not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/communities/{communityId}/releases/{releaseId}/release-group": {
+      "put": {
+        "tags": [
+          "Communities"
+        ],
+        "summary": "Attach a release to a release group, or detach it",
+        "description": "Pass `releaseGroupId: null` to detach. Named `release-group` rather than `group` because in the community routes \"group\" already means a release, inherited from the legacy vocabulary.\n\nGated by **community access, not a permission**, and it refuses rather than filtering: the path names one community, so the caller is owed a straight answer. You may only group releases you can already reach.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "communityId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "releaseId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "releaseGroupId": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                },
+                "required": [
+                  "releaseGroupId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The release and its new group id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "releaseGroupId": {
+                      "type": "number",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "releaseGroupId"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No release group with that id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not a member of this community",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found, or no such release in it",
             "content": {
               "application/json": {
                 "schema": {
@@ -33333,7 +34703,7 @@
             }
           },
           "400": {
-            "description": "Invalid request body",
+            "description": "Validation error, or groupId names no release in a public community. Featuring is an act of publication (ADR-0036 §4), so a private-community release is refused at set time rather than filtered at read time — and 400 rather than 404 because the route exists and it is the body id that does not resolve. Covers a dangling groupId too: FeaturedAlbum.groupId carries no foreign key.",
             "content": {
               "application/json": {
                 "schema": {
@@ -38052,6 +39422,9 @@
                               "consumers",
                               "contributors"
                             ]
+                          },
+                          "group": {
+                            "$ref": "#/components/schemas/ReleaseGroupRef"
                           }
                         },
                         "required": [
@@ -38065,8 +39438,389 @@
                           "createdAt",
                           "artist",
                           "tags",
-                          "_count"
+                          "_count",
+                          "group"
                         ]
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/search/release-groups": {
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Search release groups, deduping \"the same album\" across communities",
+        "description": "Where `/search/releases` ATTACHES a group to each hit and keeps its own pagination, this endpoint makes the group the row — so `total` counts albums rather than releases, and a cross-community duplicate is one result (ADR-0037 §4).\n\nTakes every filter `/search/releases` takes; those decide which GROUPS match. Each result carries the members this viewer may see, which is not the same set — a group matched by one release still shows every version of that album the viewer can reach.\n\nReturns only releases that have been grouped. `releaseGroupId` is never backfilled, so an uncurated catalogue returns nothing here and `/search/releases` remains the complete list.\n\nOrders by group fields only. Ordering by member count is deliberately absent: only the whole relation can be counted, not its visible part, so it would rank groups by a number including members the caller cannot see.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 25
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "q",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "required": false,
+            "name": "tags",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "any",
+                "all"
+              ],
+              "default": "any"
+            },
+            "required": false,
+            "name": "tagMode",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "title",
+                "year",
+                "createdAt"
+              ],
+              "default": "title"
+            },
+            "required": false,
+            "name": "orderBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            },
+            "required": false,
+            "name": "order",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "exclusiveMinimum": true
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                }
+              ]
+            },
+            "required": false,
+            "name": "communityId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "artist",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "title",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "recordLabel",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "catalogueNumber",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1900,
+              "maximum": 2100
+            },
+            "required": false,
+            "name": "year",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1900,
+              "maximum": 2100
+            },
+            "required": false,
+            "name": "yearTo",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "required": false,
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Music",
+                "Applications",
+                "EBooks",
+                "ELearningVideos",
+                "Audiobooks",
+                "Comedy",
+                "Comics"
+              ]
+            },
+            "required": false,
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Album",
+                "Single",
+                "EP",
+                "Anthology",
+                "Compilation",
+                "DJMix",
+                "Live",
+                "Remix",
+                "Bootleg",
+                "Interview",
+                "Mixtape",
+                "Demo",
+                "ConcertRecording",
+                "Unknown"
+              ]
+            },
+            "required": false,
+            "name": "releaseType",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "mp3",
+                "flac",
+                "wav",
+                "ogg",
+                "aac",
+                "m4a",
+                "m4b",
+                "mp4",
+                "mkv",
+                "avi",
+                "mov",
+                "zip",
+                "exe",
+                "dmg",
+                "apk",
+                "pdf",
+                "epub",
+                "mobi",
+                "cbz",
+                "cbr",
+                "jpg",
+                "png",
+                "gif",
+                "txt"
+              ]
+            },
+            "required": false,
+            "name": "format",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Lossless",
+                "Lossless24",
+                "Kbps320",
+                "Kbps256",
+                "KbpsV0",
+                "Kbps192",
+                "KbpsV2",
+                "Kbps128",
+                "Other"
+              ]
+            },
+            "required": false,
+            "name": "bitrate",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CD",
+                "WEB",
+                "Vinyl",
+                "SACD",
+                "DVD",
+                "Cassette",
+                "BluRay",
+                "DAT",
+                "Soundboard",
+                "Other"
+              ]
+            },
+            "required": false,
+            "name": "media",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "required": false,
+            "name": "hasLog",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "required": false,
+            "name": "hasCue",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "required": false,
+            "name": "isScene",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "required": false,
+            "name": "vanityHouse",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Release group search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReleaseGroupSearchItem"
                       }
                     },
                     "meta": {
