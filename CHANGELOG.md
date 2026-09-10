@@ -35,6 +35,21 @@ All notable changes to stellar-ui are documented here.
   [#320](https://github.com/orphic-inc/stellar-ui/issues/320), which land next
   and all needed this first.
 
+- **The collage entry-list header counts what the list actually holds**
+  ([#316](https://github.com/orphic-inc/stellar-ui/issues/316)) — it reads
+  `numVisibleEntries` rather than `numEntries`, because it sits directly above
+  the list it describes. The Statistics panel keeps `numEntries`: a collage's
+  size is a property of the collage, and it is the quantity the per-collage
+  quota is enforced against. `CollageBrowse` and `UserProfile` are unchanged —
+  neither has an entry list beside the number.
+
+  The two now disagree for **two independent reasons**, and both are intended:
+  entries whose release the viewer cannot reach are omitted (api ADR-0036), and
+  entries sharing a release group are collapsed onto one row
+  ([api ADR-0037](https://github.com/orphic-inc/stellar-api/blob/main/docs/adr/0037-group-dedup-is-a-read-time-projection.md)).
+  A member outside one of a collage's communities can see "9 entries" above nine
+  rows and a Statistics panel reading 12.
+
 ## [0.9.3] — 2026-09-09
 
 ### Added
