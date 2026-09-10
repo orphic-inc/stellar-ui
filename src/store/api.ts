@@ -82,7 +82,8 @@ export const api = createApi({
     'UserFlow',
     'SiteInfo',
     'DevSeedRun',
-    'TopicSession'
+    'TopicSession',
+    'ReleaseGroup'
   ] as const,
   endpoints: () => ({})
 });
