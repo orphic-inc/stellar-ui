@@ -90,6 +90,7 @@ describe('CollageDetail', () => {
         isSubscribed: false,
         isBookmarked: false,
         numEntries: 1,
+        numVisibleEntries: 1,
         numSubscribers: 4,
         description: 'A collage',
         tags: ['electronic'],
@@ -267,6 +268,7 @@ describe('CollageDetail', () => {
         isSubscribed: false,
         isBookmarked: false,
         numEntries: 1,
+        numVisibleEntries: 1,
         numSubscribers: 0,
         description: '',
         tags: [],
@@ -306,6 +308,7 @@ describe('CollageDetail', () => {
         isSubscribed: true,
         isBookmarked: true,
         numEntries: 0,
+        numVisibleEntries: 0,
         numSubscribers: 0,
         description: '',
         tags: [],
@@ -352,6 +355,7 @@ describe('CollageDetail', () => {
         isSubscribed: false,
         isBookmarked: false,
         numEntries: 0,
+        numVisibleEntries: 0,
         numSubscribers: 0,
         description: '',
         tags: [],
@@ -388,6 +392,7 @@ describe('CollageDetail', () => {
         isSubscribed: false,
         isBookmarked: false,
         numEntries: 1,
+        numVisibleEntries: 1,
         numSubscribers: 0,
         description: undefined,
         tags: [],
@@ -465,6 +470,7 @@ describe('CollageDetail', () => {
         isSubscribed: false,
         isBookmarked: false,
         numEntries: 3,
+        numVisibleEntries: 3,
         numSubscribers: 0,
         description: '',
         tags: [],
@@ -511,6 +517,7 @@ describe('CollageDetail', () => {
         isSubscribed: false,
         isBookmarked: false,
         numEntries: 2,
+        numVisibleEntries: 2,
         numSubscribers: 0,
         description: '',
         tags: [],
@@ -547,5 +554,50 @@ describe('CollageDetail', () => {
     for (const hook of ['panel', 'colhead', 'list', 'row', 'title', 'chip']) {
       expect(document.querySelector(`[data-st="${hook}"]`)).toBeInTheDocument();
     }
+  });
+  // #316 — the two counts answer different questions and must not be swapped.
+  // The api sends `numEntries` as the collage's true size and
+  // `numVisibleEntries` as the length of the `entries` array this viewer
+  // received; they diverge whenever an entry is hidden (ADR-0036) or collapsed
+  // onto a group (ADR-0037). Fixture makes them disagree on purpose, because a
+  // fixture where they match cannot tell the two reads apart.
+  it('heads the entry list with numVisibleEntries and the Statistics panel with numEntries', () => {
+    mockUseGetCollageQuery.mockReturnValue({
+      data: {
+        id: 8,
+        userId: 7,
+        name: 'Synth Pop',
+        categoryId: 1,
+        isLocked: false,
+        isDeleted: false,
+        isSubscribed: false,
+        isBookmarked: false,
+        numEntries: 12,
+        numVisibleEntries: 9,
+        numSubscribers: 4,
+        description: null,
+        tags: [],
+        user: { username: 'alice' },
+        entries: [
+          {
+            id: 1,
+            releaseId: 55,
+            userId: 7,
+            user: { id: 7, username: 'alice' },
+            release: { title: 'Release', image: null, communityId: 2 }
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CollageDetail />);
+
+    expect(screen.getByText('9 entries')).toBeInTheDocument();
+    expect(screen.queryByText('12 entries')).not.toBeInTheDocument();
+
+    const stats = screen.getByText('Statistics').closest('[data-st="panel"]');
+    expect(stats).not.toBeNull();
+    expect(stats).toHaveTextContent(/Entries\s*12/);
   });
 });

@@ -295,7 +295,15 @@ const CollageDetail = () => {
           <div data-st="panel">
             <div data-st="colhead">
               <span>Entries</span>
-              <span>{collage.numEntries} entries</span>
+              {/* `numVisibleEntries`, not `numEntries`: this sits directly above
+                  the list it describes, and that list is shorter than the
+                  collage for two independent reasons — entries whose release
+                  this viewer cannot reach are omitted (api ADR-0036), and
+                  entries sharing a release group are collapsed onto one row (api
+                  ADR-0037). The Statistics panel keeps `numEntries`, which is
+                  the collage's own size and the quantity its per-collage quota
+                  is enforced against. */}
+              <span>{collage.numVisibleEntries} entries</span>
             </div>
             {!collage.entries || collage.entries.length === 0 ? (
               <p className="px-4 py-4 text-sm text-gray-500">No entries yet.</p>
