@@ -66,24 +66,50 @@ const EntryActions = ({
 );
 
 /**
- * What the row DISPLAYS. Every optional chain here is one field of the entry
- * being absent on the wire; none of them is a decision.
+ * What the row's RELEASE contributes.
+ *
+ * Every chain here is load-bearing against this repo's own tests, not the
+ * contract. `CollageEntry` marks `release` required and non-nullable, but two
+ * pre-existing tests contradict it — one whose entries carry no `release` at
+ * all, one named for rendering "with null user" — so the guards stay.
+ * `communityId` and `artist` need theirs on the contract's own terms anyway:
+ * the first is absent from the required set, the second is nullable.
+ */
+const describeRelease = (entry: CollageEntry) => {
+  // ONE guard, at the boundary, rather than a chain per field.
+  //
+  // `CollageEntry` marks `release` required and non-nullable, but two
+  // pre-existing tests contradict the contract — one whose entries carry no
+  // `release` at all, one named for rendering "with null user" — so a missing
+  // release has to render. Naming that case once says so; five scattered `?.`
+  // reads only imply it, and imply it about fields that are not in doubt.
+  const release = entry.release;
+  if (!release) {
+    return {
+      communityId: null,
+      title: `Release #${entry.releaseId}`,
+      artist: null
+    };
+  }
+  // Past the guard, only the contract's own optionality remains: `communityId`
+  // is absent from the required set, `artist` is nullable, `title` is neither.
+  return {
+    communityId: release.communityId ?? null,
+    title: release.title,
+    artist: release.artist?.name ?? null
+  };
+};
+
+/**
+ * What the row DISPLAYS — the release's contribution, plus the fields that
+ * come off the entry itself.
  */
 const describeDisplay = (entry: CollageEntry) => {
-  // Every chain here is load-bearing against this repo's own tests, not the
-  // contract. `CollageEntry` marks `release` and `user` required and
-  // non-nullable, but two pre-existing tests contradict it — one named for
-  // rendering "with null user", one whose entries carry no `release` at all —
-  // so the guards stay. `communityId` and `artist` need theirs on the
-  // contract's own terms: the first is absent from the required set, the
-  // second is nullable.
-  const communityId = entry.release?.communityId ?? null;
+  const release = describeRelease(entry);
   return {
-    communityId,
+    ...release,
     cover: releaseCover(entry.group, entry.release),
-    href: `/communities/${communityId ?? 0}/releases/${entry.releaseId}`,
-    title: entry.release?.title ?? `Release #${entry.releaseId}`,
-    artist: entry.release?.artist?.name ?? null,
+    href: `/communities/${release.communityId ?? 0}/releases/${entry.releaseId}`,
     addedBy: entry.user?.username ?? '—'
   };
 };

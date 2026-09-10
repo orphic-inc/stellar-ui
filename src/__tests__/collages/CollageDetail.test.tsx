@@ -857,4 +857,26 @@ describe('CollageDetail', () => {
     );
     expect(screen.queryByText(/copies$/)).not.toBeInTheDocument();
   });
+  // The missing-release case is an explicit branch in describeRelease, not an
+  // accident of optional chaining, so it gets an assertion rather than being
+  // covered only by a fixture that happens to omit the field.
+  it('falls back to the release id when an entry carries no release at all', () => {
+    mockUseGetCollageQuery.mockReturnValue({
+      data: {
+        ...defaultCollage(),
+        entries: [
+          {
+            id: 3,
+            releaseId: 20,
+            userId: 7,
+            user: { id: 7, username: 'alice' }
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CollageDetail />);
+    expect(screen.getByText('Release #20')).toBeInTheDocument();
+  });
 });
