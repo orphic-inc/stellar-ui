@@ -50,6 +50,24 @@ All notable changes to stellar-ui are documented here.
   A member outside one of a collage's communities can see "9 entries" above nine
   rows and a Statistics panel reading 12.
 
+- **A grouped release shows its group's cover art**
+  ([#318](https://github.com/orphic-inc/stellar-ui/issues/318)) — two
+  communities' copies of one album routinely carry different artwork, often one
+  good scan and one placeholder. `releaseCover(group, release)` prefers the
+  group's canonical cover and falls back to the release's own, so the same album
+  looks like the same album across the site.
+
+  The fallback is the **common** path rather than a defensive one: `group.image`
+  is null for any group with no cover art, and grouping is opt-in and never
+  backfilled, so most releases have no group at all.
+
+  Four render sites, in three files: the collage cover mosaic and entry-row
+  thumbnail, the release page's Cover panel, and the community release list.
+  That list is **derived from the contract** — the three schemas that carry a
+  `group` are `Release`, `CollageEntry` and the `/search/releases` item — rather
+  than from the site table in #318, which named `ReleaseBrowsePage` (it renders
+  no cover art at all, only a text table) and omitted `CommunityPage`.
+
 ## [0.9.3] — 2026-09-09
 
 ### Added

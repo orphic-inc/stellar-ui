@@ -12,6 +12,7 @@ import {
 } from '../../store/services/collageApi';
 import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 import { hasAnyPermission } from '../../utils/permissions';
+import { releaseCover } from '../../utils/releaseCover';
 import Spinner from '../layout/Spinner';
 import CommentsSection from '../layout/CommentsSection';
 import EditionStack from '../communities/EditionStack';
@@ -181,10 +182,18 @@ const CollageDetail = () => {
     }
   };
 
+  // Prefer each entry's group cover over the release's own (#318), so a collage
+  // holding two communities' copies of one album shows one artwork rather than
+  // a good scan beside a placeholder. Resolve first, THEN filter: an entry with
+  // no release art but a grouped cover belongs in the mosaic, and filtering on
+  // `release.image` first would drop it.
   const coverImages = (collage.entries ?? [])
-    .filter((e) => e.release?.image)
-    .slice(0, 12)
-    .map((e) => ({ src: e.release!.image!, releaseId: e.releaseId }));
+    .map((e) => ({
+      src: releaseCover(e.group, e.release),
+      releaseId: e.releaseId
+    }))
+    .filter((c): c is { src: string; releaseId: number } => c.src !== null)
+    .slice(0, 12);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
@@ -311,6 +320,7 @@ const CollageDetail = () => {
               <div data-st="list">
                 {collage.entries.map((entry, i) => {
                   const communityId = entry.release?.communityId ?? null;
+                  const cover = releaseCover(entry.group, entry.release);
                   const isExpanded = expandedId === entry.releaseId;
                   return (
                     <div key={entry.id}>
@@ -341,9 +351,9 @@ const CollageDetail = () => {
                             {isExpanded ? '−' : '+'}
                           </button>
                         )}
-                        {entry.release?.image ? (
+                        {cover ? (
                           <img
-                            src={entry.release.image}
+                            src={cover}
                             alt=""
                             className="w-8 h-8 object-cover rounded shrink-0"
                           />

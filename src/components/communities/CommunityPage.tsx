@@ -18,6 +18,7 @@ import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
 import ReportContributionModal from './ReportContributionModal';
 import { formatSize } from '../../utils';
+import { releaseCover } from '../../utils/releaseCover';
 import type { LinkHealthStatus } from '../../types';
 import { Pagination } from '../ui';
 
@@ -263,6 +264,11 @@ const CommunityPage = () => {
                 0
               );
 
+              // The group's canonical cover wins over this release's own
+              // (#318) — this list is where two communities' copies of one
+              // album most visibly diverge.
+              const cover = releaseCover(release.group, release);
+
               return (
                 <Fragment key={release.id}>
                   {/* Release header row */}
@@ -272,9 +278,9 @@ const CommunityPage = () => {
                       className="shrink-0"
                       tabIndex={-1}
                     >
-                      {release.image ? (
+                      {cover ? (
                         <img
-                          src={release.image}
+                          src={cover}
                           alt=""
                           className="w-14 h-14 object-cover rounded border border-gray-700"
                         />

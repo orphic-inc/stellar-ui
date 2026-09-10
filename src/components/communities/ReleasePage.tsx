@@ -19,6 +19,7 @@ import type { LinkHealthStatus } from '../../types';
 import { useReleaseWorkbench } from './useReleaseWorkbench';
 import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 import { Modal } from '../ui';
+import { releaseCover } from '../../utils/releaseCover';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -142,6 +143,11 @@ const ReleasePage = () => {
   if (isLoading) return <Spinner />;
   if (error || !release)
     return <div className="p-4 text-red-400">Release not found.</div>;
+
+  // The group's canonical cover wins over this release's own (#318). Declared
+  // after the guards so `release` is narrowed; the panel still hides when both
+  // are null, exactly as it did when it read `release.image` alone.
+  const cover = releaseCover(release.group, release);
 
   return (
     <div>
@@ -433,7 +439,7 @@ const ReleasePage = () => {
         {/* Sidebar */}
         <div className="w-56 shrink-0 space-y-4">
           {/* Cover art */}
-          {release.image && (
+          {cover && (
             <div data-st="panel" className="overflow-hidden">
               <div
                 data-st="colhead"
@@ -442,7 +448,7 @@ const ReleasePage = () => {
                 Cover
               </div>
               <img
-                src={release.image}
+                src={cover}
                 alt={release.title}
                 className="w-full object-cover"
               />
