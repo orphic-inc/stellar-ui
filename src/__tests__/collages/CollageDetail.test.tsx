@@ -669,4 +669,195 @@ describe('CollageDetail', () => {
     expect(rowThumbs).toContain('https://e/group.jpg');
     expect(rowThumbs).toContain('https://e/own.jpg');
   });
+  // ── #319 — the release-group collapse ──────────────────────────────────────
+
+  // A collapsed row: one visible entry standing for two, added by two different
+  // members. `alice` (id 7) owns neither the collage nor the absorbed copy.
+  const collapsedCollage = (overrides: Record<string, unknown> = {}) => ({
+    id: 8,
+    userId: 99,
+    name: 'Synth Pop',
+    categoryId: 1,
+    isLocked: false,
+    isDeleted: false,
+    isSubscribed: false,
+    isBookmarked: false,
+    numEntries: 2,
+    numVisibleEntries: 1,
+    numSubscribers: 0,
+    description: null,
+    tags: [],
+    user: { username: 'carol' },
+    entries: [
+      {
+        id: 1,
+        releaseId: 41,
+        userId: 7,
+        user: { id: 7, username: 'alice' },
+        group: { id: 3, title: 'Kid A', image: null },
+        release: { title: 'Kid A', image: null, communityId: 2 },
+        groupedWith: [
+          {
+            id: 2,
+            releaseId: 87,
+            communityId: 7,
+            title: 'Kid A',
+            userId: 55,
+            addedAt: '2024-01-01T00:00:00Z'
+          }
+        ]
+      }
+    ],
+    ...overrides
+  });
+
+  const asAlice = () => {
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: {} }
+      } as never)
+    );
+    return store;
+  };
+
+  it('marks a collapsed row with its copy count and lists the copies on expand', async () => {
+    const user = userEvent.setup();
+    mockUseGetCollageQuery.mockReturnValue({
+      data: collapsedCollage(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CollageDetail />, { store: asAlice() });
+
+    expect(screen.getByText('2 copies')).toBeInTheDocument();
+    expect(screen.queryByTestId('grouped-with')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /editions/i }));
+
+    const list = screen.getByTestId('grouped-with');
+    expect(list).toHaveTextContent('Other copies in this collage');
+    // The absorbed copy links into ITS community, not the representative's.
+    expect(list.querySelector('a')?.getAttribute('href')).toBe(
+      '/communities/7/releases/87'
+    );
+    // Permission is per row: alice added the representative, not this one.
+    expect(list).toHaveTextContent('not yours to remove');
+  });
+
+  it('removes only the copies the viewer may remove, and fires no request it knows will 403', async () => {
+    const user = userEvent.setup();
+    mockUseGetCollageQuery.mockReturnValue({
+      data: collapsedCollage(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CollageDetail />, { store: asAlice() });
+
+    await user.click(screen.getByRole('button', { name: /\[x\]/i }));
+
+    await waitFor(() => {
+      expect(mockRemoveCollageEntry).toHaveBeenCalledWith({
+        id: 8,
+        releaseId: 41
+      });
+    });
+    // THE ASSERTION THAT CARRIES THE DECISION. Removing this line leaves a test
+    // that passes whether or not the doomed request was fired, and firing it is
+    // precisely what the predicted-subset design exists to avoid.
+    expect(mockRemoveCollageEntry).not.toHaveBeenCalledWith({
+      id: 8,
+      releaseId: 87
+    });
+    expect(mockRemoveCollageEntry).toHaveBeenCalledTimes(1);
+
+    // The confirm has to say so, since the user consents to a partial result.
+    expect(window.confirm).toHaveBeenCalledWith(
+      expect.stringContaining('You can remove 1')
+    );
+  });
+
+  it('removes every copy when the viewer may remove them all', async () => {
+    const user = userEvent.setup();
+    const data = collapsedCollage();
+    // Staff, so both copies are removable regardless of who added them.
+    mockUseGetCollageQuery.mockReturnValue({
+      data,
+      isLoading: false,
+      error: undefined
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: { collages_moderate: true } }
+      } as never)
+    );
+    renderWithProviders(<CollageDetail />, { store });
+
+    await user.click(screen.getByRole('button', { name: /\[x\]/i }));
+
+    await waitFor(() => {
+      expect(mockRemoveCollageEntry).toHaveBeenCalledTimes(2);
+    });
+    expect(mockRemoveCollageEntry).toHaveBeenCalledWith({
+      id: 8,
+      releaseId: 41
+    });
+    expect(mockRemoveCollageEntry).toHaveBeenCalledWith({
+      id: 8,
+      releaseId: 87
+    });
+    expect(window.confirm).toHaveBeenCalledWith(
+      expect.stringContaining('all 2 will be removed')
+    );
+  });
+
+  it('stops on a 429 rather than firing the rest into the same rate limit', async () => {
+    const user = userEvent.setup();
+    mockUseGetCollageQuery.mockReturnValue({
+      data: collapsedCollage(),
+      isLoading: false,
+      error: undefined
+    });
+    mockRemoveCollageEntry.mockReturnValue({
+      unwrap: () => Promise.reject({ status: 429 })
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'alice',
+        userRank: { permissions: { collages_moderate: true } }
+      } as never)
+    );
+    renderWithProviders(<CollageDetail />, { store });
+
+    await user.click(screen.getByRole('button', { name: /\[x\]/i }));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith(
+        expect.stringContaining('Too many requests')
+      );
+    });
+    expect(mockRemoveCollageEntry).toHaveBeenCalledTimes(1);
+  });
+
+  it('leaves an uncollapsed row asking exactly one question and firing one request', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<CollageDetail />, { store: asAlice() });
+
+    await user.click(screen.getByRole('button', { name: /\[x\]/i }));
+
+    await waitFor(() => {
+      expect(mockRemoveCollageEntry).toHaveBeenCalledTimes(1);
+    });
+    expect(window.confirm).toHaveBeenCalledWith(
+      'Remove this release from the collage?'
+    );
+    expect(screen.queryByText(/copies$/)).not.toBeInTheDocument();
+  });
 });
