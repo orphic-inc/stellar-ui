@@ -5,6 +5,7 @@ import { renderWithProviders } from '../testUtils';
 import ReleaseBrowsePage from '../../components/releases/ReleaseBrowsePage';
 
 const mockUseSearchReleasesQuery = jest.fn();
+const mockUseSearchReleaseGroupsQuery = jest.fn();
 const mockUseGetCommunitiesQuery = jest.fn();
 const mockUseGetMeQuery = jest.fn();
 const mockSetSearchParams = jest.fn();
@@ -12,7 +13,9 @@ const mockUseSearchParams = jest.fn();
 
 jest.mock('../../store/services/searchApi', () => ({
   useSearchReleasesQuery: (...args: unknown[]) =>
-    mockUseSearchReleasesQuery(...args)
+    mockUseSearchReleasesQuery(...args),
+  useSearchReleaseGroupsQuery: (...args: unknown[]) =>
+    mockUseSearchReleaseGroupsQuery(...args)
 }));
 
 jest.mock('../../store/services/communityApi', () => ({
@@ -79,6 +82,13 @@ describe('ReleaseBrowsePage', () => {
     });
     mockUseGetCommunitiesQuery.mockReturnValue({
       data: { data: [{ id: 1, name: 'Jazz Vault' }] }
+    });
+    // Skipped in release mode, but the hook is still called, so it must return
+    // the RTK Query result shape rather than undefined.
+    mockUseSearchReleaseGroupsQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: undefined
     });
   });
 
@@ -156,8 +166,11 @@ describe('ReleaseBrowsePage', () => {
       mockSetSearchParams
     ]);
     renderWithProviders(<ReleaseBrowsePage />);
+    // Second argument since #320: the hook is skipped in group mode, so both
+    // searches are declared and only one runs.
     expect(mockUseSearchReleasesQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ q: 'jazz', tags: 'modal', page: 2 })
+      expect.objectContaining({ q: 'jazz', tags: 'modal', page: 2 }),
+      { skip: false }
     );
   });
 
@@ -397,5 +410,153 @@ describe('ReleaseBrowsePage', () => {
     renderWithProviders(<ReleaseBrowsePage />);
     expect(screen.getByText('Random Release')).toBeInTheDocument();
     expect(screen.getByText('Random Artist')).toBeInTheDocument();
+  });
+  // ── #320 — group mode ──────────────────────────────────────────────────────
+
+  const inGroupMode = (extra = '') =>
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams(`mode=groups${extra}`),
+      mockSetSearchParams
+    ]);
+
+  const groupBody = (data: unknown[], total = data.length) => ({
+    data: { data, meta: { total, page: 1, limit: 25, totalPages: 1 } },
+    isLoading: false,
+    error: undefined
+  });
+
+  it('runs exactly one of the two searches, decided by the mode', () => {
+    inGroupMode();
+    mockUseSearchReleaseGroupsQuery.mockReturnValue(groupBody([]));
+    renderWithProviders(<ReleaseBrowsePage />);
+
+    expect(mockUseSearchReleasesQuery).toHaveBeenCalledWith(expect.anything(), {
+      skip: true
+    });
+    expect(mockUseSearchReleaseGroupsQuery).toHaveBeenCalledWith(
+      expect.anything(),
+      { skip: false }
+    );
+  });
+
+  // The reconciliation is the point of the whole toggle: /search/release-groups
+  // rejects consumers/contributors/random with a 400, so a value carried across
+  // from the release search must be replaced, not sent.
+  it.each(['consumers', 'contributors', 'random'])(
+    'replaces the release-only orderBy %s with the group default rather than sending it',
+    (bad) => {
+      inGroupMode(`&orderBy=${bad}`);
+      mockUseSearchReleaseGroupsQuery.mockReturnValue(groupBody([]));
+      renderWithProviders(<ReleaseBrowsePage />);
+
+      expect(mockUseSearchReleaseGroupsQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ orderBy: 'title' }),
+        { skip: false }
+      );
+      expect(mockUseSearchReleaseGroupsQuery).not.toHaveBeenCalledWith(
+        expect.objectContaining({ orderBy: bad }),
+        expect.anything()
+      );
+    }
+  );
+
+  it('keeps an orderBy both endpoints accept', () => {
+    inGroupMode('&orderBy=year');
+    mockUseSearchReleaseGroupsQuery.mockReturnValue(groupBody([]));
+    renderWithProviders(<ReleaseBrowsePage />);
+    expect(mockUseSearchReleaseGroupsQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: 'year' }),
+      { skip: false }
+    );
+  });
+
+  it('counts albums rather than results, and lists the members the viewer can reach', () => {
+    inGroupMode();
+    mockUseSearchReleaseGroupsQuery.mockReturnValue(
+      groupBody(
+        [
+          {
+            id: 3,
+            title: 'Kid A',
+            year: 2000,
+            image: null,
+            artist: { id: 1, name: 'Radiohead' },
+            releases: [
+              {
+                id: 41,
+                title: 'Kid A',
+                year: 2000,
+                image: null,
+                communityId: 2,
+                community: { id: 2, name: 'Hydra' },
+                artist: { id: 1, name: 'Radiohead' }
+              },
+              {
+                id: 87,
+                title: 'Kid A',
+                year: 2000,
+                image: null,
+                communityId: 7,
+                community: { id: 7, name: 'Tapehead' },
+                artist: { id: 1, name: 'Radiohead' }
+              }
+            ]
+          }
+        ],
+        12
+      )
+    );
+    renderWithProviders(<ReleaseBrowsePage />);
+
+    // The row IS the group, so the count is albums — not releases.
+    expect(screen.getByText('12 albums')).toBeInTheDocument();
+    expect(screen.queryByText('12 results')).not.toBeInTheDocument();
+
+    expect(screen.getByText('Kid A')).toBeInTheDocument();
+    expect(screen.getByText('Hydra')).toBeInTheDocument();
+    expect(screen.getByText('Tapehead')).toBeInTheDocument();
+  });
+
+  // Zero in group mode does not mean the filters matched nothing — grouping is
+  // opt-in and never backfilled, so on an uncurated catalogue EVERY group query
+  // is empty. The shared copy would be wrong for the majority of queries.
+  it('names the cause of an empty group search and offers the way back', () => {
+    inGroupMode('&q=radiohead');
+    mockUseSearchReleaseGroupsQuery.mockReturnValue(groupBody([]));
+    renderWithProviders(<ReleaseBrowsePage />);
+
+    expect(screen.getByText(/no grouped albums match/i)).toBeInTheDocument();
+    expect(screen.queryByText('No releases found.')).not.toBeInTheDocument();
+    expect(screen.getByText(/grouping is opt-in/i)).toBeInTheDocument();
+
+    // The way back keeps the filters and drops the mode and its sort.
+    const back = screen
+      .getByText(/see these filters as releases/i)
+      .closest('a');
+    expect(back?.getAttribute('href')).toContain('q=radiohead');
+    expect(back?.getAttribute('href')).not.toContain('mode=groups');
+  });
+
+  it('keeps the plain empty copy in release mode', () => {
+    mockUseSearchReleasesQuery.mockReturnValue({
+      data: { data: [], meta: { total: 0, page: 1, limit: 25, totalPages: 0 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleaseBrowsePage />);
+    expect(screen.getByText('No releases found.')).toBeInTheDocument();
+    expect(screen.queryByText(/grouping is opt-in/i)).not.toBeInTheDocument();
+  });
+
+  it('offers only the sort options the active mode accepts', () => {
+    inGroupMode();
+    mockUseSearchReleaseGroupsQuery.mockReturnValue(groupBody([]));
+    renderWithProviders(<ReleaseBrowsePage />);
+    const options = [
+      ...(document.querySelectorAll(
+        '#release-orderBy option'
+      ) as NodeListOf<HTMLOptionElement>)
+    ].map((o) => o.value);
+    expect(options).toEqual(['title', 'year', 'createdAt']);
   });
 });

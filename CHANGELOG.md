@@ -53,6 +53,28 @@ All notable changes to stellar-ui are documented here.
   response carries no community **name** — for the entry or its copies — and
   naming them would cost a request per expanded row.
 
+- **Search can collapse duplicates onto the album**
+  ([#320](https://github.com/orphic-inc/stellar-ui/issues/320)) — a `Show
+releases · albums` toggle on the release browse page. In album mode the row
+  **is** the group, so an album held in three communities is one result and
+  `total` counts albums; each row lists the versions this viewer can reach.
+
+  It is a separate endpoint rather than a flag because `/search/releases`
+  paginates with `skip`/`take`: collapsing a fetched page there would leave
+  `total` overstating and show a group straddling a page boundary twice.
+
+  Every filter carries across untouched — the two endpoints accept identical
+  ones — but the **sort vocabularies differ**, so `consumers`, `contributors`
+  and `random` are reconciled to the group default on toggle rather than sent,
+  since the group endpoint answers `400` for them. There is deliberately no
+  member-count sort: the api can only count a group's whole relation, not the
+  part the viewer may see.
+
+  An empty album search **names its own cause** — grouping is opt-in and never
+  backfilled, so on an uncurated catalogue every album query is empty — and
+  links back to the same filters as releases. The shared "No releases found."
+  would be wrong for the majority of queries rather than an edge case.
+
 ### Changed
 
 - **The vendored contract picks up the whole `ReleaseGroup` surface** — nine

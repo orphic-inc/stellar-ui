@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useSearchReleasesQuery } from '../../store/services/searchApi';
+import {
+  useSearchReleasesQuery,
+  useSearchReleaseGroupsQuery
+} from '../../store/services/searchApi';
 import { useGetCommunitiesQuery } from '../../store/services/communityApi';
 import { useGetMeQuery } from '../../store/services/authApi';
 import { hasPermission } from '../../utils/permissions';
@@ -43,6 +46,22 @@ const ORDER_BY_OPTIONS = [
   { value: 'random', label: 'Random' }
 ];
 
+// `/search/release-groups` takes every filter `/search/releases` takes, but a
+// narrower sort vocabulary: `consumers`, `contributors` and `random` are
+// release properties with no group analogue, and sending one is a 400 rather
+// than a degraded sort. There is deliberately no member-count option either —
+// the api can only count a group's whole relation, not the part this viewer may
+// see, so ranking by it would expose a number including members they cannot
+// reach (#320).
+const GROUP_ORDER_BY_OPTIONS = [
+  { value: 'title', label: 'Title' },
+  { value: 'year', label: 'Year' },
+  { value: 'createdAt', label: 'Time Added' }
+];
+const GROUP_ORDER_BY = new Set(GROUP_ORDER_BY_OPTIONS.map((o) => o.value));
+const GROUP_DEFAULT_ORDER_BY = 'title';
+const GROUP_DEFAULT_ORDER = 'asc';
+
 // Layout-only class strings; paint comes from the `field`/`meta` Roles below.
 // `field` carries the box treatment; `meta` paints labels; native
 // radio/checkbox keep `field` for its accent-color (the box rules are inert on
@@ -61,8 +80,19 @@ const ReleaseBrowsePage = () => {
   const q = searchParams.get('q') ?? undefined;
   const tags = searchParams.get('tags') ?? undefined;
   const tagMode = (searchParams.get('tagMode') ?? 'any') as 'any' | 'all';
-  const orderBy = searchParams.get('orderBy') ?? 'createdAt';
-  const order = (searchParams.get('order') ?? 'desc') as 'asc' | 'desc';
+  const groupMode = searchParams.get('mode') === 'groups';
+  const rawOrderBy = searchParams.get('orderBy');
+  const rawOrder = searchParams.get('order') as 'asc' | 'desc' | null;
+  // Group mode's sort vocabulary is narrower, so an orderBy carried across from
+  // the release search is reconciled to the group default rather than sent. The
+  // toggle preserves every filter, and a filter that produced a 400 would be a
+  // worse trade than a changed sort.
+  const orderBy =
+    groupMode && !GROUP_ORDER_BY.has(rawOrderBy ?? '')
+      ? GROUP_DEFAULT_ORDER_BY
+      : (rawOrderBy ?? (groupMode ? GROUP_DEFAULT_ORDER_BY : 'createdAt'));
+  const order =
+    rawOrder ?? (groupMode ? GROUP_DEFAULT_ORDER : ('desc' as 'asc' | 'desc'));
   const page = Number(searchParams.get('page') ?? 1);
   const communityIds = searchParams
     .getAll('communityId')
@@ -106,7 +136,7 @@ const ReleaseBrowsePage = () => {
   const vanityHouse =
     searchParams.get('vanityHouse') === 'true' ? true : undefined;
 
-  const { data, isLoading, error } = useSearchReleasesQuery({
+  const searchArgs = {
     q,
     tags,
     tagMode,
@@ -130,7 +160,30 @@ const ReleaseBrowsePage = () => {
     hasCue,
     isScene,
     vanityHouse
+  };
+
+  // One hook per mode, the inactive one skipped. Both take the same arguments —
+  // the two endpoints accept identical filters — so the toggle changes what a
+  // row IS, not what was asked for.
+  const releaseResult = useSearchReleasesQuery(searchArgs, { skip: groupMode });
+  const groupResult = useSearchReleaseGroupsQuery(searchArgs, {
+    skip: !groupMode
   });
+  const { data, isLoading, error } = groupMode ? groupResult : releaseResult;
+  const groupData = groupMode ? groupResult.data : undefined;
+  const releaseData = groupMode ? undefined : releaseResult.data;
+
+  // Same filters, other mode — used by the toggle and by the empty state's way
+  // back out of group mode.
+  const modeHref = (toGroups: boolean) => {
+    const next = new URLSearchParams(searchParams);
+    if (toGroups) next.set('mode', 'groups');
+    else next.delete('mode');
+    next.delete('orderBy');
+    next.delete('order');
+    next.set('page', '1');
+    return `?${next.toString()}`;
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -138,14 +191,22 @@ const ReleaseBrowsePage = () => {
     const next = new URLSearchParams();
     const set = formParamSetter(fd, next);
 
+    // The form rebuilds the query string from scratch, so the mode has to be
+    // re-stated or submitting a filter would silently leave group mode.
+    if (groupMode) next.set('mode', 'groups');
+
     set('q');
     set('tags');
     const tm = fd.get('tagMode');
     if (tm && tm !== 'any') next.set('tagMode', String(tm));
+    // Each mode has its own default, and omitting the default keeps the URL
+    // short. Reconciliation on read is what makes omission safe.
+    const defaultOrderBy = groupMode ? GROUP_DEFAULT_ORDER_BY : 'createdAt';
+    const defaultOrder = groupMode ? GROUP_DEFAULT_ORDER : 'desc';
     const ob = fd.get('orderBy');
-    if (ob && ob !== 'createdAt') next.set('orderBy', String(ob));
+    if (ob && ob !== defaultOrderBy) next.set('orderBy', String(ob));
     const od = fd.get('order');
-    if (od && od !== 'desc') next.set('order', String(od));
+    if (od && od !== defaultOrder) next.set('order', String(od));
 
     const cids = fd.getAll('communityId');
     cids.forEach((id) => next.append('communityId', String(id)));
@@ -238,11 +299,13 @@ const ReleaseBrowsePage = () => {
                 data-st="field"
                 className={inputCls}
               >
-                {ORDER_BY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
+                {(groupMode ? GROUP_ORDER_BY_OPTIONS : ORDER_BY_OPTIONS).map(
+                  (o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  )
+                )}
               </select>
               <select name="order" defaultValue={order} data-st="field">
                 <option value="desc">Desc</option>
@@ -589,18 +652,101 @@ const ReleaseBrowsePage = () => {
         </div>
       </form>
 
+      {/* Mode toggle (#320). Every filter carries across untouched — the two
+          endpoints take identical ones — so this changes what a row IS, not
+          what was asked for. `orderBy`/`order` are dropped rather than carried,
+          because the vocabularies differ and a release-only value is a 400. */}
+      <div data-st="meta" className="text-xs mb-2 flex gap-2 items-center">
+        <span>Show</span>
+        {groupMode ? (
+          <Link to={modeHref(false)} data-st="control">
+            releases
+          </Link>
+        ) : (
+          <span data-st="prose" data-st-strong>
+            releases
+          </span>
+        )}
+        <span aria-hidden>·</span>
+        {groupMode ? (
+          <span data-st="prose" data-st-strong>
+            albums
+          </span>
+        ) : (
+          <Link to={modeHref(true)} data-st="control">
+            albums
+          </Link>
+        )}
+      </div>
+
       {/* Results */}
       {isLoading && <Spinner />}
       {error && <p className="text-red-400 text-sm">Failed to load results.</p>}
       {data && (
         <>
           <p data-st="prose" data-st-muted className="text-xs">
-            {data.meta.total} result{data.meta.total !== 1 ? 's' : ''}
+            {/* In group mode the row IS the group, so `total` counts albums
+                rather than releases — that is the whole reason this is a
+                separate endpoint instead of a flag on /search/releases. */}
+            {data.meta.total}{' '}
+            {groupMode
+              ? `album${data.meta.total !== 1 ? 's' : ''}`
+              : `result${data.meta.total !== 1 ? 's' : ''}`}
           </p>
           {data.data.length === 0 ? (
-            <p data-st="prose" data-st-muted className="text-sm">
-              No releases found.
-            </p>
+            groupMode ? (
+              // Zero here does NOT mean the filters matched nothing. Grouping is
+              // opt-in on the api side and never backfilled, so on an uncurated
+              // catalogue EVERY group query is empty — "No releases found."
+              // would be wrong for the majority of queries, not an edge case.
+              <div data-st="prose" data-st-muted className="text-sm">
+                <p>No grouped albums match these filters.</p>
+                <p className="mt-1">
+                  Grouping is opt-in — most releases are not part of a group
+                  yet.{' '}
+                  <Link to={modeHref(false)} data-st="control">
+                    See these filters as releases
+                  </Link>
+                  .
+                </p>
+              </div>
+            ) : (
+              <p data-st="prose" data-st-muted className="text-sm">
+                No releases found.
+              </p>
+            )
+          ) : groupMode && groupData ? (
+            <div data-st="list">
+              {groupData.data.map((g) => (
+                <div key={g.id} data-st="row">
+                  <div className="flex-1 min-w-0">
+                    <span data-st="title" className="block truncate">
+                      {g.title}
+                    </span>
+                    <span data-st="meta" data-st-em className="text-xs">
+                      {g.artist?.name ?? '—'}
+                      {g.year != null && ` · ${g.year}`}
+                    </span>
+                  </div>
+                  {/* `releases` is the members THIS VIEWER may see — not every
+                      member, and not only the ones that matched the query. A
+                      group found by a 2001 release still lists every version of
+                      the album the viewer can reach. */}
+                  <div className="flex flex-wrap gap-2 justify-end">
+                    {g.releases.map((r) => (
+                      <Link
+                        key={r.id}
+                        to={`/communities/${r.communityId ?? 0}/releases/${r.id}`}
+                        data-st="chip"
+                        className="text-xs"
+                      >
+                        {r.community?.name ?? `#${r.id}`}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="overflow-x-auto">
               {/* Columnar data: keep the <table> so columns stay aligned; the
@@ -616,7 +762,7 @@ const ReleaseBrowsePage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.data.map((r) => (
+                  {(releaseData?.data ?? []).map((r) => (
                     <tr key={r.id} data-st="row">
                       <td>
                         {r.communityId ? (

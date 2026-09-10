@@ -49,4 +49,28 @@ the deprecated torrent-era vocabulary.
 **Community / Release / Contribution**:
 A Community groups Releases; a Release is contributed to via Contributions.
 _Avoid_: **Torrent** (deprecated everywhere — a Release/Contribution is never a
-"torrent"), group, snatch
+"torrent"), snatch
+
+**Release Group**:
+The identity node for "the same album" across Communities — one album, many
+community-scoped Releases. It is what lets a collage show one entry instead of
+one per Community, and what `/search/release-groups` returns a row of.
+_Avoid_: album (the everyday word, and fine in UI copy — but not in code, where
+Release is the row), master, canonical release
+
+Two properties of it are load-bearing here, and neither is guessable from the
+component that renders it (`stellar-api/docs/adr/0037-…`):
+
+- **Identity inlines; membership does not.** `release.group` ships with the
+  release read — seeing a Release entitles you to its group's identity. The
+  member list is a separate access-filtered call. Never infer one from the
+  other.
+- **A shorter member list is correct, not a gap.** Every group read is filtered
+  to what the viewer may see, so two viewers on one page legitimately see
+  different lists, and a 404 means "no member you can see" **or** "no such
+  group" — deliberately indistinguishable. Render it as absence, never as an
+  error.
+
+Note the word **group** alone is ambiguous against stellar-api, where it still
+names a Release in the community routes (`stellar-api#603`). Prefer the full
+term.
