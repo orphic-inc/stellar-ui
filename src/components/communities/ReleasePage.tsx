@@ -20,6 +20,7 @@ import { useReleaseWorkbench } from './useReleaseWorkbench';
 import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 import { Modal } from '../ui';
 import { releaseCover } from '../../utils/releaseCover';
+import ReleaseGroupPanel from './ReleaseGroupPanel';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -453,6 +454,13 @@ const ReleasePage = () => {
                 className="w-full object-cover"
               />
             </div>
+          )}
+
+          {/* Release group — identity inlines with the release, membership
+              does not (#317). Renders only for a grouped release, which is the
+              minority: grouping is opt-in and never backfilled. */}
+          {release.group && (
+            <ReleaseGroupPanel group={release.group} currentReleaseId={rId} />
           )}
 
           {/* Votes */}

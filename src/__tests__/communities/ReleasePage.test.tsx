@@ -5,6 +5,7 @@ import { renderWithProviders } from '../testUtils';
 import ReleasePage from '../../components/communities/ReleasePage';
 
 const mockGetReleaseByIdQuery = jest.fn();
+const mockGetReleaseGroupQuery = jest.fn();
 const mockGetCommunityByIdQuery = jest.fn();
 const mockGetReleaseHistoryQuery = jest.fn();
 const mockGetReleaseContributionsQuery = jest.fn();
@@ -49,6 +50,11 @@ jest.mock('../../store/services/communityApi', () => ({
     jest.fn().mockResolvedValue({}),
     { isLoading: false }
   ]
+}));
+
+jest.mock('../../store/services/releaseGroupApi', () => ({
+  useGetReleaseGroupQuery: (...args: unknown[]) =>
+    mockGetReleaseGroupQuery(...args)
 }));
 
 jest.mock('../../store/services/bookmarkApi', () => ({
@@ -190,6 +196,11 @@ describe('ReleasePage', () => {
     });
     mockGetReleaseContributionsQuery.mockReturnValue({
       data: [makeContribution()]
+    });
+    mockGetReleaseGroupQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false
     });
     mockVoteOn.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockRemoveVote.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -832,5 +843,39 @@ describe('ReleasePage', () => {
         })
       );
     });
+  });
+
+  // #317 — the panel is driven by the INLINE `release.group`, so an ungrouped
+  // release must not even ask for members. Grouping is opt-in and never
+  // backfilled, so this is the common case, not the edge one.
+  it('renders no group panel, and fires no group request, for an ungrouped release', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({ group: null }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ReleasePage />);
+    expect(screen.queryByText('This album')).not.toBeInTheDocument();
+    expect(mockGetReleaseGroupQuery).not.toHaveBeenCalledWith(
+      expect.anything()
+    );
+  });
+
+  it('renders the group panel for a grouped release, keyed on the inline group id', () => {
+    mockGetReleaseByIdQuery.mockReturnValue({
+      data: makeRelease({
+        group: { id: 42, title: 'Kind of Blue', year: 1959, image: null }
+      }),
+      isLoading: false,
+      error: undefined
+    });
+    mockGetReleaseGroupQuery.mockReturnValue({
+      data: { id: 42, title: 'Kind of Blue', releases: [] },
+      isLoading: false,
+      isError: false
+    });
+    renderWithProviders(<ReleasePage />);
+    expect(screen.getByText('This album')).toBeInTheDocument();
+    expect(mockGetReleaseGroupQuery).toHaveBeenCalledWith(42);
   });
 });

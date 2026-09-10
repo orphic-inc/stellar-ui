@@ -6,6 +6,30 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **A release group panel on the release page**
+  ([#317](https://github.com/orphic-inc/stellar-ui/issues/317)) — "this album,
+  everywhere you can reach it": the group's canonical title and year, and the
+  member releases in other communities, each linking to its own release page.
+  The release being viewed is **marked, not hidden**, so the panel reads as the
+  whole album rather than a list of elsewhere.
+
+  Identity and membership arrive separately, and the split is an access boundary
+  rather than a fetching convenience. `release.group` inlines with the release
+  read — seeing a release entitles you to its group's identity — so the header
+  renders with no request. The sibling list stays behind
+  `GET /release-groups/{id}`, which returns **only the members this viewer may
+  see**. That list can be shorter than the album really is and can differ
+  between two viewers on the same page; both are correct, not gaps.
+
+  The endpoint answers `404` for a group with no viewer-visible member, using
+  the same status and message as a group that does not exist. It cannot arise
+  from this page, so it renders as no panel rather than an error banner.
+
+  The panel does not render for an ungrouped release, and fires no request for
+  one — which is most of them, since grouping is opt-in and never backfilled.
+
 ### Changed
 
 - **The vendored contract picks up the whole `ReleaseGroup` surface** — nine
