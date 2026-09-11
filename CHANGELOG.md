@@ -77,6 +77,35 @@ releases · albums` toggle on the release browse page. In album mode the row
 
 ### Changed
 
+- **The vendored contract catches up with stellar-api `0.9.3`**
+  ([#301](https://github.com/orphic-inc/stellar-ui/issues/301)) — two paths, two
+  schemas, one widened schema and two description rewrites, none of which this
+  repo could see while `typecheck` asserted agreement with a contract the API had
+  stopped serving.
+
+  `/auth/reactivation-request` and `/auth/reactivation-confirm`, with
+  `ReactivationRequestBody` and `ReactivationConfirmBody`, arrived with
+  [api#279](https://github.com/orphic-inc/stellar-api/issues/279) — the way back
+  in for a disabled account. `AbsorbedCollageEntry` gains a required `user`
+  (`{ id, username }`) from
+  [api#617](https://github.com/orphic-inc/stellar-api/issues/617), so a collapsed
+  collage row can now **name** the adder whose copy it cannot remove rather than
+  only counting them. Two 400 descriptions were rewritten at the source
+  ([api#600](https://github.com/orphic-inc/stellar-api/issues/600),
+  [api#603](https://github.com/orphic-inc/stellar-api/issues/603)).
+
+  The sync is **purely additive** — no path, schema or property was removed or
+  narrowed, and `typecheck` is clean, so there was no drift damage to repair.
+  `info.version` is `0.9.3` on both sides and the coupling stays at `0.9`, so no
+  parity cut is owed under
+  [ADR-0004](docs/adr/0004-peer-api-contract-version-coupling.md).
+
+  **Nothing in the app consumes any of it yet.** `AbsorbedCopies` still reads
+  `not yours to remove` and `removalConfirmMessage` still says "added by other
+  members", both of which `user.username` now makes nameable; and the
+  reactivation routes have no surface at all, which is the larger of the two
+  gaps.
+
 - **The vendored contract picks up the whole `ReleaseGroup` surface** — nine
   paths and seven schemas that stellar-api has shipped and this repo could not
   see. `/release-groups/{id}` and its merge/split/cover/log routes arrived with

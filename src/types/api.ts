@@ -471,6 +471,128 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/auth/reactivation-request': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Ask staff to reinstate a disabled account
+     * @description Always answers 200 with the same generic message, whether the address belongs to no account, to an active one, or to a disabled one. A distinguishable response would say which accounts are disabled, and therefore which members were banned. Open to ANY disabled account, moderator actions included: it is an appeals channel, and filtering by reason would be the same oracle by another route. A link is only sent for an account that is actually disabled. Rate-limited by authLimiter.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['ReactivationRequestBody'];
+        };
+      };
+      responses: {
+        /** @description Generic acknowledgement — identical for a known, unknown, active or disabled address */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/auth/reactivation-confirm': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Confirm a reactivation request and put it in front of staff
+     * @description Consumes the token and opens a staff-inbox conversation. Idempotent per member: where an unresolved conversation already exists the token is still spent and a message is appended to it, so one email round-trip cannot become an unlimited supply of threads. A reactivation token is not interchangeable with a password-reset one — `/auth/recovery/reset` will not accept it. Staff reinstate through the existing `users_disable` surface. Rate-limited by authLimiter.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': components['schemas']['ReactivationConfirmBody'];
+        };
+      };
+      responses: {
+        /** @description The request has been sent to staff */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid or expired token */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/auth/sessions': {
     parameters: {
       query?: never;
@@ -10818,7 +10940,7 @@ export interface paths {
     get?: never;
     /**
      * Attach a release to a release group, or detach it
-     * @description Pass `releaseGroupId: null` to detach. Named `release-group` rather than `group` because in the community routes "group" already means a release, inherited from the legacy vocabulary.
+     * @description Pass `releaseGroupId: null` to detach. Named `release-group` rather than `group` because "group" was long used in the community routes for the release itself; `ReleaseGroup` is the identity node one level above.
      *
      *     Gated by **community access, not a permission**, and it refuses rather than filtering: the path names one community, so the caller is owed a straight answer. You may only group releases you can already reach.
      */
@@ -21431,7 +21553,7 @@ export interface paths {
             'application/json': components['schemas']['VanityHouseArtist'];
           };
         };
-        /** @description Invalid path parameters */
+        /** @description Invalid path parameters or request body */
         400: {
           headers: {
             [name: string]: unknown;
@@ -27429,6 +27551,13 @@ export interface components {
       /** Format: email */
       email: string;
     };
+    ReactivationRequestBody: {
+      /** Format: email */
+      email: string;
+    };
+    ReactivationConfirmBody: {
+      token: string;
+    };
     RecoveryResetBody: {
       token: string;
       newPassword: string;
@@ -29423,6 +29552,10 @@ export interface components {
       communityId: number | null;
       title: string;
       userId: number;
+      user: {
+        id: number;
+        username: string;
+      };
       addedAt: string;
     };
     CollageEntry: {
