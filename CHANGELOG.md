@@ -77,6 +77,26 @@ releases · albums` toggle on the release browse page. In album mode the row
 
 ### Changed
 
+- **The vendored contract catches up with stellar-api `0.9.4`**
+  ([#301](https://github.com/orphic-inc/stellar-ui/issues/301)) — `UserRank`
+  gains two required fields, `inviteGrantPerPeriod` and `inviteCap`, and both
+  rank request bodies accept them as optional non-negative integers. They arrived
+  with [api#282](https://github.com/orphic-inc/stellar-api/issues/282), the
+  periodic class-based invite handout: a rank accrues `inviteGrantPerPeriod`
+  invites every 14 days, up to `inviteCap`, and both default to `0`.
+
+  `UserRankManager.test.tsx`'s `makeRank` fixture adds the two fields. It builds
+  a complete `UserRankRecord` that mirrors what the API's `formatRank` sends, so
+  the now-required fields failed `typecheck` until it did. No shipped code was
+  affected. `info.version` moves to `0.9.4`; the coupling stays at `0.9`, so no
+  parity cut is owed under
+  [ADR-0004](docs/adr/0004-peer-api-contract-version-coupling.md).
+
+  **Nothing in the app consumes them yet.** `UserRankFormPage` has no inputs for
+  either field, so staff cannot opt a rank into the handout from the UI. Because
+  every rank defaults to `0` and the api job ships `INVITE_GRANT_MODE=off`,
+  nothing is lost in the meantime.
+
 - **The vendored contract catches up with stellar-api `0.9.3`**
   ([#301](https://github.com/orphic-inc/stellar-ui/issues/301)) — two paths, two
   schemas, one widened schema and two description rewrites, none of which this
