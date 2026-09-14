@@ -12218,6 +12218,8 @@ export interface paths {
             personalCollageLimit?: number;
             authorStylesheetLimit?: number;
             assetLimit?: number | null;
+            inviteGrantPerPeriod?: number;
+            inviteCap?: number;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -12487,6 +12489,8 @@ export interface paths {
             personalCollageLimit?: number;
             authorStylesheetLimit?: number;
             assetLimit?: number | null;
+            inviteGrantPerPeriod?: number;
+            inviteCap?: number;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -28717,6 +28721,8 @@ export interface components {
       personalCollageLimit: number;
       authorStylesheetLimit: number;
       assetLimit: number | null;
+      inviteGrantPerPeriod: number;
+      inviteCap: number;
       displayStaff: boolean;
       staffGroupId: number | null;
       primaryUserCount: number;

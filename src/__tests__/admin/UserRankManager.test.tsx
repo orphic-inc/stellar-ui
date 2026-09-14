@@ -34,6 +34,8 @@ const makeRank = (
   personalCollageLimit: 0,
   authorStylesheetLimit: 0,
   assetLimit: 0,
+  inviteGrantPerPeriod: 0,
+  inviteCap: 0,
   displayStaff: false,
   staffGroupId: null,
   primaryUserCount: id * 10,
