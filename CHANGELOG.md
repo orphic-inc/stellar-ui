@@ -105,7 +105,10 @@ releases · albums` toggle on the release browse page. In album mode the row
     screen as `expectedInviteCount`. Save stays disabled while the value is
     unchanged. A `409` means the balance moved first: the dialog stays open with
     what staff typed, waits for the reloaded profile, and names the new balance.
-    Nothing is retried automatically.
+    Nothing is retried automatically. The dialog reads the balance from its own
+    subscription to the cached profile, so the notice, **Current balance** and
+    the `expectedInviteCount` a save sends are always the same number, and they
+    follow a background refresh.
   - The panel needs `invites_edit` **and** a profile that carries both invite
     fields. The api sends them only to staff it recognises by `staff`, `admin`,
     `users_edit`, `users_warn` or `users_disable`, so a rank holding
