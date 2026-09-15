@@ -24,7 +24,7 @@ const baseStats: {
   bracket: { label: string };
   contributionCoverage: number;
   eligibleContributionBytes: number;
-  policy: { status: string } | null;
+  policy: { status: string; disabledCause?: 'RATIO' | 'STAFF' | null } | null;
 } = {
   contributed: 2000000000,
   consumed: 500000000,
@@ -90,10 +90,54 @@ describe('RatioStats', () => {
     expect(ratioEl.className).toContain('text-[var(--st-danger)]');
   });
 
-  it('shows DOWNLOAD_DISABLED warning', () => {
-    mockStatsData = { ...baseStats, policy: { status: 'DOWNLOAD_DISABLED' } };
-    renderWithProviders(<RatioStats />);
-    expect(screen.getByText(/downloads disabled/i)).toBeInTheDocument();
+  describe('the disabled banner follows the cause (#332)', () => {
+    const disabledWith = (disabledCause: 'RATIO' | 'STAFF' | null) => {
+      mockStatsData = {
+        ...baseStats,
+        policy: { status: 'DOWNLOAD_DISABLED', disabledCause }
+      };
+      return renderWithProviders(<RatioStats />);
+    };
+
+    it('says a ratio disable comes back on its own', () => {
+      disabledWith('RATIO');
+      expect(screen.getByText(/downloads disabled\./i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/come back automatically once your ratio meets it/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: /staff pm/i })
+      ).not.toBeInTheDocument();
+    });
+
+    it('sends a staff disable to Staff PM and says it does not lift', () => {
+      disabledWith('STAFF');
+      expect(
+        screen.getByText(/downloads disabled by staff\./i)
+      ).toBeInTheDocument();
+      expect(screen.getByText(/does not lift on its own/i)).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /staff pm/i })).toHaveAttribute(
+        'href',
+        '/inbox/staff/new'
+      );
+    });
+
+    it('claims no cause when none is recorded', () => {
+      disabledWith(null);
+      expect(
+        screen.getByRole('link', { name: /staff pm/i })
+      ).toBeInTheDocument();
+      expect(screen.queryByText(/automatically/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/by staff/i)).not.toBeInTheDocument();
+    });
+
+    it.each(['RATIO', 'STAFF', null] as const)(
+      'does not promise an appeal (cause %s)',
+      (cause) => {
+        disabledWith(cause);
+        expect(screen.queryByText(/appeal/i)).not.toBeInTheDocument();
+      }
+    );
   });
 
   it('shows WATCH warning', () => {

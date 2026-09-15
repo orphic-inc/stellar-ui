@@ -186,6 +186,43 @@ releases · albums` toggle on the release browse page. In album mode the row
   than from the site table in #318, which named `ReleaseBrowsePage` (it renders
   no cover art at all, only a text table) and omitted `CommunityPage`.
 
+- **The vendored contract catches up with stellar-api `0.9.5`**
+  ([#328](https://github.com/orphic-inc/stellar-ui/issues/328)). The resync
+  forces one type error: `POST /ratio-policy/{userId}/override` now requires
+  `reason`, below. Everything else it vendors is new api surface, consumed
+  by the invite, login, capacity and rank issues that follow it (#324, #326,
+  #327, #329, #330, #331). `/auth/reactivation-request` and
+  `/auth/reactivation-confirm` leave the contract, and nothing here called
+  them.
+
+- **The ratio policy override takes a reason, and a download disable says why**
+  ([#332](https://github.com/orphic-inc/stellar-ui/issues/332),
+  [api#646](https://github.com/orphic-inc/stellar-api/issues/646)). Against api
+  `0.9.5` the panel's `{ status }`-only request answered `400`.
+
+  - **`RatioPolicyPanel`** sends `{ status, reason, message? }`. **Reason** is
+    required, staff-only and recorded in the audit log; a whitespace-only
+    reason is refused before any request. **Message to member** is optional,
+    sent as a System PM, and the hint says a blank one notifies nobody. Both
+    clear after a successful override, and a failure shows the api's `msg`.
+  - The status options read "OK", "Ratio watch" and "Downloads disabled", and a
+    line under the select says what the choice does. The disable line matters
+    most: a staff disable does not lift itself, so it is no nudge that clears
+    when the ratio recovers.
+  - A disabled member's current state names the cause: Ratio (lifts
+    automatically once the ratio recovers, checked daily) or Staff (only staff
+    can lift it).
+  - The panel moves onto the kit (`PageShell`, `Panel`, `Field`, `Button`,
+    `Badge`, and `field` on the select and textareas). It was one of the last
+    staff tools still painting gray utilities, illegible on a light theme.
+  - **`RatioWatchPage`** reads "Download Disabled · Ratio" or "· Staff" in the
+    status cell; a staff row's tooltip says only staff can lift it.
+  - **The member's banner in `RatioStats`** splits by cause. A ratio disable
+    says downloads come back automatically once the ratio meets its
+    requirement, checked daily, linking the ratio rules. A staff disable says it
+    does not lift on its own and links Staff PM. "Contact staff to appeal" is
+    gone from both, since the site defines no appeal process.
+
 ## [0.9.3] — 2026-09-09
 
 ### Added

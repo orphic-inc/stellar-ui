@@ -3,6 +3,42 @@ import { useGetMyRatioStatsQuery } from '../../store/services/profileApi';
 import { formatBytes } from '../../utils';
 import Spinner from '../layout/Spinner';
 
+// Why downloads are disabled decides what the member can do about it
+// (stellar-api#646): a ratio disable lifts itself on the daily sweep, a staff
+// disable does not. `null` is unreachable for a disabled row after the api's
+// backfill, so that arm says nothing about the cause.
+const DisabledNotice = ({ cause }: { cause: 'RATIO' | 'STAFF' | null }) => {
+  if (cause === 'RATIO')
+    return (
+      <>
+        <strong>Downloads disabled.</strong> Your ratio fell short of its
+        requirement. They come back automatically once your ratio meets it,
+        checked daily. See the{' '}
+        <Link to="/ratio" className="underline">
+          ratio rules
+        </Link>
+        .
+      </>
+    );
+  const staffPm = (
+    <Link to="/inbox/staff/new" className="underline">
+      Staff PM
+    </Link>
+  );
+  if (cause === 'STAFF')
+    return (
+      <>
+        <strong>Downloads disabled by staff.</strong> This does not lift on its
+        own. Contact staff through {staffPm} if you have questions.
+      </>
+    );
+  return (
+    <>
+      <strong>Downloads disabled.</strong> Contact staff through {staffPm}.
+    </>
+  );
+};
+
 const RatioStats = () => {
   const { data: stats, isLoading } = useGetMyRatioStatsQuery();
 
@@ -19,9 +55,7 @@ const RatioStats = () => {
 
       {stats.policy?.status === 'DOWNLOAD_DISABLED' && (
         <div className="border-b border-[color-mix(in_oklch,var(--st-danger)_40%,transparent)] bg-[color-mix(in_oklch,var(--st-danger)_12%,transparent)] px-4 py-3 text-sm text-[var(--st-danger)]">
-          <strong>Downloads disabled.</strong> Your ratio fell below the
-          required threshold and your download access has been suspended.
-          Contact staff to appeal.
+          <DisabledNotice cause={stats.policy.disabledCause} />
         </div>
       )}
 

@@ -1,23 +1,45 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import {
   useGetRatioPolicyQuery,
   useOverrideRatioPolicyMutation
 } from '../../store/services/ratioPolicyApi';
+import { getApiErrorMessage } from '../../utils/apiError';
+import { PageShell, Panel, Field, Button, Badge } from '../ui';
+import type { BadgeVariant } from '../ui';
 
-const STATUS_BADGE: Record<string, string> = {
-  OK: 'bg-green-800 text-green-200',
-  WATCH: 'bg-yellow-800 text-yellow-200',
-  DOWNLOAD_DISABLED: 'bg-red-800 text-red-200'
+type PolicyStatus = 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
+
+const STATUS_LABEL: Record<PolicyStatus, string> = {
+  OK: 'OK',
+  WATCH: 'Ratio watch',
+  DOWNLOAD_DISABLED: 'Downloads disabled'
 };
 
-const STATUS_OPTIONS = [
-  { value: 'OK', label: 'OK — no restrictions' },
-  { value: 'WATCH', label: 'WATCH — ratio watch period' },
-  { value: 'DOWNLOAD_DISABLED', label: 'DOWNLOAD_DISABLED — downloads blocked' }
-] as const;
+const STATUS_BADGE: Record<PolicyStatus, BadgeVariant> = {
+  OK: 'success',
+  WATCH: 'warning',
+  DOWNLOAD_DISABLED: 'danger'
+};
+
+// What each override does (stellar-api#646, ADR-0044). The disable line is the
+// one that matters: a staff disable does not lift itself, so it cannot be used
+// as a nudge that clears when the ratio recovers.
+const STATUS_EFFECT: Record<PolicyStatus, string> = {
+  OK: 'Clears any watch or disable. Automatic ratio rules resume.',
+  WATCH:
+    'Starts a 14-day watch. Downloading 10 GiB or more during it disables downloads.',
+  DOWNLOAD_DISABLED:
+    'Disables downloads until staff lift it. The ratio sweep will not.'
+};
+
+const CAUSE_TEXT: Record<'RATIO' | 'STAFF', string> = {
+  RATIO: 'Ratio — lifts automatically once the ratio recovers (checked daily)',
+  STAFF: 'Staff — only staff can lift it'
+};
+
+const isPolicyStatus = (s: string): s is PolicyStatus => s in STATUS_LABEL;
 
 const fmt = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString() : '—';
@@ -27,83 +49,164 @@ const PolicyView = ({ userId }: { userId: number }) => {
   const { data: state, isLoading, error } = useGetRatioPolicyQuery(userId);
   const [override, { isLoading: overriding }] =
     useOverrideRatioPolicyMutation();
-  const [newStatus, setNewStatus] = useState<
-    'OK' | 'WATCH' | 'DOWNLOAD_DISABLED'
-  >('OK');
+  const [newStatus, setNewStatus] = useState<PolicyStatus>('OK');
+  const [reason, setReason] = useState('');
+  const [message, setMessage] = useState('');
 
-  if (isLoading) return <p className="text-sm text-gray-400 mt-4">Loading…</p>;
+  if (isLoading)
+    return (
+      <p data-st="meta" className="text-sm">
+        Loading…
+      </p>
+    );
   if (error || !state)
     return (
-      <p className="text-sm text-red-400 mt-4">
+      <p className="text-sm text-[var(--st-danger)]">
         User not found or access denied.
       </p>
     );
 
   const handleOverride = async (e: React.FormEvent) => {
     e.preventDefault();
+    // The api trims and rejects a blank reason; refuse it here first so a
+    // whitespace-only reason costs no round trip.
+    const trimmedReason = reason.trim();
+    if (!trimmedReason) {
+      dispatch(addAlert('A reason is required.', 'danger'));
+      return;
+    }
+    const trimmedMessage = message.trim();
     try {
-      await override({ userId, status: newStatus }).unwrap();
-      dispatch(addAlert(`Status set to ${newStatus}.`, 'success'));
-    } catch {
-      dispatch(addAlert('Failed to apply override.', 'danger'));
+      await override({
+        userId,
+        status: newStatus,
+        reason: trimmedReason,
+        ...(trimmedMessage ? { message: trimmedMessage } : {})
+      }).unwrap();
+      dispatch(
+        addAlert(`Status set to ${STATUS_LABEL[newStatus]}.`, 'success')
+      );
+      setReason('');
+      setMessage('');
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to apply override.',
+          'danger'
+        )
+      );
     }
   };
 
-  return (
-    <div className="mt-6 space-y-4">
-      <div className="bg-gray-900 border border-gray-700 rounded p-4 space-y-2">
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-400">Current status</span>
-          <span
-            className={`text-xs px-2 py-0.5 rounded font-medium ${
-              STATUS_BADGE[state.status] ?? 'bg-gray-700 text-gray-300'
-            }`}
-          >
-            {state.status}
-          </span>
-        </div>
-        <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
-          <span className="text-gray-500">Watch started</span>
-          <span className="text-gray-300">{fmt(state.watchStartedAt)}</span>
-          <span className="text-gray-500">Watch expires</span>
-          <span className="text-gray-300">{fmt(state.watchExpiresAt)}</span>
-          <span className="text-gray-500">Download disabled</span>
-          <span className="text-gray-300">{fmt(state.downloadDisabledAt)}</span>
-          <span className="text-gray-500">Last evaluated</span>
-          <span className="text-gray-300">{fmt(state.lastEvaluatedAt)}</span>
-        </div>
-      </div>
+  const status: string = state.status;
+  const known = isPolicyStatus(status);
 
-      <form onSubmit={handleOverride} className="flex items-end gap-3">
-        <div className="flex-1">
+  return (
+    <>
+      <Panel className="p-4 space-y-2">
+        <div className="flex items-center gap-3">
+          <span data-st="meta" className="text-sm">
+            Current status
+          </span>
+          <Badge variant={known ? STATUS_BADGE[status] : 'default'}>
+            {known ? STATUS_LABEL[status] : status}
+          </Badge>
+        </div>
+        {status === 'DOWNLOAD_DISABLED' && state.disabledCause && (
+          <p data-st="prose" className="text-sm">
+            Cause: {CAUSE_TEXT[state.disabledCause]}
+          </p>
+        )}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
+          <span data-st="meta">Watch started</span>
+          <span data-st="prose">{fmt(state.watchStartedAt)}</span>
+          <span data-st="meta">Watch expires</span>
+          <span data-st="prose">{fmt(state.watchExpiresAt)}</span>
+          <span data-st="meta">Download disabled</span>
+          <span data-st="prose">{fmt(state.downloadDisabledAt)}</span>
+          <span data-st="meta">Last evaluated</span>
+          <span data-st="prose">{fmt(state.lastEvaluatedAt)}</span>
+        </div>
+      </Panel>
+
+      <Panel as="form" onSubmit={handleOverride} className="p-4 space-y-3">
+        <div>
           <label
             htmlFor="ratio-override-status"
-            className="block text-sm text-gray-400 mb-1"
+            data-st="meta"
+            className="block text-xs mb-1"
           >
             Override status
           </label>
           <select
             id="ratio-override-status"
             value={newStatus}
-            onChange={(e) => setNewStatus(e.target.value as typeof newStatus)}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
+            onChange={(e) => setNewStatus(e.target.value as PolicyStatus)}
+            data-st="field"
+            className="w-full"
           >
-            {STATUS_OPTIONS.map(({ value, label }) => (
+            {(Object.keys(STATUS_LABEL) as PolicyStatus[]).map((value) => (
               <option key={value} value={value}>
-                {label}
+                {STATUS_LABEL[value]}
               </option>
             ))}
           </select>
+          <p data-st="meta" className="text-xs mt-1">
+            {STATUS_EFFECT[newStatus]}
+          </p>
         </div>
-        <button
-          type="submit"
-          disabled={overriding}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded disabled:opacity-50"
-        >
-          {overriding ? 'Applying…' : 'Apply override'}
-        </button>
-      </form>
-    </div>
+        <div>
+          <label
+            htmlFor="ratio-override-reason"
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Reason
+            <span className="text-[var(--st-danger)]"> *</span>
+            <span className="text-[var(--st-text-faint)]">
+              {' '}
+              Staff only, recorded in the audit log.
+            </span>
+          </label>
+          <textarea
+            id="ratio-override-reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            required
+            rows={2}
+            data-st="field"
+            className="w-full"
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="ratio-override-message"
+            data-st="meta"
+            className="block text-xs mb-1"
+          >
+            Message to member
+            <span className="text-[var(--st-text-faint)]">
+              {' '}
+              Sent to the member as a System PM. Leave blank and the member is
+              not notified.
+            </span>
+          </label>
+          <textarea
+            id="ratio-override-message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={3}
+            data-st="field"
+            className="w-full"
+          />
+        </div>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={overriding}>
+            {overriding ? 'Applying…' : 'Apply override'}
+          </Button>
+        </div>
+      </Panel>
+    </>
   );
 };
 
@@ -118,47 +221,24 @@ const RatioPolicyPanel = () => {
   };
 
   return (
-    <div className="thin">
-      <div className="mb-4">
-        <Link
-          to="/staff/tools"
-          className="text-blue-400 text-sm hover:underline"
-        >
-          ← Toolbox
-        </Link>
-      </div>
-
-      <h2 className="text-xl font-semibold mb-4">Ratio Policy Override</h2>
-
-      <form onSubmit={handleLookup} className="flex gap-3">
-        <div className="flex-1">
-          <label
-            htmlFor="ratio-user-id"
-            className="block text-sm text-gray-400 mb-1"
-          >
-            User ID
-          </label>
-          <input
-            id="ratio-user-id"
-            type="number"
-            min={1}
-            value={inputId}
-            onChange={(e) => setInputId(e.target.value)}
-            required
-            placeholder="e.g. 42"
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm focus:outline-none focus:border-blue-500"
-          />
-        </div>
-        <button
-          type="submit"
-          className="self-end px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded"
-        >
-          Load
-        </button>
+    <PageShell title="Ratio Policy Override">
+      <form onSubmit={handleLookup} className="flex items-end gap-3">
+        <Field
+          id="ratio-user-id"
+          label="User ID"
+          type="number"
+          min={1}
+          value={inputId}
+          onChange={(e) => setInputId(e.target.value)}
+          required
+          placeholder="e.g. 42"
+          containerClassName="flex-1"
+        />
+        <Button type="submit">Load</Button>
       </form>
 
       {activeUserId !== null && <PolicyView userId={activeUserId} />}
-    </div>
+    </PageShell>
   );
 };
 
