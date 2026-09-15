@@ -8,10 +8,14 @@ jest.mock('../../store/services/adminApi', () => ({
   useGetRatioWatchQuery: () => mockQuery()
 }));
 
-const makeRow = (status: string) => ({
+const makeRow = (
+  status: string,
+  disabledCause: 'RATIO' | 'STAFF' | null = null
+) => ({
   userId: 3,
   user: { id: 3, username: 'overconsumer' },
   status,
+  disabledCause,
   watchStartedAt: '2026-01-02T00:00:00.000Z',
   watchExpiresAt: null,
   downloadDisabledAt: null,
@@ -51,4 +55,23 @@ describe('RatioWatchPage', () => {
     renderWithProviders(<RatioWatchPage />);
     expect(screen.getByText('Watch')).toBeInTheDocument();
   });
+  it.each([
+    ['RATIO', 'Download Disabled · Ratio', null],
+    ['STAFF', 'Download Disabled · Staff', 'Only staff can lift this']
+  ] as const)(
+    'names the cause of a %s disable in the status cell',
+    (cause, label, title) => {
+      mockQuery.mockReturnValue({
+        data: {
+          data: [makeRow('DOWNLOAD_DISABLED', cause)],
+          meta: { totalPages: 1 }
+        },
+        isLoading: false
+      });
+      renderWithProviders(<RatioWatchPage />);
+      const cell = screen.getByText(label, { selector: 'span' });
+      if (title) expect(cell).toHaveAttribute('title', title);
+      else expect(cell).not.toHaveAttribute('title');
+    }
+  );
 });

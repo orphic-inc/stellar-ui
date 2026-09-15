@@ -9,6 +9,11 @@ type RatioWatchRow = NonNullable<
   ReturnType<typeof useGetRatioWatchQuery>['data']
 >['data'][number];
 
+const CAUSE: Record<NonNullable<RatioWatchRow['disabledCause']>, string> = {
+  RATIO: ' · Ratio',
+  STAFF: ' · Staff'
+};
+
 const RatioWatchPage = () => {
   const [page, setPage] = useState(1);
   const { data, isLoading } = useGetRatioWatchQuery(page);
@@ -24,18 +29,27 @@ const RatioWatchPage = () => {
     },
     {
       header: 'Status',
-      cell: (r) => (
-        <span
-          className={cn(
-            'text-xs font-semibold',
-            r.status === 'DOWNLOAD_DISABLED'
-              ? 'text-[var(--st-danger)]'
-              : 'text-[var(--st-warning)]'
-          )}
-        >
-          {r.status === 'DOWNLOAD_DISABLED' ? 'Download Disabled' : 'Watch'}
-        </span>
-      )
+      cell: (r) => {
+        const disabled = r.status === 'DOWNLOAD_DISABLED';
+        // The cause says whether the disable clears itself (#332): a ratio
+        // disable lifts on the daily sweep, a staff one waits for staff.
+        const cause = disabled && r.disabledCause ? CAUSE[r.disabledCause] : '';
+        return (
+          <span
+            className={cn(
+              'text-xs font-semibold',
+              disabled ? 'text-[var(--st-danger)]' : 'text-[var(--st-warning)]'
+            )}
+            title={
+              disabled && r.disabledCause === 'STAFF'
+                ? 'Only staff can lift this'
+                : undefined
+            }
+          >
+            {disabled ? `Download Disabled${cause}` : 'Watch'}
+          </span>
+        );
+      }
     },
     {
       header: 'Watch Started',

@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Stellar API",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "description": "REST API for the Stellar community tracker. All routes under `/api/*`. Authentication uses JWT cookies (`token` cookie set on login). Separately from any per-operation failure documented below, **every** endpoint can answer `403` with `{ msg: \"Access from this network is not permitted\" }` when the caller's IP is banned: that check runs before routing and applies even to endpoints needing no session."
   },
   "servers": [
@@ -33,6 +33,25 @@
         },
         "required": [
           "error"
+        ]
+      },
+      "AccountDisabledResponse": {
+        "type": "object",
+        "properties": {
+          "msg": {
+            "type": "string"
+          },
+          "disabledChannel": {
+            "type": "string"
+          },
+          "ircGuideUrl": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "msg",
+          "disabledChannel",
+          "ircGuideUrl"
         ]
       },
       "ValidationError": {
@@ -208,6 +227,9 @@
           "canDownload": {
             "type": "boolean"
           },
+          "canInvite": {
+            "type": "boolean"
+          },
           "contributed": {
             "type": "string"
           },
@@ -307,30 +329,6 @@
         },
         "required": [
           "email"
-        ]
-      },
-      "ReactivationRequestBody": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email"
-          }
-        },
-        "required": [
-          "email"
-        ]
-      },
-      "ReactivationConfirmBody": {
-        "type": "object",
-        "properties": {
-          "token": {
-            "type": "string",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "token"
         ]
       },
       "RecoveryResetBody": {
@@ -1206,6 +1204,10 @@
             "type": "number",
             "nullable": true
           },
+          "canInvite": {
+            "type": "boolean",
+            "nullable": true
+          },
           "staffBio": {
             "type": "string",
             "nullable": true
@@ -1299,6 +1301,7 @@
           "warned",
           "standing",
           "inviteCount",
+          "canInvite",
           "staffBio",
           "stats",
           "userRank",
@@ -1364,6 +1367,10 @@
           },
           "inviteCount": {
             "type": "number",
+            "nullable": true
+          },
+          "canInvite": {
+            "type": "boolean",
             "nullable": true
           },
           "staffBio": {
@@ -1462,6 +1469,7 @@
           "warned",
           "standing",
           "inviteCount",
+          "canInvite",
           "staffBio",
           "stats",
           "userRank",
@@ -2033,6 +2041,67 @@
           "score",
           "dimensions",
           "suspect"
+        ]
+      },
+      "InviteEligibility": {
+        "type": "object",
+        "properties": {
+          "canSend": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "invites_revoked",
+              "downloads_disabled",
+              "poor_standing",
+              "ratio_watch",
+              "site_full",
+              "no_invites",
+              null
+            ]
+          },
+          "msg": {
+            "type": "string",
+            "nullable": true
+          },
+          "unlimited": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "canSend",
+          "reason",
+          "msg",
+          "unlimited"
+        ]
+      },
+      "OwnInviteItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "email": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "expires": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "reason",
+          "createdAt",
+          "expires"
         ]
       },
       "DonorRewards": {
@@ -4377,6 +4446,8 @@
           "users_view_email",
           "recovery_manage",
           "invites_manage",
+          "invites_edit",
+          "invites_unlimited",
           "ratio_policy_manage",
           "site_history_manage",
           "ip_bans_manage",
@@ -6407,6 +6478,15 @@
             "type": "string",
             "nullable": true
           },
+          "disabledCause": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "RATIO",
+              "STAFF",
+              null
+            ]
+          },
           "lastEvaluatedAt": {
             "type": "string"
           }
@@ -6416,6 +6496,7 @@
           "watchStartedAt",
           "watchExpiresAt",
           "downloadDisabledAt",
+          "disabledCause",
           "lastEvaluatedAt"
         ]
       },
@@ -7221,8 +7302,12 @@
             "enum": [
               "pending",
               "accepted",
-              "rejected"
+              "expired",
+              "cancelled"
             ]
+          },
+          "createdAt": {
+            "type": "string"
           }
         },
         "required": [
@@ -7231,7 +7316,8 @@
           "email",
           "expires",
           "reason",
-          "status"
+          "status",
+          "createdAt"
         ]
       },
       "InviteTreeItem": {
@@ -7481,6 +7567,15 @@
             "type": "string",
             "nullable": true
           },
+          "disabledCause": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "RATIO",
+              "STAFF",
+              null
+            ]
+          },
           "lastEvaluatedAt": {
             "type": "string"
           }
@@ -7492,6 +7587,7 @@
           "watchStartedAt",
           "watchExpiresAt",
           "downloadDisabledAt",
+          "disabledCause",
           "lastEvaluatedAt"
         ]
       },
@@ -8637,7 +8733,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
+                  "$ref": "#/components/schemas/AccountDisabledResponse"
                 }
               }
             }
@@ -8693,7 +8789,7 @@
           "Auth"
         ],
         "summary": "Public self-registration",
-        "description": "Ungated — no session, no permission — so the 403 here is the handler speaking, not middleware: it is the site's registration policy refusing, and every branch of it concerns the invite. The 400 is the submission itself being unusable. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show.",
+        "description": "Ungated — no session, no permission — so the 403 here is the handler speaking, not middleware: it is the site's registration policy refusing — closed, full (#624), or a problem with the invite. A full site refuses before any write, so a presented invite stays pending — but its clock keeps running, and the message names when it expires (#627). The 400 is the submission itself being unusable. A request-body validation failure also answers 400, carrying an `errors` object this schema does not show.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -8733,7 +8829,7 @@
             }
           },
           "403": {
-            "description": "Registration is closed, or the invite key is missing, invalid, already used, or issued for a different email address",
+            "description": "Registration is closed, the site is full (enabled accounts have reached `maxUsers`), or the invite key is missing, invalid, already used, issued for a different email address, or expired. An invite expires three days after it is sent, or as soon as its inviter is disabled (#627) or has invite privileges revoked, and a cancelled invite answers the same way (#636)",
             "content": {
               "application/json": {
                 "schema": {
@@ -8999,106 +9095,6 @@
         }
       }
     },
-    "/auth/reactivation-request": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Ask staff to reinstate a disabled account",
-        "description": "Always answers 200 with the same generic message, whether the address belongs to no account, to an active one, or to a disabled one. A distinguishable response would say which accounts are disabled, and therefore which members were banned. Open to ANY disabled account, moderator actions included: it is an appeals channel, and filtering by reason would be the same oracle by another route. A link is only sent for an account that is actually disabled. Rate-limited by authLimiter.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReactivationRequestBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Generic acknowledgement — identical for a known, unknown, active or disabled address",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid request body",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limited",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/auth/reactivation-confirm": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Confirm a reactivation request and put it in front of staff",
-        "description": "Consumes the token and opens a staff-inbox conversation. Idempotent per member: where an unresolved conversation already exists the token is still spent and a message is appended to it, so one email round-trip cannot become an unlimited supply of threads. A reactivation token is not interchangeable with a password-reset one — `/auth/recovery/reset` will not accept it. Staff reinstate through the existing `users_disable` surface. Rate-limited by authLimiter.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReactivationConfirmBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "The request has been sent to staff",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid or expired token",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limited",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/auth/sessions": {
       "get": {
         "tags": [
@@ -9231,6 +9227,9 @@
                         "closed"
                       ]
                     },
+                    "registrationFull": {
+                      "type": "boolean"
+                    },
                     "configWarnings": {
                       "type": "array",
                       "items": {
@@ -9259,6 +9258,7 @@
                   "required": [
                     "installed",
                     "registrationStatus",
+                    "registrationFull",
                     "configWarnings",
                     "setupChecklist"
                   ]
@@ -11659,6 +11659,247 @@
         ]
       }
     },
+    "/users/{id}/can-invite": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Staff: revoke or restore a member's invite privileges",
+        "description": "Requires `invites_edit` (#636). While revoked the member cannot send (403), earns no invites from the handout, and their pending invites lapse and are refunded. The balance is kept. `reason` is recorded in the audit log for staff; `message`, when present, is sent to the member as a System PM. Idempotent: writing the current value still succeeds.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "canInvite": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "canInvite",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invite privileges revoked or restored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing invites_edit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{id}/invite-count": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Staff: set a member's invite count",
+        "description": "Requires `invites_edit` (#636). A compare-and-set: the write applies only while the balance still equals `expectedInviteCount`, so a spend, grant or refund that landed since the caller read it is never overwritten. Not bounded by the rank `inviteCap`. `reason` is recorded in the audit log; `message`, when present, is sent to the member as a System PM naming the new balance.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "inviteCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000
+                  },
+                  "expectedInviteCount": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "inviteCount",
+                  "expectedInviteCount",
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Invite count updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing invites_edit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The balance no longer equals `expectedInviteCount`; reload and retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
     "/users/settings": {
       "get": {
         "tags": [
@@ -12889,7 +13130,7 @@
             }
           },
           "403": {
-            "description": "No invites remaining",
+            "description": "A send gate refused (#637): invite privileges revoked (#636), download access disabled, active warnings (poor standing), ratio watch, the site is full (#624), or no invites remaining. The first that applies is reported, in that order, and no invite is spent. A caller with `invites_unlimited` is never refused for the balance, and spends nothing. `GET /profile/me/invites/eligibility` answers the same gates first",
             "content": {
               "application/json": {
                 "schema": {
@@ -12899,7 +13140,208 @@
             }
           },
           "409": {
-            "description": "Invite already exists",
+            "description": "A live invite already exists for that address, or a cancelled one has not reached its original expiry (#640). An expired one does not block it: the address can be invited again (#627)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/profile/me/invites/eligibility": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Whether you can send an invite right now",
+        "description": "Self only (#637). Runs the same gates as `POST /profile/referral/create-invite`, in the same order, and `msg` is the words that send would answer. `reason` and `msg` are null exactly when `canSend` is true. Does not check an address: a send can still be refused `409` for one already invited.",
+        "responses": {
+          "200": {
+            "description": "Your invite eligibility",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteEligibility"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/profile/me/invites": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Your invites that can still be used",
+        "description": "Self only (#640). Pending invites that registration would still accept: not past `expires`, and sent while you are enabled and hold invite privileges, so a revoked member gets an empty list. Soonest to lapse first, then by `id`. Not a history: accepted invitees are in your invite tree.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of your live pending invites",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OwnInviteItem"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/profile/me/invites/{inviteId}/withdraw": {
+      "post": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Withdraw one of your pending invites",
+        "description": "Self only (#640). Moves your `pending` invite to `cancelled` and returns it to your `inviteCount`, unless it was sent without spending one (`invites_unlimited`, #637). The key holder is then answered `invite_expired`. The address stays taken until the invite's original `expires`, so it cannot be re-invited by anyone before then. Needs no invite privileges: a revoked member can withdraw.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "inviteId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`Invite withdrawn and returned to you`, or `Invite withdrawn` for an invite that was not spent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such invite, or it is not yours",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The invite is yours but no longer pending: already accepted, expired or cancelled",
             "content": {
               "application/json": {
                 "schema": {
@@ -22846,6 +23288,12 @@
                       "invites_manage": {
                         "type": "boolean"
                       },
+                      "invites_edit": {
+                        "type": "boolean"
+                      },
+                      "invites_unlimited": {
+                        "type": "boolean"
+                      },
                       "ratio_policy_manage": {
                         "type": "boolean"
                       },
@@ -23298,6 +23746,12 @@
                         "type": "boolean"
                       },
                       "invites_manage": {
+                        "type": "boolean"
+                      },
+                      "invites_edit": {
+                        "type": "boolean"
+                      },
+                      "invites_unlimited": {
                         "type": "boolean"
                       },
                       "ratio_policy_manage": {
@@ -31895,6 +32349,7 @@
         "tags": [
           "RatioPolicy"
         ],
+        "description": "Requires `ratio_policy_manage`. An absolute write: staff always win over the automatic transitions. `DOWNLOAD_DISABLED` records `disabledCause: STAFF`, which never lifts on its own; `OK` and `WATCH` clear the cause. A staff `WATCH` starts from the member's current `consumed`, so the 10 GiB rule applies (#646). `reason` is required and recorded in the audit log; `message`, when present, is sent to the member as a System PM.",
         "parameters": [
           {
             "schema": {
@@ -31918,10 +32373,19 @@
                       "WATCH",
                       "DOWNLOAD_DISABLED"
                     ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1
                   }
                 },
                 "required": [
-                  "status"
+                  "status",
+                  "reason"
                 ]
               }
             }
@@ -34245,6 +34709,7 @@
         "tags": [
           "Staff"
         ],
+        "description": "Requires `invites_manage`. Ordered by `expires` descending, then `id` descending. `email` is a case-insensitive substring match (#636).",
         "parameters": [
           {
             "schema": {
@@ -34256,15 +34721,34 @@
           },
           {
             "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
               "type": "string",
               "enum": [
                 "pending",
                 "accepted",
-                "rejected"
+                "expired",
+                "cancelled"
               ]
             },
             "required": false,
             "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 254
+            },
+            "required": false,
+            "name": "email",
             "in": "query"
           }
         ],
@@ -34332,11 +34816,130 @@
         ]
       }
     },
+    "/users/invites/{inviteId}/cancel": {
+      "post": {
+        "tags": [
+          "Staff"
+        ],
+        "summary": "Staff: cancel a pending invite",
+        "description": "Requires `invites_edit` (#636). Moves a `pending` invite to `cancelled` and returns it to its inviter's `inviteCount`, uncapped, if it was spent (an `invites_unlimited` send is not, #637). The key holder is then answered `invite_expired`, as for any lapse. The address can be invited again once the invite's original `expires` passes (#640). A pending invite past `expires` that the sweep has not reached yet can be cancelled too. `reason` is recorded in the audit log; `message`, when present, is sent to the inviter as a System PM.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "inviteId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "`Invite cancelled and returned to its inviter`, or `Invite cancelled` for an invite that was not spent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing invites_edit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invite not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The invite is no longer pending: already accepted, expired or cancelled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
     "/users/invite-tree": {
       "get": {
         "tags": [
           "Staff"
         ],
+        "description": "Every account has an invite-tree row (#633). By default only members someone invited are listed; `all=true` includes members nobody invited, whose `inviterId` and `inviter` are null.",
         "parameters": [
           {
             "schema": {
@@ -34344,6 +34947,18 @@
             },
             "required": false,
             "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "required": false,
+            "name": "all",
             "in": "query"
           }
         ],
