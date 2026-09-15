@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import UserProfile from '../../components/profile/UserProfile';
 import { ensureRequestPolyfill, makeResponse } from '../fetchTestUtils';
@@ -647,5 +647,152 @@ describe('UserProfile RTK Query integration', () => {
         );
       expect(notePostReqs.length).toBe(1);
     });
+  });
+});
+
+// ── staff invite controls (#329) ──────────────────────────────────────────────
+
+const INVITE_STAFF_USER = {
+  id: 99,
+  username: 'invitestaff',
+  userRank: {
+    name: 'Staff',
+    level: 800,
+    permissions: { staff: true, invites_edit: true }
+  }
+};
+
+const fetchMock = () => global.fetch as jest.Mock;
+
+const requestsTo = (pathname: string, method: string) =>
+  fetchMock()
+    .mock.calls.map((call) => call[0] as Request)
+    .filter(
+      (req) =>
+        new URL(req.url, 'http://localhost').pathname === pathname &&
+        req.method === method
+    );
+
+/**
+ * The profile answers each read with the next balance in `balances` (the last
+ * one repeats), and the count edit answers each save with the next status.
+ */
+const setupInviteFetch = (balances: number[], saveStatuses: number[]) => {
+  setupFetch();
+  const base = fetchMock().getMockImplementation()!;
+  let reads = 0;
+  let saves = 0;
+  fetchMock().mockImplementation((request: Request) => {
+    const { pathname } = new URL(request.url, 'http://localhost');
+    if (pathname === '/api/profile/user/42') {
+      const inviteCount = balances[Math.min(reads++, balances.length - 1)];
+      return Promise.resolve(
+        makeResponse({ body: makeProfile({ inviteCount, canInvite: true }) })
+      );
+    }
+    if (pathname === '/api/users/42/invite-count') {
+      const status = saveStatuses[Math.min(saves++, saveStatuses.length - 1)];
+      return Promise.resolve(makeResponse({ status, body: { msg: 'x' } }));
+    }
+    return base(request);
+  });
+};
+
+describe('UserProfile staff invite controls (#329)', () => {
+  beforeAll(() => {
+    ensureRequestPolyfill();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    fetchMock().mockReset();
+  });
+
+  it('shows the Invites panel to staff with invites_edit', async () => {
+    setupFetch({ profile: makeProfile({ canInvite: true }) });
+    renderAs(INVITE_STAFF_USER);
+    await screen.findByText('Staff Actions');
+    expect(
+      await screen.findByRole('button', { name: 'Revoke invites' })
+    ).toBeInTheDocument();
+  });
+
+  it('hides it from staff without invites_edit', async () => {
+    setupFetch({ profile: makeProfile({ canInvite: true }) });
+    renderAs(STAFF_USER);
+    await screen.findByText('Staff Actions');
+    expect(
+      screen.queryByRole('button', { name: /edit balance/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides it when the api did not disclose the invite fields', async () => {
+    setupFetch({
+      profile: makeProfile({ inviteCount: null, canInvite: null })
+    });
+    renderAs(INVITE_STAFF_USER);
+    await screen.findByText('Staff Actions');
+    expect(
+      screen.queryByRole('button', { name: /edit balance/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [false, true],
+    [true, false]
+  ])(
+    'marks the sidebar balance revoked when canInvite is %s',
+    async (canInvite, marked) => {
+      setupFetch({ profile: makeProfile({ canInvite }) });
+      renderAs(REGULAR_USER);
+      expect(await screen.findByText('Invites:')).toBeInTheDocument();
+      expect(!!screen.queryByText('(revoked)')).toBe(marked);
+    }
+  );
+});
+
+describe('UserProfile invite balance conflict, end to end (#329)', () => {
+  beforeAll(() => {
+    ensureRequestPolyfill();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    fetchMock().mockReset();
+  });
+
+  it('reloads on a 409, names the new balance, and saves against it', async () => {
+    const user = userEvent.setup();
+    setupInviteFetch([3, 5], [409, 200]);
+    renderAs(INVITE_STAFF_USER);
+    await user.click(
+      await screen.findByRole('button', { name: /edit balance/i })
+    );
+    const dialog = screen.getByRole('dialog');
+    const field = within(dialog).getByLabelText(/new balance/i);
+    await user.clear(field);
+    await user.type(field, '10');
+    await user.type(within(dialog).getByLabelText(/^reason/i), 'Prize');
+    const save = within(dialog).getByRole('button', { name: 'Set balance' });
+    await user.click(save);
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'It is now 5.'
+    );
+    expect(dialog).toHaveTextContent('Current balance: 5');
+    await user.click(save);
+
+    await waitFor(() =>
+      expect(requestsTo('/api/users/42/invite-count', 'PUT')).toHaveLength(2)
+    );
+    const bodies = await Promise.all(
+      requestsTo('/api/users/42/invite-count', 'PUT').map((r) =>
+        r.text().then((t) => JSON.parse(t))
+      )
+    );
+    expect(bodies.map((b) => b.expectedInviteCount)).toEqual([3, 5]);
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
   });
 });

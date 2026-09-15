@@ -84,6 +84,14 @@ type SetUserRankLockArgs = {
   rankLocked: boolean;
 };
 
+type SetUserCanInviteArgs = { id: number } & NonNullable<
+  paths['/users/{id}/can-invite']['put']['requestBody']
+>['content']['application/json'];
+
+type SetUserInviteCountArgs = { id: number } & NonNullable<
+  paths['/users/{id}/invite-count']['put']['requestBody']
+>['content']['application/json'];
+
 export const userApi = api.injectEndpoints({
   endpoints: (build) => ({
     getUserById: build.query<PublicUserResponse, number>({
@@ -250,6 +258,33 @@ export const userApi = api.injectEndpoints({
         url: `/users/${id}/rank-lock`,
         method: 'PUT',
         body: { rankLocked }
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
+    }),
+    // Staff invite controls (stellar-api#636, invites_edit). RTK Query applies
+    // invalidatesTags to a rejected mutation too, so after a 409 every profile
+    // read on the page (the sidebar's may be keyed by username) reloads the
+    // balance the save lost to; the edit dialog awaits its own copy.
+    setUserCanInvite: build.mutation<
+      paths['/users/{id}/can-invite']['put']['responses'][200]['content']['application/json'],
+      SetUserCanInviteArgs
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/users/${id}/can-invite`,
+        method: 'PUT',
+        body
+      }),
+      invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
+    }),
+    // A compare-and-set: `expectedInviteCount` is the balance staff were shown.
+    setUserInviteCount: build.mutation<
+      paths['/users/{id}/invite-count']['put']['responses'][200]['content']['application/json'],
+      SetUserInviteCountArgs
+    >({
+      query: ({ id, ...body }) => ({
+        url: `/users/${id}/invite-count`,
+        method: 'PUT',
+        body
       }),
       invalidatesTags: (_, __, { id }) => [{ type: 'User', id }, 'Profile']
     }),
@@ -473,6 +508,8 @@ export const {
   useGetUserRankAssignmentQuery,
   useSetUserRankMutation,
   useSetUserRankLockMutation,
+  useSetUserCanInviteMutation,
+  useSetUserInviteCountMutation,
   useLinkIrcNickMutation,
   useGetUserIpHistoryQuery,
   useGetUserEmailHistoryQuery,

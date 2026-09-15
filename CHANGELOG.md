@@ -91,6 +91,29 @@ releases · albums` toggle on the release browse page. In album mode the row
     no rank carries `invites_edit` until an admin grants it.
   - A **Sent** column shows when each invite was last sent (`createdAt`).
 
+- **Staff can revoke a member's invites and set their invite balance from the
+  profile** ([#329](https://github.com/orphic-inc/stellar-ui/issues/329),
+  [api#636](https://github.com/orphic-inc/stellar-api/issues/636)). A new
+  **Invites** panel sits under **Change Rank** in Staff Actions, showing the
+  balance and whether invite privileges are allowed or revoked.
+
+  - **Revoke invites** / **Restore invites** opens a dialog that says what the
+    change does, then takes a required **Reason** (staff only, audit log) and an
+    optional **Message to member** (a System PM; blank notifies nobody). The
+    direction is fixed when the dialog opens.
+  - **Edit balance** takes a new balance from 0 to 1000 and sends the balance on
+    screen as `expectedInviteCount`. Save stays disabled while the value is
+    unchanged. A `409` means the balance moved first: the dialog stays open with
+    what staff typed, waits for the reloaded profile, and names the new balance.
+    Nothing is retried automatically.
+  - The panel needs `invites_edit` **and** a profile that carries both invite
+    fields. The api sends them only to staff it recognises by `staff`, `admin`,
+    `users_edit`, `users_warn` or `users_disable`, so a rank holding
+    `invites_edit` alone sees no panel. On existing installs no rank carries
+    `invites_edit` until an admin grants it.
+  - The profile sidebar marks a revoked member's balance **(revoked)**, for the
+    member and for staff. The balance is kept while revoked.
+
 ### Changed
 
 - **The vendored contract catches up with stellar-api `0.9.4`**

@@ -43,10 +43,11 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { avatarSrc, onAvatarError } from '../../utils/avatar';
-import { hasAnyPermission } from '../../utils/permissions';
+import { hasAnyPermission, hasPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 import UserBadges from '../layout/UserBadges';
+import InviteControlsPanel from './InviteControlsPanel';
 
 const COLLAGE_CATEGORY_LABELS: Record<number, string> = {
   0: 'Personal',
@@ -395,6 +396,7 @@ const RankAssignmentPanel = ({
 
 const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
   const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
   const [showWarnModal, setShowWarnModal] = useState(false);
   const [showIpHistory, setShowIpHistory] = useState(false);
   const [showEmailHistory, setShowEmailHistory] = useState(false);
@@ -696,6 +698,20 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
               bodyClass={bodyClass}
             />
           )}
+
+          {/* The api discloses both only to staff it recognises (#329), and the
+              count is what the compare-and-set sends back, so no fields, no panel. */}
+          {profile?.inviteCount != null &&
+            profile.canInvite != null &&
+            hasPermission(currentUser, 'invites_edit') && (
+              <InviteControlsPanel
+                key={profileId}
+                profileId={profileId}
+                inviteCount={profile.inviteCount}
+                canInvite={profile.canInvite}
+                bodyClass={bodyClass}
+              />
+            )}
 
           {/* Donor status */}
           <div data-st="panel">
@@ -1608,6 +1624,12 @@ const UserProfile = () => {
                 profile.inviteCount !== undefined && (
                   <li>
                     <span data-st="meta">Invites:</span> {profile.inviteCount}
+                    {profile.canInvite === false && (
+                      <span className="text-[var(--st-warning)]">
+                        {' '}
+                        (revoked)
+                      </span>
+                    )}
                   </li>
                 )}
               {profileIsDonor && <li className="text-pink-400">Donor ♥</li>}
