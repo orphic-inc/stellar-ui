@@ -3,7 +3,7 @@ import {
   useSetUserCanInviteMutation,
   useSetUserInviteCountMutation
 } from '../../store/services/userApi';
-import { profileApi } from '../../store/services/profileApi';
+import { useGetProfileByUserIdQuery } from '../../store/services/profileApi';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
@@ -207,43 +207,57 @@ const BalanceField = ({
   </div>
 );
 
-type Conflict = { current: number | null };
+/** After a 409: whether the reload that followed it came back. */
+type Conflict = 'reloaded' | 'unreloaded';
 
 // No `prose` role: its text colour would beat the warning one.
-const ConflictNotice = ({ conflict }: { conflict: Conflict }) => (
+const ConflictNotice = ({
+  conflict,
+  balance
+}: {
+  conflict: Conflict;
+  balance: number;
+}) => (
   <p
     role="alert"
     className="text-sm rounded border border-[var(--st-warning)] px-3 py-2 text-[var(--st-warning)]"
   >
     The balance changed while you were editing.
-    {conflict.current === null
-      ? ' Reload the page to see the current balance.'
-      : ` It is now ${conflict.current}. Check the new balance and save again.`}
+    {conflict === 'reloaded'
+      ? ` It is now ${balance}. Check the new balance and save again.`
+      : ' Reload the page to see the current balance.'}
   </p>
 );
 
 /**
- * A 409 means the balance moved after the dialog opened. Wait for the reloaded
- * profile (the mutation's invalidation has usually started it already; this
- * joins that request rather than racing it) so the notice names the balance the
- * next save will be checked against, not the one that just lost.
+ * The balance from the dialog's own subscription to the profile the page
+ * already caches, not from a prop. A render of this dialog reads the
+ * store as it is at that moment, so the notice, "Current balance" and the
+ * `expectedInviteCount` a save sends are always one number. A prop only
+ * catches up when the parent re-renders, which after a 409 could land a render
+ * after the notice (it did, on CI) and show two different balances.
  */
-const useReloadedInviteCount = (profileId: number) => {
-  const dispatch = useAppDispatch();
-  return async (): Promise<number | null> => {
-    const result = await dispatch(
-      profileApi.endpoints.getProfileByUserId.initiate(String(profileId), {
-        forceRefetch: true,
-        subscribe: false
-      })
-    );
-    return result.data?.inviteCount ?? null;
-  };
+const useCachedBalance = (profileId: number, openedWith: number) => {
+  const { data: profile, refetch } = useGetProfileByUserIdQuery(
+    String(profileId)
+  );
+  return { balance: profile?.inviteCount ?? openedWith, refetch };
+};
+
+/** The typed balance, or null when it is not one the api accepts. */
+const parseBalance = (value: string): number | null => {
+  const count = Number(value);
+  return value.trim() !== '' &&
+    Number.isInteger(count) &&
+    count >= 0 &&
+    count <= MAX_INVITE_COUNT
+    ? count
+    : null;
 };
 
 const InviteBalanceModal = ({
   profileId,
-  inviteCount,
+  inviteCount: openedWith,
   onClose
 }: {
   profileId: number;
@@ -252,21 +266,17 @@ const InviteBalanceModal = ({
 }) => {
   const dispatch = useAppDispatch();
   const [setInviteCount, { isLoading }] = useSetUserInviteCountMutation();
-  const reloadInviteCount = useReloadedInviteCount(profileId);
-  const [next, setNext] = useState(String(inviteCount));
+  const { balance, refetch } = useCachedBalance(profileId, openedWith);
+  const [next, setNext] = useState(String(openedWith));
   const [reason, setReason] = useState('');
   const [message, setMessage] = useState('');
   const [conflict, setConflict] = useState<Conflict | null>(null);
 
-  const nextCount = Number(next);
-  const validCount =
-    next.trim() !== '' &&
-    Number.isInteger(nextCount) &&
-    nextCount >= 0 &&
-    nextCount <= MAX_INVITE_COUNT;
+  const nextCount = parseBalance(next);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (nextCount === null) return;
     const notes = toNotes(reason, message);
     if (!notes) {
       dispatch(addAlert('A reason is required.', 'danger'));
@@ -277,14 +287,16 @@ const InviteBalanceModal = ({
       await setInviteCount({
         id: profileId,
         inviteCount: nextCount,
-        expectedInviteCount: inviteCount,
+        expectedInviteCount: balance,
         ...notes
       }).unwrap();
       dispatch(addAlert(`Invite balance set to ${nextCount}.`, 'success'));
       onClose();
     } catch (err) {
       if (isConflict(err)) {
-        setConflict({ current: await reloadInviteCount() });
+        // Joins the refetch the mutation's invalidation started, if any.
+        const reloaded = await refetch();
+        setConflict(reloaded.isError ? 'unreloaded' : 'reloaded');
         return;
       }
       dispatch(
@@ -305,9 +317,9 @@ const InviteBalanceModal = ({
     >
       <form onSubmit={handleSubmit} className="space-y-3">
         <p data-st="prose" className="text-sm">
-          Current balance: <strong>{inviteCount}</strong>
+          Current balance: <strong>{balance}</strong>
         </p>
-        {conflict && <ConflictNotice conflict={conflict} />}
+        {conflict && <ConflictNotice conflict={conflict} balance={balance} />}
         <BalanceField value={next} onChange={setNext} />
         <NoteFields
           idPrefix="invite-count"
@@ -322,7 +334,7 @@ const InviteBalanceModal = ({
           </Button>
           <Button
             type="submit"
-            disabled={isLoading || !validCount || nextCount === inviteCount}
+            disabled={isLoading || nextCount === null || nextCount === balance}
           >
             {isLoading ? 'Saving…' : 'Set balance'}
           </Button>

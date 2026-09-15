@@ -9,8 +9,11 @@ import { selectAlerts } from '../../store/slices/alertSlice';
 
 const mockSetCanInvite = jest.fn();
 const mockSetInviteCount = jest.fn();
-const mockInitiate = jest.fn();
+const mockProfileQuery = jest.fn();
+const mockRefetch = jest.fn();
 let mockSaving = false;
+/** The balance in the profile cache, as the dialog's own subscription reads it. */
+let mockBalance = 3;
 
 jest.mock('../../store/services/userApi', () => ({
   useSetUserCanInviteMutation: () => [
@@ -24,13 +27,7 @@ jest.mock('../../store/services/userApi', () => ({
 }));
 
 jest.mock('../../store/services/profileApi', () => ({
-  profileApi: {
-    endpoints: {
-      getProfileByUserId: {
-        initiate: (...args: unknown[]) => mockInitiate(...args)
-      }
-    }
-  }
+  useGetProfileByUserIdQuery: (arg: unknown) => mockProfileQuery(arg)
 }));
 
 const resolves = () => ({ unwrap: () => Promise.resolve({ msg: 'ok' }) });
@@ -38,13 +35,22 @@ const rejects = (status: number, msg: string) => ({
   unwrap: () => Promise.reject({ status, data: { msg } })
 });
 
-/** The reloaded profile a 409 waits for, as the dispatched thunk resolves it. */
-const reloadsTo = (inviteCount: number | undefined) =>
-  mockInitiate.mockReturnValue(() =>
-    Promise.resolve({
-      data: inviteCount === undefined ? undefined : { inviteCount }
-    })
-  );
+/** Long enough that React renders a premature notice before the reload lands. */
+const RELOAD_MS = 20;
+
+/**
+ * The refetch a 409 awaits. Like the real store, it has already updated the
+ * cache when it resolves, so the next render of the dialog reads the new value.
+ */
+const reloadsTo = (inviteCount: number | 'error') =>
+  mockRefetch.mockImplementation(async () => {
+    // Later, as a network reload lands: a notice shown before this resolves
+    // would name the old balance.
+    await new Promise((resolve) => setTimeout(resolve, RELOAD_MS));
+    if (inviteCount === 'error') return { isError: true };
+    mockBalance = inviteCount;
+    return { isError: false, data: { inviteCount } };
+  });
 
 const hasAlert = (store: ReturnType<typeof createTestStore>, msg: string) =>
   selectAlerts(store.getState()).some((a) => a.msg === msg);
@@ -85,6 +91,11 @@ const open = async (button: RegExp, props: PanelProps = {}) => {
 beforeEach(() => {
   jest.clearAllMocks();
   mockSaving = false;
+  mockBalance = 3;
+  mockProfileQuery.mockImplementation(() => ({
+    data: { inviteCount: mockBalance },
+    refetch: mockRefetch
+  }));
   mockSetCanInvite.mockReturnValue(resolves());
   mockSetInviteCount.mockReturnValue(resolves());
 });
@@ -201,6 +212,7 @@ describe('InviteControlsPanel balance edit (#329)', () => {
   it('sends the displayed balance as expectedInviteCount, then closes', async () => {
     const { dialog, reason, save, user, store } = await setBalance('10');
     expect(dialog).toHaveTextContent('Current balance: 3');
+    expect(mockProfileQuery).toHaveBeenCalledWith('42');
     expect(dialog).toHaveTextContent('Not limited by the rank');
     await reason(' Contest prize ');
     await user.click(save);
@@ -238,12 +250,25 @@ describe('InviteControlsPanel balance edit (#329)', () => {
       expect(hasAlert(store, 'Missing invites_edit')).toBe(true)
     );
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(mockInitiate).not.toHaveBeenCalled();
+    expect(mockRefetch).not.toHaveBeenCalled();
+  });
+
+  it('follows a background refresh of the cached balance', async () => {
+    const { dialog, reason, save, user, rerender, store } =
+      await setBalance('10');
+    mockBalance = 6;
+    rerender(wrapped(store, {}));
+    expect(dialog).toHaveTextContent('Current balance: 6');
+    await reason('Contest prize');
+    await user.click(save);
+    expect(mockSetInviteCount).toHaveBeenCalledWith(
+      expect.objectContaining({ expectedInviteCount: 6 })
+    );
   });
 });
 
 describe('InviteControlsPanel balance conflict (#329)', () => {
-  const conflictAt = async (reloaded: number | undefined) => {
+  const conflictAt = async (reloaded: number | 'error') => {
     mockSetInviteCount.mockReturnValueOnce(
       rejects(409, 'The invite balance has changed')
     );
@@ -267,10 +292,9 @@ describe('InviteControlsPanel balance conflict (#329)', () => {
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
       'The balance changed while you were editing. It is now 5. Check the new balance and save again.'
     );
-    expect(mockInitiate).toHaveBeenCalledWith('42', {
-      forceRefetch: true,
-      subscribe: false
-    });
+    // The same render: the notice never names a balance the line above lacks.
+    expect(dialog).toHaveTextContent('Current balance: 5');
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
     expect(field).toHaveValue(10);
     expect(within(dialog).getByLabelText(/^reason/i)).toHaveValue(
       'Contest prize'
@@ -282,11 +306,9 @@ describe('InviteControlsPanel balance conflict (#329)', () => {
   });
 
   it('sends the reloaded balance on the next save, without retrying itself', async () => {
-    const { dialog, save, rerender, store } = await conflictAt(5);
+    const { dialog, save } = await conflictAt(5);
     await within(dialog).findByRole('alert');
     expect(mockSetInviteCount).toHaveBeenCalledTimes(1);
-    rerender(wrapped(store, { inviteCount: 5 }));
-    expect(dialog).toHaveTextContent('Current balance: 5');
     await save();
     expect(mockSetInviteCount).toHaveBeenLastCalledWith(
       expect.objectContaining({ inviteCount: 10, expectedInviteCount: 5 })
@@ -294,7 +316,7 @@ describe('InviteControlsPanel balance conflict (#329)', () => {
   });
 
   it('asks for a page reload when the profile cannot be reloaded', async () => {
-    const { dialog } = await conflictAt(undefined);
+    const { dialog } = await conflictAt('error');
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
       'Reload the page to see the current balance.'
     );

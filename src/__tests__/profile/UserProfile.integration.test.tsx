@@ -776,6 +776,8 @@ describe('UserProfile invite balance conflict, end to end (#329)', () => {
     const save = within(dialog).getByRole('button', { name: 'Set balance' });
     await user.click(save);
 
+    // Asserted in the render that shows the notice: before the fix the notice
+    // could name 5 while "Current balance" still read 3 (#329, main CI).
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
       'It is now 5.'
     );
