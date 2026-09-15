@@ -28,6 +28,7 @@ export type UserRef = SessionItem['user'];
 
 export type InviteItem =
   paths['/users/invites']['get']['responses'][200]['content']['application/json']['data'][number];
+export type InviteStatus = InviteItem['status'];
 export type InviteTreeItem =
   paths['/users/invite-tree']['get']['responses'][200]['content']['application/json']['data'][number];
 export type RatioWatchItem =
@@ -161,15 +162,31 @@ export const adminApi = api.injectEndpoints({
     // Invite Pool
     getInvites: build.query<
       paths['/users/invites']['get']['responses'][200]['content']['application/json'],
-      { page?: number; status?: string } | void
+      { page?: number; status?: InviteStatus; email?: string } | void
     >({
       query: (args) => {
         const params = new URLSearchParams();
         if (args?.page) params.set('page', String(args.page));
         if (args?.status) params.set('status', args.status);
+        if (args?.email) params.set('email', args.email);
         return `/users/invites?${params.toString()}`;
       },
       providesTags: ['Invite']
+    }),
+    // Staff cancel (stellar-api#636): pending → cancelled, refunding the
+    // inviter when the invite was spent. 409 once it is no longer pending.
+    cancelInvite: build.mutation<
+      paths['/users/invites/{inviteId}/cancel']['post']['responses'][200]['content']['application/json'],
+      { inviteId: number } & NonNullable<
+        paths['/users/invites/{inviteId}/cancel']['post']['requestBody']
+      >['content']['application/json']
+    >({
+      query: ({ inviteId, ...body }) => ({
+        url: `/users/invites/${inviteId}/cancel`,
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Invite']
     }),
 
     // Invite Tree
@@ -315,6 +332,7 @@ export const {
   useGetRegistrationLogQuery,
   useGetSessionsQuery,
   useGetInvitesQuery,
+  useCancelInviteMutation,
   useGetInviteTreeQuery,
   useGetRatioWatchQuery,
   useGetVanityHouseArtistsQuery,
