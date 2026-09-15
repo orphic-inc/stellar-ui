@@ -161,6 +161,29 @@ describe('Register', () => {
     });
   });
 
+  it("shows the api's expired-invite message as-is (#330)", async () => {
+    // stellar-api#627: a lapsed key answers 403 with this exact message.
+    const expired =
+      'This invite has expired. Ask the member who invited you to send a new one.';
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'invite' }
+    });
+    mockRegister.mockReturnValue({
+      unwrap: () => Promise.reject({ status: 403, data: { msg: expired } })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<Register />);
+
+    await fillForm(user);
+    await user.type(screen.getByLabelText(/invite key/i), 'KEY-LAPSED');
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    await waitFor(() => {
+      const alerts = selectAlerts(store.getState());
+      expect(alerts.some((a) => a.msg === expired)).toBe(true);
+    });
+  });
+
   it('falls back to generic message when error has no recognized shape', async () => {
     mockRegister.mockReturnValue({
       unwrap: () => Promise.reject({ status: 500 })

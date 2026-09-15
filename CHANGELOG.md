@@ -75,6 +75,22 @@ releases · albums` toggle on the release browse page. In album mode the row
   links back to the same filters as releases. The shared "No releases found."
   would be wrong for the majority of queries rather than an edge case.
 
+- **Staff can search the invite pool by email and cancel a pending invite**
+  ([#329](https://github.com/orphic-inc/stellar-ui/issues/329),
+  [api#636](https://github.com/orphic-inc/stellar-api/issues/636)).
+
+  - **Search** is a case-insensitive substring, sent 300ms after typing stops
+    and only at 3 characters or more, the api's minimum. It combines with the
+    status filter, and **Clear** resets both.
+  - **Cancel** appears on pending rows for staff with `invites_edit` (or
+    `admin`). A modal names the address and takes a required **Reason** (staff
+    only, audit log) and an optional **Message to inviter** (a System PM; blank
+    notifies nobody). The api refunds the inviter when the invite was spent.
+    A `409` or `404`, meaning the invite was accepted, lapsed or cancelled
+    first, shows the api's `msg` and refreshes the list. On existing installs
+    no rank carries `invites_edit` until an admin grants it.
+  - A **Sent** column shows when each invite was last sent (`createdAt`).
+
 ### Changed
 
 - **The vendored contract catches up with stellar-api `0.9.4`**
@@ -221,7 +237,20 @@ releases · albums` toggle on the release browse page. In album mode the row
     says downloads come back automatically once the ratio meets its
     requirement, checked daily, linking the ratio rules. A staff disable says it
     does not lift on its own and links Staff PM. "Contact staff to appeal" is
-    gone from both, since the site defines no appeal process.
+    gone from both, since the site defines no appeal process. **Not yet visible to
+    members:** nothing mounts `RatioStats` since `63d64cf`; mounting the notice
+    is [#334](https://github.com/orphic-inc/stellar-ui/issues/334).
+
+### Fixed
+
+- **The invite pool's status filter and colours use the real statuses**
+  ([#330](https://github.com/orphic-inc/stellar-ui/issues/330)). The filter
+  sent upper-case values the api refuses with `400`, including `USED`, which
+  never existed, and the colour check matched nothing, so every row read as
+  pending. The filter now offers `pending`, `accepted`, `expired` and
+  `cancelled`, and each row shows a status chip: Pending amber, Accepted green,
+  Expired and Cancelled neutral, since an invite that lapsed or was withdrawn
+  ended normally.
 
 ## [0.9.3] — 2026-09-09
 
