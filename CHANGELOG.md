@@ -6,6 +6,16 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.5] — 2026-09-16
+
+**There is no `0.9.4`.** The patch moved two, from `0.9.3`, so that
+stellar-compose can pin `stellar-api:0.9.5` and `stellar-ui:0.9.5` together and
+tag that commit as a stack version — compose tags only commits where both pins
+name the same release, and leaves an unequal pair untagged rather than giving it
+an invented number. Per [ADR-0004](docs/adr/0004-peer-api-contract-version-coupling.md)
+the patch digit is this repo's own cadence, so the skip costs nothing here; the
+next UI-only release is `0.9.6` against the same `0.9.5` contract.
+
 ### Added
 
 - **A release group panel on the release page**
