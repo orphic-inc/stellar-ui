@@ -22,7 +22,9 @@ export const downloadApi = api.injectEndpoints({
       // download, and only after a download). `getMyRatioStats` provides
       // 'Profile', and it feeds the notice on the member's own profile —
       // without this the notice serves the pre-download cache (ui#334).
-      invalidatesTags: ['Contribution', 'Profile']
+      // 'Auth' as well (ui#345): the session now carries the same policy state
+      // (stellar-api#659) and feeds the site-wide banner.
+      invalidatesTags: ['Contribution', 'Profile', 'Auth']
     }),
 
     reverseGrant: builder.mutation<
@@ -36,8 +38,8 @@ export const downloadApi = api.injectEndpoints({
       }),
       // A reversal decrements `consumed` (stellar-api `modules/downloads.ts`),
       // so it moves the ratio in the other direction and needs 'Profile' for
-      // the same reason a grant does.
-      invalidatesTags: ['Download', 'Contribution', 'Profile']
+      // the same reason a grant does, and 'Auth' for the banner's.
+      invalidatesTags: ['Download', 'Contribution', 'Profile', 'Auth']
     }),
 
     reportContribution: builder.mutation<
