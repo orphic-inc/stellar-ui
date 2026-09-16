@@ -14,6 +14,14 @@ type CreateInviteArgs = NonNullable<
 type CreateInviteResponse =
   paths['/profile/referral/create-invite']['post']['responses'][201]['content']['application/json'];
 
+// The member's own invite surfaces (stellar-api#637, #640).
+export type InviteEligibility = components['schemas']['InviteEligibility'];
+type MyInvitesResponse =
+  paths['/profile/me/invites']['get']['responses'][200]['content']['application/json'];
+export type OwnInviteItem = components['schemas']['OwnInviteItem'];
+type WithdrawInviteResponse =
+  paths['/profile/me/invites/{inviteId}/withdraw']['post']['responses'][200]['content']['application/json'];
+
 export type DonorRewardsResponse = components['schemas']['DonorRewards'];
 type UpdateDonorRewardsArgs = NonNullable<
   paths['/profile/me/donor-rewards']['put']['requestBody']
@@ -49,7 +57,29 @@ export const profileApi = api.injectEndpoints({
         method: 'POST',
         body: data
       }),
-      invalidatesTags: ['Profile']
+      // 'Auth' too: the session carries inviteCount, which the header reads.
+      invalidatesTags: ['Profile', 'Auth', 'Invite']
+    }),
+    // The gates a send would apply, in the same order and the same words
+    // (#637). Advisory: the POST enforces them.
+    getInviteEligibility: build.query<InviteEligibility, void>({
+      query: () => '/profile/me/invites/eligibility',
+      providesTags: ['Invite']
+    }),
+    // Only invites registration would still accept; a revoked member gets none.
+    getMyInvites: build.query<MyInvitesResponse, number | void>({
+      query: (page) => ({
+        url: '/profile/me/invites',
+        params: { page: page || 1 }
+      }),
+      providesTags: ['Invite']
+    }),
+    withdrawInvite: build.mutation<WithdrawInviteResponse, number>({
+      query: (inviteId) => ({
+        url: `/profile/me/invites/${inviteId}/withdraw`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['Invite', 'Profile', 'Auth']
     }),
     getMyRatioStats: build.query<MyRatioStatsResponse, void>({
       query: () => '/profile/me/ratio',
@@ -90,6 +120,9 @@ export const {
   useUpdateMyProfileMutation,
   useDeleteMyProfileMutation,
   useCreateInviteMutation,
+  useGetInviteEligibilityQuery,
+  useGetMyInvitesQuery,
+  useWithdrawInviteMutation,
   useGetMyRatioStatsQuery,
   useGetDonorRewardsQuery,
   useUpdateDonorRewardsMutation,

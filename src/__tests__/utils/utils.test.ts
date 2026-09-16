@@ -1,6 +1,7 @@
 import {
   formatDate,
   readableTime,
+  untilTime,
   formatBytes,
   ordinalSuffix,
   parseSize,
@@ -20,6 +21,54 @@ describe('formatDate', () => {
     const result = formatDate('2024-06-15T00:00:00Z');
     expect(result).toMatch(/Jun|June/);
     expect(result).toMatch(/2024/);
+  });
+});
+
+describe('readableTime ahead of now (#331)', () => {
+  it('counts down rather than reading as the past', () => {
+    const in2Days = new Date(Date.now() + 2 * 86400000 + 60000).toISOString();
+    expect(readableTime(in2Days)).toBe('in 2d');
+  });
+
+  it.each([
+    [5 * 60000 + 1000, 'in 5m'],
+    [3 * 3600000 + 60000, 'in 3h']
+  ])('reads %s ms ahead as %s', (ms, expected) => {
+    expect(readableTime(new Date(Date.now() + ms).toISOString())).toBe(
+      expected
+    );
+  });
+
+  it('does not call a moment away "just now", as the past branch did', () => {
+    const soon = new Date(Date.now() + 30000).toISOString();
+    expect(readableTime(soon)).toBe('in under a minute');
+  });
+
+  it('falls back to a date beyond 30 days, as it does behind', () => {
+    const far = new Date(Date.now() + 40 * 86400000).toISOString();
+    expect(readableTime(far)).toBe(formatDate(far));
+  });
+});
+
+describe('untilTime (#331)', () => {
+  it.each([
+    [2 * 86400000 + 60000, 'in 2 days'],
+    [86400000 + 60000, 'in 1 day'],
+    [5 * 3600000 + 60000, 'in 5 hours'],
+    [3600000 + 60000, 'in 1 hour'],
+    [2 * 60000 + 1000, 'in 2 minutes']
+  ])('reads %s ms ahead as %s', (ms, expected) => {
+    expect(untilTime(new Date(Date.now() + ms).toISOString())).toBe(expected);
+  });
+
+  it.each([[undefined], ['']])('says "shortly" for %s', (value) => {
+    expect(untilTime(value)).toBe('shortly');
+  });
+
+  it('says "shortly" for a date already past', () => {
+    expect(untilTime(new Date(Date.now() - 60000).toISOString())).toBe(
+      'shortly'
+    );
   });
 });
 

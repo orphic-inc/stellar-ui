@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useLogoutMutation } from '../../store/services/authApi';
 import { api } from '../../store/api';
 import { logout as logoutAction } from '../../store/slices/authSlice';
+import { hasPermission } from '../../utils/permissions';
 import type { AuthUser } from '../../types';
 
 interface Props {
@@ -21,8 +22,11 @@ const UserMenu = ({ user }: Props) => {
     navigate('/login');
   };
 
-  const inviteDisplay =
-    user.inviteCount == null ? '∞' : String(user.inviteCount);
+  // `invites_unlimited` (stellar-api#637) is what makes a balance meaningless;
+  // `inviteCount` is a non-null column, so the old null check never fired.
+  const inviteDisplay = hasPermission(user, 'invites_unlimited')
+    ? '∞'
+    : String(user.inviteCount ?? 0);
 
   return (
     <div className="flex items-center gap-1 text-sm">

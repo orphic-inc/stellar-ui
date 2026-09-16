@@ -62,11 +62,29 @@ describe('UserMenu', () => {
     expect(screen.getByText(/invite \(3\)/i)).toBeInTheDocument();
   });
 
-  it('shows ∞ when invite count is null', () => {
-    renderWithProviders(
-      <UserMenu user={{ ...mockUser, inviteCount: undefined }} />
-    );
-    expect(screen.getByText(/invite \(∞\)/i)).toBeInTheDocument();
+  // ∞ follows the permission, not a null count: `inviteCount` is a non-null
+  // column, so the old null branch never ran (stellar-ui#331, api#637).
+  it.each([['invites_unlimited'], ['admin']])(
+    'shows ∞ for a sender with %s',
+    (permission) => {
+      renderWithProviders(
+        <UserMenu
+          user={{
+            ...mockUser,
+            userRank: {
+              ...mockUser.userRank,
+              permissions: { [permission]: true }
+            }
+          }}
+        />
+      );
+      expect(screen.getByText(/invite \(∞\)/i)).toBeInTheDocument();
+    }
+  );
+
+  it('shows the count for a sender without it, whatever the count', () => {
+    renderWithProviders(<UserMenu user={{ ...mockUser, inviteCount: 0 }} />);
+    expect(screen.getByText(/invite \(0\)/i)).toBeInTheDocument();
   });
 
   it('calls logout, dispatches actions, and navigates to /login', async () => {
