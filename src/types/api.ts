@@ -27923,6 +27923,13 @@ export interface components {
       contributed?: string;
       consumed?: string;
       ratio?: number;
+      ratioPolicy?: {
+        /** @enum {string} */
+        status: 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
+        watchExpiresAt: string | null;
+        /** @enum {string|null} */
+        disabledCause: 'RATIO' | 'STAFF' | null;
+      } | null;
       userRank: {
         level: number;
         name: string;

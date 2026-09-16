@@ -8,6 +8,40 @@ All notable changes to stellar-ui are documented here.
 
 ### Added
 
+- **A site-wide ratio policy banner**
+  ([#345](https://github.com/orphic-inc/stellar-ui/issues/345)) — a member on
+  ratio watch, or with downloads disabled, now sees it on **every**
+  authenticated page, above the global notices. The profile notice (#334) and
+  the System PM both require the member to go looking; a watch runs 14 days and
+  carries a 10 GiB download trigger, either of which can pass unseen.
+
+  Not dismissible. A notification is an event you acknowledge once; this is
+  derived state that is true until it is not, and a member who dismissed it on
+  Monday would get no warning on Thursday as the trigger approached.
+
+  **The disabled arm keys on `canDownload`, not on the policy status.** The api
+  documents that flag as "an independent download-capability flag, NOT a
+  projection of ratio", with ratio policy merely its first writer and future
+  abuse suspensions expected to gate it too. Keying on the policy enum would
+  leave any such member with dead download buttons and no explanation — the
+  exact defect #334 existed to fix. The cause only _explains_ the flag, and
+  degrades to a neutral "contact staff" when the ratio domain has nothing
+  specific to say.
+
+  The watch arm carries the deadline and the 10 GiB trigger but **no numbers**:
+  a banner is an interrupt, not a report, and `/ratio` and the profile carry the
+  arithmetic.
+
+  Wording is single-sourced with the profile notice in
+  `components/ratio/ratioPolicyCopy`, so one member cannot read two
+  explanations of one state on two screens. #334's spec passes unchanged, which
+  is the evidence that extraction changed no behaviour.
+
+  It reads the session (stellar-api#659), not `GET /profile/me/ratio`. That
+  route runs an unbounded read over every one of the member's contributions —
+  fine behind a profile view, not for something rendered on each page and
+  polled.
+
 - **`Eligible Contributions` on `/ratio`** — contribution coverage is eligible
   bytes over downloaded, and the page showed the percentage with neither
   operand. `RatioStats` was the only other component that rendered the figure,
@@ -55,6 +89,23 @@ All notable changes to stellar-ui are documented here.
   invalidation or page load. Closing that is folded into the site-wide ratio
   banner issue, where the same freshness question has to be answered for both
   surfaces at once.
+
+- **The session refreshes after a download, and on a timer** (#345) — the
+  download mutations now invalidate `'Auth'` alongside `'Profile'`, since the
+  session carries the same policy state. That closes only the member's own
+  actions: the daily sweep and a staff override move the state with nothing to
+  invalidate on, and the api evaluates the policy _after_ the grant responds,
+  so invalidation can lose the race. `PrivateLayout` therefore polls the session
+  every 15 minutes — nothing calls `setupListeners`, so `refetchOnFocus` is
+  unavailable without a global change and a surface needing fresh state must
+  poll for itself.
+
+  Measured rather than assumed: each poll hands `selectCurrentUser` consumers a
+  new object reference, so they re-render once per interval, but the content is
+  identical so nothing visibly changes. At that cadence it is not worth a
+  deep-equality guard in `setCredentials`, which would alter every login path to
+  save four renders an hour. A test pins both halves so a shorter interval has
+  to confront the cost knowingly.
 
 ## [0.9.5] — 2026-09-16
 
