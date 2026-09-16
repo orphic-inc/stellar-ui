@@ -10,6 +10,8 @@ import {
 import { canSeeModBar, canUseReportActions } from '../staff/staffAffordances';
 import { canAccessToolbox } from '../staff/staffToolRegistry';
 
+const SITE_FULL_POLL_MS = 5 * 60 * 1000;
+
 const CHECKLIST_LINKS: Record<
   string,
   { to: string; label: string } | undefined
@@ -77,6 +79,33 @@ const SetupChecklist = ({
   );
 };
 
+/**
+ * Live state, so it is not a checklist item: those dismiss permanently by id
+ * and would stay silent the next time the site filled (#327). No dismiss
+ * control at all — the row leaves when the site stops being full.
+ *
+ * `role="status"` rather than `alert`: ModBar is in the header of every private
+ * page, and an assertive live region would interrupt a screen reader on each
+ * navigation.
+ */
+const SiteFullBanner = () => (
+  <div
+    role="status"
+    className="mt-1 flex flex-wrap items-center gap-2 rounded border border-rose-800/70 bg-rose-950/40 px-2 py-1 text-[11px] text-rose-200"
+  >
+    <span className="font-medium text-rose-100">
+      The site is full — every seat is taken. Registration and invite sending
+      are refused.
+    </span>
+    <Link
+      to="/staff/tools/settings"
+      className="text-rose-300 hover:text-rose-100 underline underline-offset-2 transition-colors"
+    >
+      Open settings
+    </Link>
+  </div>
+);
+
 const StaffLinks = ({
   showToolboxLink,
   showReportsLink,
@@ -119,7 +148,13 @@ const StaffLinks = ({
 const ModBar = () => {
   const user = useAppSelector(selectCurrentUser);
   const { data: reportCounts } = useGetReportCountsQuery();
-  const { data: installStatus } = useGetInstallStatusQuery();
+  // Polled, unlike every other reader of this query: App.tsx holds a root
+  // subscription for the whole session and nothing here calls setupListeners,
+  // so without a timer the banner would only ever appear to staff who loaded
+  // the tab after the site was already full — silent exactly when it is needed.
+  const { data: installStatus } = useGetInstallStatusQuery(undefined, {
+    pollingInterval: SITE_FULL_POLL_MS
+  });
   const [dismissChecklistItem] = useDismissInstallChecklistItemMutation();
 
   if (!canSeeModBar(user)) return null;
@@ -137,6 +172,7 @@ const ModBar = () => {
           showReportsLink={showReportsLink}
           openReports={openReports}
         />
+        {installStatus?.registrationFull && <SiteFullBanner />}
         <SetupChecklist
           items={setupChecklist}
           onDismiss={(id) => void dismissChecklistItem(id)}

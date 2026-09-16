@@ -139,6 +139,21 @@ const Register = () => {
     return <RegisterNotice>Registration is currently closed.</RegisterNotice>;
   }
 
+  // One wording in both modes (#327). The api says more when it refuses the
+  // POST — an invite key presented to a full site is not spent, and the reply
+  // names the date the key runs out. That sentence needs a key to be accurate,
+  // and this page renders before one is entered, so it is left to the submit:
+  // stellar-api#627 kept an invite's clock running while the site is full, so
+  // promising here that the invite "stays valid" would be a promise we cannot
+  // keep.
+  if (installStatus?.registrationFull) {
+    return (
+      <RegisterNotice>
+        Registration is full: the site has reached its member limit.
+      </RegisterNotice>
+    );
+  }
+
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
