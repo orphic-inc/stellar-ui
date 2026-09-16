@@ -322,6 +322,11 @@ releases · albums` toggle on the release browse page. In album mode the row
 
 ### Fixed
 
+- **The login page no longer trails a separator when registration is closed.**
+  The `·` between "Forgot password?" and "Register" rendered unconditionally,
+  so an install with registration closed showed a stray dot. It now belongs to
+  the Register link it separates.
+
 - **The invite pool's status filter and colours use the real statuses**
   ([#330](https://github.com/orphic-inc/stellar-ui/issues/330)). The filter
   sent upper-case values the api refuses with `400`, including `USED`, which

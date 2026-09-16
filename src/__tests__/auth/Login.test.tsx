@@ -115,10 +115,19 @@ describe('Login', () => {
 
   it('hides Register link when registrationStatus is not open', () => {
     mockInstallStatus = { registrationStatus: 'closed' };
-    renderWithProviders(<Login />);
+    const { container } = renderWithProviders(<Login />);
     expect(
       screen.queryByRole('link', { name: /register/i })
     ).not.toBeInTheDocument();
+    // The separator goes with it: a closed registration used to leave a
+    // trailing "·" after "Forgot password?".
+    expect(container.textContent).not.toContain('·');
+  });
+
+  it('separates the two links when Register is shown', () => {
+    mockInstallStatus = { registrationStatus: 'open' };
+    const { container } = renderWithProviders(<Login />);
+    expect(container.textContent).toContain('·');
   });
 
   it('redirects to / when user is already logged in', async () => {

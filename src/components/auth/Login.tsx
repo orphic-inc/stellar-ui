@@ -61,6 +61,97 @@ const DisabledAccountPanel = ({ disabled }: { disabled: AccountDisabled }) => (
   </div>
 );
 
+const FIELD_CLASS =
+  'w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500';
+
+const LoginField = ({
+  name,
+  label,
+  type,
+  value,
+  onChange,
+  placeholder,
+  minLength
+}: {
+  name: keyof FormState;
+  label: string;
+  type: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  minLength?: number;
+}) => (
+  <div>
+    <label
+      htmlFor={`login-${name}`}
+      className="block text-sm font-medium text-gray-300 mb-1"
+    >
+      {label}
+    </label>
+    <input
+      id={`login-${name}`}
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      minLength={minLength}
+      required
+      placeholder={placeholder}
+      className={FIELD_CLASS}
+    />
+  </div>
+);
+
+/** The toast wording for every refusal the panel does not take. */
+const loginErrorMessage = (err: unknown): string => {
+  if ((err as { status?: number })?.status === 429)
+    return 'Too many attempts, try again later.';
+  return getApiErrorMessage(err) ?? 'Invalid email or password.';
+};
+
+const LoginNotice = ({ notice }: { notice: string }) => (
+  <div className="mb-4 bg-amber-900/40 border border-amber-700 text-amber-300 rounded-lg px-4 py-3 text-sm">
+    {notice}
+  </div>
+);
+
+const LoginHeading = () => (
+  <div className="text-center mb-8">
+    <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-2">
+      Stellar
+    </h1>
+    <p className="text-gray-400 text-sm">Sign in to your account</p>
+  </div>
+);
+
+const LoginSubmit = ({ isLoading }: { isLoading: boolean }) => (
+  <button
+    type="submit"
+    disabled={isLoading}
+    className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+  >
+    {isLoading ? 'Signing in…' : 'Sign In'}
+  </button>
+);
+
+const LoginLinks = ({ canRegister }: { canRegister: boolean }) => (
+  <div className="text-center text-sm text-gray-500 space-x-2">
+    <Link to="/recovery" className="hover:text-gray-300 transition-colors">
+      Forgot password?
+    </Link>
+    {/* Separator belongs to the Register link: without it a closed
+        registration left a trailing "·" after Forgot password?. */}
+    {canRegister && (
+      <>
+        <span>·</span>
+        <Link to="/register" className="hover:text-gray-300 transition-colors">
+          Register
+        </Link>
+      </>
+    )}
+  </div>
+);
+
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -93,102 +184,45 @@ const Login = () => {
         setDisabled(accountDisabled);
         return;
       }
-      const status = (err as { status?: number })?.status;
-      const authErrorMessage =
-        getApiErrorMessage(err) ?? 'Invalid email or password.';
-      const msg =
-        status === 429
-          ? 'Too many attempts, try again later.'
-          : authErrorMessage;
-      dispatch(addAlert(msg, 'danger'));
+      dispatch(addAlert(loginErrorMessage(err), 'danger'));
     }
   };
 
   return (
     <div className="w-full max-w-sm">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-2">
-          Stellar
-        </h1>
-        <p className="text-gray-400 text-sm">Sign in to your account</p>
-      </div>
+      <LoginHeading />
 
       {disabled && <DisabledAccountPanel disabled={disabled} />}
 
-      {notice && (
-        <div className="mb-4 bg-amber-900/40 border border-amber-700 text-amber-300 rounded-lg px-4 py-3 text-sm">
-          {notice}
-        </div>
-      )}
+      {notice && <LoginNotice notice={notice} />}
 
       <form
         onSubmit={onSubmit}
         className="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4"
       >
-        <div>
-          <label
-            htmlFor="login-email"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Email
-          </label>
-          <input
-            id="login-email"
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={onChange}
-            required
-            placeholder="you@example.com"
-            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
-          />
-        </div>
+        <LoginField
+          name="email"
+          label="Email"
+          type="email"
+          value={form.email}
+          onChange={onChange}
+          placeholder="you@example.com"
+        />
+        <LoginField
+          name="password"
+          label="Password"
+          type="password"
+          value={form.password}
+          onChange={onChange}
+          placeholder="••••••••"
+          minLength={6}
+        />
 
-        <div>
-          <label
-            htmlFor="login-password"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Password
-          </label>
-          <input
-            id="login-password"
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={onChange}
-            minLength={6}
-            required
-            placeholder="••••••••"
-            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
-          />
-        </div>
+        <LoginSubmit isLoading={isLoading} />
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
-        >
-          {isLoading ? 'Signing in…' : 'Sign In'}
-        </button>
-
-        <div className="text-center text-sm text-gray-500 space-x-2">
-          <Link
-            to="/recovery"
-            className="hover:text-gray-300 transition-colors"
-          >
-            Forgot password?
-          </Link>
-          <span>·</span>
-          {installStatus?.registrationStatus === 'open' && (
-            <Link
-              to="/register"
-              className="hover:text-gray-300 transition-colors"
-            >
-              Register
-            </Link>
-          )}
-        </div>
+        <LoginLinks
+          canRegister={installStatus?.registrationStatus === 'open'}
+        />
       </form>
     </div>
   );
