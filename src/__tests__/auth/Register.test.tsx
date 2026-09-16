@@ -241,6 +241,11 @@ describe('Register', () => {
       screen.getByText(/enter your invite key to register/i)
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/invite key/i)).toBeInTheDocument();
+    // Every field on this form is required, which is why RegisterField does not
+    // take it as a prop. Pinned so that stays a property of the markup.
+    expect(screen.getByLabelText(/invite key/i)).toBeRequired();
+    expect(screen.getByLabelText(/username/i)).toBeRequired();
+    expect(screen.getByLabelText(/^password$/i)).toBeRequired();
 
     await fillForm(user);
     await user.type(screen.getByLabelText(/invite key/i), 'KEY-1234');

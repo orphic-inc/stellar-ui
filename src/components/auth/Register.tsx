@@ -24,6 +24,11 @@ const RegisterHeading = ({ className }: { className: string }) => (
   <h1 className={`${HEADING_CLASS} ${className}`}>Stellar</h1>
 );
 
+/**
+ * Every field on this form is required, so that is not a prop — it was one
+ * briefly, defaulted to true and overridden nowhere, which put the parameter
+ * count over Codacy's limit of 8. Keep it at or under that when adding props.
+ */
 const RegisterField = ({
   name,
   label,
@@ -32,8 +37,7 @@ const RegisterField = ({
   onChange,
   placeholder,
   minLength,
-  maxLength,
-  required = true
+  maxLength
 }: {
   name: keyof FormState;
   label: React.ReactNode;
@@ -43,7 +47,6 @@ const RegisterField = ({
   placeholder: string;
   minLength?: number;
   maxLength?: number;
-  required?: boolean;
 }) => (
   <div>
     <label
@@ -60,7 +63,7 @@ const RegisterField = ({
       onChange={onChange}
       minLength={minLength}
       maxLength={maxLength}
-      required={required}
+      required
       placeholder={placeholder}
       className={FIELD_CLASS}
     />
