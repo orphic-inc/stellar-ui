@@ -6,6 +6,7 @@ import { useGetInstallStatusQuery } from '../../store/services/installApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
+import type { components } from '../../types/api';
 
 interface FormState {
   email: string;
@@ -15,6 +16,50 @@ interface FormState {
 interface LocationState {
   notice?: string;
 }
+
+type AccountDisabled = components['schemas']['AccountDisabledResponse'];
+
+/**
+ * A disabled sign-in (stellar-api#622) carries where to go, not just that it
+ * failed. Older apis answer the same 403 with `msg` alone, so both fields are
+ * required before the panel replaces the toast.
+ */
+const asAccountDisabled = (err: unknown): AccountDisabled | null => {
+  const rejection = (err ?? {}) as {
+    status?: number;
+    data?: Partial<AccountDisabled>;
+  };
+  if (rejection.status !== 403) return null;
+  const { msg, disabledChannel, ircGuideUrl } = rejection.data ?? {};
+  if (!disabledChannel || !ircGuideUrl) return null;
+  return { msg: msg ?? 'Account disabled', disabledChannel, ircGuideUrl };
+};
+
+/**
+ * Persistent, not a toast: the member has a channel to note and a link to
+ * follow, and reactivation happens there rather than in this app (#324).
+ */
+const DisabledAccountPanel = ({ disabled }: { disabled: AccountDisabled }) => (
+  <div
+    role="alert"
+    className="mb-4 bg-red-900/40 border border-red-700 text-red-300 rounded-lg px-4 py-3 text-sm space-y-2"
+  >
+    <p className="font-medium">{disabled.msg}</p>
+    <p>
+      Reactivation is handled by staff on IRC. Ask in{' '}
+      <strong className="font-semibold">{disabled.disabledChannel}</strong> and
+      they can reinstate your account.
+    </p>
+    <a
+      href={disabled.ircGuideUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-block underline hover:text-red-200"
+    >
+      How to connect to IRC
+    </a>
+  </div>
+);
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,6 +71,7 @@ const Login = () => {
 
   const notice = (location.state as LocationState)?.notice;
   const [form, setForm] = useState<FormState>({ email: '', password: '' });
+  const [disabled, setDisabled] = useState<AccountDisabled | null>(null);
 
   useEffect(() => {
     if (user) navigate('/');
@@ -36,10 +82,17 @@ const Login = () => {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Cleared per attempt: the next refusal may be about another account.
+    setDisabled(null);
     try {
       await login(form).unwrap();
       navigate('/');
     } catch (err) {
+      const accountDisabled = asAccountDisabled(err);
+      if (accountDisabled) {
+        setDisabled(accountDisabled);
+        return;
+      }
       const status = (err as { status?: number })?.status;
       const authErrorMessage =
         getApiErrorMessage(err) ?? 'Invalid email or password.';
@@ -59,6 +112,8 @@ const Login = () => {
         </h1>
         <p className="text-gray-400 text-sm">Sign in to your account</p>
       </div>
+
+      {disabled && <DisabledAccountPanel disabled={disabled} />}
 
       {notice && (
         <div className="mb-4 bg-amber-900/40 border border-amber-700 text-amber-300 rounded-lg px-4 py-3 text-sm">

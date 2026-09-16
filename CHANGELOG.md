@@ -153,6 +153,23 @@ releases · albums` toggle on the release browse page. In album mode the row
   `in 2d`, which also fixes the staff invite pool's **Expires** column, where
   every pending invite claimed to expire "just now".
 
+- **A disabled account is told where reactivation happens**
+  ([#324](https://github.com/orphic-inc/stellar-ui/issues/324),
+  [api#622](https://github.com/orphic-inc/stellar-api/issues/622)). Signing in
+  to a disabled account showed a four-word toast that then vanished. The login
+  form now keeps a panel that names the IRC channel to ask in and links the
+  public guide on connecting, both taken from the `403` itself
+  (`AccountDisabledResponse`), so neither value is written into this repo.
+
+  Reactivation is handled by staff on IRC, not in this app: the vendored
+  `/auth/reactivation-request` and `/auth/reactivation-confirm` routes
+  deliberately get no surface here. The panel stays until the next sign-in
+  attempt, rather than disappearing on a timer while the member is reading a
+  channel name.
+
+  An api older than the `403` that carries those two fields still shows the
+  toast it always did.
+
 ### Changed
 
 - **The vendored contract catches up with stellar-api `0.9.4`**
