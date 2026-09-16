@@ -48,6 +48,7 @@ import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 import UserBadges from '../layout/UserBadges';
 import InviteControlsPanel from './InviteControlsPanel';
+import RatioPolicyNotice from './RatioPolicyNotice';
 
 const COLLAGE_CATEGORY_LABELS: Record<number, string> = {
   0: 'Personal',
@@ -1256,6 +1257,13 @@ const UserProfile = () => {
       <div className="flex gap-6 items-start">
         {/* Main content (left) */}
         <div className="flex-1 space-y-4 min-w-0">
+          {/* Own profile only: `myRatioStats` is skipped off it. Mounted here
+              rather than in the Statistics panel because that column is 176px
+              wide (ui#334) — the notice is prose and needs the main column. */}
+          {isOwnProfile && myRatioStats && (
+            <RatioPolicyNotice stats={myRatioStats} />
+          )}
+
           {profile.profile?.profileInfoHtml && (
             <div data-st="panel">
               <div data-st="colhead" data-st-title>

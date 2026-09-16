@@ -14,11 +14,6 @@ jest.mock('../../components/layout/Time', () => ({
   default: ({ date }: { date: string }) => <span>{date}</span>
 }));
 
-jest.mock('../../components/profile/RatioStats', () => ({
-  __esModule: true,
-  default: () => <div data-testid="ratio-stats" />
-}));
-
 jest.mock('../../components/layout/UserBadges', () => ({
   __esModule: true,
   default: () => null
