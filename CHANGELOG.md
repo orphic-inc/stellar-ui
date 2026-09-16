@@ -170,6 +170,33 @@ releases · albums` toggle on the release browse page. In album mode the row
   An api older than the `403` that carries those two fields still shows the
   toast it always did.
 
+- **A full site says so, to the visitor and to staff**
+  ([#327](https://github.com/orphic-inc/stellar-ui/issues/327)) — stellar-api
+  `0.9.5` enforces `maxUsers` as a count of enabled accounts, and reports it
+  anonymously as `registrationFull` on `GET /install`. Two surfaces consume it.
+
+  The register page renders a notice in place of the form: _"Registration is
+  full: the site has reached its member limit."_ The same words in invite mode,
+  which is a deliberate omission — an invite's clock keeps running while the
+  site is full, so this page cannot promise a key stays valid. The api's own
+  refusal names the date the key runs out, and that reply is already surfaced
+  verbatim on submit, which is where a key exists to be accurate about.
+
+  Staff get an undismissable banner in the ModBar, not a setup-checklist item:
+  checklist items dismiss permanently by id, so one would go silent the next
+  time the site filled. It names both consequences — registration and invite
+  sending are refused — and links to the settings page where `maxUsers` lives.
+
+  The banner polls, alone among this query's readers. `App.tsx` holds a root
+  subscription for the whole session and nothing in this app calls
+  `setupListeners`, so an unpolled read is the boot-time snapshot: staff who
+  opened a tab before the site filled would never see the banner at all.
+
+  Known gap, tracked in stellar-api: `registrationFull` is forced `false` while
+  registration is `closed`, but invite sending is refused on capacity alone. So
+  closing registration on a full site keeps refusing sends while the banner goes
+  dark. That needs a capacity signal independent of registration status.
+
 ### Changed
 
 - **The vendored contract catches up with stellar-api `0.9.4`**

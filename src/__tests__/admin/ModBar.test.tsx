@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import ModBar from '../../components/admin/ModBar';
@@ -18,7 +18,10 @@ jest.mock('../../store/services/reportsApi', () => ({
 }));
 
 jest.mock('../../store/services/installApi', () => ({
-  useGetInstallStatusQuery: () => mockUseGetInstallStatusQuery(),
+  // Args forwarded, not swallowed: ModBar is the one caller that passes query
+  // options, and the polling interval is part of what this spec pins (#327).
+  useGetInstallStatusQuery: (...args: unknown[]) =>
+    mockUseGetInstallStatusQuery(...args),
   useDismissInstallChecklistItemMutation: () => [
     mockDismissInstallChecklistItem
   ]
@@ -170,6 +173,73 @@ describe('ModBar', () => {
     expect(mockDismissInstallChecklistItem).toHaveBeenCalledWith(
       'max-users-default'
     );
+  });
+
+  describe('the site-full banner (#327)', () => {
+    const FULL = /the site is full — every seat is taken/i;
+
+    it('shows the banner while registrationFull is true', () => {
+      mockUseAppSelector.mockReturnValue(staffUser);
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: { setupChecklist: [], registrationFull: true }
+      });
+
+      renderWithProviders(<ModBar />);
+
+      expect(screen.getByRole('status')).toHaveTextContent(FULL);
+      expect(
+        screen.getByRole('link', { name: /open settings/i })
+      ).toHaveAttribute('href', '/staff/tools/settings');
+    });
+
+    it('hides the banner while the site is not full', () => {
+      mockUseAppSelector.mockReturnValue(staffUser);
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: { setupChecklist: [], registrationFull: false }
+      });
+
+      renderWithProviders(<ModBar />);
+
+      expect(screen.queryByText(FULL)).not.toBeInTheDocument();
+    });
+
+    it('offers no way to dismiss it', () => {
+      // A checklist item dismisses permanently by id, which would leave the
+      // banner silent the next time the site filled. Assert against the banner
+      // itself, not the bar: the checklist's own × must still be there.
+      mockUseAppSelector.mockReturnValue(staffUser);
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: {
+          registrationFull: true,
+          setupChecklist: [
+            {
+              id: 'max-users-default',
+              message: 'maxUsers is still the default value.'
+            }
+          ]
+        }
+      });
+
+      renderWithProviders(<ModBar />);
+
+      const banner = screen.getByRole('status');
+      expect(banner).toHaveTextContent(FULL);
+      expect(within(banner).queryByRole('button')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /dismiss max-users-default/i })
+      ).toBeInTheDocument();
+    });
+
+    it('polls so a site that fills mid-session still raises it', () => {
+      // App.tsx holds a root subscription and nothing calls setupListeners, so
+      // an unpolled read would be the boot-time snapshot for the whole session.
+      mockUseAppSelector.mockReturnValue(staffUser);
+      renderWithProviders(<ModBar />);
+
+      expect(mockUseGetInstallStatusQuery).toHaveBeenCalledWith(undefined, {
+        pollingInterval: 5 * 60 * 1000
+      });
+    });
   });
 
   it('hides the launch checklist when there are no unresolved items', () => {

@@ -77,6 +77,100 @@ describe('Register', () => {
     ).toBeInTheDocument();
   });
 
+  describe('a full site (#327)', () => {
+    it('replaces the form with the full notice in open mode', () => {
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: { registrationStatus: 'open', registrationFull: true }
+      });
+      renderWithProviders(<Register />);
+
+      expect(
+        screen.getByText(
+          /registration is full: the site has reached its member limit/i
+        )
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /register/i })
+      ).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/username/i)).not.toBeInTheDocument();
+    });
+
+    it('says the same thing in invite mode, and promises nothing about the key', () => {
+      // stellar-api#627 keeps an invite's clock running while the site is full,
+      // so this page must not promise the key stays valid. The api's own reply
+      // to the POST names the expiry date; before a key is entered there is no
+      // date to name.
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: { registrationStatus: 'invite', registrationFull: true }
+      });
+      renderWithProviders(<Register />);
+
+      expect(
+        screen.getByText(
+          /registration is full: the site has reached its member limit/i
+        )
+      ).toBeInTheDocument();
+      expect(screen.queryByLabelText(/invite key/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/still valid|valid until/i)
+      ).not.toBeInTheDocument();
+    });
+
+    it('renders the form while the site is not full', () => {
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: { registrationStatus: 'open', registrationFull: false }
+      });
+      renderWithProviders(<Register />);
+
+      expect(
+        screen.getByRole('button', { name: /register/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText(/registration is full/i)
+      ).not.toBeInTheDocument();
+    });
+
+    it('keeps the closed wording when a closed site is also full', () => {
+      // The api forces registrationFull false while closed, but the branch
+      // order is what guarantees the closed wording wins if it ever did not.
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: { registrationStatus: 'closed', registrationFull: true }
+      });
+      renderWithProviders(<Register />);
+
+      expect(
+        screen.getByText(/registration is currently closed/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText(/registration is full/i)
+      ).not.toBeInTheDocument();
+    });
+
+    it("surfaces the api's expiry-qualified refusal when the site fills mid-visit", async () => {
+      // registrationFull is a snapshot; the submit is authoritative and its
+      // words are the api's, expiry date included.
+      const full =
+        'Registration is full: the site has reached its member limit. Your invite is valid until Fri, 19 Sep 2026 12:00:00 GMT.';
+      mockUseGetInstallStatusQuery.mockReturnValue({
+        data: { registrationStatus: 'invite', registrationFull: false }
+      });
+      mockRegister.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 403, data: { msg: full } })
+      });
+      const user = userEvent.setup();
+      const { store } = renderWithProviders(<Register />);
+
+      await fillForm(user);
+      await user.type(screen.getByLabelText(/invite key/i), 'KEY-LATE');
+      await user.click(screen.getByRole('button', { name: /register/i }));
+
+      await waitFor(() => {
+        const alerts = selectAlerts(store.getState());
+        expect(alerts.some((a) => a.msg === full)).toBe(true);
+      });
+    });
+  });
+
   it('shows "Passwords do not match" when passwords differ', async () => {
     const user = userEvent.setup();
     const { store } = renderWithProviders(<Register />);
