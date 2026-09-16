@@ -118,6 +118,29 @@ describe('UserRankManager', () => {
     expect(within(rows[1] as HTMLElement).getByText('2')).toBeInTheDocument();
   });
 
+  it('renders the Invites column as rate / cap, and a dash when off (#326)', () => {
+    mockUseGetUserRanksQuery.mockReturnValue({
+      data: [
+        makeRank(1, 'Member', 100),
+        makeRank(2, 'Donor', 500, { inviteGrantPerPeriod: 2, inviteCap: 10 }),
+        // A rate above the cap grants nothing (stellar-api ADR-0039). Showing
+        // both numbers in one cell is what makes that visible from the list.
+        makeRank(3, 'Broken', 300, { inviteGrantPerPeriod: 5, inviteCap: 2 })
+      ],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserRankManager />);
+    const rows = document.querySelectorAll('table[data-st="grid"] tbody tr');
+    expect(within(rows[0] as HTMLElement).getByText('—')).toBeInTheDocument();
+    expect(
+      within(rows[1] as HTMLElement).getByText('2 / 10')
+    ).toBeInTheDocument();
+    expect(
+      within(rows[2] as HTMLElement).getByText('5 / 2')
+    ).toBeInTheDocument();
+  });
+
   it('renders ranks on the grid table (kit hooks present)', () => {
     mockUseGetUserRanksQuery.mockReturnValue({
       data: [makeRank(1, 'Member', 100)],

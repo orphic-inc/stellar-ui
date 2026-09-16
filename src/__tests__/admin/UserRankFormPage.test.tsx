@@ -139,6 +139,109 @@ describe('UserRankFormPage — create mode', () => {
     });
   });
 
+  describe('invite handout fields (#326)', () => {
+    const rate = () => screen.getByLabelText(/invites earned every 14 days/i);
+    const cap = () => screen.getByLabelText(/invite cap/i);
+
+    const setNumber = async (
+      user: ReturnType<typeof userEvent.setup>,
+      field: HTMLElement,
+      value: string
+    ) => {
+      await user.clear(field);
+      await user.type(field, value);
+    };
+
+    it('says 0 = none on both, not the collage field 0 = unlimited', () => {
+      renderWithProviders(<UserRankFormPage />);
+      // Personal Collage Limit means the opposite by 0 and sits in this same
+      // grid. Both readings must be present and distinct.
+      expect(screen.getAllByText('0 = none')).toHaveLength(2);
+      expect(screen.getByText('0 = unlimited')).toBeInTheDocument();
+    });
+
+    it('sends both fields on create', async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<UserRankFormPage />);
+      await user.type(screen.getByLabelText(/^name$/i), 'Veteran');
+      await setNumber(user, rate(), '2');
+      await setNumber(user, cap(), '10');
+      await user.click(screen.getByRole('button', { name: /^create$/i }));
+
+      await waitFor(() => {
+        expect(mockCreateUserRank).toHaveBeenCalledWith(
+          expect.objectContaining({ inviteGrantPerPeriod: 2, inviteCap: 10 })
+        );
+      });
+    });
+
+    it('defaults both to 0 when untouched', async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<UserRankFormPage />);
+      await user.type(screen.getByLabelText(/^name$/i), 'Untouched');
+      await user.click(screen.getByRole('button', { name: /^create$/i }));
+
+      await waitFor(() => {
+        expect(mockCreateUserRank).toHaveBeenCalledWith(
+          expect.objectContaining({ inviteGrantPerPeriod: 0, inviteCap: 0 })
+        );
+      });
+    });
+
+    it('warns that a rate above the cap never grants', async () => {
+      // stellar-api measures room against the FULL grant, so at a balance of 0
+      // a rate above the cap is already "at cap" and never fires.
+      const user = userEvent.setup();
+      renderWithProviders(<UserRankFormPage />);
+      await setNumber(user, rate(), '5');
+      await setNumber(user, cap(), '2');
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        /a rate above the cap never grants/i
+      );
+    });
+
+    it('clears the warning when the rate equals the cap', async () => {
+      // The api's boundary is strict: perPeriod === cap grants, then holds.
+      const user = userEvent.setup();
+      renderWithProviders(<UserRankFormPage />);
+      await setNumber(user, rate(), '5');
+      await setNumber(user, cap(), '2');
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+
+      await setNumber(user, cap(), '5');
+      await waitFor(() =>
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      );
+    });
+
+    it('warns when a rate is set but the cap is 0', async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<UserRankFormPage />);
+      await setNumber(user, rate(), '3');
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        /holds no invites/i
+      );
+    });
+
+    it('says the rank earns none at rate 0, without alarming', async () => {
+      renderWithProviders(<UserRankFormPage />);
+      expect(
+        await screen.findByText(/this rank earns no invites/i)
+      ).toBeInTheDocument();
+      // "off" is not a misconfiguration, so it is not an alert.
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('says values are inert until the job is enabled', () => {
+      renderWithProviders(<UserRankFormPage />);
+      expect(
+        screen.getByText(/saved but nothing is granted/i)
+      ).toBeInTheDocument();
+    });
+  });
+
   it('dispatches danger alert on create failure', async () => {
     mockCreateUserRank.mockReturnValue({
       unwrap: () => Promise.reject({})
@@ -205,6 +308,58 @@ describe('UserRankFormPage — edit mode', () => {
         }) as HTMLInputElement
       ).checked
     ).toBe(true);
+  });
+
+  it('prefills the invite fields and sends them on update (#326)', async () => {
+    mockGetUserRankByIdQuery.mockReturnValue({
+      data: {
+        id: 3,
+        level: 500,
+        name: 'Staff',
+        permissions: { staff: true },
+        secondary: true,
+        permittedForumIds: [7],
+        inviteGrantPerPeriod: 2,
+        inviteCap: 10
+      },
+      isLoading: false
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<UserRankFormPage />);
+
+    const rate = screen.getByLabelText(
+      /invites earned every 14 days/i
+    ) as HTMLInputElement;
+    const cap = screen.getByLabelText(/invite cap/i) as HTMLInputElement;
+    await waitFor(() => expect(rate.value).toBe('2'));
+    expect(cap.value).toBe('10');
+
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => {
+      expect(mockUpdateUserRank).toHaveBeenCalledWith(
+        expect.objectContaining({ inviteGrantPerPeriod: 2, inviteCap: 10 })
+      );
+    });
+  });
+
+  it('prefills invite fields as 0 when the rank omits them (#326)', async () => {
+    // The default beforeEach rank carries neither field.
+    renderWithProviders(<UserRankFormPage />);
+    await waitFor(() =>
+      expect((screen.getByLabelText(/^name$/i) as HTMLInputElement).value).toBe(
+        'Staff'
+      )
+    );
+    expect(
+      (
+        screen.getByLabelText(
+          /invites earned every 14 days/i
+        ) as HTMLInputElement
+      ).value
+    ).toBe('0');
+    expect(
+      (screen.getByLabelText(/invite cap/i) as HTMLInputElement).value
+    ).toBe('0');
   });
 
   it('shows spinner when isLoading is true in edit mode', () => {

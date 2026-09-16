@@ -43,6 +43,17 @@ const UserRankManager = () => {
       numeric: true
     },
     {
+      // Rate and cap together, because neither is readable alone: a rate above
+      // the cap grants nothing at all (stellar-api ADR-0039), and that is only
+      // visible when the two are side by side.
+      header: 'Invites',
+      cell: (r) =>
+        (r.inviteGrantPerPeriod ?? 0) === 0
+          ? '—'
+          : `${r.inviteGrantPerPeriod} / ${r.inviteCap ?? 0}`,
+      numeric: true
+    },
+    {
       header: 'Actions',
       cell: (r) => (
         <span className="flex gap-3">

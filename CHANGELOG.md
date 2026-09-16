@@ -197,6 +197,37 @@ releases · albums` toggle on the release browse page. In album mode the row
   closing registration on a full site keeps refusing sends while the banner goes
   dark. That needs a capacity signal independent of registration status.
 
+- **Staff can opt a rank into the invite handout**
+  ([#326](https://github.com/orphic-inc/stellar-ui/issues/326)) — the rank form
+  gains `inviteGrantPerPeriod` and `inviteCap`, the two settings stellar-api
+  `0.9.5` added for the periodic class-based handout (ADR-0039). The api ships
+  every rank at `0`, so until now the only way to turn grants on was to write to
+  the database by hand.
+
+  Both say **`0 = none`**, which is the opposite of the `0 = unlimited` on
+  Personal Collage Limit beside them. That split is the api's own — the schema
+  documents `assetLimit` as the deliberate opposite of the collage and
+  stylesheet limits — so the form states each field's meaning rather than
+  assuming a house convention.
+
+  A live warning covers the settings that save cleanly and then do nothing. The
+  obvious one is a rate with a cap of `0`. The one that does not announce itself
+  is a **rate above the cap**: the api measures room against the full grant
+  (`balance > cap - perPeriod`), so a member starting at `0` is already at a cap
+  below the rate, and the rank advances its clock forever without ever granting.
+  The sweep logs that as "at cap", which reads like a healthy member holding
+  invites. A rate equal to the cap is fine and does not warn.
+
+  A rate of `0` is stated plainly rather than flagged — that is the rank being
+  switched off, not a mistake. One further line notes that grants come from a
+  scheduled job, so values are saved but inert until an operator enables it;
+  the mode is an environment variable exposed on no route, so the ui cannot say
+  which state a given server is in.
+
+  `UserRankManager` gains one **Invites** column showing `rate / cap`, or `—`
+  when the rank earns none. One column rather than two, because neither number
+  means anything alone — `5 / 2` is only legible as broken when both are shown.
+
 ### Changed
 
 - **The vendored contract catches up with stellar-api `0.9.4`**
