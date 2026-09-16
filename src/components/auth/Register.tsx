@@ -14,6 +14,87 @@ interface FormState {
   inviteKey: string;
 }
 
+const FIELD_CLASS =
+  'w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500';
+
+const HEADING_CLASS =
+  'text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent';
+
+const RegisterHeading = ({ className }: { className: string }) => (
+  <h1 className={`${HEADING_CLASS} ${className}`}>Stellar</h1>
+);
+
+const RegisterField = ({
+  name,
+  label,
+  type,
+  value,
+  onChange,
+  placeholder,
+  minLength,
+  maxLength,
+  required = true
+}: {
+  name: keyof FormState;
+  label: React.ReactNode;
+  type: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  minLength?: number;
+  maxLength?: number;
+  required?: boolean;
+}) => (
+  <div>
+    <label
+      htmlFor={`reg-${name}`}
+      className="block text-sm font-medium text-gray-300 mb-1"
+    >
+      {label}
+    </label>
+    <input
+      id={`reg-${name}`}
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      minLength={minLength}
+      maxLength={maxLength}
+      required={required}
+      placeholder={placeholder}
+      className={FIELD_CLASS}
+    />
+  </div>
+);
+
+const SignInLink = () => (
+  <Link
+    to="/login"
+    className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm"
+  >
+    Sign in
+  </Link>
+);
+
+/** The page with no form on it: registration is refused before it is tried. */
+const RegisterNotice = ({ children }: { children: React.ReactNode }) => (
+  <div className="w-full max-w-sm text-center">
+    <RegisterHeading className="mb-6" />
+    <p className="text-gray-400 mb-4">{children}</p>
+    <SignInLink />
+  </div>
+);
+
+const RegisterSubmit = ({ isLoading }: { isLoading: boolean }) => (
+  <button
+    type="submit"
+    disabled={isLoading}
+    className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+  >
+    {isLoading ? 'Creating account…' : 'Register'}
+  </button>
+);
+
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -55,160 +136,118 @@ const Register = () => {
   };
 
   if (installStatus?.registrationStatus === 'closed') {
-    return (
-      <div className="w-full max-w-sm text-center">
-        <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-6">
-          Stellar
-        </h1>
-        <p className="text-gray-400 mb-4">Registration is currently closed.</p>
-        <Link
-          to="/login"
-          className="text-indigo-400 hover:text-indigo-300 transition-colors text-sm"
-        >
-          Sign in
-        </Link>
-      </div>
-    );
+    return <RegisterNotice>Registration is currently closed.</RegisterNotice>;
   }
 
   return (
     <div className="w-full max-w-sm">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-black tracking-widest uppercase bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-300 bg-clip-text text-transparent mb-2">
-          Stellar
-        </h1>
+        <RegisterHeading className="mb-2" />
         <p className="text-gray-400 text-sm">
-          {installStatus?.registrationStatus === 'invite'
+          {isInviteMode
             ? 'Enter your invite key to register'
             : 'Create your account'}
         </p>
       </div>
 
-      <form
+      <RegisterFormBody
+        form={form}
+        onChange={onChange}
         onSubmit={onSubmit}
-        className="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4"
-      >
-        <div>
-          <label
-            htmlFor="reg-username"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Username
-          </label>
-          <input
-            id="reg-username"
-            type="text"
-            name="username"
-            value={form.username}
-            onChange={onChange}
-            minLength={2}
-            maxLength={30}
-            required
-            placeholder="yourname"
-            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="reg-email"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Email
-          </label>
-          <input
-            id="reg-email"
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={onChange}
-            required
-            placeholder="you@example.com"
-            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="reg-password"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Password
-          </label>
-          <input
-            id="reg-password"
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={onChange}
-            minLength={6}
-            required
-            placeholder="6+ characters"
-            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="reg-password2"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
-            Confirm Password
-          </label>
-          <input
-            id="reg-password2"
-            type="password"
-            name="password2"
-            value={form.password2}
-            onChange={onChange}
-            minLength={6}
-            required
-            placeholder="••••••••"
-            className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
-          />
-        </div>
-
-        {isInviteMode && (
-          <div>
-            <label
-              htmlFor="reg-invite-key"
-              className="block text-sm font-medium text-gray-300 mb-1"
-            >
-              Invite Key <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="reg-invite-key"
-              type="text"
-              name="inviteKey"
-              value={form.inviteKey}
-              onChange={onChange}
-              required
-              placeholder="Paste your invite key"
-              className="w-full rounded-lg bg-gray-700 border border-gray-600 text-white px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-gray-500"
-            />
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
-        >
-          {isLoading ? 'Creating account…' : 'Register'}
-        </button>
-
-        <p className="text-center text-sm text-gray-500">
-          Already have an account?{' '}
-          <Link
-            to="/login"
-            className="text-indigo-400 hover:text-indigo-300 transition-colors"
-          >
-            Sign in
-          </Link>
-        </p>
-      </form>
+        isInviteMode={isInviteMode}
+        isLoading={isLoading}
+      />
     </div>
   );
 };
+
+const RegisterCoreFields = ({
+  form,
+  onChange
+}: {
+  form: FormState;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) => (
+  <>
+    <RegisterField
+      name="username"
+      label="Username"
+      type="text"
+      value={form.username}
+      onChange={onChange}
+      minLength={2}
+      maxLength={30}
+      placeholder="yourname"
+    />
+    <RegisterField
+      name="email"
+      label="Email"
+      type="email"
+      value={form.email}
+      onChange={onChange}
+      placeholder="you@example.com"
+    />
+    <RegisterField
+      name="password"
+      label="Password"
+      type="password"
+      value={form.password}
+      onChange={onChange}
+      minLength={6}
+      placeholder="6+ characters"
+    />
+    <RegisterField
+      name="password2"
+      label="Confirm Password"
+      type="password"
+      value={form.password2}
+      onChange={onChange}
+      minLength={6}
+      placeholder="••••••••"
+    />
+  </>
+);
+
+const RegisterFormBody = ({
+  form,
+  onChange,
+  onSubmit,
+  isInviteMode,
+  isLoading
+}: {
+  form: FormState;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  isInviteMode: boolean;
+  isLoading: boolean;
+}) => (
+  <form
+    onSubmit={onSubmit}
+    className="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4"
+  >
+    <RegisterCoreFields form={form} onChange={onChange} />
+
+    {isInviteMode && (
+      <RegisterField
+        name="inviteKey"
+        label={
+          <>
+            Invite Key <span className="text-red-400">*</span>
+          </>
+        }
+        type="text"
+        value={form.inviteKey}
+        onChange={onChange}
+        placeholder="Paste your invite key"
+      />
+    )}
+
+    <RegisterSubmit isLoading={isLoading} />
+
+    <p className="text-center text-sm text-gray-500">
+      Already have an account? <SignInLink />
+    </p>
+  </form>
+);
 
 export default Register;
