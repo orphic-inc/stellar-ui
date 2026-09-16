@@ -21,9 +21,43 @@ interface FormValues {
   secondary: boolean;
   permittedForumIds: number[];
   personalCollageLimit: number;
+  inviteGrantPerPeriod: number;
+  inviteCap: number;
   displayStaff: boolean;
   staffGroupId: number | '';
 }
+
+const NUMBER_INPUT_CLASS =
+  'w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm';
+
+/**
+ * What the handout job will do with this rate and cap (stellar-api#282,
+ * ADR-0039), or null when it will hand out invites normally.
+ *
+ * `perPeriod > cap` is the one that does not announce itself. The api measures
+ * room against the FULL grant — `balance > cap - perPeriod` — so at a fresh
+ * balance of 0 a rate above the cap is already "at cap", and the rank advances
+ * its clock forever without ever granting. `perPeriod === cap` is fine.
+ */
+const grantConfigNote = (
+  perPeriod: number,
+  cap: number
+): { tone: 'warn' | 'muted'; text: string } | null => {
+  if (!Number.isFinite(perPeriod) || !Number.isFinite(cap)) return null;
+  if (perPeriod <= 0)
+    return { tone: 'muted', text: 'This rank earns no invites.' };
+  if (cap <= 0)
+    return {
+      tone: 'warn',
+      text: 'This rank holds no invites, so the rate above grants nothing. Raise the cap.'
+    };
+  if (perPeriod > cap)
+    return {
+      tone: 'warn',
+      text: `A rate above the cap never grants: a member starting at 0 is already at the cap of ${cap}. Lower the rate to ${cap} or less, or raise the cap.`
+    };
+  return null;
+};
 
 const UserRankFormPage = () => {
   const { id } = useParams<{ id?: string }>();
@@ -49,6 +83,8 @@ const UserRankFormPage = () => {
         secondary: false,
         permittedForumIds: [],
         personalCollageLimit: 0,
+        inviteGrantPerPeriod: 0,
+        inviteCap: 0,
         displayStaff: false,
         staffGroupId: ''
       }
@@ -56,6 +92,12 @@ const UserRankFormPage = () => {
 
   const displayStaff = useWatch({ control, name: 'displayStaff' });
   const selectedForumIds = useWatch({ control, name: 'permittedForumIds' });
+  const inviteGrantPerPeriod = useWatch({
+    control,
+    name: 'inviteGrantPerPeriod'
+  });
+  const inviteCap = useWatch({ control, name: 'inviteCap' });
+  const inviteNote = grantConfigNote(inviteGrantPerPeriod, inviteCap);
 
   useEffect(() => {
     if (existing) {
@@ -66,6 +108,8 @@ const UserRankFormPage = () => {
         secondary: existing.secondary ?? false,
         permittedForumIds: existing.permittedForumIds ?? [],
         personalCollageLimit: existing.personalCollageLimit ?? 0,
+        inviteGrantPerPeriod: existing.inviteGrantPerPeriod ?? 0,
+        inviteCap: existing.inviteCap ?? 0,
         displayStaff: existing.displayStaff ?? false,
         staffGroupId: existing.staffGroupId ?? ''
       });
@@ -185,6 +229,40 @@ const UserRankFormPage = () => {
                 />
                 <p className="text-xs text-gray-500 mt-1">0 = unlimited</p>
               </div>
+              <div>
+                <label
+                  htmlFor="perm-invite-rate"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
+                  Invites Earned Every 14 Days
+                </label>
+                <input
+                  id="perm-invite-rate"
+                  type="number"
+                  min={0}
+                  {...register('inviteGrantPerPeriod', {
+                    valueAsNumber: true
+                  })}
+                  className={NUMBER_INPUT_CLASS}
+                />
+                <p className="text-xs text-gray-500 mt-1">0 = none</p>
+              </div>
+              <div>
+                <label
+                  htmlFor="perm-invite-cap"
+                  className="block text-sm font-medium text-gray-300 mb-1"
+                >
+                  Invite Cap
+                </label>
+                <input
+                  id="perm-invite-cap"
+                  type="number"
+                  min={0}
+                  {...register('inviteCap', { valueAsNumber: true })}
+                  className={NUMBER_INPUT_CLASS}
+                />
+                <p className="text-xs text-gray-500 mt-1">0 = none</p>
+              </div>
               <div className="rounded border border-gray-700 bg-gray-900/50 px-3 py-3">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -204,6 +282,23 @@ const UserRankFormPage = () => {
                 </label>
               </div>
             </div>
+
+            {inviteNote && (
+              <p
+                role={inviteNote.tone === 'warn' ? 'alert' : undefined}
+                className={
+                  inviteNote.tone === 'warn'
+                    ? 'text-xs text-amber-300 rounded border border-amber-800/70 bg-amber-950/40 px-3 py-2'
+                    : 'text-xs text-gray-500'
+                }
+              >
+                {inviteNote.text}
+              </p>
+            )}
+            <p className="text-xs text-gray-500">
+              Invites are handed out by a scheduled job. If it is not enabled on
+              this server, the values above are saved but nothing is granted.
+            </p>
           </div>
         </div>
 
