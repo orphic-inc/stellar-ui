@@ -2,9 +2,21 @@ import {
   DisabledNotice,
   WatchNotice,
   DISABLED_CLASS,
-  WATCH_CLASS,
-  type RatioPolicyView
+  WATCH_CLASS
 } from './ratioPolicyCopy';
+import type { AuthUser } from '../../types';
+
+/**
+ * Exactly the session fields this reads, taken from the contract rather than
+ * restated — so a change to either on the api side surfaces here as a type
+ * error instead of a silently dead branch.
+ *
+ * Hoisted out of the props annotation deliberately: Codacy's lizard counts each
+ * optional property in an INLINE structural type toward cyclomatic complexity,
+ * which put this component at 11 against a limit of 10 while the code itself
+ * branched four times.
+ */
+type BannerUser = Pick<AuthUser, 'canDownload' | 'ratioPolicy'>;
 
 /**
  * The site-wide ratio policy banner (#345), on every authenticated page.
@@ -20,11 +32,7 @@ import {
  *
  * Presentational: `PrivateLayout` owns the polled session subscription.
  */
-const RatioPolicyBanner = ({
-  user
-}: {
-  user: { canDownload?: boolean; ratioPolicy?: RatioPolicyView | null };
-}) => {
+const RatioPolicyBanner = ({ user }: { user: BannerUser }) => {
   const policy = user.ratioPolicy ?? null;
 
   // Keyed on `canDownload`, NOT on `policy.status`. The api documents the flag
