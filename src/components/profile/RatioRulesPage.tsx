@@ -98,6 +98,17 @@ const RatioRulesPage = () => {
               {(stats.contributionCoverage * 100).toFixed(0)}%
             </p>
           </div>
+          {/* Coverage is eligible bytes over downloaded, so showing the
+              percentage alone left both operands off the page once
+              RatioStats — its only other display — was deleted (ui#334). */}
+          <div>
+            <span data-st="meta" className="text-xs uppercase tracking-wide">
+              Eligible Contributions
+            </span>
+            <p data-st="prose" data-st-strong className="text-base mt-0.5">
+              {formatBytes(Number(stats.eligibleContributionBytes))}
+            </p>
+          </div>
         </div>
       )}
 

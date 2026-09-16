@@ -6,6 +6,56 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **`Eligible Contributions` on `/ratio`** — contribution coverage is eligible
+  bytes over downloaded, and the page showed the percentage with neither
+  operand. `RatioStats` was the only other component that rendered the figure,
+  so deleting it (below) would have dropped it from the app entirely.
+
+### Fixed
+
+- **The ratio policy notice is mounted again**
+  ([#334](https://github.com/orphic-inc/stellar-ui/issues/334)) — a member on
+  ratio watch, or with downloads disabled, saw nothing on their own profile.
+  `63d64cf` replaced `<RatioStats />` with inline stat rows in May and the
+  watch and disabled banners went with it; the component and its spec stayed,
+  and the spec rendered the component directly, so it kept passing against code
+  nothing mounted. [#333](https://github.com/orphic-inc/stellar-ui/issues/333)'s
+  cause-aware disabled banner has been unreachable since it shipped.
+
+  The notice is now a `RatioPolicyNotice` at the top of `UserProfile`'s main
+  column. Not in the Statistics panel, where the old rows were: that column is
+  176px wide and the notice is prose.
+
+  **The watch wording now carries what a member needs to act on it**, mirroring
+  the api's own watch PM: the current and required ratio, the deadline, and —
+  new here — the **10 GiB trigger**, which can disable downloads tomorrow
+  whatever the deadline says. It states no "you must upload X" figure, because
+  the required ratio is computed from eligible contribution bytes and so moves
+  as you upload; any deficit printed here would overstate it.
+
+  `RatioStats.tsx` and its spec are deleted, along with a stale
+  `jest.mock('…/RatioStats')` in `UserProfile.integration.test.tsx` that had
+  been mocking a component `UserProfile` no longer imports. The new spec renders
+  **`UserProfile`**, never the notice alone — a spec that mounts the notice
+  directly would reproduce the bug rather than catch it.
+
+- **A download refreshes the ratio stats it changes** — `grantAccess` and
+  `reverseGrant` invalidated `'Contribution'` and `'Download'` but never
+  `'Profile'`, which `getMyRatioStats` provides. Both mutations move the
+  member's `consumed`, and ADR-0044 puts `OK → WATCH` after a download and only
+  after a download, so the surface most likely to need fresh policy state was
+  reading the pre-download cache.
+
+  One limit, deliberately left: stellar-api evaluates the policy **in the
+  background after the grant responds**, so the refetch can still beat the
+  transition that sets `WATCH`. The ratio numbers are now always correct; the
+  status flip may lag by one interaction and lands on the next `'Profile'`
+  invalidation or page load. Closing that is folded into the site-wide ratio
+  banner issue, where the same freshness question has to be answered for both
+  surfaces at once.
+
 ## [0.9.5] — 2026-09-16
 
 **There is no `0.9.4`.** The patch moved two, from `0.9.3`, so that

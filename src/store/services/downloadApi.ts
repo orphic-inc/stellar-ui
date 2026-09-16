@@ -17,7 +17,12 @@ export const downloadApi = api.injectEndpoints({
         method: 'POST',
         body: idempotencyKey ? { idempotencyKey } : {}
       }),
-      invalidatesTags: ['Contribution']
+      // 'Profile' too: a grant increments `consumed`, so the ratio and the
+      // ratio policy state both move (ADR-0044 puts `OK -> WATCH` after a
+      // download, and only after a download). `getMyRatioStats` provides
+      // 'Profile', and it feeds the notice on the member's own profile —
+      // without this the notice serves the pre-download cache (ui#334).
+      invalidatesTags: ['Contribution', 'Profile']
     }),
 
     reverseGrant: builder.mutation<
@@ -29,7 +34,10 @@ export const downloadApi = api.injectEndpoints({
         method: 'POST',
         body: reason ? { reason } : {}
       }),
-      invalidatesTags: ['Download', 'Contribution']
+      // A reversal decrements `consumed` (stellar-api `modules/downloads.ts`),
+      // so it moves the ratio in the other direction and needs 'Profile' for
+      // the same reason a grant does.
+      invalidatesTags: ['Download', 'Contribution', 'Profile']
     }),
 
     reportContribution: builder.mutation<
