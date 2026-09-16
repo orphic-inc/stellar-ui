@@ -7,17 +7,37 @@ export const formatDate = (dateStr?: string): string => {
   });
 };
 
+/**
+ * A date as a short distance from now: `2h ago` behind, `in 2d` ahead. Dates
+ * ahead used to fall into the "just now" branch, so an invite expiring in three
+ * days read as if it had only now happened (stellar-ui#331).
+ */
 export const readableTime = (dateStr?: string): string => {
   if (!dateStr) return '';
   const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
+  const mins = Math.floor(Math.abs(diff) / 60000);
+  const ahead = diff < 0;
+  const since = (value: string) => (ahead ? `in ${value}` : `${value} ago`);
+  if (mins < 1) return ahead ? 'in under a minute' : 'just now';
+  if (mins < 60) return since(`${mins}m`);
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return since(`${hrs}h`);
   const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d ago`;
+  if (days < 30) return since(`${days}d`);
   return formatDate(dateStr);
+};
+
+/** The same distance in prose, for a sentence: `in 2 days`, `in 5 hours`. */
+export const untilTime = (dateStr?: string): string => {
+  if (!dateStr) return 'shortly';
+  const ms = new Date(dateStr).getTime() - Date.now();
+  if (ms <= 0) return 'shortly';
+  const plural = (value: number, unit: string) =>
+    `in ${value} ${unit}${value === 1 ? '' : 's'}`;
+  const hrs = Math.floor(ms / 3600000);
+  if (hrs < 1) return plural(Math.max(1, Math.floor(ms / 60000)), 'minute');
+  if (hrs < 24) return plural(hrs, 'hour');
+  return plural(Math.floor(hrs / 24), 'day');
 };
 
 export const formatBytes = (bytes?: number): string => {

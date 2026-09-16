@@ -117,6 +117,42 @@ releases · albums` toggle on the release browse page. In album mode the row
   - The profile sidebar marks a revoked member's balance **(revoked)**, for the
     member and for staff. The balance is kept while revoked.
 
+- **The invite page explains the rules, the gates, and what you have pending**
+  ([#329](https://github.com/orphic-inc/stellar-ui/issues/329),
+  [#331](https://github.com/orphic-inc/stellar-ui/issues/331),
+  [api#637](https://github.com/orphic-inc/stellar-api/issues/637),
+  [api#640](https://github.com/orphic-inc/stellar-api/issues/640)). `/invite`
+  now reads rules, send, pending invites, then the invite tree.
+
+  - **The Golden Rules are quoted, not paraphrased.** Rules 1.1, 2.1 and 2.2
+    come from `GET /rules/tree` and render through `utils/rulesText.tsx` with
+    the tree's `variables`, replacing two hard-coded paragraphs. They are
+    selected by their stable `code` and numbered by position, so a reordered
+    tree renumbers them rather than quoting the wrong rule.
+  - **A refused sender is told before typing.** The page reads
+    `GET /profile/me/invites/eligibility` and, when it refuses, shows the api's
+    own `msg` in place of the form; a trailing site path in that message is
+    rendered as a link. A send still surfaces its own `403`, which remains the
+    authority. If the eligibility read itself fails, the form is shown: the
+    POST decides.
+  - **Pending invites** lists what has not been accepted yet, soonest to lapse
+    first, with the note, when it was sent and when it expires. **Withdraw**
+    confirms first, saying the link stops working immediately and that the
+    address cannot be invited again until the original expiry, then reports the
+    api's `msg` — which is what says whether the invite came back to you.
+  - **The header count follows a send or a withdraw**, which it did not before,
+    and shows **∞** for a sender holding `invites_unlimited` (or `admin`). The
+    old `∞` branch keyed on a null count, which the api never sends. An
+    unlimited sender's page says "Invites: unlimited" instead of a balance.
+  - `${irc}` in rule 1.1 points at the public IRC guide rather than `/irc`, a
+    route this app does not have
+    ([api#630](https://github.com/orphic-inc/stellar-api/issues/630)).
+
+- **A date in the future reads as the future.** `readableTime` counted only
+  backwards, so anything ahead fell into its "just now" branch. It now reads
+  `in 2d`, which also fixes the staff invite pool's **Expires** column, where
+  every pending invite claimed to expire "just now".
+
 ### Changed
 
 - **The vendored contract catches up with stellar-api `0.9.4`**
