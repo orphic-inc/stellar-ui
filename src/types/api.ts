@@ -5441,6 +5441,69 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/announcements/news': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The paginated news list
+     * @description Newest first, with `id` as the tiebreak so a shared `createdAt` cannot repeat or skip a row across a page boundary. Distinct from `GET /announcements`, which answers the homepage's combined first-paint payload and is not pageable. Uncapped: the Member Feed's own size is the feed's concern, not this list's.
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: number;
+          limit?: number;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated news items, newest first */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['Announcement'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description `page` or `limit` is not a positive integer, or `limit` exceeds the maximum page size */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/announcements/global-notices': {
     parameters: {
       query?: never;

@@ -5,11 +5,15 @@ import PrivateHomepage from '../../components/pages/private/PrivateHomepage';
 import { setCredentials } from '../../store/slices/authSlice';
 
 const mockUseGetAnnouncementsQuery = jest.fn();
+const mockUseGetNewsQuery = jest.fn();
 const mockUseGetHomepageFeaturedQuery = jest.fn();
 const mockUseGetSiteStatsQuery = jest.fn();
 
 jest.mock('../../store/services/announcementApi', () => ({
-  useGetAnnouncementsQuery: () => mockUseGetAnnouncementsQuery()
+  useGetAnnouncementsQuery: () => mockUseGetAnnouncementsQuery(),
+  // News moved to its own paginated endpoint (stellar-api#670) so the panel can
+  // reach an item a news.xml link names (#348).
+  useGetNewsQuery: (...args: unknown[]) => mockUseGetNewsQuery(...args)
 }));
 
 jest.mock('../../store/services/homeApi', () => ({
@@ -41,12 +45,17 @@ const renderWithUser = () => {
 };
 
 const emptyAnnouncements = { announcements: [], blogPosts: [] };
+const newsPage = (items: unknown[], total = items.length) => ({
+  data: { data: items, meta: { total, page: 1, limit: 5, totalPages: 1 } },
+  isLoading: false
+});
 const emptyFeatured = { albumOfTheMonth: null, vanityHouse: null };
 const emptyStats = {};
 
 describe('PrivateHomepage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseGetNewsQuery.mockReturnValue(newsPage([]));
     mockUseGetAnnouncementsQuery.mockReturnValue({
       data: emptyAnnouncements,
       isLoading: false
@@ -62,10 +71,7 @@ describe('PrivateHomepage', () => {
   });
 
   it('shows spinner in announcements section while loading', () => {
-    mockUseGetAnnouncementsQuery.mockReturnValue({
-      data: undefined,
-      isLoading: true
-    });
+    mockUseGetNewsQuery.mockReturnValue({ data: undefined, isLoading: true });
     renderWithUser();
     expect(document.querySelector('.animate-spin')).toBeInTheDocument();
   });
@@ -76,15 +82,16 @@ describe('PrivateHomepage', () => {
   });
 
   it('renders announcement titles', () => {
-    mockUseGetAnnouncementsQuery.mockReturnValue({
-      data: {
-        announcements: [
-          { id: 1, title: 'Site Update', createdAt: '2026-01-01T00:00:00Z' }
-        ],
-        blogPosts: []
-      },
-      isLoading: false
-    });
+    mockUseGetNewsQuery.mockReturnValue(
+      newsPage([
+        {
+          id: 1,
+          title: 'Site Update',
+          body: '',
+          createdAt: '2026-01-01T00:00:00Z'
+        }
+      ])
+    );
     renderWithUser();
     expect(screen.getByText('Site Update')).toBeInTheDocument();
   });

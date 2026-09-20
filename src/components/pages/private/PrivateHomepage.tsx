@@ -1,13 +1,9 @@
-import { Fragment, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../../store/slices/authSlice';
-import { useGetAnnouncementsQuery } from '../../../store/services/announcementApi';
 import { useGetHomepageFeaturedQuery } from '../../../store/services/homeApi';
 import { useGetSiteStatsQuery } from '../../../store/services/siteApi';
 import { Link } from 'react-router-dom';
-import Time from '../../layout/Time';
-import Spinner from '../../layout/Spinner';
-import DOMPurify from 'dompurify';
+import NewsPanel from './NewsPanel';
 
 const StatRow = ({
   label,
@@ -28,12 +24,8 @@ const StatRow = ({
 
 const PrivateHomepage = () => {
   const user = useSelector(selectCurrentUser);
-  const { data: announcements, isLoading } = useGetAnnouncementsQuery();
   const { data: stats } = useGetSiteStatsQuery();
   const { data: featured } = useGetHomepageFeaturedQuery();
-  const [expandedAnnouncement, setExpandedAnnouncement] = useState<
-    number | null
-  >(null);
 
   const aotm = featured?.albumOfTheMonth;
   const vanityHouse = featured?.vanityHouse;
@@ -53,64 +45,7 @@ const PrivateHomepage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main — announcements */}
         <div className="lg:col-span-2 space-y-6">
-          <div data-st="panel">
-            <div data-st="colhead">
-              <h2>Announcements</h2>
-            </div>
-            <div data-st="list">
-              {isLoading ? (
-                <div className="p-4">
-                  <Spinner />
-                </div>
-              ) : !announcements?.announcements?.length ? (
-                <p data-st="prose" data-st-muted className="p-4 text-sm">
-                  No announcements.
-                </p>
-              ) : (
-                announcements.announcements.map((n) => (
-                  <Fragment key={n.id}>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setExpandedAnnouncement(
-                          expandedAnnouncement === n.id ? null : n.id
-                        )
-                      }
-                      data-st="row"
-                      {...(expandedAnnouncement === n.id
-                        ? { 'data-st-open': '' }
-                        : {})}
-                      className="w-full text-left cursor-pointer"
-                    >
-                      <span
-                        data-st="prose"
-                        data-st-strong
-                        className="flex-1 min-w-0 truncate text-sm"
-                      >
-                        {n.title}
-                      </span>
-                      <span
-                        data-st="meta"
-                        className="text-xs shrink-0 ml-4 flex items-center gap-2"
-                      >
-                        <Time date={n.createdAt} />
-                        <span>{expandedAnnouncement === n.id ? '▲' : '▼'}</span>
-                      </span>
-                    </button>
-                    {expandedAnnouncement === n.id && n.body && (
-                      <div
-                        data-st="prose"
-                        className="px-3 pb-4 text-sm"
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(n.body)
-                        }}
-                      />
-                    )}
-                  </Fragment>
-                ))
-              )}
-            </div>
-          </div>
+          <NewsPanel />
         </div>
 
         {/* Sidebar */}

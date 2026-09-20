@@ -80,6 +80,31 @@ All notable changes to stellar-ui are documented here.
   store as soon as the tab is closed rather than lingering for RTK Query's
   default minute.
 
+- **Homepage news items are addressable, and the panel can reach back**
+  ([#348](https://github.com/orphic-inc/stellar-ui/issues/348)) — every item in
+  the announcements panel now carries `id="news-<id>"`, so the links the Member
+  Feed's `news.xml` publishes land on the item rather than the top of the page.
+
+  **The panel had to grow to make that true.** The feed publishes 50 items;
+  the homepage showed five, so 45 of those links pointed at an anchor that
+  could not exist. News now comes from the paginated list added in
+  stellar-api#670: five rows at rest, a **Load more news** control, and a
+  fragment that widens the request to the feed's whole reach in one go rather
+  than paging until it finds something.
+
+  **Arriving from a feed link** scrolls the item into view, expands it — the
+  reader has already seen the body in their reader, so a collapsed headline
+  would be a non-sequitur — briefly highlights it, and moves focus to it so
+  assistive technology announces the arrival. `scrollIntoView` moves the
+  viewport but never focus, so without that a screen-reader user got no signal
+  at all. The scroll honours `prefers-reduced-motion`, which the stylesheet's
+  own reduced-motion block does not cover: it disables `transition`, not
+  `scroll-behavior`.
+
+  An item the list cannot reach now says so in one muted line, rather than
+  leaving the reader at the top of the page unable to tell a stale link from a
+  broken one.
+
 ### Changed
 
 - **Re-vendored the API contract from stellar-api**
