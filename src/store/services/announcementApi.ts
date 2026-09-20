@@ -13,6 +13,13 @@ type CreateBlogPostArgs = NonNullable<
 >['content']['application/json'];
 type CreateBlogPostResponse =
   paths['/announcements/blog']['post']['responses'][201]['content']['application/json'];
+// The paginated news list (stellar-api#670). Distinct from `/announcements`,
+// which answers the homepage's combined first-paint payload and is not
+// pageable. This is what lets the page reach an item a news.xml link names.
+type NewsListResponse =
+  paths['/announcements/news']['get']['responses'][200]['content']['application/json'];
+export type NewsItem = NewsListResponse['data'][number];
+
 type GlobalNoticesResponse =
   paths['/announcements/global-notices']['get']['responses'][200]['content']['application/json'];
 type CreateGlobalNoticeArgs = NonNullable<
@@ -25,6 +32,11 @@ export const announcementApi = api.injectEndpoints({
   endpoints: (build) => ({
     getAnnouncements: build.query<AnnouncementsResponse, void>({
       query: () => '/announcements',
+      providesTags: ['Announcement']
+    }),
+    getNews: build.query<NewsListResponse, { page?: number; limit?: number }>({
+      query: ({ page = 1, limit = 5 }) =>
+        `/announcements/news?page=${page}&limit=${limit}`,
       providesTags: ['Announcement']
     }),
     createAnnouncement: build.mutation<
@@ -77,6 +89,7 @@ export const announcementApi = api.injectEndpoints({
 
 export const {
   useGetAnnouncementsQuery,
+  useGetNewsQuery,
   useCreateAnnouncementMutation,
   useDeleteAnnouncementMutation,
   useCreateBlogPostMutation,
