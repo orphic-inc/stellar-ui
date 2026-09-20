@@ -2109,6 +2109,66 @@
           "unlimited"
         ]
       },
+      "MemberFeeds": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "enum": [
+                  false
+                ]
+              }
+            },
+            "required": [
+              "enabled"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "enum": [
+                  true
+                ]
+              },
+              "feeds": {
+                "type": "object",
+                "properties": {
+                  "contributions": {
+                    "type": "string",
+                    "description": "Complete feed URL, carrying `user` and `token` query parameters"
+                  },
+                  "mine": {
+                    "type": "string",
+                    "description": "Complete feed URL, carrying `user` and `token` query parameters"
+                  },
+                  "news": {
+                    "type": "string",
+                    "description": "Complete feed URL, carrying `user` and `token` query parameters"
+                  },
+                  "bookmarks": {
+                    "type": "string",
+                    "description": "Complete feed URL, carrying `user` and `token` query parameters"
+                  }
+                },
+                "required": [
+                  "contributions",
+                  "mine",
+                  "news",
+                  "bookmarks"
+                ]
+              }
+            },
+            "required": [
+              "enabled",
+              "feeds"
+            ]
+          }
+        ]
+      },
       "OwnInviteItem": {
         "type": "object",
         "properties": {
@@ -4474,6 +4534,7 @@
           "users_edit",
           "users_warn",
           "users_disable",
+          "users_edit_reset_feeds",
           "users_view_ips",
           "users_view_email",
           "recovery_manage",
@@ -9425,6 +9486,16 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -11803,6 +11874,114 @@
         ]
       }
     },
+    "/users/{id}/feed-token/rotate": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Staff: revoke a member's Member Feed URLs",
+        "description": "Requires `users_edit_reset_feeds` (ADR-0014, #262). Bumps the member's feed token epoch, so every Member Feed URL they have handed out stops working. The new URLs are never returned to staff. `reason` is recorded in the audit log; `message`, when present, is sent to the member as a System PM.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "reason"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Feed token rotated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters or request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing users_edit_reset_feeds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
     "/users/{id}/invite-count": {
       "put": {
         "tags": [
@@ -13233,6 +13412,415 @@
             "cookieAuth": []
           }
         ]
+      }
+    },
+    "/profile/me/feeds": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Your Member Feed URLs",
+        "description": "Self only (ADR-0014, #262). `enabled: false` when this site has not set `STELLAR_FEED_SECRET`, in which case every feed URL would 404, so none is returned. Each URL is complete; there is no separate token field. Sent `Cache-Control: no-store`: the body is a live credential.",
+        "responses": {
+          "200": {
+            "description": "Your feed URLs, or that feeds are not enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberFeeds"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/profile/me/feed-token/rotate": {
+      "post": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Revoke your Member Feed URLs and get new ones",
+        "description": "Self only (ADR-0014, #262). Bumps your feed token epoch, so every feed URL you have handed out stops working, and answers the new URLs in the same shape as `GET /profile/me/feeds`. Sent `Cache-Control: no-store`.",
+        "responses": {
+          "200": {
+            "description": "Your new feed URLs, or that feeds are not enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberFeeds"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/feeds/contributions.xml": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Member Feed: new contributions",
+        "description": "New contributions the feed owner can see (`releaseVisibleTo`), optionally filtered; filters AND together, one value each. A `community` the owner cannot see yields an empty feed. Filters are validated only after the token, so a 400 is never answered to an unauthenticated caller. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "user",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": false,
+            "name": "community",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "tag",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "mp3",
+                "flac",
+                "wav",
+                "ogg",
+                "aac",
+                "m4a",
+                "m4b",
+                "mp4",
+                "mkv",
+                "avi",
+                "mov",
+                "zip",
+                "exe",
+                "dmg",
+                "apk",
+                "pdf",
+                "epub",
+                "mobi",
+                "cbz",
+                "cbr",
+                "jpg",
+                "png",
+                "gif",
+                "txt"
+              ]
+            },
+            "required": false,
+            "name": "format",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Lossless",
+                "Lossless24",
+                "Kbps320",
+                "Kbps256",
+                "KbpsV0",
+                "Kbps192",
+                "KbpsV2",
+                "Kbps128",
+                "Other"
+              ]
+            },
+            "required": false,
+            "name": "bitrate",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0: new contributions",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feeds/mine.xml": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Member Feed: the owner's own contributions",
+        "description": "The feed owner's own contributions, still access-filtered like every surface. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "user",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0: the owner's contributions",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feeds/news.xml": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Member Feed: site news",
+        "description": "Site news, each body rendered from BBCode for the owner as viewer, so `[mature]` follows their setting. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "user",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0: site news",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feeds/bookmarks.xml": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Member Feed: new contributions on the owner's bookmarks",
+        "description": "New contributions on bookmarked releases, and on visible releases crediting a bookmarked artist in any role, each once. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
+            "required": true,
+            "name": "user",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "token",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "RSS 2.0: new contributions on bookmarks",
+            "content": {
+              "application/rss+xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/profile/me/invites": {
@@ -23308,6 +23896,9 @@
                       "users_disable": {
                         "type": "boolean"
                       },
+                      "users_edit_reset_feeds": {
+                        "type": "boolean"
+                      },
                       "users_view_ips": {
                         "type": "boolean"
                       },
@@ -23766,6 +24357,9 @@
                         "type": "boolean"
                       },
                       "users_disable": {
+                        "type": "boolean"
+                      },
+                      "users_edit_reset_feeds": {
                         "type": "boolean"
                       },
                       "users_view_ips": {

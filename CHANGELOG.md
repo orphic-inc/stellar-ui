@@ -47,6 +47,33 @@ All notable changes to stellar-ui are documented here.
   operand. `RatioStats` was the only other component that rendered the figure,
   so deleting it (below) would have dropped it from the app entirely.
 
+### Changed
+
+- **Re-vendored the API contract from stellar-api**
+  ([#328](https://github.com/orphic-inc/stellar-ui/issues/328)) — `src/types/openapi.json`
+  and the generated `src/types/api.ts` now match the spec the API serves.
+  Three merged API pull requests had widened it since the last sync: the Member
+  Feed token surface, the four feed documents, and ratio policy state on the
+  session.
+
+  **Seven new paths**, all Member Feed: `/feeds/contributions.xml`,
+  `/feeds/mine.xml`, `/feeds/news.xml`, `/feeds/bookmarks.xml`, the member's own
+  `/profile/me/feeds` and `/profile/me/feed-token/rotate`, and the staff
+  `/users/{id}/feed-token/rotate`. One new schema, `MemberFeeds`. Nothing in the
+  UI consumes them yet — [#349](https://github.com/orphic-inc/stellar-ui/issues/349)
+  is the settings page that will.
+
+  **Three paths changed shape in place**, and both changes are additive:
+  `/install/checklist/{id}/dismiss` now declares a `429`, and the two
+  `/tools/user-ranks` operations carry a new `users_edit_reset_feeds`
+  permission. The rank form renders from the API's live permission catalog
+  rather than a list of its own, so the new key appears there with no change
+  here.
+
+  No consumer broke: `typecheck` was clean against the new contract. The
+  contract's `major.minor` did not move (0.9), so ADR-0004 forces no version
+  bump.
+
 ### Fixed
 
 - **The ratio policy notice is mounted again**
