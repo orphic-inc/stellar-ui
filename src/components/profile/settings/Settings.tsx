@@ -18,6 +18,7 @@ import { getApiErrorMessage } from '../../../utils/apiError';
 import { useGetStylesheetsQuery } from '../../../store/services/siteApi';
 import Spinner from '../../layout/Spinner';
 import DonorSettingsTab from './DonorSettingsTab';
+import FeedSettings from './FeedSettings';
 import IrcNickSettings from './IrcNickSettings';
 import type { paths } from '../../../types/api';
 
@@ -27,7 +28,7 @@ type ProfileForm = NonNullable<
 type MyProfileResponse =
   paths['/profile/me']['get']['responses'][200]['content']['application/json'];
 
-type Tab = 'appearance' | 'privacy' | 'security' | 'donor';
+type Tab = 'appearance' | 'privacy' | 'security' | 'feeds' | 'donor';
 
 const PARANOIA_LABELS: Record<number, string> = {
   0: 'No restrictions — your profile is fully visible',
@@ -231,6 +232,12 @@ const Settings = () => {
           onClick={() => setActiveTab('security')}
         >
           Security
+        </button>
+        <button
+          className={tabClass('feeds')}
+          onClick={() => setActiveTab('feeds')}
+        >
+          Feeds
         </button>
         {currentUser?.isDonor && (
           <button
@@ -565,6 +572,9 @@ const Settings = () => {
           </button>
         </form>
       )}
+
+      {/* Feeds tab */}
+      {activeTab === 'feeds' && <FeedSettings />}
 
       {/* Donor tab */}
       {activeTab === 'donor' && currentUser?.isDonor && <DonorSettingsTab />}

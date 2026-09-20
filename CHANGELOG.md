@@ -47,6 +47,39 @@ All notable changes to stellar-ui are documented here.
   operand. `RatioStats` was the only other component that rendered the figure,
   so deleting it (below) would have dropped it from the app entirely.
 
+- **Member Feed settings — view, copy and reset your feed URLs**
+  ([#349](https://github.com/orphic-inc/stellar-ui/issues/349)) — a new
+  **Feeds** tab in settings surfaces the four RSS feeds stellar-api serves
+  (stellar-api#262): new contributions, your own contributions, news and your
+  bookmarks. Until now the api served them and nothing in the UI could reach
+  them.
+
+  **The URLs are credentials and are treated as such.** Each carries a bearer
+  token, so they render as read-only fields rather than links — a link would
+  put the token in browser history — and the token is masked until you choose
+  **Show tokens**. That control is deliberately section-wide rather than
+  per-row: the api derives **one** token per member and maps it into all four
+  URLs, so revealing any single row already discloses the other three, and four
+  separate toggles would imply a separation that does not exist.
+
+  **The contributions feed can be filtered** by community, tag, format and
+  bitrate, each single-valued and ANDed, with the copied URL reflecting the
+  selection. The format and bitrate options are pinned to the contract: they
+  are `Record`s over the generated union, so a value added upstream fails the
+  typecheck here instead of silently going missing from the list. Bitrates
+  render through the existing shared label map, so `KbpsV0` reads as
+  `V0 (VBR)`. Filters narrow what the api already decided you may see —
+  `releaseVisibleTo` runs first — so no filter can widen access.
+
+  **Resetting** asks for confirmation, stating that every URL already in use
+  stops working, then shows the new URLs straight from the rotate response
+  without a second request. A failed reset leaves the displayed URLs untouched
+  and reports the api's own message.
+
+  The feed URLs are cached with `keepUnusedDataFor: 0`, so the token leaves the
+  store as soon as the tab is closed rather than lingering for RTK Query's
+  default minute.
+
 ### Changed
 
 - **Re-vendored the API contract from stellar-api**
