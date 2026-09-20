@@ -745,6 +745,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     delete?: never;
@@ -2885,6 +2894,99 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/users/{id}/feed-token/rotate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Staff: revoke a member's Member Feed URLs
+     * @description Requires `users_edit_reset_feeds` (ADR-0014, #262). Bumps the member's feed token epoch, so every Member Feed URL they have handed out stops working. The new URLs are never returned to staff. `reason` is recorded in the audit log; `message`, when present, is sent to the member as a System PM.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            reason: string;
+            message?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Feed token rotated */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing users_edit_reset_feeds */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/users/{id}/invite-count': {
     parameters: {
       query?: never;
@@ -4072,6 +4174,397 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/me/feeds': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Your Member Feed URLs
+     * @description Self only (ADR-0014, #262). `enabled: false` when this site has not set `STELLAR_FEED_SECRET`, in which case every feed URL would 404, so none is returned. Each URL is complete; there is no separate token field. Sent `Cache-Control: no-store`: the body is a live credential.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Your feed URLs, or that feeds are not enabled */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MemberFeeds'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/profile/me/feed-token/rotate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Revoke your Member Feed URLs and get new ones
+     * @description Self only (ADR-0014, #262). Bumps your feed token epoch, so every feed URL you have handed out stops working, and answers the new URLs in the same shape as `GET /profile/me/feeds`. Sent `Cache-Control: no-store`.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Your new feed URLs, or that feeds are not enabled */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MemberFeeds'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/feeds/contributions.xml': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Member Feed: new contributions
+     * @description New contributions the feed owner can see (`releaseVisibleTo`), optionally filtered; filters AND together, one value each. A `community` the owner cannot see yields an empty feed. Filters are validated only after the token, so a 400 is never answered to an unauthenticated caller. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.
+     */
+    get: {
+      parameters: {
+        query: {
+          user: number;
+          token: string;
+          community?: number;
+          tag?: string;
+          format?:
+            | 'mp3'
+            | 'flac'
+            | 'wav'
+            | 'ogg'
+            | 'aac'
+            | 'm4a'
+            | 'm4b'
+            | 'mp4'
+            | 'mkv'
+            | 'avi'
+            | 'mov'
+            | 'zip'
+            | 'exe'
+            | 'dmg'
+            | 'apk'
+            | 'pdf'
+            | 'epub'
+            | 'mobi'
+            | 'cbz'
+            | 'cbr'
+            | 'jpg'
+            | 'png'
+            | 'gif'
+            | 'txt';
+          bitrate?:
+            | 'Lossless'
+            | 'Lossless24'
+            | 'Kbps320'
+            | 'Kbps256'
+            | 'KbpsV0'
+            | 'Kbps192'
+            | 'KbpsV2'
+            | 'Kbps128'
+            | 'Other';
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description RSS 2.0: new contributions */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/rss+xml': string;
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed. */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/feeds/mine.xml': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Member Feed: the owner's own contributions
+     * @description The feed owner's own contributions, still access-filtered like every surface. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.
+     */
+    get: {
+      parameters: {
+        query: {
+          user: number;
+          token: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description RSS 2.0: the owner's contributions */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/rss+xml': string;
+          };
+        };
+        /** @description Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed. */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/feeds/news.xml': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Member Feed: site news
+     * @description Site news, each body rendered from BBCode for the owner as viewer, so `[mature]` follows their setting. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.
+     */
+    get: {
+      parameters: {
+        query: {
+          user: number;
+          token: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description RSS 2.0: site news */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/rss+xml': string;
+          };
+        };
+        /** @description Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed. */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/feeds/bookmarks.xml': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Member Feed: new contributions on the owner's bookmarks
+     * @description New contributions on bookmarked releases, and on visible releases crediting a bookmarked artist in any role, each once. Authenticated by the `user` and `token` query parameters from `GET /profile/me/feeds`, never a session. Newest 50, notify-and-link: items link to app pages, never to a download. Sent `Cache-Control: private, max-age=300`.
+     */
+    get: {
+      parameters: {
+        query: {
+          user: number;
+          token: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description RSS 2.0: new contributions on bookmarks */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/rss+xml': string;
+          };
+        };
+        /** @description Feeds are not enabled, or the user/token pair does not authenticate a live member. Deliberately one answer for every case, so an id is never confirmed. */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
           headers: {
             [name: string]: unknown;
           };
@@ -12464,6 +12957,7 @@ export interface paths {
               users_edit?: boolean;
               users_warn?: boolean;
               users_disable?: boolean;
+              users_edit_reset_feeds?: boolean;
               users_view_ips?: boolean;
               users_view_email?: boolean;
               recovery_manage?: boolean;
@@ -12738,6 +13232,7 @@ export interface paths {
               users_edit?: boolean;
               users_warn?: boolean;
               users_disable?: boolean;
+              users_edit_reset_feeds?: boolean;
               users_view_ips?: boolean;
               users_view_email?: boolean;
               recovery_manage?: boolean;
@@ -28381,6 +28876,25 @@ export interface components {
       msg: string | null;
       unlimited: boolean;
     };
+    MemberFeeds:
+      | {
+          /** @enum {boolean} */
+          enabled: false;
+        }
+      | {
+          /** @enum {boolean} */
+          enabled: true;
+          feeds: {
+            /** @description Complete feed URL, carrying `user` and `token` query parameters */
+            contributions: string;
+            /** @description Complete feed URL, carrying `user` and `token` query parameters */
+            mine: string;
+            /** @description Complete feed URL, carrying `user` and `token` query parameters */
+            news: string;
+            /** @description Complete feed URL, carrying `user` and `token` query parameters */
+            bookmarks: string;
+          };
+        };
     OwnInviteItem: {
       id: number;
       email: string;
@@ -29095,6 +29609,7 @@ export interface components {
       | 'users_edit'
       | 'users_warn'
       | 'users_disable'
+      | 'users_edit_reset_feeds'
       | 'users_view_ips'
       | 'users_view_email'
       | 'recovery_manage'
