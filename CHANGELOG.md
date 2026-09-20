@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.6] — 2026-09-20
+
 ### Added
 
 - **A site-wide ratio policy banner**
@@ -1152,7 +1154,9 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.3...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.6...HEAD
+[0.9.6]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.5...v0.9.6
+[0.9.5]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.3...v0.9.5
 [0.9.3]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.0...v0.9.1
