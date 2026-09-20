@@ -71,6 +71,7 @@ export const api = createApi({
     'Session',
     'Invite',
     'InviteTree',
+    'MemberFeeds',
     'RatioWatch',
     'VanityHouse',
     'DeletedCollage',
