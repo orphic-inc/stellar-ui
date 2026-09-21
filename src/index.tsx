@@ -11,14 +11,18 @@ import './global.css'; // WS0: theming contract — role tokens + data-st hooks 
 import App from './components/App';
 import SentryUserSync from './components/SentryUserSync';
 import store from './store';
-import { sentryBeforeSend } from './utils/sentry';
+import { sentryBeforeSend, scrubUrls } from './utils/sentry';
 
 if (__SENTRY_DSN__) {
   Sentry.init({
     dsn: __SENTRY_DSN__,
     release: __APP_VERSION__,
     environment: __APP_ENV__,
-    beforeSend: sentryBeforeSend
+    beforeSend: sentryBeforeSend,
+    // Inert until `tracesSampleRate` is set, and wired now so that turning
+    // tracing on cannot silently reopen #361: httpContext writes the full URL
+    // onto spans, and `beforeSend` does not see transaction events.
+    beforeSendTransaction: scrubUrls
   });
 }
 

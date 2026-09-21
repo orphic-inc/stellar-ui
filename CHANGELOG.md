@@ -48,6 +48,37 @@ All notable changes to stellar-ui are documented here.
 
   A link with no key behaves exactly as before.
 
+### Security
+
+- **Sentry no longer receives the query string of any URL**
+  ([#361](https://github.com/orphic-inc/stellar-ui/issues/361)) — two routes
+  here carry a credential there: `/recovery?token=…`, a password-reset token
+  that grants account takeover, and `/register?inviteKey=…`. The browser
+  client attaches the full page URL to every captured event, the previous
+  page's URL as a `Referer` header, and URLs to navigation and network
+  breadcrumbs. Nothing removed them, so an error captured anywhere near either
+  page sent a live credential to a third party, where it is retained and
+  searchable.
+
+  All four are stripped from the first `?` now. The path survives, so an event
+  still says which route it came from.
+
+  **The `Referer` header mattered most and is the easiest to miss.** It holds
+  the page _before_ this one, so a member who registers and lands on the
+  homepage carries the invite key into the next error thrown there — scrubbing
+  only the current URL would have left the common case open.
+
+  **Query strings are stripped wholesale rather than by name.** stellar-api
+  redacts its one credential parameter by name; doing that here would
+  reproduce the bug being fixed, since this gap exists precisely because
+  nobody revisited the scrubber when a second credential-bearing URL appeared.
+  The query strings in this app are browse filters and page numbers.
+
+  `beforeSendTransaction` is wired to the same function. It does nothing today
+  — no sample rate is set, so no spans are sent — but the same integration
+  writes full URLs onto spans, and enabling tracing later would otherwise
+  reopen this silently.
+
 ## [0.9.6] — 2026-09-20
 
 ### Added
