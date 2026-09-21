@@ -22,6 +22,16 @@ All notable changes to stellar-ui are documented here.
   state the api could not then produce. The api produces it now, so that test
   covers a real state and its branch ordering is load-bearing.
 
+- **The vendored contract picks up the seventh invite send gate**
+  ([#358](https://github.com/orphic-inc/stellar-ui/issues/358)) —
+  [stellar-api#673](https://github.com/orphic-inc/stellar-api/issues/673) added
+  `registration_closed` to the invite eligibility `reason` enum, and named the
+  new refusal in the `403` on `POST /profile/referral/create-invite`.
+
+  **No component needed changing.** `InviteForm` renders the api's `msg` and
+  never switches on `reason`, which is what stellar-api's ADR-0043 intends —
+  the api owns the words, so the member-facing string arrives for free.
+
 ### Fixed
 
 - **The invite key from the emailed link now reaches the form**
