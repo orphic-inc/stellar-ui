@@ -620,6 +620,7 @@ export interface paths {
               installed: boolean;
               /** @enum {string} */
               registrationStatus: 'open' | 'invite' | 'closed';
+              /** @description Enabled seats have reached `maxUsers`. Independent of `registrationStatus`: a closed site that is full still reports `true`. Best-effort — `POST /auth/register` re-checks under a lock and is the only authoritative answer. */
               registrationFull: boolean;
               configWarnings: string[];
               setupChecklist: {

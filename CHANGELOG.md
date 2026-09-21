@@ -6,6 +6,22 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **The vendored contract catches up with stellar-api `main`** — it picks up
+  the `registrationFull` description added by
+  [stellar-api#657](https://github.com/orphic-inc/stellar-api/issues/657),
+  which stopped conditioning reported capacity on `registrationStatus`.
+
+  **No generated type changes shape**: `src/types/api.ts` gains one JSDoc
+  line and nothing here needed rewriting. The sync is owed all the same, so
+  that the vendored contract does not sit behind `main` untracked.
+
+  It also retires a comment in `Register.test.tsx` that had gone false. The
+  "closed site that is also full" case was written as a defensive check on a
+  state the api could not then produce. The api produces it now, so that test
+  covers a real state and its branch ordering is load-bearing.
+
 ## [0.9.6] — 2026-09-20
 
 ### Added

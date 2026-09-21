@@ -131,8 +131,11 @@ describe('Register', () => {
     });
 
     it('keeps the closed wording when a closed site is also full', () => {
-      // The api forces registrationFull false while closed, but the branch
-      // order is what guarantees the closed wording wins if it ever did not.
+      // Closed and full is a real state, not a hypothetical: since
+      // stellar-api#657 the api reports capacity independently of
+      // registrationStatus, so a closed full site does send registrationFull
+      // true. The branch order is what makes the closed wording win here, and
+      // it is load-bearing rather than defensive.
       mockUseGetInstallStatusQuery.mockReturnValue({
         data: { registrationStatus: 'closed', registrationFull: true }
       });
