@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useRegisterMutation } from '../../store/services/authApi';
 import { useGetInstallStatusQuery } from '../../store/services/installApi';
@@ -104,13 +104,24 @@ const Register = () => {
   const [register, { isLoading }] = useRegisterMutation();
   const { data: installStatus } = useGetInstallStatusQuery();
 
-  const [form, setForm] = useState<FormState>({
+  const [searchParams] = useSearchParams();
+  // The invite email carries the key ONLY inside `/register?inviteKey=…`
+  // (stellar-api's mailer sends no separate copy), and until #359 nothing read
+  // it — so every invited member landed on an empty required field and had to
+  // pick the key out of their own address bar.
+  //
+  // Seeded once, as the initial value, rather than synced in an effect: the
+  // key cannot change without a navigation, and `setState` inside an effect is
+  // rejected by this repo's lint. The field stays editable, because mail
+  // clients wrap and truncate long URLs and a mangled key the member can see
+  // is one they can correct.
+  const [form, setForm] = useState<FormState>(() => ({
     username: '',
     email: '',
     password: '',
     password2: '',
-    inviteKey: ''
-  });
+    inviteKey: searchParams.get('inviteKey') ?? ''
+  }));
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -127,7 +138,11 @@ const Register = () => {
         username: form.username,
         email: form.email,
         password: form.password,
-        ...(isInviteMode && { inviteKey: form.inviteKey })
+        // Sent whenever there is one, not only in invite mode (#360). An open
+        // site honours a presented key too since stellar-api#675: it records
+        // the inviter rather than losing the relationship. A bad key is
+        // harmless there — the api is lenient and simply drops the edge.
+        ...(form.inviteKey && { inviteKey: form.inviteKey })
       }).unwrap();
       dispatch(addAlert('Account created.', 'success'));
       navigate('/');

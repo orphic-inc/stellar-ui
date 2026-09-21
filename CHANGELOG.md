@@ -22,6 +22,32 @@ All notable changes to stellar-ui are documented here.
   state the api could not then produce. The api produces it now, so that test
   covers a real state and its branch ordering is load-bearing.
 
+### Fixed
+
+- **The invite key from the emailed link now reaches the form**
+  ([#359](https://github.com/orphic-inc/stellar-ui/issues/359),
+  [#360](https://github.com/orphic-inc/stellar-ui/issues/360)) — the invite
+  email carries the key **only** inside `/register?inviteKey=…`, and nothing
+  here read the query string. Every invited member landed on an empty,
+  required **Invite Key** field and had to pick the key out of their own
+  address bar. That is the whole invite flow on an invite-only site.
+
+  The field is now seeded from the link and stays editable. Mail clients wrap
+  and truncate long URLs, so a member who can see a mangled key is one who can
+  correct it — which is why the key is prefilled rather than used invisibly,
+  as the recovery token is.
+
+  **The key is also sent on an open site**, where no field is rendered to hold
+  it. Since
+  [stellar-api#675](https://github.com/orphic-inc/stellar-api/issues/675) an
+  open site honours a presented key and records who invited whom, instead of
+  losing the relationship; a bad key is harmless there, because the api drops
+  the edge rather than refusing the registration. An open site still shows no
+  invite field, since a member arriving without a key should not be left
+  wondering what they are missing.
+
+  A link with no key behaves exactly as before.
+
 ## [0.9.6] — 2026-09-20
 
 ### Added
