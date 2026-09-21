@@ -263,6 +263,96 @@ describe('Register', () => {
     });
   });
 
+  // #359. The invite email carries the key only inside the link, so a member
+  // following it used to land on an empty required field and have to pick the
+  // key out of their own address bar.
+  it('prefills the invite key from the link (#359)', async () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'invite' }
+    });
+    mockRegister.mockReturnValue({ unwrap: () => Promise.resolve({ id: 2 }) });
+    const user = userEvent.setup();
+    renderWithProviders(<Register />, {
+      initialEntries: ['/register?inviteKey=KEY-FROM-LINK']
+    });
+
+    expect(screen.getByLabelText(/invite key/i)).toHaveValue('KEY-FROM-LINK');
+
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    await waitFor(() =>
+      expect(mockRegister).toHaveBeenCalledWith(
+        expect.objectContaining({ inviteKey: 'KEY-FROM-LINK' })
+      )
+    );
+  });
+
+  // Seeded, not locked. Mail clients wrap and truncate long URLs, so a member
+  // who can see a mangled key must be able to correct it.
+  it('lets the member edit a prefilled key (#359)', async () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'invite' }
+    });
+    mockRegister.mockReturnValue({ unwrap: () => Promise.resolve({ id: 2 }) });
+    const user = userEvent.setup();
+    renderWithProviders(<Register />, {
+      initialEntries: ['/register?inviteKey=TRUNCATED']
+    });
+
+    await user.clear(screen.getByLabelText(/invite key/i));
+    await user.type(screen.getByLabelText(/invite key/i), 'CORRECTED');
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    await waitFor(() =>
+      expect(mockRegister).toHaveBeenCalledWith(
+        expect.objectContaining({ inviteKey: 'CORRECTED' })
+      )
+    );
+  });
+
+  // #360. An open site honours a presented key since stellar-api#675, so the
+  // key must travel even where no field is rendered to hold it.
+  it('sends a key from the link on an open site, with no field shown (#360)', async () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'open', registrationFull: false }
+    });
+    mockRegister.mockReturnValue({ unwrap: () => Promise.resolve({ id: 2 }) });
+    const user = userEvent.setup();
+    renderWithProviders(<Register />, {
+      initialEntries: ['/register?inviteKey=KEY-FROM-LINK']
+    });
+
+    // No field: an open site needs no invite, so showing one would invite a
+    // member without a key to wonder what they are missing.
+    expect(screen.queryByLabelText(/invite key/i)).not.toBeInTheDocument();
+
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    await waitFor(() =>
+      expect(mockRegister).toHaveBeenCalledWith(
+        expect.objectContaining({ inviteKey: 'KEY-FROM-LINK' })
+      )
+    );
+  });
+
+  it('sends no inviteKey when the link carries none', async () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: { registrationStatus: 'open', registrationFull: false }
+    });
+    mockRegister.mockReturnValue({ unwrap: () => Promise.resolve({ id: 2 }) });
+    const user = userEvent.setup();
+    renderWithProviders(<Register />);
+
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: /register/i }));
+
+    await waitFor(() => expect(mockRegister).toHaveBeenCalled());
+    expect(mockRegister.mock.calls[0][0]).not.toHaveProperty('inviteKey');
+  });
+
   it("shows the api's expired-invite message as-is (#330)", async () => {
     // stellar-api#627: a lapsed key answers 403 with this exact message.
     const expired =
