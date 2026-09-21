@@ -4109,7 +4109,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description A send gate refused (#637): invite privileges revoked (#636), download access disabled, active warnings (poor standing), ratio watch, the site is full (#624), or no invites remaining. The first that applies is reported, in that order, and no invite is spent. A caller with `invites_unlimited` is never refused for the balance, and spends nothing. `GET /profile/me/invites/eligibility` answers the same gates first */
+        /** @description A send gate refused (#637): invite privileges revoked (#636), download access disabled, active warnings (poor standing), ratio watch, registration is closed (#673), the site is full (#624), or no invites remaining. The first that applies is reported, in that order, and no invite is spent. A caller with `invites_unlimited` is never refused for the balance, and spends nothing. `GET /profile/me/invites/eligibility` answers the same gates first */
         403: {
           headers: {
             [name: string]: unknown;
@@ -28934,6 +28934,7 @@ export interface components {
         | 'downloads_disabled'
         | 'poor_standing'
         | 'ratio_watch'
+        | 'registration_closed'
         | 'site_full'
         | 'no_invites'
         | null;
