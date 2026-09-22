@@ -74,7 +74,6 @@ const makeProfile = () => ({
     siteAppearance: '',
     externalStylesheet: '',
     styledTooltips: false,
-    paranoia: 0,
     notificationMethod: 'popup',
     showEmail: false,
     showLastSeen: true,
@@ -146,12 +145,13 @@ describe('Settings', () => {
     ).toBeInTheDocument();
   });
 
-  it('switches to privacy tab and shows paranoia options', async () => {
+  it('switches to privacy tab and shows the five privacy flags', async () => {
     const user = userEvent.setup();
     renderWithProviders(<Settings />);
     await user.click(screen.getByRole('button', { name: /privacy/i }));
-    expect(screen.getByText(/paranoia level/i)).toBeInTheDocument();
-    expect(screen.getByText(/level 0:/i)).toBeInTheDocument();
+    expect(screen.getByText(/show on your profile/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/ratio and buffer/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/notification method/i)).toBeInTheDocument();
   });
 
@@ -427,7 +427,7 @@ describe('Settings', () => {
     const user = userEvent.setup();
     renderWithProviders(<Settings />);
     await user.click(screen.getByRole('button', { name: /^privacy$/i }));
-    expect(screen.getByText(/paranoia level/i)).toBeInTheDocument();
+    expect(screen.getByText(/show on your profile/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /^appearance$/i }));
     expect(screen.getByLabelText(/^stylesheet$/i)).toBeInTheDocument();
   });
@@ -439,7 +439,7 @@ describe('Settings', () => {
   // Security additionally surfaces the IRC-nick linker (#82/#201), the feature
   // #97 said was unreachable behind the inert tabs.
   it.each([
-    ['privacy', /paranoia level/i],
+    ['privacy', /show on your profile/i],
     ['security', /^irc nick$/i]
   ] as const)(
     'replaces Appearance when switching to the %s tab',
@@ -506,20 +506,6 @@ describe('Settings', () => {
     expect((screen.getByLabelText(/^avatar$/i) as HTMLInputElement).value).toBe(
       'https://example.com/avatar.png'
     );
-  });
-
-  it('shows unknown paranoia level with empty string fallback', async () => {
-    mockUseGetMyProfileQuery.mockReturnValue({
-      data: {
-        ...makeProfile(),
-        userSettings: { ...makeProfile().userSettings, paranoia: 99 }
-      },
-      isLoading: false
-    });
-    const user = userEvent.setup();
-    renderWithProviders(<Settings />);
-    await user.click(screen.getByRole('button', { name: /^privacy$/i }));
-    expect(screen.getByText(/current: level 99/i)).toBeInTheDocument();
   });
 
   it('shows "Saving…" on Security tab when isChangingPw is true', async () => {
@@ -599,16 +585,15 @@ describe('Settings', () => {
   });
 
   it('lives on Appearance, not Privacy — it governs what YOU see', async () => {
-    // Paranoia governs what OTHERS see of you and cascades onto five flags;
-    // this one is deliberately excluded from that cascade (stellar-api #400).
-    // Placing it beside the paranoia radio would imply the coupling that
-    // exclusion exists to deny.
+    // The five Privacy checkboxes govern what OTHERS see of you; this one is
+    // deliberately separate (stellar-api #400, ADR-0046 §5). Placing it beside
+    // them would imply the coupling that separation exists to deny.
     const user = userEvent.setup();
     renderWithProviders(<Settings />);
     expect(screen.getByLabelText(/show mature content/i)).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /privacy/i }));
-    expect(screen.getByText(/paranoia level/i)).toBeInTheDocument();
+    expect(screen.getByText(/show on your profile/i)).toBeInTheDocument();
     expect(
       screen.queryByLabelText(/show mature content/i)
     ).not.toBeInTheDocument();
@@ -699,9 +684,16 @@ describe('Settings', () => {
     );
   });
 
-  it('pre-selects the radio button matching the saved paranoia level', async () => {
+  // ─── The five privacy flags (api #586, ADR-0046) ──────────────────────────
+  //
+  // These replaced a four-level "paranoia" radio. The level gated nothing
+  // server-side, and the cascade that applied it overwrote these very
+  // checkboxes on every save — which is why they could not ship before.
+
+  it('checks each box from the saved flags', async () => {
     const profile = makeProfile();
-    profile.userSettings.paranoia = 2;
+    profile.userSettings.showEmail = false;
+    profile.userSettings.showRatioStats = true;
     mockUseGetMyProfileQuery.mockReturnValue({
       data: profile,
       isLoading: false
@@ -711,9 +703,50 @@ describe('Settings', () => {
     renderWithProviders(<Settings />);
     await user.click(screen.getByRole('button', { name: /privacy/i }));
 
-    const radios = screen.getAllByRole('radio') as HTMLInputElement[];
-    const checked = radios.find((r) => r.checked);
-    expect(checked).toBeDefined();
-    expect(checked?.value).toBe('2');
+    expect(screen.getByLabelText(/email address/i)).not.toBeChecked();
+    expect(screen.getByLabelText(/ratio and buffer/i)).toBeChecked();
+  });
+
+  it('a preset ticks the boxes, and they remain individually editable', async () => {
+    // The preset is a starting point, not a mode: the whole reason the level
+    // was removed is that it stopped a member adjusting one box afterwards.
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /privacy/i }));
+
+    await user.click(screen.getByRole('button', { name: /hide everything/i }));
+    expect(screen.getByLabelText(/ratio and buffer/i)).not.toBeChecked();
+
+    await user.click(screen.getByLabelText(/ratio and buffer/i));
+    expect(screen.getByLabelText(/ratio and buffer/i)).toBeChecked();
+    expect(screen.getByLabelText(/email address/i)).not.toBeChecked();
+  });
+
+  it('submits the five flags and no paranoia key', async () => {
+    const updateFn = jest
+      .fn()
+      .mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUseUpdateMyProfileMutation.mockReturnValue([
+      updateFn,
+      { isLoading: false }
+    ]);
+
+    const user = userEvent.setup();
+    renderWithProviders(<Settings />);
+    await user.click(screen.getByRole('button', { name: /privacy/i }));
+    await user.click(screen.getByRole('button', { name: /show everything/i }));
+    await user.click(screen.getByRole('button', { name: /save settings/i }));
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(updateFn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        showEmail: true,
+        showLastSeen: true,
+        showContributedStats: true,
+        showConsumedStats: true,
+        showRatioStats: true
+      })
+    );
+    expect(updateFn.mock.calls[0][0]).not.toHaveProperty('paranoia');
   });
 });

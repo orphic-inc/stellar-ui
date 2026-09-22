@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import {
   useGetMyProfileQuery,
   useUpdateMyProfileMutation
@@ -30,12 +30,69 @@ type MyProfileResponse =
 
 type Tab = 'appearance' | 'privacy' | 'security' | 'feeds' | 'donor';
 
-const PARANOIA_LABELS: Record<number, string> = {
-  0: 'No restrictions — your profile is fully visible',
-  1: 'Hide your email address and last-seen time',
-  2: 'Also hide your contributed/consumed stats',
-  3: 'Also hide your ratio and buffer — nearly all activity stats are hidden'
-};
+// The five privacy flags are the whole control (stellar-api #586, ADR-0046).
+// There is no stored level any more: it gated nothing server-side, and the
+// cascade that applied it overwrote these very checkboxes on every save, which
+// is why they could not ship until now.
+const PRIVACY_FLAGS = [
+  { name: 'showEmail', label: 'Email address' },
+  { name: 'showLastSeen', label: 'Last-seen time' },
+  { name: 'showContributedStats', label: 'Contributed stats' },
+  { name: 'showConsumedStats', label: 'Consumed stats' },
+  { name: 'showRatioStats', label: 'Ratio and buffer' }
+] as const;
+
+type PrivacyFlag = (typeof PRIVACY_FLAGS)[number]['name'];
+
+// Presets tick the boxes and leave no trace — the server stores only the five
+// booleans, so which button was pressed is not recoverable and is not meant to
+// be. These four mirror the levels members had before, so a familiar choice
+// still lands in one click.
+const PRIVACY_PRESETS: {
+  label: string;
+  values: Record<PrivacyFlag, boolean>;
+}[] = [
+  {
+    label: 'Show everything',
+    values: {
+      showEmail: true,
+      showLastSeen: true,
+      showContributedStats: true,
+      showConsumedStats: true,
+      showRatioStats: true
+    }
+  },
+  {
+    label: 'Hide contact details',
+    values: {
+      showEmail: false,
+      showLastSeen: false,
+      showContributedStats: true,
+      showConsumedStats: true,
+      showRatioStats: true
+    }
+  },
+  {
+    label: 'Hide transfer stats',
+    values: {
+      showEmail: false,
+      showLastSeen: false,
+      showContributedStats: false,
+      showConsumedStats: false,
+      showRatioStats: true
+    }
+  },
+  {
+    label: 'Hide everything',
+    values: {
+      showEmail: false,
+      showLastSeen: false,
+      showContributedStats: false,
+      showConsumedStats: false,
+      showRatioStats: false
+    }
+  }
+];
 
 const NOTIFICATION_OPTIONS = [
   { value: 'Disabled', label: 'Disabled — no notifications' },
@@ -53,8 +110,12 @@ const toProfileForm = (profile: MyProfileResponse): ProfileForm => ({
   siteAppearance: profile.userSettings.siteAppearance,
   externalStylesheet: profile.userSettings.externalStylesheet ?? '',
   styledTooltips: profile.userSettings.styledTooltips,
-  paranoia: profile.userSettings.paranoia,
   notificationMethod: profile.userSettings.notificationMethod,
+  showEmail: profile.userSettings.showEmail,
+  showLastSeen: profile.userSettings.showLastSeen,
+  showContributedStats: profile.userSettings.showContributedStats,
+  showConsumedStats: profile.userSettings.showConsumedStats,
+  showRatioStats: profile.userSettings.showRatioStats,
   showMatureContent: profile.userSettings.showMatureContent
 });
 
@@ -66,14 +127,17 @@ const Settings = () => {
   const { data: profile, isLoading } = useGetMyProfileQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
   const { data: stylesheets } = useGetStylesheetsQuery();
-  const { register, handleSubmit, reset, control, setValue } =
-    useForm<ProfileForm>();
+  const { register, handleSubmit, reset, setValue } = useForm<ProfileForm>();
 
   useEffect(() => {
     if (profile) reset(toProfileForm(profile));
   }, [profile, reset]);
 
-  const paranoiaValue = useWatch({ control, name: 'paranoia' }) ?? 0;
+  const applyPrivacyPreset = (values: Record<PrivacyFlag, boolean>) => {
+    for (const flag of PRIVACY_FLAGS) {
+      setValue(flag.name, values[flag.name], { shouldDirty: true });
+    }
+  };
 
   // Site Stylesheet slot source (ADR-0024 §4) — Personal (external URL) XOR
   // Registry (an adopted author sheet). Mirrors the server invariant: the UI
@@ -441,10 +505,9 @@ const Settings = () => {
           {/* Its own panel, and on Appearance rather than Privacy, because this
               governs what YOU see. The five show* settings on Privacy govern
               what OTHERS see of you, and the API keeps the two apart on purpose
-              — `paranoiaToVisibility` deliberately excludes this field, so
-              raising paranoia cannot silently change what you are shown
-              (stellar-api #400). Sitting it beside the paranoia radio would
-              imply exactly the coupling that comment exists to deny. */}
+              (stellar-api #400, and ADR-0046 §5 after the paranoia level was
+              removed). Sitting it beside those checkboxes would imply exactly
+              the coupling that separation exists to deny. */}
           <div data-st="panel" className="p-5 space-y-4">
             <h3
               data-st="prose"
@@ -503,34 +566,49 @@ const Settings = () => {
 
             <div>
               <p data-st="meta" className="block text-sm mb-2">
-                Paranoia level
+                Show on your profile
               </p>
               <div className="space-y-2">
-                {([0, 1, 2, 3] as const).map((level) => (
+                {PRIVACY_FLAGS.map((flag) => (
                   <label
-                    key={level}
+                    key={flag.name}
+                    htmlFor={flag.name}
                     className="flex items-start gap-3 cursor-pointer"
                   >
                     <input
-                      type="radio"
-                      value={String(level)}
-                      checked={paranoiaValue === level}
-                      onChange={() => setValue('paranoia', level)}
+                      id={flag.name}
+                      type="checkbox"
+                      {...register(flag.name)}
                       data-st="field"
                       className="mt-0.5"
                     />
                     <span data-st="prose" className="text-sm">
-                      <span data-st="prose" data-st-strong className="mr-1">
-                        Level {level}:
-                      </span>
-                      {PARANOIA_LABELS[level]}
+                      {flag.label}
                     </span>
                   </label>
                 ))}
               </div>
-              <p data-st="meta" className="text-xs mt-2">
-                Current: Level {paranoiaValue} —{' '}
-                {PARANOIA_LABELS[paranoiaValue] ?? ''}
+
+              <p data-st="meta" className="text-xs mt-3 mb-2">
+                Or pick a starting point, then adjust:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {PRIVACY_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => applyPrivacyPreset(preset.values)}
+                    data-st="button"
+                    className="text-xs px-2 py-1"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+
+              <p data-st="meta" className="text-xs mt-3">
+                These control what other members see. Staff can always see your
+                stats, and nothing here affects what you can see.
               </p>
             </div>
 
