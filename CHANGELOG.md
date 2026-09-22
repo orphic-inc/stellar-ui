@@ -6,7 +6,37 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **Privacy settings you can actually set**
+  ([#367](https://github.com/orphic-inc/stellar-ui/issues/367),
+  [stellar-api#586](https://github.com/orphic-inc/stellar-api/issues/586)) —
+  the Privacy tab now carries the five `show*` controls: email address,
+  last-seen time, contributed stats, consumed stats, and ratio/buffer.
+
+  These existed in the contract and were accepted by the api all along, but no
+  control could ship: `PUT /profile/me` cascaded the paranoia level over them
+  on every save, and this form posted a level every time — so five checkboxes
+  would have arrived inert. api#586 removed the level, so a ticked box now
+  reaches the database.
+
+  Four preset buttons tick the boxes as a starting point, matching the levels
+  members had before. They leave no trace: the server stores only the five
+  booleans, so a preset is a convenience, never a mode you are stuck in.
+
 ### Changed
+
+- **The paranoia level radio is gone**
+  ([#367](https://github.com/orphic-inc/stellar-ui/issues/367),
+  [stellar-api ADR-0046](https://github.com/orphic-inc/stellar-api/blob/main/docs/adr/0046-privacy-is-five-flags-not-a-level.md)) —
+  `UserSettings.paranoia` no longer exists in the contract, so the four-level
+  radio and its "Current: Level N" readback are replaced by the checkboxes
+  above. No privacy setting changes value; the level was only ever a way of
+  writing these five.
+
+  `showMatureContent` stays where it is, on Appearance. It governs what _you_
+  see rather than what others see of you, and that separation outlives the
+  level it was originally excluded from.
 
 - **The vendored contract catches up with stellar-api `main`** — it picks up
   the `registrationFull` description added by
