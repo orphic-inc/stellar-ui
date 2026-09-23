@@ -7220,6 +7220,1014 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/notification-filters': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The caller's filters and their rank allowance
+     * @description `limit` is the rank `notificationFilterLimit`: `null` is unlimited, a number is the cap.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Filters, oldest first */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              filters: components['schemas']['NotificationFilter'][];
+              limit: number | null;
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    /**
+     * Create a filter
+     * @description Tags are normalized and alias-resolved (#689). Artists are ids and must exist. A filter needs a label and at least one set field; a flag alone counts.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            label: string;
+            /** @default [] */
+            artistIds?: number[];
+            /** @default [] */
+            tags?: string[];
+            /** @default [] */
+            notTags?: string[];
+            /** @default [] */
+            communityIds?: number[];
+            /** @default [] */
+            releaseTypes?: (
+              | 'Music'
+              | 'Applications'
+              | 'EBooks'
+              | 'ELearningVideos'
+              | 'Audiobooks'
+              | 'Comedy'
+              | 'Comics'
+            )[];
+            /** @default [] */
+            releaseCategories?: (
+              | 'Album'
+              | 'Single'
+              | 'EP'
+              | 'Anthology'
+              | 'Compilation'
+              | 'DJMix'
+              | 'Live'
+              | 'Remix'
+              | 'Bootleg'
+              | 'Interview'
+              | 'Mixtape'
+              | 'Demo'
+              | 'ConcertRecording'
+              | 'Unknown'
+            )[];
+            /** @default [] */
+            fileTypes?: (
+              | 'mp3'
+              | 'flac'
+              | 'wav'
+              | 'ogg'
+              | 'aac'
+              | 'm4a'
+              | 'm4b'
+              | 'mp4'
+              | 'mkv'
+              | 'avi'
+              | 'mov'
+              | 'zip'
+              | 'exe'
+              | 'dmg'
+              | 'apk'
+              | 'pdf'
+              | 'epub'
+              | 'mobi'
+              | 'cbz'
+              | 'cbr'
+              | 'jpg'
+              | 'png'
+              | 'gif'
+              | 'txt'
+            )[];
+            /** @default [] */
+            bitrates?: (
+              | 'Lossless'
+              | 'Lossless24'
+              | 'Kbps320'
+              | 'Kbps256'
+              | 'KbpsV0'
+              | 'Kbps192'
+              | 'KbpsV2'
+              | 'Kbps128'
+              | 'Other'
+            )[];
+            /** @default [] */
+            media?: (
+              | 'CD'
+              | 'WEB'
+              | 'Vinyl'
+              | 'SACD'
+              | 'DVD'
+              | 'Cassette'
+              | 'BluRay'
+              | 'DAT'
+              | 'Soundboard'
+              | 'Other'
+            )[];
+            /** @default null */
+            fromYear?: number | null;
+            /** @default null */
+            toYear?: number | null;
+            /** @default false */
+            newReleasesOnly?: boolean;
+            /** @default false */
+            excludeCompilations?: boolean;
+            /** @default false */
+            mainCreditsOnly?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Filter created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['NotificationFilter'];
+          };
+        };
+        /** @description The rank limit is reached, an artist does not exist, the filter sets nothing, or the request is invalid */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notification-filters/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Replace a filter */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            label: string;
+            /** @default [] */
+            artistIds?: number[];
+            /** @default [] */
+            tags?: string[];
+            /** @default [] */
+            notTags?: string[];
+            /** @default [] */
+            communityIds?: number[];
+            /** @default [] */
+            releaseTypes?: (
+              | 'Music'
+              | 'Applications'
+              | 'EBooks'
+              | 'ELearningVideos'
+              | 'Audiobooks'
+              | 'Comedy'
+              | 'Comics'
+            )[];
+            /** @default [] */
+            releaseCategories?: (
+              | 'Album'
+              | 'Single'
+              | 'EP'
+              | 'Anthology'
+              | 'Compilation'
+              | 'DJMix'
+              | 'Live'
+              | 'Remix'
+              | 'Bootleg'
+              | 'Interview'
+              | 'Mixtape'
+              | 'Demo'
+              | 'ConcertRecording'
+              | 'Unknown'
+            )[];
+            /** @default [] */
+            fileTypes?: (
+              | 'mp3'
+              | 'flac'
+              | 'wav'
+              | 'ogg'
+              | 'aac'
+              | 'm4a'
+              | 'm4b'
+              | 'mp4'
+              | 'mkv'
+              | 'avi'
+              | 'mov'
+              | 'zip'
+              | 'exe'
+              | 'dmg'
+              | 'apk'
+              | 'pdf'
+              | 'epub'
+              | 'mobi'
+              | 'cbz'
+              | 'cbr'
+              | 'jpg'
+              | 'png'
+              | 'gif'
+              | 'txt'
+            )[];
+            /** @default [] */
+            bitrates?: (
+              | 'Lossless'
+              | 'Lossless24'
+              | 'Kbps320'
+              | 'Kbps256'
+              | 'KbpsV0'
+              | 'Kbps192'
+              | 'KbpsV2'
+              | 'Kbps128'
+              | 'Other'
+            )[];
+            /** @default [] */
+            media?: (
+              | 'CD'
+              | 'WEB'
+              | 'Vinyl'
+              | 'SACD'
+              | 'DVD'
+              | 'Cassette'
+              | 'BluRay'
+              | 'DAT'
+              | 'Soundboard'
+              | 'Other'
+            )[];
+            /** @default null */
+            fromYear?: number | null;
+            /** @default null */
+            toYear?: number | null;
+            /** @default false */
+            newReleasesOnly?: boolean;
+            /** @default false */
+            excludeCompilations?: boolean;
+            /** @default false */
+            mainCreditsOnly?: boolean;
+          };
+        };
+      };
+      responses: {
+        /** @description Filter replaced */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['NotificationFilter'];
+          };
+        };
+        /** @description An artist does not exist, the filter sets nothing, or the request is invalid */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such filter of the caller’s */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** Delete a filter and its hits */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Filter deleted */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description No such filter of the caller’s */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notification-filters/hits': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Contributions the caller’s filters caught
+     * @description One item per contribution, naming every filter that caught it, newest first. `read` is true only when every hit in scope is read. `filterId` narrows to one filter; `unread=true` to contributions with an unread hit. Contributions the caller can no longer see are left out.
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: string;
+          limit?: string;
+          filterId?: string;
+          unread?: 'true' | 'false';
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Caught contributions */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['NotificationFilterHitItem'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description `filterId` names no filter of the caller’s */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    /**
+     * Clear read hits
+     * @description Removes READ hits only, every filter’s or `filterId`’s, so unread matches survive.
+     */
+    delete: {
+      parameters: {
+        query?: {
+          filterId?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Read hits cleared */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description `filterId` names no filter of the caller’s */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notification-filters/hits/unread-count': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * How many caught contributions are unread
+     * @description Counts contributions, not hits: three filters catching one is 1.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Unread count */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              count: number;
+            };
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notification-filters/hits/read': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Mark a caught contribution read
+     * @description Every filter’s hit on it, or only `filterId`’s. Re-reading is a no-op.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            contributionId: number;
+            filterId?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Marked read */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller has no hit on that contribution */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notification-filters/hits/catchup': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Mark every hit read, or one filter’s */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            filterId?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Caught up */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Invalid request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description `filterId` names no filter of the caller’s */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/notification-filters/hits/{contributionId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a caught contribution, read or not */
+    delete: {
+      parameters: {
+        query?: {
+          filterId?: string;
+        };
+        header?: never;
+        path: {
+          contributionId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's rank has a `notificationFilterLimit` of 0 */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller has no hit on that contribution */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/notification-filters': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff read of a member’s notification filters
+     * @description Requires `users_edit`. Read-only, and not subject to the member’s own rank allowance.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The member’s filters */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['NotificationFilter'][];
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing users_edit */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/subscriptions': {
     parameters: {
       query?: never;
@@ -12063,13 +13071,13 @@ export interface paths {
             'application/json': components['schemas']['ReleaseTag'];
           };
         };
-        /** @description Invalid path parameters or request body */
+        /** @description A tag name has no usable characters once normalized (#689), or the request is invalid */
         400: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ValidationError'];
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not authenticated */
@@ -13052,6 +14060,7 @@ export interface paths {
             assetLimit?: number | null;
             inviteGrantPerPeriod?: number;
             inviteCap?: number;
+            notificationFilterLimit?: number | null;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -13326,6 +14335,7 @@ export interface paths {
             assetLimit?: number | null;
             inviteGrantPerPeriod?: number;
             inviteCap?: number;
+            notificationFilterLimit?: number | null;
             displayStaff?: boolean;
             staffGroupId?: number | null;
           };
@@ -14297,19 +15307,23 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * One comment thread, paginated
+     * @description Reads exactly one thread: `context` and `pageId` are both required (#697). A thread follows its page, so a page the caller cannot see answers the same 404 as one that does not exist.
+     */
     get: {
       parameters: {
-        query?: {
+        query: {
           page?: number;
           limit?: number;
-          context?:
+          context:
             | 'artist'
             | 'collages'
             | 'contributions'
             | 'requests'
             | 'communities'
             | 'release';
-          pageId?: number;
+          pageId: number;
         };
         header?: never;
         path?: never;
@@ -14344,9 +15358,19 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description No such page, or one the caller cannot see */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
       };
     };
     put?: never;
+    /** @description A page that does not exist and a page the caller cannot see both answer 400 `The commented item was not found` (#697), so a write cannot probe for private ids. That 400 shares its status with body validation, so it is not declared as a separate response. */
     post: {
       parameters: {
         query?: never;
@@ -14469,7 +15493,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Comment not found, or soft-deleted */
+        /** @description Comment not found, soft-deleted, or in a thread the caller cannot see */
         404: {
           headers: {
             [name: string]: unknown;
@@ -14533,7 +15557,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not found */
+        /** @description Not found, or in a thread the caller cannot see — checked before authorship */
         404: {
           headers: {
             [name: string]: unknown;
@@ -14599,7 +15623,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not found */
+        /** @description Not found, or in a thread a caller who is neither author nor moderator cannot see */
         404: {
           headers: {
             [name: string]: unknown;
@@ -21733,13 +22757,13 @@ export interface paths {
             'application/json': components['schemas']['TagAliasItem'];
           };
         };
-        /** @description Invalid request body */
+        /** @description `badTag` has no usable characters once normalized, or normalizes to the name of its own target (#689); or the request is invalid */
         400: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ValidationError'];
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not authenticated */
@@ -21830,13 +22854,13 @@ export interface paths {
             'application/json': components['schemas']['TagAliasItem'];
           };
         };
-        /** @description Invalid path parameters or request body */
+        /** @description `badTag` has no usable characters once normalized, or normalizes to the name of its own target (#689); or the request is invalid */
         400: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ValidationError'];
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not authenticated */
@@ -22009,7 +23033,7 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Tag promoted. Created when absent, and the name may differ from the one sent: it is case-folded and redirected through the alias table. */
+        /** @description Tag promoted. Created when absent, and the name may differ from the one sent: it is normalized (#689) and redirected through the alias table. */
         201: {
           headers: {
             [name: string]: unknown;
@@ -22018,13 +23042,13 @@ export interface paths {
             'application/json': components['schemas']['TagItem'];
           };
         };
-        /** @description Invalid request body */
+        /** @description A tag name has no usable characters once normalized (#689), or the request is invalid */
         400: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['ValidationError'];
+            'application/json': components['schemas']['MsgResponse'];
           };
         };
         /** @description Not authenticated */
@@ -23172,7 +24196,7 @@ export interface paths {
     };
     /**
      * One collage with its entries and your subscription context
-     * @description Entries are ordered by `sort`. `isSubscribed`/`isBookmarked` describe the CALLER, so this response is per-viewer and not cacheable across members. Visiting while subscribed updates your `lastVisit`. Two access rules are worth noting: a DELETED collage answers 404 to non-staff rather than 403, and a PERSONAL collage (categoryId 0) answers 403 to anyone but its owner or staff.
+     * @description Entries are ordered by `sort`. `isSubscribed`/`isBookmarked` describe the CALLER, so this response is per-viewer and not cacheable across members. Visiting while subscribed updates your `lastVisit`. Two access rules are worth noting: a DELETED collage answers 404 to non-staff rather than 403, and a PERSONAL collage (categoryId 0) is readable by any member; only its owner or staff may change it (#706).
      */
     get: {
       parameters: {
@@ -23205,15 +24229,6 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-        /** @description Personal collage belonging to someone else */
-        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -29436,6 +30451,156 @@ export interface components {
       /** @enum {string} */
       kind: 'ThemeImage' | 'ThemeFont' | 'Avatar';
     };
+    NotificationFilter: {
+      id: number;
+      label: string;
+      artistIds: number[];
+      tags: string[];
+      notTags: string[];
+      communityIds: number[];
+      releaseTypes: (
+        | 'Music'
+        | 'Applications'
+        | 'EBooks'
+        | 'ELearningVideos'
+        | 'Audiobooks'
+        | 'Comedy'
+        | 'Comics'
+      )[];
+      releaseCategories: (
+        | 'Album'
+        | 'Single'
+        | 'EP'
+        | 'Anthology'
+        | 'Compilation'
+        | 'DJMix'
+        | 'Live'
+        | 'Remix'
+        | 'Bootleg'
+        | 'Interview'
+        | 'Mixtape'
+        | 'Demo'
+        | 'ConcertRecording'
+        | 'Unknown'
+      )[];
+      fileTypes: (
+        | 'mp3'
+        | 'flac'
+        | 'wav'
+        | 'ogg'
+        | 'aac'
+        | 'm4a'
+        | 'm4b'
+        | 'mp4'
+        | 'mkv'
+        | 'avi'
+        | 'mov'
+        | 'zip'
+        | 'exe'
+        | 'dmg'
+        | 'apk'
+        | 'pdf'
+        | 'epub'
+        | 'mobi'
+        | 'cbz'
+        | 'cbr'
+        | 'jpg'
+        | 'png'
+        | 'gif'
+        | 'txt'
+      )[];
+      bitrates: (
+        | 'Lossless'
+        | 'Lossless24'
+        | 'Kbps320'
+        | 'Kbps256'
+        | 'KbpsV0'
+        | 'Kbps192'
+        | 'KbpsV2'
+        | 'Kbps128'
+        | 'Other'
+      )[];
+      media: (
+        | 'CD'
+        | 'WEB'
+        | 'Vinyl'
+        | 'SACD'
+        | 'DVD'
+        | 'Cassette'
+        | 'BluRay'
+        | 'DAT'
+        | 'Soundboard'
+        | 'Other'
+      )[];
+      fromYear: number | null;
+      toYear: number | null;
+      newReleasesOnly: boolean;
+      excludeCompilations: boolean;
+      mainCreditsOnly: boolean;
+      createdAt: string;
+      updatedAt: string;
+    };
+    NotificationFilterHitItem: {
+      contributionId: number;
+      read: boolean;
+      matchedAt: string;
+      filters: {
+        id: number;
+        label: string;
+      }[];
+      contribution: {
+        id: number;
+        /** @enum {string} */
+        type:
+          | 'mp3'
+          | 'flac'
+          | 'wav'
+          | 'ogg'
+          | 'aac'
+          | 'm4a'
+          | 'm4b'
+          | 'mp4'
+          | 'mkv'
+          | 'avi'
+          | 'mov'
+          | 'zip'
+          | 'exe'
+          | 'dmg'
+          | 'apk'
+          | 'pdf'
+          | 'epub'
+          | 'mobi'
+          | 'cbz'
+          | 'cbr'
+          | 'jpg'
+          | 'png'
+          | 'gif'
+          | 'txt';
+        /** @enum {string|null} */
+        bitrate:
+          | 'Lossless'
+          | 'Lossless24'
+          | 'Kbps320'
+          | 'Kbps256'
+          | 'KbpsV0'
+          | 'Kbps192'
+          | 'KbpsV2'
+          | 'Kbps128'
+          | 'Other'
+          | null;
+        createdAt: string;
+        uploader: {
+          id: number;
+          username: string;
+        };
+        release: {
+          id: number;
+          title: string;
+          year: number;
+          communityId: number | null;
+        };
+      };
+    };
     Forum: {
       id: number;
       sort: number;
@@ -29975,6 +31140,7 @@ export interface components {
       assetLimit: number | null;
       inviteGrantPerPeriod: number;
       inviteCap: number;
+      notificationFilterLimit: number | null;
       displayStaff: boolean;
       staffGroupId: number | null;
       primaryUserCount: number;
