@@ -16,6 +16,7 @@ const mockSubscribeComments = jest.fn();
 
 let mockCommentsData: unknown[] | undefined = [];
 let mockIsLoading = false;
+let mockError: unknown = undefined;
 
 const mockComments = [
   {
@@ -39,7 +40,8 @@ const mockComments = [
 jest.mock('../../store/services/commentApi', () => ({
   useGetCommentsQuery: () => ({
     data: mockCommentsData,
-    isLoading: mockIsLoading
+    isLoading: mockIsLoading,
+    error: mockError
   }),
   useCreateCommentMutation: () => [mockCreateComment, { isLoading: false }],
   useDeleteCommentMutation: () => [mockDeleteComment]
@@ -84,6 +86,7 @@ describe('CommentsSection', () => {
     jest.clearAllMocks();
     mockCommentsData = mockComments;
     mockIsLoading = false;
+    mockError = undefined;
     mockCurrentUser = { id: 99, username: 'bob' };
     mockCreateComment.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSubscribeComments.mockReturnValue({
@@ -102,6 +105,22 @@ describe('CommentsSection', () => {
     mockCommentsData = [];
     renderWithProviders(<CommentsSection context="release" pageId={1} />);
     expect(screen.getByText(/no comments yet/i)).toBeInTheDocument();
+  });
+
+  // stellar-api#697/#701: a thread on a page the viewer cannot see, or on a
+  // deleted page, answers 404. Staff reach one by opening a deleted collage.
+  it('shows a closed thread with no form when the thread answers 404', () => {
+    mockCommentsData = undefined;
+    mockError = { status: 404, data: { msg: 'Page not found' } };
+    renderWithProviders(<CommentsSection context="collages" pageId={1} />);
+    expect(screen.getByText(/comments are closed/i)).toBeInTheDocument();
+    expect(screen.queryByText(/no comments yet/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/add a comment/i)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/subscribe to comments/i)
+    ).not.toBeInTheDocument();
   });
 
   it('renders comment authors and bodies', () => {

@@ -36,6 +36,7 @@ const makeRank = (
   assetLimit: 0,
   inviteGrantPerPeriod: 0,
   inviteCap: 0,
+  notificationFilterLimit: 0,
   displayStaff: false,
   staffGroupId: null,
   primaryUserCount: id * 10,

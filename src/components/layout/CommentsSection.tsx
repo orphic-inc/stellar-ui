@@ -33,10 +33,17 @@ const CommentsSection = ({
   alreadySubscribed = false
 }: Props) => {
   const currentUser = useSelector(selectCurrentUser);
-  const { data: comments, isLoading } = useGetCommentsQuery({
+  const {
+    data: comments,
+    isLoading,
+    error
+  } = useGetCommentsQuery({
     context,
     pageId
   });
+  // The api answers 404 for a thread on a page this viewer cannot see, or on a
+  // deleted page (stellar-api#697, #701), and refuses a post there with 400.
+  const closed = !!error && 'status' in error && error.status === 404;
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
 
@@ -108,6 +115,10 @@ const CommentsSection = ({
         <div data-st="meta" className="px-3 py-2 text-xs">
           Loading…
         </div>
+      ) : closed ? (
+        <div data-st="meta" className="px-3 py-2 text-xs">
+          Comments are closed.
+        </div>
       ) : !comments?.length ? (
         <div data-st="meta" className="px-3 py-2 text-xs">
           No comments yet.
@@ -159,7 +170,7 @@ const CommentsSection = ({
         </div>
       )}
 
-      {currentUser && (
+      {currentUser && !closed && (
         <form
           className="px-3 py-2 border-t border-[var(--st-border-subtle)]"
           onSubmit={handleSubmit}

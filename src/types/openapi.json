@@ -2979,6 +2979,330 @@
           "kind"
         ]
       },
+      "NotificationFilter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "label": {
+            "type": "string"
+          },
+          "artistIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notTags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "communityIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "releaseTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Music",
+                "Applications",
+                "EBooks",
+                "ELearningVideos",
+                "Audiobooks",
+                "Comedy",
+                "Comics"
+              ]
+            }
+          },
+          "releaseCategories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Album",
+                "Single",
+                "EP",
+                "Anthology",
+                "Compilation",
+                "DJMix",
+                "Live",
+                "Remix",
+                "Bootleg",
+                "Interview",
+                "Mixtape",
+                "Demo",
+                "ConcertRecording",
+                "Unknown"
+              ]
+            }
+          },
+          "fileTypes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "mp3",
+                "flac",
+                "wav",
+                "ogg",
+                "aac",
+                "m4a",
+                "m4b",
+                "mp4",
+                "mkv",
+                "avi",
+                "mov",
+                "zip",
+                "exe",
+                "dmg",
+                "apk",
+                "pdf",
+                "epub",
+                "mobi",
+                "cbz",
+                "cbr",
+                "jpg",
+                "png",
+                "gif",
+                "txt"
+              ]
+            }
+          },
+          "bitrates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Lossless",
+                "Lossless24",
+                "Kbps320",
+                "Kbps256",
+                "KbpsV0",
+                "Kbps192",
+                "KbpsV2",
+                "Kbps128",
+                "Other"
+              ]
+            }
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "CD",
+                "WEB",
+                "Vinyl",
+                "SACD",
+                "DVD",
+                "Cassette",
+                "BluRay",
+                "DAT",
+                "Soundboard",
+                "Other"
+              ]
+            }
+          },
+          "fromYear": {
+            "type": "integer",
+            "nullable": true
+          },
+          "toYear": {
+            "type": "integer",
+            "nullable": true
+          },
+          "newReleasesOnly": {
+            "type": "boolean"
+          },
+          "excludeCompilations": {
+            "type": "boolean"
+          },
+          "mainCreditsOnly": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "artistIds",
+          "tags",
+          "notTags",
+          "communityIds",
+          "releaseTypes",
+          "releaseCategories",
+          "fileTypes",
+          "bitrates",
+          "media",
+          "fromYear",
+          "toYear",
+          "newReleasesOnly",
+          "excludeCompilations",
+          "mainCreditsOnly",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "NotificationFilterHitItem": {
+        "type": "object",
+        "properties": {
+          "contributionId": {
+            "type": "integer"
+          },
+          "read": {
+            "type": "boolean"
+          },
+          "matchedAt": {
+            "type": "string"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "label": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ]
+            }
+          },
+          "contribution": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "mp3",
+                  "flac",
+                  "wav",
+                  "ogg",
+                  "aac",
+                  "m4a",
+                  "m4b",
+                  "mp4",
+                  "mkv",
+                  "avi",
+                  "mov",
+                  "zip",
+                  "exe",
+                  "dmg",
+                  "apk",
+                  "pdf",
+                  "epub",
+                  "mobi",
+                  "cbz",
+                  "cbr",
+                  "jpg",
+                  "png",
+                  "gif",
+                  "txt"
+                ]
+              },
+              "bitrate": {
+                "type": "string",
+                "nullable": true,
+                "enum": [
+                  "Lossless",
+                  "Lossless24",
+                  "Kbps320",
+                  "Kbps256",
+                  "KbpsV0",
+                  "Kbps192",
+                  "KbpsV2",
+                  "Kbps128",
+                  "Other",
+                  null
+                ]
+              },
+              "createdAt": {
+                "type": "string"
+              },
+              "uploader": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "username"
+                ]
+              },
+              "release": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "integer"
+                  },
+                  "communityId": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "year",
+                  "communityId"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "bitrate",
+              "createdAt",
+              "uploader",
+              "release"
+            ]
+          }
+        },
+        "required": [
+          "contributionId",
+          "read",
+          "matchedAt",
+          "filters",
+          "contribution"
+        ]
+      },
       "Forum": {
         "type": "object",
         "properties": {
@@ -4645,6 +4969,10 @@
           "inviteCap": {
             "type": "integer"
           },
+          "notificationFilterLimit": {
+            "type": "integer",
+            "nullable": true
+          },
           "displayStaff": {
             "type": "boolean"
           },
@@ -4676,6 +5004,7 @@
           "assetLimit",
           "inviteGrantPerPeriod",
           "inviteCap",
+          "notificationFilterLimit",
           "displayStaff",
           "staffGroupId",
           "primaryUserCount",
@@ -16733,6 +17062,1273 @@
         ]
       }
     },
+    "/notification-filters": {
+      "get": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "The caller's filters and their rank allowance",
+        "description": "`limit` is the rank `notificationFilterLimit`: `null` is unlimited, a number is the cap.",
+        "responses": {
+          "200": {
+            "description": "Filters, oldest first",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "filters": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/NotificationFilter"
+                      }
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "filters",
+                    "limit"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Create a filter",
+        "description": "Tags are normalized and alias-resolved (#689). Artists are ids and must exist. A filter needs a label and at least one set field; a flag alone counts.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "artistIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "notTags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "communityIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "releaseTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "Music",
+                        "Applications",
+                        "EBooks",
+                        "ELearningVideos",
+                        "Audiobooks",
+                        "Comedy",
+                        "Comics"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "releaseCategories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "Album",
+                        "Single",
+                        "EP",
+                        "Anthology",
+                        "Compilation",
+                        "DJMix",
+                        "Live",
+                        "Remix",
+                        "Bootleg",
+                        "Interview",
+                        "Mixtape",
+                        "Demo",
+                        "ConcertRecording",
+                        "Unknown"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "fileTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "mp3",
+                        "flac",
+                        "wav",
+                        "ogg",
+                        "aac",
+                        "m4a",
+                        "m4b",
+                        "mp4",
+                        "mkv",
+                        "avi",
+                        "mov",
+                        "zip",
+                        "exe",
+                        "dmg",
+                        "apk",
+                        "pdf",
+                        "epub",
+                        "mobi",
+                        "cbz",
+                        "cbr",
+                        "jpg",
+                        "png",
+                        "gif",
+                        "txt"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "bitrates": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "Lossless",
+                        "Lossless24",
+                        "Kbps320",
+                        "Kbps256",
+                        "KbpsV0",
+                        "Kbps192",
+                        "KbpsV2",
+                        "Kbps128",
+                        "Other"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "media": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "CD",
+                        "WEB",
+                        "Vinyl",
+                        "SACD",
+                        "DVD",
+                        "Cassette",
+                        "BluRay",
+                        "DAT",
+                        "Soundboard",
+                        "Other"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "fromYear": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1000,
+                    "maximum": 9999,
+                    "default": null
+                  },
+                  "toYear": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1000,
+                    "maximum": 9999,
+                    "default": null
+                  },
+                  "newReleasesOnly": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "excludeCompilations": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "mainCreditsOnly": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "label"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Filter created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationFilter"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The rank limit is reached, an artist does not exist, the filter sets nothing, or the request is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/notification-filters/{id}": {
+      "put": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Replace a filter",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "artistIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "notTags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 50
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "communityIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "exclusiveMinimum": true
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "releaseTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "Music",
+                        "Applications",
+                        "EBooks",
+                        "ELearningVideos",
+                        "Audiobooks",
+                        "Comedy",
+                        "Comics"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "releaseCategories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "Album",
+                        "Single",
+                        "EP",
+                        "Anthology",
+                        "Compilation",
+                        "DJMix",
+                        "Live",
+                        "Remix",
+                        "Bootleg",
+                        "Interview",
+                        "Mixtape",
+                        "Demo",
+                        "ConcertRecording",
+                        "Unknown"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "fileTypes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "mp3",
+                        "flac",
+                        "wav",
+                        "ogg",
+                        "aac",
+                        "m4a",
+                        "m4b",
+                        "mp4",
+                        "mkv",
+                        "avi",
+                        "mov",
+                        "zip",
+                        "exe",
+                        "dmg",
+                        "apk",
+                        "pdf",
+                        "epub",
+                        "mobi",
+                        "cbz",
+                        "cbr",
+                        "jpg",
+                        "png",
+                        "gif",
+                        "txt"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "bitrates": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "Lossless",
+                        "Lossless24",
+                        "Kbps320",
+                        "Kbps256",
+                        "KbpsV0",
+                        "Kbps192",
+                        "KbpsV2",
+                        "Kbps128",
+                        "Other"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "media": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "CD",
+                        "WEB",
+                        "Vinyl",
+                        "SACD",
+                        "DVD",
+                        "Cassette",
+                        "BluRay",
+                        "DAT",
+                        "Soundboard",
+                        "Other"
+                      ]
+                    },
+                    "maxItems": 100,
+                    "default": []
+                  },
+                  "fromYear": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1000,
+                    "maximum": 9999,
+                    "default": null
+                  },
+                  "toYear": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 1000,
+                    "maximum": 9999,
+                    "default": null
+                  },
+                  "newReleasesOnly": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "excludeCompilations": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "mainCreditsOnly": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "label"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Filter replaced",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationFilter"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "An artist does not exist, the filter sets nothing, or the request is invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such filter of the caller’s",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Delete a filter and its hits",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Filter deleted"
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such filter of the caller’s",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/notification-filters/hits": {
+      "get": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Contributions the caller’s filters caught",
+        "description": "One item per contribution, naming every filter that caught it, newest first. `read` is true only when every hit in scope is read. `filterId` narrows to one filter; `unread=true` to contributions with an unread hit. Contributions the caller can no longer see are left out.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "filterId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "required": false,
+            "name": "unread",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Caught contributions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/NotificationFilterHitItem"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "meta"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`filterId` names no filter of the caller’s",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Clear read hits",
+        "description": "Removes READ hits only, every filter’s or `filterId`’s, so unread matches survive.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "filterId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Read hits cleared"
+          },
+          "400": {
+            "description": "Invalid query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`filterId` names no filter of the caller’s",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/notification-filters/hits/unread-count": {
+      "get": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "How many caught contributions are unread",
+        "description": "Counts contributions, not hits: three filters catching one is 1.",
+        "responses": {
+          "200": {
+            "description": "Unread count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "count"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/notification-filters/hits/read": {
+      "post": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Mark a caught contribution read",
+        "description": "Every filter’s hit on it, or only `filterId`’s. Re-reading is a no-op.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contributionId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  },
+                  "filterId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                },
+                "required": [
+                  "contributionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Marked read"
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The caller has no hit on that contribution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/notification-filters/hits/catchup": {
+      "post": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Mark every hit read, or one filter’s",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "filterId": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Caught up"
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`filterId` names no filter of the caller’s",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/notification-filters/hits/{contributionId}": {
+      "delete": {
+        "tags": [
+          "NotificationFilters"
+        ],
+        "summary": "Remove a caught contribution, read or not",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "contributionId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "filterId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "400": {
+            "description": "Invalid path or query parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller's rank has a `notificationFilterLimit` of 0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The caller has no hit on that contribution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{id}/notification-filters": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Staff read of a member’s notification filters",
+        "description": "Requires `users_edit`. Read-only, and not subject to the member’s own rank allowance.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The member’s filters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationFilter"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid path parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing users_edit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
     "/subscriptions": {
       "get": {
         "tags": [
@@ -22723,11 +24319,11 @@
             }
           },
           "400": {
-            "description": "Invalid path parameters or request body",
+            "description": "A tag name has no usable characters once normalized (#689), or the request is invalid",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
+                  "$ref": "#/components/schemas/MsgResponse"
                 }
               }
             }
@@ -24095,6 +25691,11 @@
                     "type": "integer",
                     "minimum": 0
                   },
+                  "notificationFilterLimit": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0
+                  },
                   "displayStaff": {
                     "type": "boolean"
                   },
@@ -24555,6 +26156,11 @@
                   },
                   "inviteCap": {
                     "type": "integer",
+                    "minimum": 0
+                  },
+                  "notificationFilterLimit": {
+                    "type": "integer",
+                    "nullable": true,
                     "minimum": 0
                   },
                   "displayStaff": {
@@ -25718,6 +27324,8 @@
         "tags": [
           "Comments"
         ],
+        "summary": "One comment thread, paginated",
+        "description": "Reads exactly one thread: `context` and `pageId` are both required (#697). A thread follows its page, so a page the caller cannot see answers the same 404 as one that does not exist.",
         "parameters": [
           {
             "schema": {
@@ -25753,7 +27361,7 @@
                 "release"
               ]
             },
-            "required": false,
+            "required": true,
             "name": "context",
             "in": "query"
           },
@@ -25763,7 +27371,7 @@
               "minimum": 0,
               "exclusiveMinimum": true
             },
-            "required": false,
+            "required": true,
             "name": "pageId",
             "in": "query"
           }
@@ -25798,6 +27406,16 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "No such page, or one the caller cannot see",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -25810,6 +27428,7 @@
         "tags": [
           "Comments"
         ],
+        "description": "A page that does not exist and a page the caller cannot see both answer 400 `The commented item was not found` (#697), so a write cannot probe for private ids. That 400 shares its status with body validation, so it is not declared as a separate response.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -25968,7 +27587,7 @@
             }
           },
           "404": {
-            "description": "Comment not found, or soft-deleted",
+            "description": "Comment not found, soft-deleted, or in a thread the caller cannot see",
             "content": {
               "application/json": {
                 "schema": {
@@ -26058,7 +27677,7 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "Not found, or in a thread the caller cannot see — checked before authorship",
             "content": {
               "application/json": {
                 "schema": {
@@ -26133,7 +27752,7 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "Not found, or in a thread a caller who is neither author nor moderator cannot see",
             "content": {
               "application/json": {
                 "schema": {
@@ -35074,11 +36693,11 @@
             }
           },
           "400": {
-            "description": "Invalid request body",
+            "description": "`badTag` has no usable characters once normalized, or normalizes to the name of its own target (#689); or the request is invalid",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
+                  "$ref": "#/components/schemas/MsgResponse"
                 }
               }
             }
@@ -35193,11 +36812,11 @@
             }
           },
           "400": {
-            "description": "Invalid path parameters or request body",
+            "description": "`badTag` has no usable characters once normalized, or normalizes to the name of its own target (#689); or the request is invalid",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
+                  "$ref": "#/components/schemas/MsgResponse"
                 }
               }
             }
@@ -35396,7 +37015,7 @@
         },
         "responses": {
           "201": {
-            "description": "Tag promoted. Created when absent, and the name may differ from the one sent: it is case-folded and redirected through the alias table.",
+            "description": "Tag promoted. Created when absent, and the name may differ from the one sent: it is normalized (#689) and redirected through the alias table.",
             "content": {
               "application/json": {
                 "schema": {
@@ -35406,11 +37025,11 @@
             }
           },
           "400": {
-            "description": "Invalid request body",
+            "description": "A tag name has no usable characters once normalized (#689), or the request is invalid",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
+                  "$ref": "#/components/schemas/MsgResponse"
                 }
               }
             }
@@ -36895,7 +38514,7 @@
           "Collages"
         ],
         "summary": "One collage with its entries and your subscription context",
-        "description": "Entries are ordered by `sort`. `isSubscribed`/`isBookmarked` describe the CALLER, so this response is per-viewer and not cacheable across members. Visiting while subscribed updates your `lastVisit`. Two access rules are worth noting: a DELETED collage answers 404 to non-staff rather than 403, and a PERSONAL collage (categoryId 0) answers 403 to anyone but its owner or staff.",
+        "description": "Entries are ordered by `sort`. `isSubscribed`/`isBookmarked` describe the CALLER, so this response is per-viewer and not cacheable across members. Visiting while subscribed updates your `lastVisit`. Two access rules are worth noting: a DELETED collage answers 404 to non-staff rather than 403, and a PERSONAL collage (categoryId 0) is readable by any member; only its owner or staff may change it (#706).",
         "parameters": [
           {
             "schema": {
@@ -36929,16 +38548,6 @@
           },
           "401": {
             "description": "Not authenticated",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MsgResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Personal collage belonging to someone else",
             "content": {
               "application/json": {
                 "schema": {

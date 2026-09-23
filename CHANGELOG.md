@@ -88,6 +88,21 @@ All notable changes to stellar-ui are documented here.
 
   A link with no key behaves exactly as before.
 
+- **A closed comment thread says so, instead of offering a form that fails**
+  ([#371](https://github.com/orphic-inc/stellar-ui/issues/371),
+  [stellar-api#697](https://github.com/orphic-inc/stellar-api/issues/697),
+  [stellar-api#701](https://github.com/orphic-inc/stellar-api/issues/701)) —
+  the api now answers 404 for a thread on a page the viewer cannot see, or on
+  a deleted page. The comments panel showed "No comments yet." with a live
+  form, and posting failed. It now reads "Comments are closed." with no form.
+  Staff see this on a deleted collage they can still open.
+
+- **Featured shelves on a profile open for every viewer**
+  ([stellar-api#706](https://github.com/orphic-inc/stellar-api/issues/706)) —
+  a personal collage linked from someone else's profile answered 403. The api
+  now lets any member read one; changing it is still for its owner or staff.
+  This needed no UI code, only the re-vendored contract.
+
 ### Security
 
 - **Sentry no longer receives the query string of any URL**
