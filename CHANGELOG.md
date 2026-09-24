@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.7] — 2026-09-23
+
 ### Added
 
 - **Privacy settings you can actually set**
@@ -61,6 +63,24 @@ All notable changes to stellar-ui are documented here.
   **No component needed changing.** `InviteForm` renders the api's `msg` and
   never switches on `reason`, which is what stellar-api's ADR-0043 intends —
   the api owns the words, so the member-facing string arrives for free.
+
+- **The vendored contract catches up with stellar-api 0.9.7**
+  ([#358](https://github.com/orphic-inc/stellar-ui/issues/358)) — it picks up
+  two api changes that need no UI code yet:
+
+  - `POST /communities/{id}/members` takes an optional `role`
+    ([stellar-api#709](https://github.com/orphic-inc/stellar-api/issues/709)).
+    It defaults to `consumer`, which is what the current form admits. The
+    picker that sends it is
+    [#373](https://github.com/orphic-inc/stellar-ui/issues/373).
+  - `GET /contributions/{id}` no longer declares a `403`
+    ([stellar-api#700](https://github.com/orphic-inc/stellar-api/issues/700)).
+    A contribution the viewer cannot see is now the same `404` as a missing
+    one. Nothing here branched on that `403`.
+
+  The notification-filter operations #358 listed were already vendored by
+  [#372](https://github.com/orphic-inc/stellar-ui/pull/372). This sync clears
+  the rest of that drift.
 
 ### Fixed
 
@@ -1282,7 +1302,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.6...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.7...HEAD
+[0.9.7]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.6...v0.9.7
 [0.9.6]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.3...v0.9.5
 [0.9.3]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.2...v0.9.3

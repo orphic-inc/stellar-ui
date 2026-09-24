@@ -11281,8 +11281,8 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Add a member (consumer) to a community
-     * @description Community admin or curator only.
+     * Admit a member to a community as a consumer or a contributor
+     * @description Community admin or curator only. `role` defaults to `consumer`. Admit as `contributor` a member who is to upload: an upload requires membership and cannot itself be the way in (#709, ADR-0050).
      */
     post: {
       parameters: {
@@ -11297,6 +11297,11 @@ export interface paths {
         content: {
           'application/json': {
             userId: number;
+            /**
+             * @default consumer
+             * @enum {string}
+             */
+            role?: 'consumer' | 'contributor';
           };
         };
       };
@@ -11375,7 +11380,7 @@ export interface paths {
     post?: never;
     /**
      * Remove a member from a community
-     * @description Answers 409 when the target is the community LEADER or a CURATOR: that role has to be removed first. The leader is checked before the curator because a leader is always also a curator, so the message names the role that actually has to be reassigned.
+     * @description Removes the member from both the consumer and the contributor role (#709); 404 when they hold neither. Answers 409 when the target is the community LEADER or a CURATOR: that role has to be removed first. The leader is checked before the curator because a leader is always also a curator, so the message names the role that actually has to be reassigned.
      */
     delete: {
       parameters: {
@@ -13346,6 +13351,7 @@ export interface paths {
       };
     };
     put?: never;
+    /** @description Requires membership of the community (#709, ADR-0050). A release in a community the caller cannot see answers the same 404 as a missing one (ADR-0036 §5). */
     post: {
       parameters: {
         query?: never;
@@ -13449,7 +13455,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Release not found */
+        /** @description Release not found, or in a community you cannot see */
         404: {
           headers: {
             [name: string]: unknown;
@@ -13524,6 +13530,7 @@ export interface paths {
       };
     };
     put?: never;
+    /** @description Requires membership of the community (#709, ADR-0050). A community the caller cannot see answers the same 404 as a missing one. */
     post: {
       parameters: {
         query?: never;
@@ -13665,7 +13672,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Community not found */
+        /** @description Community not found, or one you cannot see */
         404: {
           headers: {
             [name: string]: unknown;
@@ -13700,7 +13707,7 @@ export interface paths {
     };
     /**
      * One contribution, with its release, collaborators and comments
-     * @description Comments carry `bodyHtml`, rendered at read time from BBCode. `sizeInBytes` is serialised as a number rather than the global BigInt-to-string default.
+     * @description Only a contribution the caller can see, read through the same rule as every contribution read; there is no exception for its uploader (#700). Your own uploads stay listed on GET /contributions. Comments carry `bodyHtml`, rendered at read time from BBCode. `sizeInBytes` is serialised as a number rather than the global BigInt-to-string default.
      */
     get: {
       parameters: {
@@ -13740,16 +13747,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not a member of the release’s community */
-        403: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            'application/json': components['schemas']['MsgResponse'];
-          };
-        };
-        /** @description Contribution not found, or its community does not exist */
+        /** @description Contribution not found, or in a community the caller cannot see */
         404: {
           headers: {
             [name: string]: unknown;
