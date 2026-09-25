@@ -6,6 +6,14 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **`ArtistPicker` and `TagPicker`** (#375): shared chip pickers in the UI kit, built on a generic `ChipPicker`, which uses `downshift` for keyboard handling and ARIA and renders only the kit's own `field`/`chip`/`list`/`row` hooks.
+  - Suggestions arrive after a 250 ms pause, from two characters.
+  - The artist picker holds `{ id, name }` pairs and marks a removed artist.
+  - The tag picker suggests from `GET /tags` and accepts free text as typed; the api stores the canonical form.
+  - No page adopts them yet; #370 is the first consumer.
+
 ## [0.9.7] — 2026-09-23
 
 ### Added
