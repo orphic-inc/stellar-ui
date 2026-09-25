@@ -14,3 +14,8 @@ export type { Column } from './DataTable';
 export type { BadgeVariant } from './Badge';
 export type { ModalSize } from './Modal';
 export { default as BBCodeContent } from './BBCodeContent';
+export { default as ChipPicker } from './ChipPicker';
+export { default as ArtistPicker } from './ArtistPicker';
+export { default as TagPicker } from './TagPicker';
+export type { ChipPickerProps } from './ChipPicker';
+export type { ArtistRef } from './ArtistPicker';
