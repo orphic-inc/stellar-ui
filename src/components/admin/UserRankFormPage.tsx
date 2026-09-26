@@ -291,7 +291,8 @@ const UserRankFormPage = () => {
                   <input
                     type="checkbox"
                     {...register('secondary')}
-                    className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+
+                    className="mt-0.5"
                   />
                   <span className="min-w-0">
                     <span className="block text-sm text-gray-200">
@@ -357,7 +358,8 @@ const UserRankFormPage = () => {
                             type="checkbox"
                             checked={selectedForumIds.includes(forum.id)}
                             onChange={() => togglePermittedForum(forum.id)}
-                            className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+
+                            className="mt-0.5"
                           />
                           <span className="min-w-0">
                             <span className="block text-sm text-gray-200">
@@ -403,7 +405,8 @@ const UserRankFormPage = () => {
                       <input
                         type="checkbox"
                         {...register(`permissions.${key}`)}
-                        className="mt-0.5 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
+
+                        className="mt-0.5"
                       />
                       <span className="min-w-0">
                         <span className="block text-sm text-gray-200 group-hover:text-white transition-colors">
@@ -430,11 +433,7 @@ const UserRankFormPage = () => {
           </div>
           <div className="p-4 space-y-4">
             <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                {...register('displayStaff')}
-                className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
-              />
+              <input type="checkbox" {...register('displayStaff')} />
               <span className="text-sm text-gray-300">Show on staff page</span>
             </label>
             <div>

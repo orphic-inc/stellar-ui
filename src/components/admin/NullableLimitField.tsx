@@ -50,7 +50,6 @@ const NullableLimitField = ({ id, label, value, onChange }: Props) => {
                 onChange(lastNumber.current);
               }
             }}
-            className="rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-800"
           />
           Unlimited
           {/* Other checkboxes on the page are "Unlimited …" too, so the name

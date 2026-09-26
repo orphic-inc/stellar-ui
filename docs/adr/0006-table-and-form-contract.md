@@ -35,3 +35,17 @@ The interim WS4·3/4·4 forum work had papered over (1) by **converting** topic-
 - **The `<table>` rules are tag-qualified** (`tr[data-st='row']`, 0-1-1), so they outrank the bare-attribute flex base rule (0-1-0) by specificity — safe to add unlayered alongside the existing CSS, order-independent.
 - **Standing obligation:** a surface picks div vs. table by whether its data is list-shaped or columnar, and emits the same Roles either way. Form controls emit `field`; buttons emit `control`. A future contributor must not mint a per-table or per-input Role.
 - **Limit:** `accent-color` covers native radio/checkbox/range tint but not OS-drawn `<select>` option lists — the same limit every theme already has.
+
+## Amendment (2026-09-26) — the forms plugin had defeated native checkboxes (#368)
+
+Decision 4's "native radio/checkbox tint via `accent-color`" never held in this repo. `@tailwindcss/forms` sets `appearance: none` on checkboxes and radios and draws the checked state itself: a `currentColor` fill plus a ✓ background image. Tinting does nothing on a control the browser no longer draws. The plugin's rules are layered, and `[data-st='field']`'s `background:` shorthand is not, so on every `field` checkbox the unlayered rule erased the plugin's drawing. No checkbox or radio carrying `field` showed whether it was ticked. The ones without `field` showed the plugin's box in fixed colours that no theme reached.
+
+**The decision stands; its implementation moves.** One unlayered element rule in `src/index.css`, directly after the `@plugin` line, restores native controls for **every** checkbox and radio, whether or not it carries `field`:
+
+- `appearance: auto` and `accent-color: var(--st-accent)`;
+- `background`, `border`, `padding` and `box-shadow` reset, which clears the plugin's box and its fixed-blue focus ring;
+- `:focus-visible` takes the shared themed outline (`2px solid var(--st-accent-ring)`), so focus looks the same inside and outside a `data-st` surface.
+
+At 0-1-1 the rule outranks `[data-st='field']` (0-1-0), so `field` needs no carve-out. `field` stays on checkboxes and radios as the form-control marker, but the element rule, not `field`, is what styles them. A theme that wants to restyle them targets `[data-st='field'][type='checkbox']` or the element with enough specificity.
+
+It lives in `index.css`, not `global.css`, because it undoes a plugin loaded there. `global.css` stays the `data-st` hook contract. `src/__tests__/nativeControls.test.ts` pins the rule's declarations and placement. It also fails if a checkbox or radio regains a class that only styled the plugin's box.

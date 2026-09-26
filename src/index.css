@@ -2,6 +2,33 @@
 
 @plugin "@tailwindcss/forms";
 
+/* ── Checkboxes and radios are the browser's own (#368, ADR-0006) ──────────────
+ * Undoes the forms plugin above for these two types. The plugin sets
+ * `appearance: none` and draws the checked state itself (a `currentColor` fill
+ * plus a ✓ image), which nothing themed, and which the unlayered
+ * `[data-st='field']` background erased, so no checkbox showed its state.
+ *
+ * Native controls tinted by `accent-color` are what ADR-0006 decided. Unlayered,
+ * so this beats the plugin's layered base rules; at 0-1-1 it also beats
+ * `[data-st='field']` (0-1-0), so `field` needs no carve-out. The box resets
+ * clear the plugin's `:focus` ring, and focus takes the shared themed outline
+ * (global.css) whether or not the control sits inside a `data-st` surface. */
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: auto;
+  accent-color: var(--st-accent);
+  background: none;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible {
+  outline: 2px solid var(--st-accent-ring);
+  outline-offset: 1px;
+}
+
 /* ── Sublime baseline = Tailwind's own theme (ADR-0005, @theme prototype) ─────
  * The `--st-*` Role Theme Tokens the data-st contract paints from. Sublime is
  * "just the default token values" (docs/theming.md §2), so its defaults ARE
