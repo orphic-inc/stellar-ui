@@ -38,7 +38,12 @@ const mockUser = {
   username: 'jazzfan',
   avatar: null,
   inviteCount: 3,
-  userRank: { level: 100, name: 'User', color: '#fff' }
+  userRank: {
+    level: 100,
+    name: 'User',
+    color: '#fff',
+    notificationFilterLimit: null
+  }
 };
 
 describe('UserMenu', () => {
