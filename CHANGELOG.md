@@ -23,11 +23,16 @@ All notable changes to stellar-ui are documented here.
 ### Changed
 
 - Re-vendored the api contract: the session's rank carries `notificationFilterLimit`, a filter carries its `artists` by name (stellar-api#715), and `POST /communities/{id}/members` answers `204` (stellar-api#711).
+- Re-vendored the api contract for stellar-api#719: `warned` clears once a warning expires (shape unchanged), the session carries `warnedUntil`, and an invite-tree node carries `donorRank`.
 
 ### Fixed
 
 - **A member's theme no longer outlives their session** (#379). Logging out removes the theme and its stored href, so the public pages render the default. A pre-applied theme that fails to load, such as a registry sheet answering 401 after the session lapsed, removes itself. Previously a member logging back in could see the default theme until they refreshed, because the stale link was adopted with an unchanged href, which never refetches.
 - **Checkboxes and radios show whether they are ticked** (#368). `@tailwindcss/forms` drew them itself, and the `field` Role's background erased that drawing, so a ticked box looked unticked on every surface. Every checkbox and radio is now the browser's own control, tinted by the theme accent (`accent-color: var(--st-accent)`), with the shared themed focus outline. Classes that only styled the plugin's box are gone. Recorded as an amendment to ADR-0006.
+- **Donor and warning signs follow a member wherever they are named as an author** (#103, stellar-api#719), not only on their profile.
+  - **Where:** forum post headers, comments, PM senders and participants, the inbox From column, and the staff inbox (requester, assignee, senders, and the queue's requester). They stay off the topic list and "last edited by" lines, where a name is metadata rather than authorship.
+  - **The donor sign is the member's tier**, its badge in its colour, named in the tooltip. It reads `donorRank` alone, so an expired grant shows nothing even while `isDonor` lags behind it. The profile header and invite tree use the tier too, in place of a plain ♥.
+  - **The warning sign links to the rules.** On your own name its tooltip says when your warning ends, or that it has no end; nobody else's expiry is shown or sent.
 
 ## [0.9.7] — 2026-09-23
 

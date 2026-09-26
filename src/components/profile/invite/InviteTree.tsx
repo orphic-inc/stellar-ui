@@ -20,7 +20,7 @@ const renderNode = (node: MemberInviteTreeNode): React.ReactNode => (
           >
             {node.username}
           </Link>
-          <UserBadges disabled={node.disabled} isDonor={node.isDonor} />
+          <UserBadges disabled={node.disabled} donorRank={node.donorRank} />
         </span>
       </td>
       <td className="px-4 py-2.5">

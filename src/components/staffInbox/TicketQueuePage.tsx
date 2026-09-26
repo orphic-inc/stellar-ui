@@ -7,6 +7,7 @@ import {
 import Spinner from '../layout/Spinner';
 import { Badge, Pagination } from '../ui';
 import type { BadgeVariant } from '../ui';
+import { AuthorBadges } from '../layout/UserBadges';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -203,6 +204,7 @@ const TicketQueuePage = () => {
                   </td>
                   <td className="py-2 pr-3">
                     <span data-st="meta">{ticket.user?.username ?? '—'}</span>
+                    <AuthorBadges author={ticket.user} />
                   </td>
                   <td className="py-2 pr-3">
                     <Badge variant={STATUS_TONE[ticket.status] ?? 'default'}>

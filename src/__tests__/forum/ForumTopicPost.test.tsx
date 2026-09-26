@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../testUtils';
+import { makeAuthorRef, renderWithProviders } from '../testUtils';
 import ForumTopicPost from '../../components/forum/ForumTopicPost';
 
 jest.mock('dompurify', () => ({
@@ -479,5 +479,23 @@ describe('ForumTopicPost', () => {
     );
 
     expect(screen.getByText(/loading edit history/i)).toBeInTheDocument();
+  });
+});
+
+// #103 — the author's donor and warning signs sit beside their name.
+describe('ForumTopicPost author signs', () => {
+  it('shows the donor tier and warning sign beside the author', () => {
+    renderWithProviders(
+      <ForumTopicPost
+        post={{
+          ...mockPost,
+          author: makeAuthorRef({ id: 10, username: 'alice' })
+        }}
+        forumId={1}
+        topicId={5}
+      />
+    );
+    expect(screen.getByLabelText('Donor: Patron')).toBeInTheDocument();
+    expect(screen.getByLabelText('Warned')).toBeInTheDocument();
   });
 });

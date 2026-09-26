@@ -6,6 +6,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { api } from '../store/api';
 import authReducer from '../store/slices/authSlice';
 import alertReducer from '../store/slices/alertSlice';
+import type { AuthorRef } from '../types';
 
 export const createTestStore = () =>
   configureStore({
@@ -35,3 +36,19 @@ export const renderWithProviders = (
   );
   return { ...result, store };
 };
+
+/**
+ * An AuthorRef carrying both signs (#103): an active donor tier and an active
+ * warning. Surfaces assert `Donor: Patron` and `Warned` render beside the name.
+ */
+export const makeAuthorRef = (
+  overrides: Partial<AuthorRef> = {}
+): AuthorRef => ({
+  id: 42,
+  username: 'signed',
+  avatar: null,
+  isDonor: true,
+  donorRank: { name: 'Patron', badge: '★', color: '#ffcc00' },
+  warned: '2026-09-01T00:00:00.000Z',
+  ...overrides
+});

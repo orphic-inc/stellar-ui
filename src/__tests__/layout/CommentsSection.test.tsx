@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../testUtils';
+import { makeAuthorRef, renderWithProviders } from '../testUtils';
 import CommentsSection from '../../components/layout/CommentsSection';
 
 jest.mock('dompurify', () => ({ sanitize: (html: string) => html }));
@@ -350,5 +350,19 @@ describe('CommentsSection', () => {
       expect((textarea as HTMLTextAreaElement).value).toBe('Great');
       expect(checkbox).toBeChecked();
     });
+  });
+});
+
+describe('CommentsSection author signs (#103)', () => {
+  it('shows the donor tier and warning sign beside the comment author', () => {
+    mockIsLoading = false;
+    mockError = undefined;
+    mockCurrentUser = { id: 99, username: 'bob' };
+    mockCommentsData = [
+      { ...mockComments[0], author: makeAuthorRef({ username: 'alice' }) }
+    ];
+    renderWithProviders(<CommentsSection context="release" pageId={1} />);
+    expect(screen.getByLabelText('Donor: Patron')).toBeInTheDocument();
+    expect(screen.getByLabelText('Warned')).toBeInTheDocument();
   });
 });

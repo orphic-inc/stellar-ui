@@ -16,6 +16,7 @@ import Spinner from '../layout/Spinner';
 import { canUseTicketStaffActions } from '../staff/staffAffordances';
 import { Badge } from '../ui';
 import type { BadgeVariant } from '../ui';
+import { AuthorBadges } from '../layout/UserBadges';
 
 const STATUS_TONE: Record<string, BadgeVariant> = {
   Unanswered: 'warning',
@@ -134,6 +135,7 @@ const TicketView = () => {
               <Link to={`/user/${ticket.user?.username}`} data-st="control">
                 {ticket.user?.username}
               </Link>
+              <AuthorBadges author={ticket.user} />
             </p>
           )}
           {ticket.assignedUser && (
@@ -142,6 +144,7 @@ const TicketView = () => {
               <span data-st="prose" data-st-strong>
                 {ticket.assignedUser.username}
               </span>
+              <AuthorBadges author={ticket.assignedUser} />
             </p>
           )}
         </div>
@@ -209,13 +212,16 @@ const TicketView = () => {
             >
               <div className="flex items-center gap-2 mb-2 text-sm">
                 {msg.sender ? (
-                  <Link
-                    to={`/user/${msg.sender.username}`}
-                    data-st="control"
-                    className="font-medium"
-                  >
-                    {msg.sender.username}
-                  </Link>
+                  <>
+                    <Link
+                      to={`/user/${msg.sender.username}`}
+                      data-st="control"
+                      className="font-medium"
+                    >
+                      {msg.sender.username}
+                    </Link>
+                    <AuthorBadges author={msg.sender} />
+                  </>
                 ) : (
                   <span data-st="meta" className="font-medium">
                     System

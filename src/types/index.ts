@@ -6,6 +6,9 @@ export type UserRank = components['schemas']['UserRank'];
 export type AuthUserRank = components['schemas']['AuthUser']['userRank'];
 export type AuthUser = components['schemas']['AuthUser'];
 export type PublicUser = components['schemas']['PublicUser'];
+/** The author identity every post, comment, PM and ticket carries (#103). */
+export type AuthorRef = components['schemas']['AuthorRef'];
+export type DonorRankRef = NonNullable<AuthorRef['donorRank']>;
 
 export type ArtistHistory = components['schemas']['ArtistHistory'];
 
