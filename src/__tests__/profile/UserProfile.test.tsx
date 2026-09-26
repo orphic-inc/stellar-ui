@@ -16,9 +16,15 @@ jest.mock('../../components/layout/Time', () => ({
   default: ({ date }: { date: string }) => <span>{date}</span>
 }));
 
+// Renders nothing; records what the header passed it (#103). The signs
+// themselves are UserBadges.test.tsx's to prove.
+let mockBadgeProps: Record<string, unknown> | undefined;
 jest.mock('../../components/layout/UserBadges', () => ({
   __esModule: true,
-  default: () => null
+  default: (props: Record<string, unknown>) => {
+    mockBadgeProps = props;
+    return null;
+  }
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -1264,6 +1270,44 @@ describe('UserProfile', () => {
     expect(screen.queryByText(/\dt\s*\/\s*\dp/)).not.toBeInTheDocument();
     expect(screen.getAllByText(/topics/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/posts/i).length).toBeGreaterThan(0);
+  });
+
+  // #103 — the header passes the tier (not isDonor) and whose name it is.
+  it('hands the header badges the donor tier and the profile id', () => {
+    const rank = {
+      name: 'Gold',
+      badge: '★',
+      color: '#ffcc00',
+      grantedAt: '2026-01-01T00:00:00Z',
+      expiresAt: null
+    };
+    mockProfileData = {
+      ...mockProfile,
+      isDonor: true,
+      warned: '2026-09-01T00:00:00.000Z',
+      donorPresentation: {
+        profileBlocks: [],
+        customIcon: null,
+        customIconLink: null,
+        secondAvatar: null,
+        iconMouseOverText: null,
+        avatarMouseOverText: null,
+        rank
+      }
+    } as never;
+    renderWithProviders(<UserProfile />);
+    expect(mockBadgeProps).toMatchObject({
+      userId: 42,
+      warned: '2026-09-01T00:00:00.000Z',
+      donorRank: rank
+    });
+  });
+
+  it('hands the header no tier when there is no donor presentation', () => {
+    // isDonor can lag an expired grant; the tier is what decides.
+    mockProfileData = { ...mockProfile, isDonor: true } as never;
+    renderWithProviders(<UserProfile />);
+    expect(mockBadgeProps).toMatchObject({ donorRank: null });
   });
 });
 

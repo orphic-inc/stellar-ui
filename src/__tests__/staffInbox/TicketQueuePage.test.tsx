@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../testUtils';
+import { makeAuthorRef, renderWithProviders } from '../testUtils';
 import TicketQueuePage from '../../components/staffInbox/TicketQueuePage';
 
 const mockUseGetTicketQueueQuery = jest.fn();
@@ -245,5 +245,32 @@ describe('TicketQueuePage', () => {
     expect(mockUseGetTicketQueueQuery).toHaveBeenLastCalledWith(
       expect.objectContaining({ assignedToMe: false, unassigned: true })
     );
+  });
+});
+
+describe('TicketQueuePage requester signs (#103)', () => {
+  it('shows the signs beside the requester', () => {
+    mockUseGetTicketQueueQuery.mockReturnValue({
+      data: {
+        total: 1,
+        page: 1,
+        pageSize: 25,
+        conversations: [
+          {
+            id: 1,
+            subject: 'First ticket',
+            status: 'Unanswered',
+            user: makeAuthorRef({ username: 'alice' }),
+            assignedUser: null,
+            updatedAt: '2026-05-17T12:00:00.000Z'
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<TicketQueuePage />);
+    expect(screen.getByLabelText('Donor: Patron')).toBeInTheDocument();
+    expect(screen.getByLabelText('Warned')).toBeInTheDocument();
   });
 });

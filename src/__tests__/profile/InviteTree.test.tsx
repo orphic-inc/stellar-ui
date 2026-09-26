@@ -151,3 +151,27 @@ describe('InviteTree', () => {
     expect(container.querySelector('[data-st="chip"]')).toBeInTheDocument();
   });
 });
+
+describe('InviteTree donor tier (#103)', () => {
+  it('shows a member’s active tier, and nothing for an expired grant', () => {
+    mockParamId = undefined;
+    mockIsLoading = false;
+    mockData = {
+      tree: [
+        {
+          ...tree[0],
+          donorRank: { name: 'Patron', badge: '★', color: '#ffcc00' },
+          // isDonor lags an expired grant; donorRank is what decides.
+          children: [{ ...tree[0].children[0], isDonor: true, donorRank: null }]
+        }
+      ],
+      summary
+    };
+    mockUseGetMemberInviteTreeQuery.mockImplementation(() => ({
+      data: mockData,
+      isLoading: mockIsLoading
+    }));
+    renderWithProviders(<InviteTree />);
+    expect(screen.getAllByLabelText('Donor: Patron')).toHaveLength(1);
+  });
+});

@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InboxPage from '../../components/messages/InboxPage';
-import { renderWithProviders } from '../testUtils';
+import { makeAuthorRef, renderWithProviders } from '../testUtils';
 
 const mockUseGetInboxQuery = jest.fn();
 const mockDeleteConversation = jest.fn();
@@ -166,5 +166,37 @@ describe('InboxPage', () => {
 
     rerender(<InboxPage />);
     expect(screen.getByText('Failed to load inbox.')).toBeInTheDocument();
+  });
+});
+
+describe('InboxPage sender signs (#103)', () => {
+  it('shows the signs beside the sender in the From column', () => {
+    mockUseGetInboxQuery.mockReturnValue({
+      data: {
+        total: 1,
+        page: 1,
+        pageSize: 25,
+        conversations: [
+          {
+            id: 1,
+            subject: 'Signed thread',
+            participants: [
+              {
+                userId: 7,
+                isRead: true,
+                isSticky: false,
+                receivedAt: '2026-05-17T12:00:00.000Z'
+              }
+            ],
+            messages: [{ sender: makeAuthorRef({ username: 'alice' }) }]
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<InboxPage />);
+    expect(screen.getByLabelText('Donor: Patron')).toBeInTheDocument();
+    expect(screen.getByLabelText('Warned')).toBeInTheDocument();
   });
 });

@@ -11,6 +11,7 @@ import { useSubscribeCommentsMutation } from '../../store/services/subscriptionA
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { BBCodeContent } from '../ui';
 import Time from './Time';
+import { AuthorBadges } from './UserBadges';
 
 const SUBSCRIBABLE_PAGES: CommentPage[] = [
   'release',
@@ -131,8 +132,11 @@ const CommentsSection = ({
               className="px-3 py-2 text-xs border-t border-[var(--st-border-subtle)] first:border-0"
             >
               <div className="flex items-center justify-between gap-1 mb-1">
-                <span data-st="prose" data-st-strong className="truncate">
-                  {c.author?.username ?? 'Unknown'}
+                <span className="flex items-center min-w-0">
+                  <span data-st="prose" data-st-strong className="truncate">
+                    {c.author?.username ?? 'Unknown'}
+                  </span>
+                  <AuthorBadges author={c.author} />
                 </span>
                 <span data-st="meta" className="shrink-0">
                   <Time date={c.createdAt} />

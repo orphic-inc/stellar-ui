@@ -1143,9 +1143,10 @@ const UserProfile = () => {
           </span>
         )}
         <UserBadges
+          userId={profile.id}
           disabled={profileDisabled}
           warned={profileWarned}
-          isDonor={profileIsDonor}
+          donorRank={donorPresentation?.rank ?? null}
         />
         <div className="flex items-center gap-3 ml-auto text-sm">
           {isOwnProfile && (

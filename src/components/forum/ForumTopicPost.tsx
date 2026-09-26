@@ -10,6 +10,7 @@ import { quotePost } from '../../utils/quoteBBCode';
 import { BBCodeContent } from '../ui';
 import { avatarSrc, onAvatarError } from '../../utils/avatar';
 import type { ForumPost, ForumPostEdit } from '../../types';
+import { AuthorBadges } from '../layout/UserBadges';
 
 interface Props {
   post: ForumPost;
@@ -91,6 +92,7 @@ const ForumTopicPost = ({
           >
             {author?.username}
           </Link>
+          <AuthorBadges author={author} />
           <Time date={createdAt} />
           <button type="button" data-st="control" onClick={handleQuote}>
             Quote

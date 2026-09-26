@@ -7,6 +7,7 @@ import {
 } from '../../store/services/messagesApi';
 import Spinner from '../layout/Spinner';
 import { Pagination } from '../ui';
+import { AuthorBadges } from '../layout/UserBadges';
 
 const InboxPage = () => {
   const [page, setPage] = useState(1);
@@ -154,6 +155,7 @@ const InboxPage = () => {
                     <span data-st="meta">
                       {lastMsg?.sender?.username ?? 'System'}
                     </span>
+                    <AuthorBadges author={lastMsg?.sender} />
                   </td>
                   <td className="py-2 text-xs whitespace-nowrap">
                     <span data-st="meta">

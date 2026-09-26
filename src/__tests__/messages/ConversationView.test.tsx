@@ -2,7 +2,11 @@ import React from 'react';
 import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ConversationView from '../../components/messages/ConversationView';
-import { createTestStore, renderWithProviders } from '../testUtils';
+import {
+  createTestStore,
+  makeAuthorRef,
+  renderWithProviders
+} from '../testUtils';
 import { selectAlerts } from '../../store/slices/alertSlice';
 import { setCredentials } from '../../store/slices/authSlice';
 
@@ -251,5 +255,35 @@ describe('ConversationView', () => {
 
     renderWithProviders(<ConversationView />, { store });
     expect(screen.getByText('Conversation not found.')).toBeInTheDocument();
+  });
+});
+
+describe('ConversationView author signs (#103)', () => {
+  it('shows the signs on the participant and on each message sender', () => {
+    const alice = makeAuthorRef({ id: 8, username: 'alice' });
+    mockUseGetConversationQuery.mockReturnValue({
+      data: {
+        id: 1,
+        subject: 'Hello',
+        participants: [
+          { userId: 7, isSticky: false, user: { username: 'me' } },
+          { userId: 8, isSticky: false, user: alice }
+        ],
+        messages: [
+          {
+            id: 11,
+            body: 'Reply',
+            createdAt: '2026-05-17T13:00:00.000Z',
+            sender: alice
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ConversationView />);
+    // Once in the "With:" line, once on the message.
+    expect(screen.getAllByLabelText('Donor: Patron')).toHaveLength(2);
+    expect(screen.getAllByLabelText('Warned')).toHaveLength(2);
   });
 });

@@ -1,7 +1,11 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createTestStore, renderWithProviders } from '../testUtils';
+import {
+  createTestStore,
+  makeAuthorRef,
+  renderWithProviders
+} from '../testUtils';
 import { setCredentials } from '../../store/slices/authSlice';
 import { selectAlerts } from '../../store/slices/alertSlice';
 import TicketView from '../../components/staffInbox/TicketView';
@@ -519,5 +523,44 @@ describe('TicketView', () => {
         true
       );
     });
+  });
+});
+
+describe('TicketView author signs (#103)', () => {
+  it('shows the signs on the requester, the assignee and each sender', () => {
+    const requester = makeAuthorRef({ id: 7, username: 'regular' });
+    mockUseParams.mockReturnValue({ id: '15' });
+    mockUseGetCannedResponsesQuery.mockReturnValue({ data: [] });
+    mockUseGetTicketQuery.mockReturnValue({
+      data: {
+        id: 15,
+        subject: 'Need moderator help',
+        status: 'Open',
+        user: requester,
+        assignedUser: makeAuthorRef({ id: 9, username: 'mod-one' }),
+        messages: [
+          {
+            id: 1,
+            body: 'Original issue',
+            createdAt: '2026-05-17T12:00:00.000Z',
+            sender: requester
+          }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod-one',
+        userRank: { permissions: { staff: true } }
+      } as never)
+    );
+    renderWithProviders(<TicketView />, { store });
+    // Requester ("From:"), assignee, and the message sender.
+    expect(screen.getAllByLabelText('Donor: Patron')).toHaveLength(3);
+    expect(screen.getAllByLabelText('Warned')).toHaveLength(3);
   });
 });
