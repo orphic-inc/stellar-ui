@@ -11282,7 +11282,7 @@ export interface paths {
     put?: never;
     /**
      * Admit a member to a community as a consumer or a contributor
-     * @description Community admin or curator only. `role` defaults to `consumer`. Admit as `contributor` a member who is to upload: an upload requires membership and cannot itself be the way in (#709, ADR-0050).
+     * @description Community admin or curator only. `role` defaults to `consumer`. Admit as `contributor` a member who is to upload: an upload requires membership and cannot itself be the way in (#709, ADR-0050). Answers 204 whether or not the member already held the role; read the resulting roles from `members` on GET /communities/{id} (#711).
      */
     post: {
       parameters: {
@@ -11306,14 +11306,12 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Member added */
-        201: {
+        /** @description Member admitted */
+        204: {
           headers: {
             [name: string]: unknown;
           };
-          content: {
-            'application/json': components['schemas']['CommunityMember'];
-          };
+          content?: never;
         };
         /** @description Invalid path parameters or request body */
         400: {
@@ -11471,10 +11469,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /**
-     * Promote a user to community curator
-     * @description Answers **204, not 201**, unlike POST /communities/{id}/members which answers 201. The asymmetry is existing behaviour and is documented rather than changed.
-     */
+    /** Promote a user to community curator */
     post: {
       parameters: {
         query?: never;
@@ -29767,6 +29762,7 @@ export interface components {
         personalCollageLimit?: number;
         authorStylesheetLimit?: number;
         assetLimit?: number | null;
+        notificationFilterLimit: number | null;
       };
     };
     ChangePasswordBody: {
@@ -30453,6 +30449,10 @@ export interface components {
       id: number;
       label: string;
       artistIds: number[];
+      artists: {
+        id: number;
+        name: string;
+      }[];
       tags: string[];
       notTags: string[];
       communityIds: number[];

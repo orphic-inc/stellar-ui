@@ -107,7 +107,8 @@ describe('PrivateLayout', () => {
           name: 'User',
           level: 100,
           color: 'gray',
-          permissions: {}
+          permissions: {},
+          notificationFilterLimit: null
         }
       })
     );
@@ -174,7 +175,8 @@ describe('PrivateLayout', () => {
             name: 'User',
             level: 100,
             color: 'gray',
-            permissions: {}
+            permissions: {},
+            notificationFilterLimit: null
           },
           ...over
         })

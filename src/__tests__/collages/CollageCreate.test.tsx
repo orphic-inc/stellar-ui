@@ -45,7 +45,8 @@ const makeAuthUser = (personalCollageLimit: number): AuthUser => ({
     color: '',
     badge: '',
     permissions: {},
-    personalCollageLimit
+    personalCollageLimit,
+    notificationFilterLimit: null
   }
 });
 

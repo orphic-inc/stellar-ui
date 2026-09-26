@@ -40,7 +40,8 @@ describe('authApi', () => {
       name: 'User',
       level: 100,
       color: 'gray',
-      permissions: {}
+      permissions: {},
+      notificationFilterLimit: null
     }
   };
 

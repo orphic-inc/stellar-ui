@@ -64,7 +64,12 @@ const render = (hash = '') => {
       id: 1,
       username: 'jazzfan',
       avatar: null,
-      userRank: { level: 100, name: 'User', color: '#fff' }
+      userRank: {
+        level: 100,
+        name: 'User',
+        color: '#fff',
+        notificationFilterLimit: null
+      }
     })
   );
   return renderWithProviders(<PrivateHomepage />, {
