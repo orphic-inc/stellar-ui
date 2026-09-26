@@ -141,7 +141,6 @@ const CollageEditForm = ({
               id="isFeatured"
               checked={isFeatured}
               onChange={(e) => setIsFeatured(e.target.checked)}
-              className="rounded"
             />
             <label htmlFor="isFeatured" className="text-sm text-gray-300">
               Feature this collage on my profile
@@ -161,7 +160,6 @@ const CollageEditForm = ({
                 id="isLocked"
                 checked={isLocked}
                 onChange={(e) => setIsLocked(e.target.checked)}
-                className="rounded"
               />
               <label htmlFor="isLocked" className="text-sm text-gray-300">
                 Lock collage (prevent new entries)

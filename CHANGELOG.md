@@ -27,6 +27,7 @@ All notable changes to stellar-ui are documented here.
 ### Fixed
 
 - **A member's theme no longer outlives their session** (#379). Logging out removes the theme and its stored href, so the public pages render the default. A pre-applied theme that fails to load, such as a registry sheet answering 401 after the session lapsed, removes itself. Previously a member logging back in could see the default theme until they refreshed, because the stale link was adopted with an unchanged href, which never refetches.
+- **Checkboxes and radios show whether they are ticked** (#368). `@tailwindcss/forms` drew them itself, and the `field` Role's background erased that drawing, so a ticked box looked unticked on every surface. Every checkbox and radio is now the browser's own control, tinted by the theme accent (`accent-color: var(--st-accent)`), with the shared themed focus outline. Classes that only styled the plugin's box are gone. Recorded as an amendment to ADR-0006.
 
 ## [0.9.7] — 2026-09-23
 

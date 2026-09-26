@@ -256,7 +256,6 @@ const ForumTopicPage = () => {
                     value={i}
                     onChange={() => setSelectedAnswer(i)}
                     checked={selectedAnswer === i}
-                    className="accent-indigo-500"
                   />
                   {answer}
                 </label>

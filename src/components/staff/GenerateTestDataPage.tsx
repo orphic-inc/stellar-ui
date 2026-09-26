@@ -682,7 +682,8 @@ const GenerateTestDataPage = () => {
                       value={opt.value}
                       checked={mode === opt.value}
                       onChange={() => handleModeChange(opt.value)}
-                      className="mt-0.5 shrink-0 accent-indigo-500"
+
+                      className="mt-0.5 shrink-0"
                     />
                     <div>
                       <p className="text-sm font-medium text-white">
@@ -767,7 +768,8 @@ const GenerateTestDataPage = () => {
                         checked={sections.includes(s.key)}
                         disabled={disabled}
                         onChange={() => !disabled && handleSectionToggle(s.key)}
-                        className="mt-0.5 accent-indigo-500 shrink-0"
+
+                        className="mt-0.5 shrink-0"
                       />
                       <span>
                         {s.label}
@@ -842,7 +844,6 @@ const GenerateTestDataPage = () => {
                     type="checkbox"
                     checked={includeEdgeCases}
                     onChange={(e) => setIncludeEdgeCases(e.target.checked)}
-                    className="accent-indigo-500"
                   />
                   <span className="text-gray-300 flex items-center gap-1">
                     Include edge cases
@@ -867,7 +868,6 @@ const GenerateTestDataPage = () => {
                     type="checkbox"
                     checked={includeModerationData}
                     onChange={(e) => setIncludeModerationData(e.target.checked)}
-                    className="accent-indigo-500"
                   />
                   <span className="text-gray-300">Include moderation data</span>
                 </label>
@@ -878,7 +878,6 @@ const GenerateTestDataPage = () => {
                     type="checkbox"
                     checked={includeStatsData}
                     onChange={(e) => setIncludeStatsData(e.target.checked)}
-                    className="accent-indigo-500"
                   />
                   <span className="text-gray-300">Include stats data</span>
                 </label>
