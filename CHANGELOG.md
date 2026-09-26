@@ -24,6 +24,10 @@ All notable changes to stellar-ui are documented here.
 
 - Re-vendored the api contract: the session's rank carries `notificationFilterLimit`, a filter carries its `artists` by name (stellar-api#715), and `POST /communities/{id}/members` answers `204` (stellar-api#711).
 
+### Fixed
+
+- **A member's theme no longer outlives their session** (#379). Logging out removes the theme and its stored href, so the public pages render the default. A pre-applied theme that fails to load, such as a registry sheet answering 401 after the session lapsed, removes itself. Previously a member logging back in could see the default theme until they refreshed, because the stale link was adopted with an unchanged href, which never refetches.
+
 ## [0.9.7] — 2026-09-23
 
 ### Added
