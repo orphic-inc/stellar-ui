@@ -23,7 +23,7 @@ The progression is continuous: the dabbler's tokens and the power user's role ov
 
 A themeable surface emits a `data-st` **hook** and (almost) no inline utilities; the contract CSS (`src/global.css`) paints that hook from `--st-*` **role tokens**. **Sublime is just the default token values.** A Theme = redefined token values + optional role/part overrides. The contract CSS is **unlayered**, so hooks win over any stray Tailwind utility. Hooks come in **two tiers**: a small fixed set of app-wide **Roles**, and **Parts** scoped inside a Role that must _earn their place_.
 
-> **React layer (ADR-0007).** A surface need not emit the hooks by hand. A small primitive kit in `src/components/ui/` (`PageShell`/`Panel`/`Button`/`Field`/`DataTable`/`Badge`/`Pagination`/`SectionHeading`) **owns the hooks**, so the contract lands **once per primitive, not once per page** — adopting a primitive *completes* that surface's migration. The CSS contract below is unchanged; the kit is purely the React layer that emits it.
+> **React layer (ADR-0007).** A surface need not emit the hooks by hand. A small primitive kit in `src/components/ui/` (`PageShell`/`Panel`/`Button`/`Field`/`DataTable`/`Badge`/`Pagination`/`SectionHeading`) **owns the hooks**, so the contract lands **once per primitive, not once per page** — adopting a primitive _completes_ that surface's migration. The CSS contract below is unchanged; the kit is purely the React layer that emits it.
 
 ---
 
@@ -49,20 +49,20 @@ Seeded with Sublime's Tailwind-default values (oklch authoritative). A Theme red
 
 The learnable core. Each means the same thing on every page; styling it once re-skins the app. **Growing this set is rare and deliberate.**
 
-| Role      | What it is                                           | Default paint (tokens)                                                           |
-| --------- | ---------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `panel`   | a bounded surface (card / box)                       | `--st-panel`, `--st-border`, `--st-radius`                                       |
-| `colhead` | a column / section header bar                        | `--st-base`, `--st-text-muted`, `--st-border`                                    |
-| `list`    | a vertical stack of rows                             | layout only                                                                      |
-| `row`     | one record in a list; may be a disclosure            | `--st-row-pad`, `--st-border-subtle`, hover/open via `--st-raised`/`--st-accent` |
-| `title`   | the primary label / click-target of a row or panel   | `--st-link` / `--st-text-strong`, `--st-link-hover`                              |
-| `meta`    | secondary / muted metadata run                       | `--st-text-muted`, `--st-text-faint`                                             |
-| `chip`    | a small bordered token (tag, flag, format)           | `--st-raised`, `--st-border`, `--st-text-muted`                                  |
-| `icon`    | a fixed glyph slot (e.g. category sprite)            | `--st-raised`, `--st-radius-sm`                                                  |
-| `rollup`  | an aggregate list (label + count) — top tags/artists | `--st-link`, `--st-text-faint`, `--st-mono`                                      |
-| `bar`     | a proportional fill bar (weight / progress)          | `--st-weight`, `--st-weight-track`                                               |
-| `prose`   | body / heading copy inside a surface                 | `--st-text` (`-strong` → `--st-text-strong`; `-muted` → `--st-text-muted`)       |
-| `control` | an interactive affordance (button or link)           | `--st-link` / `--st-link-hover` (`-primary` → `--st-accent` fill; `-danger` → `--st-danger` on hover) |
+| Role      | What it is                                           | Default paint (tokens)                                                                                      |
+| --------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `panel`   | a bounded surface (card / box)                       | `--st-panel`, `--st-border`, `--st-radius`                                                                  |
+| `colhead` | a column / section header bar                        | `--st-base`, `--st-text-muted`, `--st-border`                                                               |
+| `list`    | a vertical stack of rows                             | layout only                                                                                                 |
+| `row`     | one record in a list; may be a disclosure            | `--st-row-pad`, `--st-border-subtle`, hover/open via `--st-raised`/`--st-accent`                            |
+| `title`   | the primary label / click-target of a row or panel   | `--st-link` / `--st-text-strong`, `--st-link-hover`                                                         |
+| `meta`    | secondary / muted metadata run                       | `--st-text-muted`, `--st-text-faint`                                                                        |
+| `chip`    | a small bordered token (tag, flag, format)           | `--st-raised`, `--st-border`, `--st-text-muted`                                                             |
+| `icon`    | a fixed glyph slot (e.g. category sprite)            | `--st-raised`, `--st-radius-sm`                                                                             |
+| `rollup`  | an aggregate list (label + count) — top tags/artists | `--st-link`, `--st-text-faint`, `--st-mono`                                                                 |
+| `bar`     | a proportional fill bar (weight / progress)          | `--st-weight`, `--st-weight-track`                                                                          |
+| `prose`   | body / heading copy inside a surface                 | `--st-text` (`-strong` → `--st-text-strong`; `-muted` → `--st-text-muted`)                                  |
+| `control` | an interactive affordance (button or link)           | `--st-link` / `--st-link-hover` (`-primary` → `--st-accent` fill; `-danger` → `--st-danger` on hover)       |
 | `field`   | a form control (input / textarea / select)           | `--st-raised`, `--st-border`, `--st-text` (`accent-color` → `--st-accent`; placeholder → `--st-text-faint`) |
 
 > **Table variant of `colhead` + `row` (WS5, ADR-0006).** The same two Roles paint a genuine `<table>`: a `<thead>` is a `colhead`, a `<tr>` is a `row`, cells inherit. Tag-qualified rules (`tr[data-st='row']`, `thead[data-st='colhead']`) swap flex→table layout while the token paint carries over, so styling `row`/`colhead` once reskins div listings _and_ data tables. `grid` is a layout-only helper on the `<table>` (sets `border-collapse`). List-shaped data stays div `panel`/`list`/`row` (e.g. `ForumPage`); columnar data keeps its `<table>` and column alignment (e.g. `ForumCategoryPage`).
@@ -81,7 +81,7 @@ The learnable core. Each means the same thing on every page; styling it once re-
 
 > **Applied in WS9 (invite surfaces):** `InviteForm` + `InviteTree`, **no new Roles or tokens**. `InviteTree` is a textbook ADR-0006 table migration — the invitee adjacency tree keeps its `<table>` (column alignment is the point) as `grid`/`colhead`/`row`, numeric stat columns carry `data-st-num`, the per-row member link is a `title` (or `meta` + `line-through` when the account is disabled), and the summary rollup is a `panel` of stat `panel`s with by-rank `chip`s. `InviteForm` is the first migrated surface built on **legacy tracker classes** (`box`/`pad`/`field_div`/`label`) rather than Tailwind grays: those classes are inert under Sublime and carry layout under legacy themes, so they stay and the `data-st` hooks (`panel`/`field`/`control`/`meta`/`prose`) layer on top to supply the token paint — nothing to strip, just hooks to add.
 
-> **Applied in WS10 (ratio surfaces — completes the Profile section):** `RatioStats` + `RatioRulesPage`, **no new Roles or tokens**. `RatioStats` is a display `panel` with a `colhead` cap and `meta` label/value rows; `RatioRulesPage` is a prose-heavy page (`prose` on the wrapper, `prose -strong` headings, `--st-text-strong` leaf utility on the inline `<strong>`s) with the bracket reference table as a `grid`/`colhead`/`row` variant and the user's active bracket flagged with `data-st-open` (the open-row accent wash). The notable call is **status colour without chip/control**: the WATCH / LEECH banners and the conditional ratio / coverage values are full-width banners and inline figures, not chips or buttons, so they paint straight from the `--st-success/warning/danger` status tokens via leaf utilities (`text-[var(--st-danger)]`, plus a `color-mix(... 12% transparent)` tint for the banner fill that mirrors the chip-status border recipe). This is the §3.2 leaf-colour escape hatch carrying *semantic* status colour where no Role spans the element — the status tokens are shared, only their delivery differs from WS7's chip/control modifiers.
+> **Applied in WS10 (ratio surfaces — completes the Profile section):** `RatioStats` + `RatioRulesPage`, **no new Roles or tokens**. `RatioStats` is a display `panel` with a `colhead` cap and `meta` label/value rows; `RatioRulesPage` is a prose-heavy page (`prose` on the wrapper, `prose -strong` headings, `--st-text-strong` leaf utility on the inline `<strong>`s) with the bracket reference table as a `grid`/`colhead`/`row` variant and the user's active bracket flagged with `data-st-open` (the open-row accent wash). The notable call is **status colour without chip/control**: the WATCH / LEECH banners and the conditional ratio / coverage values are full-width banners and inline figures, not chips or buttons, so they paint straight from the `--st-success/warning/danger` status tokens via leaf utilities (`text-[var(--st-danger)]`, plus a `color-mix(... 12% transparent)` tint for the banner fill that mirrors the chip-status border recipe). This is the §3.2 leaf-colour escape hatch carrying _semantic_ status colour where no Role spans the element — the status tokens are shared, only their delivery differs from WS7's chip/control modifiers.
 
 > **Applied in WS11 (app chrome — the visible header + dropdowns, §7 item 4):** `PrivateHeader` + `UserMenu` + `NotificationCorner` + `QuickSearch`, **no new Roles or tokens**. This surface is mostly **token leaf utilities, not Roles** — chrome is structural bars and state-keyed nav, which §3.2's escape hatch covers and which `control`/`panel` would fight. `PrivateHeader`'s bars repaint via `bg-[var(--st-backdrop)]`/`-base` + `border-[var(--st-border-subtle)]`; the primary nav is the WS8 **tab-strip** pattern (active `border-[var(--st-accent)] text-[var(--st-text-strong)]`, inactive muted→text, keyed off `NavLink`'s `isActive`) — not a Role; the faint stats/quicklinks strip stays `--st-text-faint`→`-text` on hover; unread count badges fill from `--st-accent` (inbox) / `--st-warning` (staff). `UserMenu` keeps its **padded pill** menu items, which rules out `control` (it zeroes padding for text-links): items paint `--st-text-muted`→`-text-strong` with a `--st-raised` hover wash, the username at `--st-link`, logout reddening to `--st-danger`. `NotificationCorner` is the one Role-bearing piece: the dropdown is a `panel` with a `colhead` cap, the feed is a `list` of `row`s (`data-st-open` for the unread accent wash), "Mark all read" is a `control`, while the quiet ✕ icon buttons stay `--st-text-faint`→`-text`/`-danger` leaf utilities (a bright `control` ✕ on every row would be noisy). The PM call-to-action and the floating bell paint from `--st-accent`/`color-mix` and the surface tokens. `QuickSearch` inputs take `field`. Test note: the layout suites mock `Link`/`NavLink` to strip extra props (the §7 gotcha), so hooks-present assertions target real elements (the `panel`/`colhead`/`list`/`row` in the notification dropdown, the `field` input, the logout `<button>` className, the nav active-class token) rather than the mocked anchors.
 
@@ -91,10 +91,10 @@ The learnable core. Each means the same thing on every page; styling it once re-
 
 A Part is justified **only** when no composition of Tier-1 Roles expresses the structure. Each Part names the Role it lives in.
 
-| Part (in Role)                                                                     | Why it can't be Tier-1 composition                                                                                                                                                                                                                                                                                                                                                        |
-| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Part (in Role)                                                                     | Why it can't be Tier-1 composition                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `edition-stack` / `edition` / `edition-format` / `edition-flag` (in `panel`/`row`) | the format-and-quality disclosure under a release row — nested grid + lossless emphasis that `row` alone can't carry. **Shared release Part (D-2)** — also used by the release workbench, not Collage-owned. Speculative sub-slots (`edition-size`, `edition-availability`) reconcile to real fields in WS2; the torrent-era `edition-seeders` was renamed to `edition-availability` in WS1 (CONTEXT.md). |
-| `coverart-mosaic` / `coverart-cell` (in `panel`)                                   | a weighted gap-less grid with a 2×2 lead cell — geometry no `list`/`row` gives. Empty state per **D-4**: missing covers render a placeholder cell; the mosaic panel is omitted only when the whole collage has zero art.                                                                                                                                                                  |
+| `coverart-mosaic` / `coverart-cell` (in `panel`)                                   | a weighted gap-less grid with a 2×2 lead cell — geometry no `list`/`row` gives. Empty state per **D-4**: missing covers render a placeholder cell; the mosaic panel is omitted only when the whole collage has zero art.                                                                                                                                                                                  |
 
 **Resolved in WS1 (D-5) — both candidates decomposed; neither is a Part:**
 
@@ -134,7 +134,7 @@ source order — **no `!important`, no selectors to chase.**
   those surfaces convert.
 - Member-authored CSS arrives **pre-validated from the API** (stellar-api
   ADR-0031, which supersedes ADR-0003); the UI does not re-check it. Note the
-  mechanism changed: the api no longer *sanitizes*. It validates and **rejects**,
+  mechanism changed: the api no longer _sanitizes_. It validates and **rejects**,
   storing the author's bytes verbatim, so what the UI receives is the CSS as
   written — never a silently rewritten copy. Nothing arrives cleaned, so the UI
   must not assume anything was stripped out of it on the way.
@@ -142,14 +142,14 @@ source order — **no `!important`, no selectors to chase.**
 ### 4.1 Anti-pattern — the legacy utility-override theme (and the conversion audit)
 
 **A conformant theme MUST define the `--st-*` primitive set.** A theme that
-re-skins *only* by overriding Tailwind utility classes
+re-skins _only_ by overriding Tailwind utility classes
 (`.bg-gray-800 { … !important }`, `body { … }`) and sets **no** `--st-*` tokens is
 **not** on the contract. This is the legacy Gazelle porting shortcut, and it is a
-trap: such a theme skins surfaces that *still* carry raw `.bg-gray-*` utilities but
+trap: such a theme skins surfaces that _still_ carry raw `.bg-gray-*` utilities but
 **silently stops skinning any surface migrated onto the token contract** (those
 read `--st-*` tokens the theme never set, so they fall back to the Sublime look).
 It is the exact mirror of a token-only theme on a not-yet-migrated surface — and as
-the WS4 sweep converts surfaces, a utility-only theme covers *less and less*.
+the WS4 sweep converts surfaces, a utility-only theme covers _less and less_.
 
 Keeping utility overrides is fine **in addition to** the `--st-*` block (they cover
 not-yet-migrated surfaces during the sweep — see the bullet above). They are never a
@@ -158,15 +158,15 @@ substitute for it.
 **Conversion audit (2026-07-02).** Only Layer Cake was ported correctly at first;
 the others shipped as utility-only and were (are being) remediated:
 
-| Theme | `--st-*` primitives | Status | Lives |
-|---|---|---|---|
-| `layer-cake` | all | reference theme (WS3) | api-canonical |
-| `sublime` | — | baseline (skins by omission; bundled Tailwind *is* Sublime) | ui — `src/index.css` |
-| `kuro` | all | remediated — aliases its `--kuro-*` palette onto `--st-*` | api-canonical |
-| `anorex` | all | ported token-only (the classic Gazelle wood default) | api-canonical |
-| `proton` | none | **legacy utility-only — pending token pass** | api-canonical |
-| `postmod` | none | **legacy utility-only — pending token pass** | ui-static (blocked) |
-| `dark-ambient` | — | registered (has a logo) but **no stylesheet yet** | api-canonical since 0.6.3 |
+| Theme          | `--st-*` primitives | Status                                                      | Lives                     |
+| -------------- | ------------------- | ----------------------------------------------------------- | ------------------------- |
+| `layer-cake`   | all                 | reference theme (WS3)                                       | api-canonical             |
+| `sublime`      | —                   | baseline (skins by omission; bundled Tailwind _is_ Sublime) | ui — `src/index.css`      |
+| `kuro`         | all                 | remediated — aliases its `--kuro-*` palette onto `--st-*`   | api-canonical             |
+| `anorex`       | all                 | ported token-only (the classic Gazelle wood default)        | api-canonical             |
+| `proton`       | none                | **legacy utility-only — pending token pass**                | api-canonical             |
+| `postmod`      | none                | **legacy utility-only — pending token pass**                | ui-static (blocked)       |
+| `dark-ambient` | —                   | registered (has a logo) but **no stylesheet yet**           | api-canonical since 0.6.3 |
 
 **Where a theme's CSS lives (ui#168).** "api-canonical" means the authored file is
 `prisma/seed-assets/stylesheets/<name>.css` in **stellar-api**, seeded as a
@@ -189,7 +189,7 @@ reads as of that date. Only the "Lives" column is maintained, because a wrong
 location sends someone editing a file that changes nothing. Since the audit, api
 0.6.3 shipped `dark-ambient` and 0.6.4 added six more token-only palettes
 (`shiro`, `mono`, `minimal`, `hydro`, `bubblegum`, `white`), all api-canonical
-and none listed above. Per-theme remediation *status* is tracked in the theming
+and none listed above. Per-theme remediation _status_ is tracked in the theming
 handoff, not here (this section is the durable contract; a live checklist here
 becomes a merge-conflict magnet).
 
@@ -198,7 +198,7 @@ failures and neither subsumes the other:
 
 - `src/__tests__/themes.tokens.test.ts` (**here**) pins the primitive set against
   `src/index.css` — the contract every `data-st` hook paints from. It catches the
-  set *itself* drifting, which no api guard can see. It used to read the bundled
+  set _itself_ drifting, which no api guard can see. It used to read the bundled
   `layer-cake`/`kuro`/`anorex` files; those are gone, and copying them back as ui
   fixtures would have restored the duplication #168 removed.
 - stellar-api's `stylesheetFixtures.spec.ts` asserts the same list against each
@@ -288,28 +288,28 @@ rolling handoff, not here.**
 
 The per-surface WS4 sweep (§7) migrates the user-facing and staff surfaces in its
 cluster list onto the contract (`GenerateTestDataPage`, a dev-only utility, stays
-bespoke by design). "The sweep is done" is a claim this procedure exists to *test*,
+bespoke by design). "The sweep is done" is a claim this procedure exists to _test_,
 not assume — the 2026-07-02 audit found stragglers never in a cluster (the Toolbox,
 the rank form, the contribution flow). The contract is only as good as what the
 themes render, so verify against real themes, not just the token defaults:
 
 1. **Sublime is the regression baseline.** Sublime injects nothing — the bundled
-   Tailwind *is* Sublime and seeds the `--st-*` defaults — so every migrated
+   Tailwind _is_ Sublime and seeds the `--st-*` defaults — so every migrated
    surface must look **identical to its pre-migration self** under Sublime. Walk
    the app on the default theme and diff against memory/screenshots: any surface
    that shifted (spacing, weight, a control that lost its fill, a value that went
    faint) is a migration bug, not a theme bug. This is the "no visible change on
    the baseline" gate — pass it first.
 2. **Hunt for un-migrated islands — with Layer Cake, NOT kuro.** Layer Cake is
-   token-only (zero utility overrides), so it re-skins *only* surfaces already on
+   token-only (zero utility overrides), so it re-skins _only_ surfaces already on
    the hook contract. A surface that kept an inline `.bg-gray-*` utility instead of
    a Role falls back to the raw Sublime look and **pops as an island** against Layer
    Cake's palette — file it and migrate the leaf. **Do not island-hunt with
    kuro/proton/postmod:** they carry legacy `.bg-gray-*` `!important` overrides (see
-   §4.1) that repaint raw grays, so an un-migrated surface *looks* themed under them
+   §4.1) that repaint raw grays, so an un-migrated surface _looks_ themed under them
    and the island hides — the exact trap that let the sweep be declared "done" while
    the Toolbox, the rank form, and the contribution flow were still un-migrated
-   (2026-07-02 audit). Use kuro for the *opposite* check — that **migrated** surfaces
+   (2026-07-02 audit). Use kuro for the _opposite_ check — that **migrated** surfaces
    **translate**: every `panel`/`colhead`/`list`/`row`/`prose`/`meta`/`control`/
    `field`/`chip` picks up kuro's tokens with no leftover gray.
 3. **Spot-check the status hues** (`chip`/`control` `-warning`/`-success`/
@@ -317,4 +317,4 @@ themes render, so verify against real themes, not just the token defaults:
    colour is the most likely thing to go illegible on a light re-skin.
 
 Record surface-level findings in the rolling handoff, not here; this section is
-the durable *procedure*, not a running checklist.
+the durable _procedure_, not a running checklist.
