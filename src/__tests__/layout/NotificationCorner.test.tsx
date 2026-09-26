@@ -53,6 +53,11 @@ jest.mock('../../store/services/notificationApi', () => ({
   useDeleteNotificationMutation: () => [mockDeleteNotification]
 }));
 
+// Filter matches (#370) are covered in NotificationCornerFilterHits.test.tsx.
+jest.mock('../../store/services/notificationFilterApi', () => ({
+  useGetNotificationFilterHitUnreadCountQuery: () => ({ data: undefined })
+}));
+
 jest.mock('../../store/services/messagesApi', () => ({
   useGetUnreadCountQuery: () => ({ data: { count: mockPmCount } })
 }));

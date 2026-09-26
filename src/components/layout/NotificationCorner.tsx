@@ -10,6 +10,7 @@ import {
   type NotificationType
 } from '../../store/services/notificationApi';
 import { useGetUnreadCountQuery } from '../../store/services/messagesApi';
+import { useGetNotificationFilterHitUnreadCountQuery } from '../../store/services/notificationFilterApi';
 
 function renderNotificationText(
   type: NotificationType,
@@ -66,7 +67,151 @@ function sourcePath(n: Notification): string | null {
   }
 }
 
-const NotificationCorner = () => {
+const countOf = (data: { count: number } | undefined) => data?.count ?? 0;
+
+/** A count that lives on its own page (unread PMs, filter matches). */
+const SummaryLink = ({
+  to,
+  text,
+  action,
+  onClick
+}: {
+  to: string;
+  text: string;
+  action: string;
+  onClick: () => void;
+}) => (
+  <Link
+    to={to}
+    onClick={onClick}
+    className="flex items-center gap-2 px-3 py-2 border-b border-[var(--st-border-subtle)] bg-[color-mix(in_oklch,var(--st-accent)_15%,transparent)] hover:bg-[color-mix(in_oklch,var(--st-accent)_25%,transparent)] transition-colors"
+  >
+    <span className="text-[var(--st-link-hover)] text-sm font-medium">
+      {text}
+    </span>
+    <span className="ml-auto text-[var(--st-link)] text-xs">{action} →</span>
+  </Link>
+);
+
+const PanelHeader = ({
+  onMarkAllRead,
+  onClose
+}: {
+  /** Omitted when nothing is unread. */
+  onMarkAllRead?: () => void;
+  onClose: () => void;
+}) => (
+  <div data-st="colhead">
+    <span>Notifications</span>
+    <div className="flex items-center gap-2">
+      {onMarkAllRead && (
+        <button
+          onClick={() => onMarkAllRead()}
+          data-st="control"
+          className="text-xs"
+        >
+          Mark all read
+        </button>
+      )}
+      <button
+        onClick={onClose}
+        className="text-[var(--st-text-faint)] hover:text-[var(--st-text)] transition-colors text-xs"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+);
+
+const SummaryLinks = ({
+  pmCount,
+  hitCount,
+  onNavigate
+}: {
+  pmCount: number;
+  hitCount: number;
+  onNavigate: () => void;
+}) => (
+  <>
+    {pmCount > 0 && (
+      <SummaryLink
+        to="/messages"
+        text={`${pmCount} unread message${pmCount !== 1 ? 's' : ''}`}
+        action="View Inbox"
+        onClick={onNavigate}
+      />
+    )}
+    {hitCount > 0 && (
+      <SummaryLink
+        to="/notification-filters/hits"
+        text={`${hitCount} new filter match${hitCount !== 1 ? 'es' : ''}`}
+        action="View matches"
+        onClick={onNavigate}
+      />
+    )}
+  </>
+);
+
+const NotificationRow = ({
+  n,
+  onOpen,
+  onDismiss
+}: {
+  n: Notification;
+  onOpen: () => void;
+  onDismiss: () => void;
+}) => {
+  const isUnread = !n.readAt;
+  const path = sourcePath(n);
+  return (
+    <li
+      data-st="row"
+      data-st-open={isUnread ? '' : undefined}
+      className="items-start"
+    >
+      {isUnread && (
+        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--st-accent-ring)] shrink-0" />
+      )}
+      <span
+        className={`flex-1 text-sm leading-snug ${
+          isUnread
+            ? 'text-[var(--st-text-strong)]'
+            : 'text-[var(--st-text-muted)]'
+        }`}
+      >
+        {path ? (
+          <Link
+            to={path}
+            onClick={onOpen}
+            className="hover:text-[var(--st-link-hover)] transition-colors"
+          >
+            {renderNotificationText(n.type, n.actor?.username, n.source?.title)}
+          </Link>
+        ) : (
+          renderNotificationText(
+            n.type,
+            n.actor?.username,
+            `${n.page} #${n.pageId}`
+          )
+        )}
+      </span>
+      <button
+        onClick={onDismiss}
+        className="text-[var(--st-text-faint)] hover:text-[var(--st-danger)] transition-colors text-xs shrink-0 mt-0.5"
+        aria-label="Dismiss"
+      >
+        ✕
+      </button>
+    </li>
+  );
+};
+
+type Props = {
+  /** The rank allows notification filters (#370); their unread matches join the count. */
+  showFilterHits?: boolean;
+};
+
+const NotificationCorner = ({ showFilterHits = false }: Props) => {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -76,10 +221,15 @@ const NotificationCorner = () => {
   const [markAllRead] = useMarkAllNotificationsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
   const { data: pmData } = useGetUnreadCountQuery();
+  const { data: hitData } = useGetNotificationFilterHitUnreadCountQuery(
+    undefined,
+    { skip: !showFilterHits }
+  );
 
-  const pmCount = pmData?.count ?? 0;
-  const unreadNotifCount = unreadNotifData?.count ?? 0;
-  const totalCount = pmCount + unreadNotifCount;
+  const pmCount = countOf(pmData);
+  const hitCount = countOf(hitData);
+  const unreadNotifCount = countOf(unreadNotifData);
+  const totalCount = pmCount + hitCount + unreadNotifCount;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -93,7 +243,7 @@ const NotificationCorner = () => {
 
   if (totalCount === 0) return null;
 
-  const notifCount = notifications?.length ?? 0;
+  const notifCount = (notifications ?? []).length;
 
   return (
     <div
@@ -102,100 +252,33 @@ const NotificationCorner = () => {
     >
       {open && (
         <div data-st="panel" className="w-80 shadow-2xl">
-          <div data-st="colhead">
-            <span>Notifications</span>
-            <div className="flex items-center gap-2">
-              {unreadNotifCount > 0 && (
-                <button
-                  onClick={() => markAllRead()}
-                  data-st="control"
-                  className="text-xs"
-                >
-                  Mark all read
-                </button>
-              )}
-              <button
-                onClick={() => setOpen(false)}
-                className="text-[var(--st-text-faint)] hover:text-[var(--st-text)] transition-colors text-xs"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
+          <PanelHeader
+            onMarkAllRead={unreadNotifCount > 0 ? markAllRead : undefined}
+            onClose={() => setOpen(false)}
+          />
+          <SummaryLinks
+            pmCount={pmCount}
+            hitCount={hitCount}
+            onNavigate={() => setOpen(false)}
+          />
 
-          {pmCount > 0 && (
-            <Link
-              to="/messages"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2 px-3 py-2 border-b border-[var(--st-border-subtle)] bg-[color-mix(in_oklch,var(--st-accent)_15%,transparent)] hover:bg-[color-mix(in_oklch,var(--st-accent)_25%,transparent)] transition-colors"
-            >
-              <span className="text-[var(--st-link-hover)] text-sm font-medium">
-                {pmCount} unread message{pmCount !== 1 ? 's' : ''}
-              </span>
-              <span className="ml-auto text-[var(--st-link)] text-xs">
-                View Inbox →
-              </span>
-            </Link>
-          )}
-
-          {notifCount === 0 && pmCount === 0 ? (
+          {notifCount === 0 && pmCount === 0 && hitCount === 0 ? (
             <p data-st="meta" className="px-3 py-4 text-sm text-center">
               No notifications
             </p>
           ) : notifCount > 0 ? (
             <ul data-st="list" className="max-h-64 overflow-y-auto">
-              {notifications!.map((n) => {
-                const isUnread = !n.readAt;
-                return (
-                  <li
-                    key={n.id}
-                    data-st="row"
-                    data-st-open={isUnread ? '' : undefined}
-                    className="items-start"
-                  >
-                    {isUnread && (
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--st-accent-ring)] shrink-0" />
-                    )}
-                    <span
-                      className={`flex-1 text-sm leading-snug ${
-                        isUnread
-                          ? 'text-[var(--st-text-strong)]'
-                          : 'text-[var(--st-text-muted)]'
-                      }`}
-                    >
-                      {sourcePath(n) ? (
-                        <Link
-                          to={sourcePath(n)!}
-                          onClick={() => {
-                            if (isUnread) markRead(n.id);
-                            setOpen(false);
-                          }}
-                          className="hover:text-[var(--st-link-hover)] transition-colors"
-                        >
-                          {renderNotificationText(
-                            n.type,
-                            n.actor?.username,
-                            n.source?.title
-                          )}
-                        </Link>
-                      ) : (
-                        renderNotificationText(
-                          n.type,
-                          n.actor?.username,
-                          `${n.page} #${n.pageId}`
-                        )
-                      )}
-                    </span>
-                    <button
-                      onClick={() => deleteNotification(n.id)}
-                      className="text-[var(--st-text-faint)] hover:text-[var(--st-danger)] transition-colors text-xs shrink-0 mt-0.5"
-                      aria-label="Dismiss"
-                    >
-                      ✕
-                    </button>
-                  </li>
-                );
-              })}
+              {notifications!.map((n) => (
+                <NotificationRow
+                  key={n.id}
+                  n={n}
+                  onOpen={() => {
+                    if (!n.readAt) markRead(n.id);
+                    setOpen(false);
+                  }}
+                  onDismiss={() => deleteNotification(n.id)}
+                />
+              ))}
             </ul>
           ) : null}
         </div>

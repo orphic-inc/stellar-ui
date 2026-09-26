@@ -13,6 +13,16 @@ All notable changes to stellar-ui are documented here.
   - The artist picker holds `{ id, name }` pairs and marks a removed artist.
   - The tag picker suggests from `GET /tags` and accepts free text as typed; the api stores the canonical form.
   - No page adopts them yet; #370 is the first consumer.
+- **Contribution notification filters** (#370, stellar-api#263): a member names the new contributions they want to hear about.
+  - **Filters page** at `/notification-filters`: create, edit and delete filters within the rank's allowance. Artists and tags use the new pickers; deleting a filter asks first, because its matches go with it.
+  - **Matches page** at `/notification-filters/hits`, plus one view per filter. Opening a match marks it read; loading the page marks nothing. Catch up and clear read act on the view in front of you.
+  - Unread matches join the notification corner's count.
+  - The header's **Filters** link shows only when the session's `notificationFilterLimit` is not `0`.
+  - **Rank editor:** a Notification Filters limit, a number plus an "Unlimited" checkbox, since `null` means unlimited and `0` means none.
+
+### Changed
+
+- Re-vendored the api contract: the session's rank carries `notificationFilterLimit`, a filter carries its `artists` by name (stellar-api#715), and `POST /communities/{id}/members` answers `204` (stellar-api#711).
 
 ## [0.9.7] — 2026-09-23
 

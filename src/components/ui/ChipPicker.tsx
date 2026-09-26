@@ -216,13 +216,17 @@ const ChipRow = <T,>({
           {...selection.getSelectedItemProps({ selectedItem: item, index })}
         />
       ))}
+      {/* The `field` box is the wrapper. @tailwindcss/forms gives every text
+          input its own border, padding, size and ring, which drew a second
+          box inside it; the focus outline still comes from the shared
+          `[data-st] :focus-visible` rule. */}
       <input
         {...box.getInputProps(inputProps)}
         disabled={atMax}
         placeholder={
           atMax ? `Limit of ${picker.max} reached` : picker.placeholder
         }
-        className="flex-1 min-w-[8rem] bg-transparent outline-none"
+        className="flex-1 min-w-[8rem] bg-transparent outline-none border-0 p-0 [font-size:inherit] focus:ring-0"
       />
     </div>
   );

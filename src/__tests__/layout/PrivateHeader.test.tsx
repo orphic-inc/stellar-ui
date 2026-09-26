@@ -307,4 +307,28 @@ describe('PrivateHeader', () => {
     renderWithProviders(<PrivateHeader user={mockUser as never} />);
     expect(screen.getByRole('link', { name: 'Inbox' })).toBeInTheDocument();
   });
+
+  // The entry point follows the session's rank allowance (#370): `0` is none,
+  // `null` is unlimited. There is no probe request behind it.
+  describe('notification filters link', () => {
+    const withLimit = (notificationFilterLimit: number | null) => ({
+      ...mockUser,
+      userRank: { ...mockUser.userRank, notificationFilterLimit }
+    });
+
+    it('is hidden when the rank allows none', () => {
+      renderWithProviders(<PrivateHeader user={withLimit(0) as never} />);
+      expect(
+        screen.queryByRole('link', { name: 'Filters' })
+      ).not.toBeInTheDocument();
+    });
+
+    it.each([null, 5])('shows for a limit of %p', (limit) => {
+      renderWithProviders(<PrivateHeader user={withLimit(limit) as never} />);
+      expect(screen.getByRole('link', { name: 'Filters' })).toHaveAttribute(
+        'href',
+        '/notification-filters'
+      );
+    });
+  });
 });

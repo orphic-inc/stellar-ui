@@ -60,6 +60,8 @@ import DraftsPage from '../../../messages/DraftsPage';
 import SnatchList from '../snatch/SnatchList';
 import BookmarksPage from '../bookmarks/BookmarksPage';
 import FriendsPage from '../friends/FriendsPage';
+import NotificationFiltersPage from '../../../notificationFilters/NotificationFiltersPage';
+import NotificationFilterHitsPage from '../../../notificationFilters/NotificationFilterHitsPage';
 import DonatePage from '../../../donate/DonatePage';
 import WikiListPage from '../../../wiki/WikiListPage';
 import WikiViewPage from '../../../wiki/WikiViewPage';
@@ -109,6 +111,11 @@ const PrivateContent = () => (
     <Route path="ratio" element={wrap(RatioRulesPage)} />
     <Route path="bookmarks" element={wrap(BookmarksPage)} />
     <Route path="friends" element={wrap(FriendsPage)} />
+    <Route path="notification-filters">
+      <Route index element={wrap(NotificationFiltersPage)} />
+      <Route path="hits" element={wrap(NotificationFilterHitsPage)} />
+      <Route path=":filterId/hits" element={wrap(NotificationFilterHitsPage)} />
+    </Route>
 
     {/* Member-facing staff roster — readable by any authenticated member
         (GET /api/staff is auth-only). The toolbox below stays staff-gated. */}

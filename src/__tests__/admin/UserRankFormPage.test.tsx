@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import UserRankFormPage from '../../components/admin/UserRankFormPage';
@@ -156,7 +156,8 @@ describe('UserRankFormPage — create mode', () => {
       renderWithProviders(<UserRankFormPage />);
       // Personal Collage Limit means the opposite by 0 and sits in this same
       // grid. Both readings must be present and distinct.
-      expect(screen.getAllByText('0 = none')).toHaveLength(2);
+      expect(within(rate().parentElement!).getByText('0 = none')).toBeTruthy();
+      expect(within(cap().parentElement!).getByText('0 = none')).toBeTruthy();
       expect(screen.getByText('0 = unlimited')).toBeInTheDocument();
     });
 

@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../../../../store/hooks';
 import { useGetMeQuery } from '../../../../store/services/authApi';
+import { hasNotificationFilters } from '../../../../store/services/notificationFilterApi';
 import {
   selectCurrentUser,
   selectIsAuthenticated
@@ -57,7 +58,7 @@ const PrivateLayout = ({ children }: Props) => {
         {children}
       </main>
       <PrivateFooter />
-      <NotificationCorner />
+      <NotificationCorner showFilterHits={hasNotificationFilters(user)} />
     </div>
   );
 };
