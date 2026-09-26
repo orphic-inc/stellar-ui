@@ -23,6 +23,7 @@ import {
   useGetMyTicketCountQuery
 } from '../../../../store/services/staffInboxApi';
 import { useGetMyProfileQuery } from '../../../../store/services/profileApi';
+import { hasNotificationFilters } from '../../../../store/services/notificationFilterApi';
 
 /*
  * Logos are ui BRANDING ASSETS, not api-canonical theme data — unlike a theme's
@@ -64,23 +65,67 @@ const navLinks = [
   { label: 'Staff', to: '/staff', end: true }
 ];
 
+const QUICKLINK_CLASS = 'hover:text-[var(--st-text)] transition-colors';
+const BADGE_CLASS =
+  'ml-1 text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold';
+
+const QuickLinks = ({ user }: Props) => {
+  const { data: inboxData } = useGetUnreadCountQuery();
+  const { data: ticketData } = useGetQueueCountQuery();
+  const { data: myTicketData } = useGetMyTicketCountQuery();
+  const inboxUnread = inboxData?.count ?? 0;
+  // Staff Inbox is one role-dispatched entry: staff who manage the queue see it
+  // (StaffInboxPage → TicketQueuePage), so the badge counts unanswered queue
+  // tickets; everyone else sees their own conversations and their own unread.
+  const staffInboxUnread =
+    (canAccessStaffQueue(user) ? ticketData : myTicketData)?.count ?? 0;
+
+  return (
+    <div className="flex items-center gap-3">
+      <Link to="/messages" className={QUICKLINK_CLASS}>
+        Inbox
+        {inboxUnread > 0 && (
+          <span className={`${BADGE_CLASS} bg-[var(--st-accent)]`}>
+            {inboxUnread}
+          </span>
+        )}
+      </Link>
+      <Link to="/inbox/staff" className={QUICKLINK_CLASS}>
+        Staff Inbox
+        {staffInboxUnread > 0 && (
+          <span className={`${BADGE_CLASS} bg-[var(--st-warning)]`}>
+            {staffInboxUnread}
+          </span>
+        )}
+      </Link>
+      <Link to="/contribute/list" className={QUICKLINK_CLASS}>
+        Contributions
+      </Link>
+      <Link to="/bookmarks" className={QUICKLINK_CLASS}>
+        Bookmarks
+      </Link>
+      <Link to="/friends" className={QUICKLINK_CLASS}>
+        Friends
+      </Link>
+      {hasNotificationFilters(user) && (
+        <Link
+          to="/notification-filters"
+          title="Contribution notification filters"
+          className={QUICKLINK_CLASS}
+        >
+          Filters
+        </Link>
+      )}
+    </div>
+  );
+};
+
 const PrivateHeader = ({ user }: Props) => {
   const [hovered, setHovered] = useState(false);
   const { data: profile } = useGetMyProfileQuery();
   const art = THEME_LOGOS[profile?.userSettings?.siteAppearance ?? ''];
   const [logo, logoHovered] = art ?? [];
   const showModBar = canSeeModBar(user);
-  const showStaffQueue = canAccessStaffQueue(user);
-  const { data: inboxData } = useGetUnreadCountQuery();
-  const { data: ticketData } = useGetQueueCountQuery();
-  const { data: myTicketData } = useGetMyTicketCountQuery();
-  const inboxUnread = inboxData?.count ?? 0;
-  const ticketUnread = ticketData?.count ?? 0;
-  const myTicketUnread = myTicketData?.count ?? 0;
-  // Staff Inbox is one role-dispatched entry: staff who manage the queue see it
-  // (StaffInboxPage → TicketQueuePage), so the badge counts unanswered queue
-  // tickets; everyone else sees their own conversations and their own unread.
-  const staffInboxUnread = showStaffQueue ? ticketUnread : myTicketUnread;
 
   const uploaded = user.contributed
     ? formatBytes(Number(user.contributed))
@@ -140,49 +185,7 @@ const PrivateHeader = ({ user }: Props) => {
               <span className="text-[var(--st-text)] font-medium">{ratio}</span>
             </Link>
           </div>
-          {/* Quicklinks */}
-          <div className="flex items-center gap-3">
-            <Link
-              to="/messages"
-              className="hover:text-[var(--st-text)] transition-colors"
-            >
-              Inbox
-              {inboxUnread > 0 && (
-                <span className="ml-1 bg-[var(--st-accent)] text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
-                  {inboxUnread}
-                </span>
-              )}
-            </Link>
-            <Link
-              to="/inbox/staff"
-              className="hover:text-[var(--st-text)] transition-colors"
-            >
-              Staff Inbox
-              {staffInboxUnread > 0 && (
-                <span className="ml-1 bg-[var(--st-warning)] text-[var(--st-text-strong)] rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
-                  {staffInboxUnread}
-                </span>
-              )}
-            </Link>
-            <Link
-              to="/contribute/list"
-              className="hover:text-[var(--st-text)] transition-colors"
-            >
-              Contributions
-            </Link>
-            <Link
-              to="/bookmarks"
-              className="hover:text-[var(--st-text)] transition-colors"
-            >
-              Bookmarks
-            </Link>
-            <Link
-              to="/friends"
-              className="hover:text-[var(--st-text)] transition-colors"
-            >
-              Friends
-            </Link>
-          </div>
+          <QuickLinks user={user} />
         </div>
       </div>
 

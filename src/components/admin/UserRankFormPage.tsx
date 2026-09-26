@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import {
   useGetUserRankByIdQuery,
   useCreateUserRankMutation,
@@ -13,6 +13,7 @@ import { useGetForumCategoriesQuery } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import PromotionCriteriaSection from './PromotionCriteriaSection';
+import NullableLimitField from './NullableLimitField';
 
 interface FormValues {
   level: number;
@@ -21,6 +22,7 @@ interface FormValues {
   secondary: boolean;
   permittedForumIds: number[];
   personalCollageLimit: number;
+  notificationFilterLimit: number | null;
   inviteGrantPerPeriod: number;
   inviteCap: number;
   displayStaff: boolean;
@@ -59,6 +61,11 @@ const grantConfigNote = (
   return null;
 };
 
+// Only an explicit null is unlimited: an absent value must not become a grant
+// on save, so it reads as 0, like the other limits.
+const savedNullableLimit = (limit: number | null | undefined) =>
+  limit === undefined ? 0 : limit;
+
 const UserRankFormPage = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
@@ -83,6 +90,7 @@ const UserRankFormPage = () => {
         secondary: false,
         permittedForumIds: [],
         personalCollageLimit: 0,
+        notificationFilterLimit: 0,
         inviteGrantPerPeriod: 0,
         inviteCap: 0,
         displayStaff: false,
@@ -108,6 +116,9 @@ const UserRankFormPage = () => {
         secondary: existing.secondary ?? false,
         permittedForumIds: existing.permittedForumIds ?? [],
         personalCollageLimit: existing.personalCollageLimit ?? 0,
+        notificationFilterLimit: savedNullableLimit(
+          existing.notificationFilterLimit
+        ),
         inviteGrantPerPeriod: existing.inviteGrantPerPeriod ?? 0,
         inviteCap: existing.inviteCap ?? 0,
         displayStaff: existing.displayStaff ?? false,
@@ -229,6 +240,18 @@ const UserRankFormPage = () => {
                 />
                 <p className="text-xs text-gray-500 mt-1">0 = unlimited</p>
               </div>
+              <Controller
+                control={control}
+                name="notificationFilterLimit"
+                render={({ field }) => (
+                  <NullableLimitField
+                    id="perm-notification-filter-limit"
+                    label="Notification Filters"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
               <div>
                 <label
                   htmlFor="perm-invite-rate"

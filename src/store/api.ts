@@ -84,7 +84,9 @@ export const api = createApi({
     'SiteInfo',
     'DevSeedRun',
     'TopicSession',
-    'ReleaseGroup'
+    'ReleaseGroup',
+    'NotificationFilter',
+    'NotificationFilterHit'
   ] as const,
   endpoints: () => ({})
 });
