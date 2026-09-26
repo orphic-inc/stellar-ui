@@ -29751,6 +29751,7 @@ export interface components {
         /** @enum {string|null} */
         disabledCause: 'RATIO' | 'STAFF' | null;
       } | null;
+      warnedUntil?: string | null;
       userRank: {
         level: number;
         name: string;
@@ -31877,6 +31878,11 @@ export interface components {
       username: string;
       rankName: string;
       isDonor: boolean;
+      donorRank: {
+        name: string;
+        badge: string;
+        color: string;
+      } | null;
       disabled: boolean;
       depth: number;
       stats: {
