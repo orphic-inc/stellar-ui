@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../../../../store/hooks';
 import { useGetMeQuery } from '../../../../store/services/authApi';
@@ -39,28 +39,46 @@ const PrivateLayout = ({ children }: Props) => {
     data: fetchedUser
   } = useGetMeQuery(undefined, { pollingInterval: RATIO_POLICY_POLL_MS });
   const user = currentUser ?? fetchedUser;
+  // The theme gate (#161): content paints only in the member's own theme.
+  const [themeReady, setThemeReady] = useState(false);
+  const markThemeReady = useCallback(() => setThemeReady(true), []);
 
   if (isUninitialized || (isLoading && !user)) return <Spinner />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (isError && !user) return <Navigate to="/login" replace />;
   if (!user) return <Navigate to="/login" replace />;
 
+  // The injector sits outside the shell so it stays mounted, in the same
+  // place, while the spinner holds: it is what resolves the theme, and its
+  // unmount cleanup would remove it (#379).
   return (
-    <div className="min-h-screen bg-[var(--st-base)] text-[var(--st-text)] flex flex-col">
-      <StylesheetInjector />
-      <PrivateHeader user={user} />
-      {/* Above the global notices: those are announcements addressed to
-          everyone and are dismissible, this is enforcement addressed to you,
-          with a deadline and a consequence. */}
-      <RatioPolicyBanner user={user} />
-      <GlobalNoticeBanner />
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
-        {children}
-      </main>
-      <PrivateFooter />
-      <NotificationCorner showFilterHits={hasNotificationFilters(user)} />
-    </div>
+    <>
+      <StylesheetInjector onReady={markThemeReady} />
+      {themeReady ? <Shell user={user}>{children}</Shell> : <Spinner />}
+    </>
   );
 };
+
+const Shell = ({
+  user,
+  children
+}: {
+  user: NonNullable<ReturnType<typeof selectCurrentUser>>;
+  children: ReactNode;
+}) => (
+  <div className="min-h-screen bg-[var(--st-base)] text-[var(--st-text)] flex flex-col">
+    <PrivateHeader user={user} />
+    {/* Above the global notices: those are announcements addressed to
+          everyone and are dismissible, this is enforcement addressed to you,
+          with a deadline and a consequence. */}
+    <RatioPolicyBanner user={user} />
+    <GlobalNoticeBanner />
+    <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+      {children}
+    </main>
+    <PrivateFooter />
+    <NotificationCorner showFilterHits={hasNotificationFilters(user)} />
+  </div>
+);
 
 export default PrivateLayout;

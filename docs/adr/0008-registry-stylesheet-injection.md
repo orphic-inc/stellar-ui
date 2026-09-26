@@ -25,4 +25,7 @@ The injector had no branch for it: the pointer was not in the profile contract (
 
 - The full adopt→display pipe closes on the UI side: adopt → pointer (contract) → injector Registry branch → `/css` route.
 - Anyone extending the injector must keep the single-winner shape — a third source is a third _input to one `href`_, never a third layer. A Registry sheet must stay on the `/css`-route `href` path; do not add a `<style>` sink for it.
-- **The theme FOUC ([#161](https://github.com/orphic-inc/stellar-ui/issues/161)) is untouched.** The injector still applies client-side in a `useEffect` after the profile query resolves, so the first paint is the un-themed base state. This ADR does not fix that — it is called out because both live in this same `href` logic and are natural to fix together in a later pass.
+- **The theme FOUC ([#161](https://github.com/orphic-inc/stellar-ui/issues/161)) was out of this ADR's scope, and is now fixed in two layers.**
+  - **Return visits:** `src/preapply-theme.js` links the stored href before `#root` parses, so the browser blocks first paint on it.
+  - **No stored href** (a first-ever visit, and every first private page after a login, since logout clears it — #379): `PrivateLayout` holds its spinner until `StylesheetInjector` reports the theme ready. That is when its sheet loads or fails, when there is none, or after 3 s, when the link is kept so a late theme still lands.
+  - The href is still resolved client-side from the profile and stylesheet queries, so that wait is the spinner's floor. Carrying the resolved href on the session is the next step if it proves too slow.

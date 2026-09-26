@@ -287,3 +287,121 @@ describe('StylesheetInjector', () => {
     });
   });
 });
+
+/**
+ * The readiness gate (#161). PrivateLayout holds its spinner until `onReady`,
+ * so the member's content never paints in a theme other than their own. A
+ * script-added <link> does not block paint, so "ready" means the sheet has
+ * loaded (or failed, or there is none), not merely that its href is known.
+ */
+describe('StylesheetInjector readiness (#161)', () => {
+  const loadedSheet = (link: HTMLLinkElement) =>
+    Object.defineProperty(link, 'sheet', { value: {}, configurable: true });
+
+  const preApply = (href: string) => {
+    const link = document.createElement('link');
+    link.id = LINK_ID;
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+    return link;
+  };
+
+  afterEach(() => jest.useRealTimers());
+
+  it('is ready at once when the member has no theme to load', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({ data: { userSettings: {} } });
+    const onReady = jest.fn();
+    render(<StylesheetInjector onReady={onReady} />);
+    expect(onReady).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits for a created link to load, not merely to exist', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        userSettings: { externalStylesheet: 'https://cdn.example.com/me.css' }
+      }
+    });
+    const onReady = jest.fn();
+    render(<StylesheetInjector onReady={onReady} />);
+
+    expect(linkEl()).not.toBeNull();
+    expect(onReady).not.toHaveBeenCalled();
+
+    linkEl()!.dispatchEvent(new Event('load'));
+    expect(onReady).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens on a stylesheet that fails, so a broken theme cannot lock the member out', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        userSettings: { externalStylesheet: 'https://cdn.example.com/gone.css' }
+      }
+    });
+    const onReady = jest.fn();
+    render(<StylesheetInjector onReady={onReady} />);
+
+    linkEl()!.dispatchEvent(new Event('error'));
+    expect(onReady).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens after 3 s even while the profile is still loading', () => {
+    jest.useFakeTimers();
+    const onReady = jest.fn();
+    render(<StylesheetInjector onReady={onReady} />);
+
+    jest.advanceTimersByTime(2999);
+    expect(onReady).not.toHaveBeenCalled();
+    jest.advanceTimersByTime(1);
+    expect(onReady).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens after 3 s on a slow sheet, and keeps its link so the theme still lands', () => {
+    jest.useFakeTimers();
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        userSettings: { externalStylesheet: 'https://slow.example.com/me.css' }
+      }
+    });
+    const onReady = jest.fn();
+    render(<StylesheetInjector onReady={onReady} />);
+
+    jest.advanceTimersByTime(3000);
+    expect(onReady).toHaveBeenCalledTimes(1);
+    expect(linkEl()?.href).toBe('https://slow.example.com/me.css');
+  });
+
+  it('is ready at once on a return visit whose pre-applied sheet has loaded', () => {
+    // preapply-theme.js ran before mount; the profile has not come back yet.
+    loadedSheet(preApply('/stylesheets/kuro.css'));
+    const onReady = jest.fn();
+    render(<StylesheetInjector onReady={onReady} />);
+    expect(onReady).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits on a pre-applied sheet still in flight, without waiting for the profile', () => {
+    const link = preApply('/stylesheets/kuro.css');
+    const onReady = jest.fn();
+    render(<StylesheetInjector onReady={onReady} />);
+    expect(onReady).not.toHaveBeenCalled();
+
+    link.dispatchEvent(new Event('load'));
+    expect(onReady).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports ready once: a later theme switch does not gate again', () => {
+    mockUseGetMyProfileQuery.mockReturnValue({ data: { userSettings: {} } });
+    const onReady = jest.fn();
+    const { rerender } = render(<StylesheetInjector onReady={onReady} />);
+
+    mockUseGetMyProfileQuery.mockReturnValue({
+      data: {
+        userSettings: { externalStylesheet: 'https://cdn.example.com/me.css' }
+      }
+    });
+    rerender(<StylesheetInjector onReady={onReady} />);
+    linkEl()!.dispatchEvent(new Event('load'));
+
+    expect(onReady).toHaveBeenCalledTimes(1);
+  });
+});

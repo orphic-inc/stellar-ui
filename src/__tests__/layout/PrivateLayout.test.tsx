@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import { createTestStore, renderWithProviders } from '../testUtils';
 import PrivateLayout from '../../components/pages/private/layout/PrivateLayout';
 import { setCredentials } from '../../store/slices/authSlice';
@@ -33,10 +33,25 @@ jest.mock('../../components/layout/NotificationCorner', () => ({
 // These shell children each fire their own RTK Query on mount; stub them so the
 // layout test doesn't issue real fetches (no jsdom Request → no unhandled-
 // rejection / act() noise). Neither is asserted by these tests.
-jest.mock('../../components/layout/StylesheetInjector', () => ({
-  __esModule: true,
-  default: () => null
-}));
+// It also reports theme readiness (#161). By default it reports at once, so
+// the shell renders; the gate's own tests hold it closed with
+// `mockThemeReadyOnMount = false` and open it by hand.
+let mockThemeReadyOnMount = true;
+let mockReportThemeReady: (() => void) | undefined;
+let mockInjectorMounts = 0;
+jest.mock('../../components/layout/StylesheetInjector', () => {
+  const { useEffect } = jest.requireActual('react');
+  const MockStylesheetInjector = ({ onReady }: { onReady?: () => void }) => {
+    mockReportThemeReady = onReady;
+    useEffect(() => {
+      mockInjectorMounts += 1;
+      if (mockThemeReadyOnMount) onReady?.();
+      // PrivateLayout's callback is stable, so this runs once per mount.
+    }, [onReady]);
+    return null;
+  };
+  return { __esModule: true, default: MockStylesheetInjector };
+});
 
 jest.mock('../../components/layout/GlobalNoticeBanner', () => ({
   __esModule: true,
@@ -46,6 +61,9 @@ jest.mock('../../components/layout/GlobalNoticeBanner', () => ({
 describe('PrivateLayout', () => {
   beforeEach(() => {
     mockUseGetMeQuery.mockReset();
+    mockThemeReadyOnMount = true;
+    mockReportThemeReady = undefined;
+    mockInjectorMounts = 0;
   });
 
   it('shows a spinner while auth state is unresolved', () => {
@@ -295,5 +313,51 @@ describe('PrivateLayout', () => {
 
     expect(window.location.pathname).not.toBe('/forums');
     expect(screen.queryByText('Child content')).not.toBeInTheDocument();
+  });
+
+  /**
+   * The theme gate (#161): the member's content never paints in a theme other
+   * than their own. The injector stays mounted behind the spinner, since it is
+   * what resolves the theme, and must not remount when the shell appears: its
+   * unmount cleanup removes the theme (#379).
+   */
+  describe('holds the shell until the theme is ready', () => {
+    const renderSignedIn = () => {
+      mockUseGetMeQuery.mockReturnValue({
+        isLoading: false,
+        isUninitialized: false,
+        isError: false,
+        data: { username: 'kai' }
+      });
+      const store = createTestStore();
+      store.dispatch(
+        setCredentials({
+          id: 7,
+          username: 'kai',
+          userRank: { permissions: {}, notificationFilterLimit: null }
+        } as never)
+      );
+      return renderWithProviders(
+        <PrivateLayout>
+          <div>Child content</div>
+        </PrivateLayout>,
+        { store }
+      );
+    };
+
+    it('shows the spinner, with the injector mounted, until the theme reports ready', () => {
+      mockThemeReadyOnMount = false;
+      const { container } = renderSignedIn();
+
+      expect(container.querySelector('.animate-spin')).not.toBeNull();
+      expect(screen.queryByText('Child content')).not.toBeInTheDocument();
+      expect(mockInjectorMounts).toBe(1);
+
+      act(() => mockReportThemeReady?.());
+
+      expect(screen.getByText('Child content')).toBeInTheDocument();
+      expect(container.querySelector('.animate-spin')).toBeNull();
+      expect(mockInjectorMounts).toBe(1);
+    });
   });
 });
