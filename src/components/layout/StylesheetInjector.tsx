@@ -98,6 +98,21 @@ const StylesheetInjector = () => {
     // "started from one we created" that's otherwise invisible but needless.
   }, [href]);
 
+  // Unmount-only, unlike the effect above, so it adds none of that churn. The
+  // injector lives in PrivateLayout, so unmounting means leaving the session
+  // (Logout, or a 401 that sends the member to /login), and the theme goes with
+  // it (#379). Kept, it styled the public pages, and its stored href was
+  // pre-applied on the next cold load, where a registry sheet 401s. The next
+  // login then resolved the SAME href and assigned it in place, which does not
+  // refetch, so the empty sheet stayed until a reload.
+  useEffect(
+    () => () => {
+      document.getElementById(LINK_ID)?.remove();
+      window.localStorage.removeItem(STORAGE_KEY);
+    },
+    []
+  );
+
   return null;
 };
 

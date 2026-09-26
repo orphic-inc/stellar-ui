@@ -252,4 +252,38 @@ describe('StylesheetInjector', () => {
     expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
     expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro.css');
   });
+
+  // Unmounting is leaving the session: PrivateLayout is its only host (#379).
+  describe('on unmount', () => {
+    const kuro = () => {
+      mockUseGetMyProfileQuery.mockReturnValue({
+        data: { userSettings: { siteAppearance: 'kuro' } }
+      });
+      mockUseGetStylesheetsQuery.mockReturnValue({
+        data: [{ name: 'kuro', cssUrl: '/stylesheets/kuro.css' }]
+      });
+    };
+
+    it('removes the theme and its stored href, so the public pages are unthemed', () => {
+      kuro();
+      const { unmount } = render(<StylesheetInjector />);
+      expect(linkEl()).not.toBeNull();
+
+      unmount();
+      expect(linkEl()).toBeNull();
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
+    });
+
+    it('keeps the theme across a re-render and a theme switch', () => {
+      kuro();
+      const { rerender } = render(<StylesheetInjector />);
+      mockUseGetStylesheetsQuery.mockReturnValue({
+        data: [{ name: 'kuro', cssUrl: '/stylesheets/kuro-v2.css' }]
+      });
+      rerender(<StylesheetInjector />);
+
+      expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
+      expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro-v2.css');
+    });
+  });
 });
