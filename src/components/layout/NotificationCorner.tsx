@@ -206,6 +206,33 @@ const NotificationRow = ({
   );
 };
 
+const BellButton = ({
+  open,
+  count,
+  onToggle
+}: {
+  open: boolean;
+  count: number;
+  onToggle: () => void;
+}) => (
+  <button
+    onClick={onToggle}
+    className={`relative flex items-center justify-center w-10 h-10 rounded-full shadow-lg border transition-colors ${
+      open
+        ? 'bg-[var(--st-raised)] border-[var(--st-border-strong)] text-[var(--st-text-strong)]'
+        : 'bg-[var(--st-panel)] border-[var(--st-border-strong)] text-[var(--st-text-muted)] hover:text-[var(--st-text-strong)] hover:bg-[var(--st-raised)]'
+    }`}
+    aria-label="Notifications"
+  >
+    🔔
+    {count > 0 && (
+      <span className="absolute -top-1 -right-1 bg-[var(--st-danger)] text-[var(--st-text-strong)] text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-0.5 leading-none">
+        {count > 99 ? '99+' : count}
+      </span>
+    )}
+  </button>
+);
+
 type Props = {
   /** The rank allows notification filters (#370); their unread matches join the count. */
   showFilterHits?: boolean;
@@ -284,22 +311,11 @@ const NotificationCorner = ({ showFilterHits = false }: Props) => {
         </div>
       )}
 
-      <button
-        onClick={() => setOpen((s) => !s)}
-        className={`relative flex items-center justify-center w-10 h-10 rounded-full shadow-lg border transition-colors ${
-          open
-            ? 'bg-[var(--st-raised)] border-[var(--st-border-strong)] text-[var(--st-text-strong)]'
-            : 'bg-[var(--st-panel)] border-[var(--st-border-strong)] text-[var(--st-text-muted)] hover:text-[var(--st-text-strong)] hover:bg-[var(--st-raised)]'
-        }`}
-        aria-label="Notifications"
-      >
-        🔔
-        {totalCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-[var(--st-danger)] text-[var(--st-text-strong)] text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-0.5 leading-none">
-            {totalCount > 99 ? '99+' : totalCount}
-          </span>
-        )}
-      </button>
+      <BellButton
+        open={open}
+        count={totalCount}
+        onToggle={() => setOpen((s) => !s)}
+      />
     </div>
   );
 };
