@@ -120,13 +120,37 @@ const QuickLinks = ({ user }: Props) => {
   );
 };
 
-const PrivateHeader = ({ user }: Props) => {
+const BrandLink = () => {
   const [hovered, setHovered] = useState(false);
   const { data: profile } = useGetMyProfileQuery();
   const art = THEME_LOGOS[profile?.userSettings?.siteAppearance ?? ''];
   const [logo, logoHovered] = art ?? [];
-  const showModBar = canSeeModBar(user);
 
+  return (
+    <Link
+      to="/"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {art ? (
+        <img
+          src={hovered ? logoHovered : logo}
+          alt="Stellar"
+          className="h-8 w-auto"
+        />
+      ) : (
+        // Themes without dedicated art get the wordmark rather than another
+        // theme's logo. Painted from the contract token, so it reads on light
+        // and dark alike — which a raster fallback cannot do (ADR-0005).
+        <span className="h-8 flex items-center text-xl font-bold tracking-widest text-[var(--st-text-strong)]">
+          STELLAR
+        </span>
+      )}
+    </Link>
+  );
+};
+
+const DataStats = ({ user }: Props) => {
   const uploaded = user.contributed
     ? formatBytes(Number(user.contributed))
     : '0 B';
@@ -134,57 +158,41 @@ const PrivateHeader = ({ user }: Props) => {
   const ratio = user.ratio != null ? user.ratio.toFixed(2) : '∞';
 
   return (
+    <div className="flex items-center gap-4">
+      <span>
+        Contributed:{' '}
+        <span className="text-[var(--st-text)] font-medium">{uploaded}</span>
+      </span>
+      <span>
+        Consumed:{' '}
+        <span className="text-[var(--st-text)] font-medium">{downloaded}</span>
+      </span>
+      <Link
+        to="/ratio"
+        className="hover:text-[var(--st-text)] transition-colors"
+      >
+        Ratio:{' '}
+        <span className="text-[var(--st-text)] font-medium">{ratio}</span>
+      </Link>
+    </div>
+  );
+};
+
+const PrivateHeader = ({ user }: Props) => {
+  const showModBar = canSeeModBar(user);
+
+  return (
     <header className="bg-[var(--st-backdrop)] border-b border-[var(--st-border-subtle)] sticky top-0 z-50">
       {/* Brand + user bar */}
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
-        <Link
-          to="/"
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-        >
-          {art ? (
-            <img
-              src={hovered ? logoHovered : logo}
-              alt="Stellar"
-              className="h-8 w-auto"
-            />
-          ) : (
-            // Themes without dedicated art get the wordmark rather than another
-            // theme's logo. Painted from the contract token, so it reads on light
-            // and dark alike — which a raster fallback cannot do (ADR-0005).
-            <span className="h-8 flex items-center text-xl font-bold tracking-widest text-[var(--st-text-strong)]">
-              STELLAR
-            </span>
-          )}
-        </Link>
+        <BrandLink />
         <UserMenu user={user} />
       </div>
 
       {/* Stats + quicklinks bar */}
       <div className="bg-[var(--st-base)] border-t border-[var(--st-border-subtle)]">
         <div className="max-w-7xl mx-auto px-4 py-1 flex items-center justify-between gap-4 text-xs text-[var(--st-text-faint)]">
-          {/* Data stats */}
-          <div className="flex items-center gap-4">
-            <span>
-              Contributed:{' '}
-              <span className="text-[var(--st-text)] font-medium">
-                {uploaded}
-              </span>
-            </span>
-            <span>
-              Consumed:{' '}
-              <span className="text-[var(--st-text)] font-medium">
-                {downloaded}
-              </span>
-            </span>
-            <Link
-              to="/ratio"
-              className="hover:text-[var(--st-text)] transition-colors"
-            >
-              Ratio:{' '}
-              <span className="text-[var(--st-text)] font-medium">{ratio}</span>
-            </Link>
-          </div>
+          <DataStats user={user} />
           <QuickLinks user={user} />
         </div>
       </div>
