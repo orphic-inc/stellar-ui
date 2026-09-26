@@ -5,8 +5,6 @@ import Install from './pages/public/Install';
 import Login from './auth/Login';
 import Register from './auth/Register';
 import Recovery from './auth/Recovery';
-import PrivateLayout from './pages/private/layout/PrivateLayout';
-import PrivateContent from './pages/private/layout/PrivateContent';
 import HomeGate from './HomeGate';
 import { useGetInstallStatusQuery } from '../store/services/installApi';
 
@@ -88,15 +86,10 @@ const App = () => {
         />
 
         <Route path="/private/*" element={<LegacyPrivateRedirect />} />
-        <Route path="/" element={<HomeGate />} />
-        <Route
-          path="/*"
-          element={
-            <PrivateLayout>
-              <PrivateContent />
-            </PrivateLayout>
-          }
-        />
+        {/* One element for "/" and every private path, so the member's layout
+            is one instance for the whole session and never remounts between
+            pages: a remount re-created the theme link (#161). */}
+        <Route path="/*" element={<HomeGate />} />
       </Routes>
     </>
   );

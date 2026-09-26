@@ -25,4 +25,7 @@ The injector had no branch for it: the pointer was not in the profile contract (
 
 - The full adopt→display pipe closes on the UI side: adopt → pointer (contract) → injector Registry branch → `/css` route.
 - Anyone extending the injector must keep the single-winner shape — a third source is a third _input to one `href`_, never a third layer. A Registry sheet must stay on the `/css`-route `href` path; do not add a `<style>` sink for it.
-- **The theme FOUC ([#161](https://github.com/orphic-inc/stellar-ui/issues/161)) is untouched.** The injector still applies client-side in a `useEffect` after the profile query resolves, so the first paint is the un-themed base state. This ADR does not fix that — it is called out because both live in this same `href` logic and are natural to fix together in a later pass.
+- **The theme FOUC ([#161](https://github.com/orphic-inc/stellar-ui/issues/161)) was out of this ADR's scope, and is now settled.**
+  - **Return visits:** `src/preapply-theme.js` links the stored href before `#root` parses, so the browser blocks first paint on it.
+  - **Navigation:** the member's layout is one instance for the whole session (#386), so moving between pages never re-creates the theme link.
+  - **No stored href** (a first-ever visit, and the first page after every login, since logout clears it — #379): the page paints in the default theme until the member's own loads. That is chosen over holding a spinner in its place (#385, closed), which reached the themed page no sooner and read as worse. Carrying the resolved href on the session would shorten that gap, if it is ever wanted.
