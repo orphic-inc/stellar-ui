@@ -83,4 +83,17 @@ describe('HomeGate', () => {
     expect(screen.getByText('Private Content')).toBeInTheDocument();
     expect(screen.queryByText('Public Landing')).not.toBeInTheDocument();
   });
+
+  it('hands a visitor anywhere but "/" to the private layout, which sends them to /login', () => {
+    mockUseGetMeQuery.mockReturnValue({
+      isUninitialized: false,
+      isLoading: false,
+      data: undefined
+    });
+
+    renderWithProviders(<HomeGate />, { initialEntries: ['/forums'] });
+
+    expect(screen.getByTestId('private-layout')).toBeInTheDocument();
+    expect(screen.queryByText('Public Landing')).not.toBeInTheDocument();
+  });
 });

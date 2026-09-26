@@ -1,12 +1,24 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { act, render, screen } from '@testing-library/react';
+import {
+  MemoryRouter,
+  useNavigate,
+  type NavigateFunction
+} from 'react-router-dom';
 import App from '../components/App';
+import { setCredentials } from '../store/slices/authSlice';
+import { createTestStore, renderWithProviders } from './testUtils';
 
 const mockUseGetInstallStatusQuery = jest.fn();
+const mockUseGetMeQuery = jest.fn();
 
 jest.mock('../store/services/installApi', () => ({
   useGetInstallStatusQuery: () => mockUseGetInstallStatusQuery()
+}));
+
+// HomeGate, now the element for "/" and every private path, reads the session.
+jest.mock('../store/services/authApi', () => ({
+  useGetMeQuery: () => mockUseGetMeQuery()
 }));
 
 jest.mock('../components/pages/public/PublicLayout', () => ({
@@ -41,12 +53,18 @@ jest.mock('../components/auth/Recovery', () => ({
   default: () => <div>Recovery Page</div>
 }));
 
-jest.mock('../components/pages/private/layout/PrivateLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="private-layout">{children}</div>
-  )
-}));
+// Counts mounts: the member's layout must be one instance for the session.
+let mockPrivateLayoutMounts = 0;
+jest.mock('../components/pages/private/layout/PrivateLayout', () => {
+  const { useEffect: useMountEffect } = jest.requireActual('react');
+  const MockPrivateLayout = ({ children }: { children: React.ReactNode }) => {
+    useMountEffect(() => {
+      mockPrivateLayoutMounts += 1;
+    }, []);
+    return <div data-testid="private-layout">{children}</div>;
+  };
+  return { __esModule: true, default: MockPrivateLayout };
+});
 
 jest.mock('../components/pages/private/layout/PrivateContent', () => ({
   __esModule: true,
@@ -60,9 +78,21 @@ const renderApp = (initialEntries: string[] = ['/']) =>
     </MemoryRouter>
   );
 
+const memberStore = () => {
+  const store = createTestStore();
+  store.dispatch(setCredentials({ id: 1 } as never));
+  return store;
+};
+
 describe('App', () => {
   beforeEach(() => {
     mockUseGetInstallStatusQuery.mockReset();
+    mockUseGetMeQuery.mockReturnValue({
+      isUninitialized: false,
+      isLoading: false,
+      data: { id: 1 }
+    });
+    mockPrivateLayoutMounts = 0;
   });
 
   it('shows the loading state while install status is loading', () => {
@@ -119,11 +149,10 @@ describe('App', () => {
 
     expect(screen.getByText('Login Page')).toBeInTheDocument();
 
-    render(
-      <MemoryRouter initialEntries={['/messages']}>
-        <App />
-      </MemoryRouter>
-    );
+    renderWithProviders(<App />, {
+      initialEntries: ['/messages'],
+      store: memberStore()
+    });
 
     expect(screen.getByTestId('private-layout')).toBeInTheDocument();
     expect(screen.getByText('Private Content')).toBeInTheDocument();
@@ -136,13 +165,45 @@ describe('App', () => {
       data: { installed: true }
     });
 
-    render(
-      <MemoryRouter initialEntries={['/private/messages']}>
-        <App />
-      </MemoryRouter>
-    );
+    renderWithProviders(<App />, {
+      initialEntries: ['/private/messages'],
+      store: memberStore()
+    });
 
     expect(screen.getByTestId('private-layout')).toBeInTheDocument();
     expect(screen.getByText('Private Content')).toBeInTheDocument();
+  });
+
+  // Home had a layout instance of its own, so crossing into or out of it
+  // remounted the layout, and the remount re-created the theme link: a
+  // default-theme flash on every home crossing (#161, since #379).
+  it('keeps one layout instance across home and other private pages', () => {
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: { installed: true }
+    });
+    let navigate: NavigateFunction = () => {};
+    const NavigateHandle = () => {
+      const nav = useNavigate();
+      useEffect(() => {
+        navigate = nav;
+      }, [nav]);
+      return null;
+    };
+
+    renderWithProviders(
+      <>
+        <App />
+        <NavigateHandle />
+      </>,
+      { initialEntries: ['/'], store: memberStore() }
+    );
+    act(() => navigate('/messages'));
+    act(() => navigate('/'));
+    act(() => navigate('/top10/releases'));
+
+    expect(screen.getByTestId('private-layout')).toBeInTheDocument();
+    expect(mockPrivateLayoutMounts).toBe(1);
   });
 });
