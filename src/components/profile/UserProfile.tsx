@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { formatBytes, ordinalSuffix } from '../../utils';
+import { formatBytes } from '../../utils';
 import { Modal, BBCodeContent } from '../ui';
 
 import {
@@ -49,6 +49,7 @@ import Time from '../layout/Time';
 import UserBadges from '../layout/UserBadges';
 import InviteControlsPanel from './InviteControlsPanel';
 import RatioPolicyNotice from './RatioPolicyNotice';
+import PercentileRankings from './PercentileRankings';
 
 const COLLAGE_CATEGORY_LABELS: Record<number, string> = {
   0: 'Personal',
@@ -68,9 +69,6 @@ const formatByteStat = (value: number | string | null | undefined) => {
     return formatBytes(Number(value));
   }
 };
-
-const formatPercentile = (percentile: number) =>
-  `${ordinalSuffix(percentile)} percentile`;
 
 // Ticket status → status-chip modifier (WS7). Resolved / unknown stay a neutral
 // chip; the chip Role paints the box, the modifier only sets the hue.
@@ -1122,13 +1120,6 @@ const UserProfile = () => {
   const donorPresentation = profile.donorPresentation;
   const featuredShelves = profile.collageShelves.featuredPersonalCollages;
   const publicShelves = profile.collageShelves.publicCollages;
-  const percentileItems = [
-    { label: 'Contributed', value: profile.percentiles.contributed },
-    { label: 'Consumed', value: profile.percentiles.consumed },
-    { label: 'Contributions', value: profile.percentiles.contributions },
-    { label: 'Forum Posts', value: profile.percentiles.forumPosts },
-    { label: 'Requests Filled', value: profile.percentiles.requestsFilled }
-  ];
 
   return (
     <div>
@@ -1797,33 +1788,7 @@ const UserProfile = () => {
             </div>
           </div>
 
-          <div data-st="panel">
-            <div data-st="colhead">
-              <span>Percentile Rankings</span>
-            </div>
-            <div className="grid gap-px bg-[var(--st-border)] grid-cols-1">
-              {percentileItems.map(({ label, value }) => (
-                <div key={label} className="bg-[var(--st-panel)] px-3 py-2">
-                  <div
-                    data-st="meta"
-                    className="text-xs uppercase tracking-wide"
-                  >
-                    {label}
-                  </div>
-                  <div
-                    data-st="prose"
-                    data-st-strong
-                    className="mt-0.5 text-sm font-semibold"
-                  >
-                    {formatPercentile(value.percentile)}
-                  </div>
-                  <div data-st="meta" className="text-xs">
-                    #{value.rank} of {value.total}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PercentileRankings percentiles={profile.percentiles} />
         </div>
       </div>
     </div>

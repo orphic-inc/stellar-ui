@@ -106,11 +106,14 @@ const mockProfile = {
   donorPresentation: null,
   collageShelves: { featuredPersonalCollages: [], publicCollages: [] },
   percentiles: {
-    contributed: { percentile: 80, rank: 5, total: 25 },
-    consumed: { percentile: 60, rank: 10, total: 25 },
-    contributions: { percentile: 70, rank: 7, total: 25 },
-    forumPosts: { percentile: 50, rank: 12, total: 25 },
-    requestsFilled: { percentile: 40, rank: 15, total: 25 }
+    contributed: { percentile: 80, rank: 5, total: 25, raw: 1000 },
+    consumed: { percentile: 60, rank: 10, total: 25, raw: 500 },
+    contributions: { percentile: 70, rank: 7, total: 25, raw: 12 },
+    forumPosts: { percentile: 50, rank: 12, total: 25, raw: 30 },
+    requestsFilled: { percentile: 40, rank: 15, total: 25, raw: 4 },
+    bountySpent: { percentile: 45, rank: 14, total: 25, raw: 100 },
+    artistsAdded: { percentile: 30, rank: 17, total: 25, raw: 9 },
+    overall: 62
   },
   staffPmOverview: null,
   disabled: false,

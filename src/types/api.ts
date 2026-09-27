@@ -13279,6 +13279,300 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{communityId}/releases/{releaseId}/credits': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Add an artist credit to a release (#721)
+     * @description Any member who can see the release may add a credit. The artist must already exist; there is no add-by-name. The caller is recorded as the credit's `addedById`.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            artistId: number;
+            /** @enum {string} */
+            role:
+              | 'Main'
+              | 'Guest'
+              | 'Composer'
+              | 'Conductor'
+              | 'DJ'
+              | 'Remixer'
+              | 'Producer'
+              | 'Arranger';
+          };
+        };
+      };
+      responses: {
+        /** @description Credit added */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseCredit'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release not found, or the artist is withdrawn */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description That artist already holds this role on the release */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/communities/{communityId}/releases/{releaseId}/credits/{creditId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Remove a credit (#721)
+     * @description A moderator (`communities_manage` or `admin`) or the credit's adder. A release keeps at least one credit. The artist itself is untouched.
+     */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+          creditId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Credit removed */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Neither a moderator nor the credit's adder */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release or credit not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description A release keeps at least one artist credit */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    /**
+     * Change a credit's role (#721)
+     * @description A moderator (`communities_manage` or `admin`) or the credit's adder. `addedById` is kept. Setting the role a credit already has is a no-op.
+     */
+    patch: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          communityId: string;
+          releaseId: string;
+          creditId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            /** @enum {string} */
+            role:
+              | 'Main'
+              | 'Guest'
+              | 'Composer'
+              | 'Conductor'
+              | 'DJ'
+              | 'Remixer'
+              | 'Producer'
+              | 'Arranger';
+          };
+        };
+      };
+      responses: {
+        /** @description The credit with its new role */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ReleaseCredit'];
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Neither a moderator nor the credit's adder */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release or credit not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description That artist already holds this role on the release */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    trace?: never;
+  };
   '/communities/{communityId}/releases/{releaseId}/contributions': {
     parameters: {
       query?: never;
@@ -29878,16 +30172,17 @@ export interface components {
       percentile: number;
       rank: number;
       total: number;
-      raw: number | null;
+      raw: number;
     };
     ProfilePercentiles: {
-      contributed: components['schemas']['ProfilePercentile'];
-      consumed: components['schemas']['ProfilePercentile'];
+      contributed: components['schemas']['ProfilePercentile'] | null;
+      consumed: components['schemas']['ProfilePercentile'] | null;
       contributions: components['schemas']['ProfilePercentile'];
       forumPosts: components['schemas']['ProfilePercentile'];
       requestsFilled: components['schemas']['ProfilePercentile'];
+      bountySpent: components['schemas']['ProfilePercentile'] | null;
       artistsAdded: components['schemas']['ProfilePercentile'];
-      overall: number;
+      overall: number | null;
     };
     ProfileCollageShelf: {
       id: number;
@@ -30775,6 +31070,21 @@ export interface components {
       id: number;
       name: string;
     };
+    ReleaseCredit: {
+      id: number;
+      /** @enum {string} */
+      role:
+        | 'Main'
+        | 'Guest'
+        | 'Composer'
+        | 'Conductor'
+        | 'DJ'
+        | 'Remixer'
+        | 'Producer'
+        | 'Arranger';
+      addedById: number | null;
+      artist: components['schemas']['ReleaseArtist'];
+    };
     ReleaseContribution: {
       id: number;
       user: {
@@ -30988,7 +31298,14 @@ export interface components {
       id: number;
       /** @enum {string} */
       action:
-        'created' | 'edit' | 'tag_added' | 'tag_removed' | 'contribution_added';
+        | 'created'
+        | 'edit'
+        | 'tag_added'
+        | 'tag_removed'
+        | 'contribution_added'
+        | 'credit_added'
+        | 'credit_removed'
+        | 'credit_role_changed';
       summary: string;
       changedFields: string[];
       before?: {
@@ -31051,6 +31368,7 @@ export interface components {
       descriptionHtml?: string;
       createdAt?: string;
       artist?: components['schemas']['ReleaseArtist'] & unknown;
+      credits?: components['schemas']['ReleaseCredit'][];
       tags?: components['schemas']['ReleaseTag'][];
       releaseTags?: components['schemas']['ReleaseTagEnriched'][];
       /** @enum {string|null} */
