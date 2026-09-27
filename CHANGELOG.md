@@ -20,10 +20,17 @@ All notable changes to stellar-ui are documented here.
   - The header's **Filters** link shows only when the session's `notificationFilterLimit` is not `0`.
   - **Rank editor:** a Notification Filters limit, a number plus an "Unlimited" checkbox, since `null` means unlimited and `0` means none.
 
+- **Profile percentile tiles show the value behind each rank** (#165, stellar-api#280/#722/#723).
+  - Each tile's meta line reads `#5 of 25 · 1.21 GB`: bytes for contributed, consumed and bounty spent, counts for the rest. It is visible text, not a hover tooltip.
+  - New **Bounty Spent** and **Artists Added** tiles, and an **Overall** tile last. Overall is a weighted score scaled by ratio, not a percentile, so it shows a bare number.
+  - A tile the member has hidden is left out, and so is Overall unless contributed, consumed and ratio are all visible to you.
+  - The panel is its own component, `PercentileRankings`.
+
 ### Changed
 
 - Re-vendored the api contract: the session's rank carries `notificationFilterLimit`, a filter carries its `artists` by name (stellar-api#715), and `POST /communities/{id}/members` answers `204` (stellar-api#711).
 - Re-vendored the api contract for stellar-api#719: `warned` clears once a warning expires (shape unchanged), the session carries `warnedUntil`, and an invite-tree node carries `donorRank`.
+- Re-vendored the api contract for stellar-api#721/#722/#723: percentile blocks can be `null` and gain `bountySpent`, `raw` is always present, `stats.buffer` needs both sides visible, `artistsAdded` counts credits attached, and releases carry `credits` with the new credit routes and history actions.
 
 ### Fixed
 
