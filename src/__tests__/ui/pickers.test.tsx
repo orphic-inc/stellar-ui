@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ArtistPicker, { type ArtistRef } from '../../components/ui/ArtistPicker';
+import ArtistPicker, {
+  type ArtistChoice,
+  type ArtistRef
+} from '../../components/ui/ArtistPicker';
 import TagPicker from '../../components/ui/TagPicker';
 import { SEARCH_DELAY_MS } from '../../components/ui/ChipPicker';
 
@@ -23,6 +26,22 @@ const ArtistHarness = ({ initial = [] }: { initial?: ArtistRef[] }) => {
       <ArtistPicker
         id="artists"
         label="Artists"
+        value={value}
+        onChange={setValue}
+      />
+      <output>{JSON.stringify(value)}</output>
+    </>
+  );
+};
+
+const CreatingHarness = () => {
+  const [value, setValue] = useState<ArtistChoice[]>([]);
+  return (
+    <>
+      <ArtistPicker
+        id="artists"
+        label="Artists"
+        allowCreate
         value={value}
         onChange={setValue}
       />
@@ -96,6 +115,39 @@ describe('ArtistPicker', () => {
       screen.getByRole('button', { name: 'Remove Removed artist #7' })
     );
     expect(screen.getByText('[]')).toBeInTheDocument();
+  });
+});
+
+describe('ArtistPicker with allowCreate (#388)', () => {
+  it('keeps unmatched text as a new artist, creating nothing', async () => {
+    const user = userEvent.setup();
+    render(<CreatingHarness />);
+    await user.type(
+      screen.getByRole('combobox', { name: 'Artists' }),
+      '  Brand New Band {Enter}'
+    );
+    expect(screen.getByText('New: Brand New Band')).toBeInTheDocument();
+    expect(
+      screen.getByText('[{"id":null,"name":"Brand New Band"}]')
+    ).toBeInTheDocument();
+  });
+
+  it('picks the existing artist when the typed name matches one', async () => {
+    mockUseSearchArtistsQuery.mockReturnValue({
+      data: {
+        data: [{ id: 4, name: 'Slowdive', vanityHouse: false, tags: [] }]
+      },
+      isFetching: false
+    });
+    const user = userEvent.setup();
+    render(<CreatingHarness />);
+    await user.type(
+      screen.getByRole('combobox', { name: 'Artists' }),
+      'slowdive{Enter}'
+    );
+    expect(
+      screen.getByText('[{"id":4,"name":"Slowdive"}]')
+    ).toBeInTheDocument();
   });
 });
 

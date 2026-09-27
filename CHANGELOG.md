@@ -26,6 +26,12 @@ All notable changes to stellar-ui are documented here.
   - A tile the member has hidden is left out, and so is Overall unless contributed, consumed and ratio are all visible to you.
   - The panel is its own component, `PercentileRankings`.
 
+- **Artist credits can be edited on the release page** (#388, stellar-api#721). An **Artists** panel replaces the single-artist one.
+  - Every credit is listed under its role heading, in role order.
+  - **Add** is open to anyone who can see the release: pick an artist, choose a role (Guest by default), and Add. If there's no match, the typed name becomes "New: …", and the artist is created only when Add is clicked, so a typo never becomes a catalogue entry.
+  - **Edit** reveals a role dropdown and a × on each credit you may manage: every credit for a moderator, otherwise only the credits you added. The last credit can't be removed.
+  - `ArtistPicker` gains an opt-in `allowCreate`; the notification filters are unchanged.
+
 ### Changed
 
 - Re-vendored the api contract: the session's rank carries `notificationFilterLimit`, a filter carries its `artists` by name (stellar-api#715), and `POST /communities/{id}/members` answers `204` (stellar-api#711).
