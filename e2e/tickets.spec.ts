@@ -1,28 +1,41 @@
 /**
- * Tickets E2E
+ * Tickets E2E — the Staff Inbox (`/inbox/staff`), which dispatches by
+ * permission: staff see the Ticket Queue, members see My Support Tickets.
  *
- * P-08a  Regular user creates a support ticket.
- * P-08b  Ticket appears in user's My Tickets list with Unanswered status.
- * P-09a  Staff sees the ticket in Staff Ticket Queue.
- * P-09b  Staff replies → ticket status advances to Open.
- * P-09c  Staff resolves → ticket status becomes Resolved.
+ * P-08a  Member creates a support ticket.
+ * P-08b  Ticket appears in the member's My Support Tickets with Unanswered.
+ * P-08c  Another member cannot see it, in the list or at its URL.
+ * P-09a  Staff sees the ticket in the Ticket Queue.
+ * P-09b  Staff replies → status advances to Open.
+ * P-09c  Staff resolves → status becomes Resolved.
+ *
+ * One serial chain following one ticket: a failure skips the rest, and a retry
+ * reruns the whole chain, so the ticket each test needs always exists.
  */
-import { test, expect } from '@playwright/test';
-import { AUTH_USER, AUTH_STAFF } from './auth-paths';
+import { test, expect, type Browser, type Page } from '@playwright/test';
+import { AUTH_USER, AUTH_STAFF, AUTH_OTHER_USER } from './auth-paths';
 
-// Shared between describe blocks (set by P-08a, read by staff tests).
-let ticketSubject: string;
-let ticketId: string;
+const pageAs = async (browser: Browser, storageState: string) => {
+  const context = await browser.newContext({ storageState });
+  return context.newPage();
+};
 
-// ─── Regular user creates and views ticket ────────────────────────────────────
+// The status chip beside the ticket view's subject heading.
+const ticketStatus = (page: Page, subject: string) =>
+  page
+    .getByRole('heading', { name: subject })
+    .locator('..')
+    .locator('[data-st="chip"]');
 
-test.describe('as regular user', () => {
-  test.use({ storageState: AUTH_USER });
+test.describe.serial('support tickets', () => {
+  let ticketSubject: string;
+  let ticketId: string;
 
-  test('P-08a: create ticket via contact form', async ({ page }) => {
+  test('P-08a: member creates a ticket', async ({ browser }) => {
     ticketSubject = `E2E Ticket ${Date.now()}`;
+    const page = await pageAs(browser, AUTH_USER);
 
-    await page.goto('/messages/tickets/new');
+    await page.goto('/inbox/staff/new');
     await expect(
       page.getByRole('heading', { name: /contact staff/i })
     ).toBeVisible();
@@ -33,65 +46,75 @@ test.describe('as regular user', () => {
       .fill('This is an automated E2E test ticket. Please ignore.');
     await page.getByRole('button', { name: /submit ticket/i }).click();
 
-    // Redirected to the ticket conversation view
-    await page.waitForURL(/\/messages\/\d+/);
+    await page.waitForURL(/\/inbox\/staff\/\d+$/);
     ticketId = page.url().split('/').pop() ?? '';
 
-    // Status badge shows Unanswered
-    await expect(page.getByText('Unanswered')).toBeVisible();
+    await expect(ticketStatus(page, ticketSubject)).toHaveText('Unanswered');
   });
 
-  test('P-08b: ticket appears in My Tickets list', async ({ page }) => {
-    await page.goto('/messages/tickets');
+  test('P-08b: ticket appears in My Support Tickets', async ({ browser }) => {
+    const page = await pageAs(browser, AUTH_USER);
 
-    const subjectLink = page.getByRole('link', { name: ticketSubject });
-    await expect(subjectLink).toBeVisible();
-
-    // Status badge for this ticket is Unanswered
-    const row = subjectLink.locator('../..');
-    await expect(row.getByText('Unanswered')).toBeVisible();
-  });
-});
-
-// ─── Staff handles the ticket ─────────────────────────────────────────────────
-
-test.describe('as staff user', () => {
-  test.use({ storageState: AUTH_STAFF });
-
-  test('P-09a: ticket appears in Staff Ticket Queue', async ({ page }) => {
-    await page.goto('/staff/tickets');
-    await expect(page.getByRole('link', { name: ticketSubject })).toBeVisible();
-  });
-
-  test('P-09b: staff replies and status advances to Open', async ({ page }) => {
-    await page.goto(`/messages/${ticketId}`);
-
-    // Ticket subject should be visible in the heading
+    await page.goto('/inbox/staff');
     await expect(
-      page.getByRole('heading', { name: ticketSubject })
+      page.getByRole('heading', { name: /my support tickets/i })
     ).toBeVisible();
 
-    // Status is Unanswered before reply
-    await expect(page.getByText('Unanswered')).toBeVisible();
+    const row = page.getByRole('row', { name: ticketSubject });
+    await expect(row.locator('[data-st="chip"]')).toHaveText('Unanswered');
+  });
 
-    // Reply as staff
-    await page.locator('#conv-reply').fill('E2E staff reply — test.');
+  test('P-08c: another member cannot see the ticket', async ({ browser }) => {
+    const page = await pageAs(browser, AUTH_OTHER_USER);
+
+    // Wait for the list itself, so the absence below is not a page still loading.
+    await page.goto('/inbox/staff');
+    await expect(
+      page.getByRole('heading', { name: /my support tickets/i })
+    ).toBeVisible();
+    await expect(page.getByText(ticketSubject)).toHaveCount(0);
+
+    await page.goto(`/inbox/staff/${ticketId}`);
+    await expect(page.getByText('Ticket not found.')).toBeVisible();
+    await expect(page.getByText(ticketSubject)).toHaveCount(0);
+  });
+
+  test('P-09a: staff sees the ticket in the Ticket Queue', async ({
+    browser
+  }) => {
+    const page = await pageAs(browser, AUTH_STAFF);
+
+    await page.goto('/inbox/staff');
+    await expect(
+      page.getByRole('heading', { name: /ticket queue/i })
+    ).toBeVisible();
+
+    const row = page.getByRole('row', { name: ticketSubject });
+    await expect(row.locator('[data-st="chip"]')).toHaveText('Unanswered');
+  });
+
+  test('P-09b: staff replies and status advances to Open', async ({
+    browser
+  }) => {
+    const page = await pageAs(browser, AUTH_STAFF);
+
+    await page.goto(`/inbox/staff/${ticketId}`);
+    await expect(ticketStatus(page, ticketSubject)).toHaveText('Unanswered');
+
+    await page.locator('#ticket-reply').fill('E2E staff reply — test.');
     await page.getByRole('button', { name: /send reply/i }).click();
 
-    // Status badge updates to Open after staff reply
-    await expect(page.getByText('Open')).toBeVisible();
-    // Reply body appears in the thread
+    await expect(ticketStatus(page, ticketSubject)).toHaveText('Open');
     await expect(page.getByText('E2E staff reply — test.')).toBeVisible();
   });
 
-  test('P-09c: staff resolves ticket', async ({ page }) => {
-    await page.goto(`/messages/${ticketId}`);
+  test('P-09c: staff resolves the ticket', async ({ browser }) => {
+    const page = await pageAs(browser, AUTH_STAFF);
 
+    await page.goto(`/inbox/staff/${ticketId}`);
     await page.getByRole('button', { name: /^resolve$/i }).click();
 
-    // Status badge changes to Resolved
-    await expect(page.getByText('Resolved')).toBeVisible();
-    // Resolve button disappears (ticket is now closed)
+    await expect(ticketStatus(page, ticketSubject)).toHaveText('Resolved');
     await expect(
       page.getByRole('button', { name: /^resolve$/i })
     ).not.toBeVisible();
