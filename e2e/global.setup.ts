@@ -1,7 +1,7 @@
 import { test as setup, request as playwrightRequest } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { AUTH_USER, AUTH_STAFF } from './auth-paths';
+import { AUTH_USER, AUTH_STAFF, AUTH_OTHER_USER } from './auth-paths';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
@@ -40,4 +40,10 @@ setup('authenticate as staff user', async () => {
   const email = process.env.TEST_STAFF_EMAIL ?? 'staffuser@example.com';
   const password = process.env.TEST_STAFF_PASSWORD ?? 'changeme';
   await saveAuthState(email, password, AUTH_STAFF);
+});
+
+// A second regular member, for the specs that check one member cannot see
+// another's data. seed-e2e-users.ts creates it with this fixed password.
+setup('authenticate as another regular user', async () => {
+  await saveAuthState('e2e_alpha@example.com', 'changeme', AUTH_OTHER_USER);
 });
