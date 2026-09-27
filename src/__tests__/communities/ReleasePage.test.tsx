@@ -104,6 +104,9 @@ jest.mock(
     }
 );
 
+// Credits have their own spec (ReleaseCredits.test.tsx, #388).
+jest.mock('../../components/communities/ReleaseCredits', () => () => null);
+
 jest.mock(
   '../../components/communities/LinkStatusBadge',
   () =>
@@ -798,16 +801,6 @@ describe('ReleasePage', () => {
       document.querySelectorAll('p[data-st="meta"]')
     ).find((el) => /positive/.test(el.textContent ?? ''));
     expect(ratingEl?.textContent).toMatch(/1 vote(?!s)/);
-  });
-
-  it('hides artist sidebar section when release has no artist', () => {
-    mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ artist: null }),
-      isLoading: false,
-      error: undefined
-    });
-    renderWithProviders(<ReleasePage />);
-    expect(screen.queryByText('Artist')).not.toBeInTheDocument();
   });
 
   it('shows Community fallback in breadcrumb when community data absent', () => {

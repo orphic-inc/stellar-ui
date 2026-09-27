@@ -21,6 +21,7 @@ import { useGetReleaseContributionsQuery } from '../../store/services/communityA
 import { Modal } from '../ui';
 import { releaseCover } from '../../utils/releaseCover';
 import ReleaseGroupPanel from './ReleaseGroupPanel';
+import ReleaseCredits from './ReleaseCredits';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -516,22 +517,12 @@ const ReleasePage = () => {
             </div>
           </div>
 
-          {/* Artist */}
-          {release.artist && (
-            <div data-st="panel" className="overflow-hidden">
-              <div
-                data-st="colhead"
-                className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
-              >
-                Artist
-              </div>
-              <div className="px-3 py-2 text-sm">
-                <Link to={`/artists/${release.artist.id}`} data-st="control">
-                  {release.artist.name}
-                </Link>
-              </div>
-            </div>
-          )}
+          <ReleaseCredits
+            communityId={cId}
+            releaseId={rId}
+            credits={release.credits ?? []}
+            user={user}
+          />
 
           {/* Tags */}
           <div data-st="panel" className="overflow-hidden">
