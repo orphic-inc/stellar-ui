@@ -19,10 +19,13 @@ test.describe('contribute form (as regular user)', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/contribute');
-    // Wait for communities to load (first real option populated).
+    // Wait for communities to load: a real option after the placeholder. It is
+    // asserted attached, not visible: Playwright never reports a native
+    // <option> as visible, so toBeVisible could not pass however the app did
+    // (#191).
     await expect(
       page.locator('#contribute-community option').nth(1)
-    ).toBeVisible();
+    ).toBeAttached();
   });
 
   test('P-08a: submit a Music release with full legacy-parity metadata', async ({
