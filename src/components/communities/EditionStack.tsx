@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import type { ReleaseContributionDetail } from '../../types';
 import { formatSize } from '../../utils';
 import { bitrateLabel, editionLabel, isLossless } from '../../utils/edition';
+import RatioExemptBadge from './RatioExemptBadge';
 
 type EditionStackProps = {
   contributions: ReleaseContributionDetail[];
@@ -97,6 +98,7 @@ const EditionStack = ({ contributions, renderActions }: EditionStackProps) => {
                       {c.releaseFile?.isScene && (
                         <span data-st="edition-flag">Scene</span>
                       )}
+                      <RatioExemptBadge value={c.ratioExempt} />
                     </span>
                     <span data-st="edition-size">
                       {formatSize(c.sizeInBytes)}

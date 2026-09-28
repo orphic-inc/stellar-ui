@@ -16,20 +16,11 @@ import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
+import RatioExemptBadge from './RatioExemptBadge';
 import ReportContributionModal from './ReportContributionModal';
 import { formatSize } from '../../utils';
 import { releaseCover } from '../../utils/releaseCover';
-import type { LinkHealthStatus } from '../../types';
 import { Pagination } from '../ui';
-
-interface ContributionRow {
-  id: number;
-  type: string;
-  sizeInBytes?: number | null;
-  linkStatus?: string | null;
-  user: { id: number; username: string };
-  _count?: { consumers: number };
-}
 
 const MusicNote = () => (
   <svg
@@ -252,15 +243,13 @@ const CommunityPage = () => {
             {releaseList.map((release) => {
               const tags =
                 (release as { tags?: { name: string }[] }).tags ?? [];
-              const contributions =
-                (release as { contributions?: ContributionRow[] })
-                  .contributions ?? [];
+              const contributions = release.contributions;
 
               const contributorCount = new Set(
                 contributions.map((c) => c.user.id)
               ).size;
               const consumerCount = contributions.reduce(
-                (sum, c) => sum + (c._count?.consumers ?? 0),
+                (sum, c) => sum + c._count.consumers,
                 0
               );
 
@@ -356,8 +345,6 @@ const CommunityPage = () => {
                   {contributions.length > 0 && (
                     <div data-st="list" className="pl-[4.25rem]">
                       {contributions.map((c) => {
-                        const linkStatus = (c.linkStatus ??
-                          'UNKNOWN') as LinkHealthStatus;
                         return (
                           <div key={c.id} data-st="row">
                             <span
@@ -387,12 +374,11 @@ const CommunityPage = () => {
                               data-st-num
                               className="text-xs shrink-0"
                             >
-                              {c._count?.consumers ?? 0}{' '}
-                              {(c._count?.consumers ?? 0) === 1
-                                ? 'snatch'
-                                : 'snatches'}
+                              {c._count.consumers}{' '}
+                              {c._count.consumers === 1 ? 'snatch' : 'snatches'}
                             </span>
-                            <LinkStatusBadge status={linkStatus} />
+                            <LinkStatusBadge status={c.linkStatus} />
+                            <RatioExemptBadge value={c.ratioExempt} />
                             <div className="flex gap-2 items-center ml-auto">
                               <DownloadButton
                                 contributionId={c.id}

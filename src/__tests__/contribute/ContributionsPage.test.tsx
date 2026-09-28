@@ -13,6 +13,7 @@ const makeContribution = (id: number) => ({
   id,
   type: 'FLAC',
   sizeInBytes: 1073741824,
+  ratioExempt: 'NONE',
   downloadUrl: 'https://example.com/file.flac',
   releaseDescription: 'High quality lossless',
   collaborators: [{ id: 1, name: 'Miles Davis' }],
@@ -167,5 +168,20 @@ describe('ContributionsPage', () => {
     expect(
       container.querySelector('a[data-st="control"][data-st-primary]')
     ).toBeInTheDocument();
+  });
+
+  it('badges a ratio-exempt contribution beside its format (ui#181)', () => {
+    mockUseGetContributionsQuery.mockReturnValue({
+      data: {
+        data: [
+          makeContribution(1),
+          { ...makeContribution(2), ratioExempt: 'NEUTRALPASS' }
+        ]
+      },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<ContributionsPage />);
+    expect(screen.getAllByText('Neutralpass')).toHaveLength(1);
   });
 });

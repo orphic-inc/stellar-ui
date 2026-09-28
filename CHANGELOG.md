@@ -31,6 +31,10 @@ All notable changes to stellar-ui are documented here.
   - **Add** is open to anyone who can see the release: pick an artist, choose a role (Guest by default), and Add. If there's no match, the typed name becomes "New: …", and the artist is created only when Add is clicked, so a typo never becomes a catalogue entry.
   - **Edit** reveals a role dropdown and a × on each credit you may manage: every credit for a moderator, otherwise only the credits you added. The last credit can't be removed.
   - `ArtistPicker` gains an opt-in `allowCreate`; the notification filters are unchanged.
+- **Freepass and Neutralpass badges** (#181, stellar-api#728). A ratio-exempt file carries a badge wherever files are listed: the release page's edition rows (and a collage entry's), the community release list, and My Contributions.
+  - **Freepass** (success) and **Neutralpass** (info) are `Badge` chips, and each one's tooltip says what it means for your ratio. An ordinary file shows nothing.
+  - A value the build does not recognise shows nothing, rather than breaking the row.
+  - The community release list reads its rows from the contract, where it used to hand-type them. `Badge` takes an optional `title`.
 
 ### Changed
 

@@ -11101,7 +11101,7 @@ export interface paths {
           };
           content: {
             'application/json': {
-              data: components['schemas']['Release'][];
+              data: components['schemas']['ReleaseBrowseItem'][];
               meta: components['schemas']['PaginationMeta'];
             };
           };
@@ -14168,13 +14168,17 @@ export interface paths {
         };
       };
       responses: {
-        /** @description Updated contribution */
+        /** @description The contribution id and its resulting exemption */
         200: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['Contribution'];
+            'application/json': {
+              id: number;
+              /** @enum {string} */
+              ratioExempt: 'NONE' | 'FREEPASS' | 'NEUTRALPASS';
+            };
           };
         };
         /** @description Invalid path parameters or request body */
@@ -31484,6 +31488,100 @@ export interface components {
       name: string;
       sortOrder: number;
       members: components['schemas']['StaffMember'][];
+    };
+    ReleaseBrowseContribution: {
+      id: number;
+      /** @enum {string} */
+      type:
+        | 'mp3'
+        | 'flac'
+        | 'wav'
+        | 'ogg'
+        | 'aac'
+        | 'm4a'
+        | 'm4b'
+        | 'mp4'
+        | 'mkv'
+        | 'avi'
+        | 'mov'
+        | 'zip'
+        | 'exe'
+        | 'dmg'
+        | 'apk'
+        | 'pdf'
+        | 'epub'
+        | 'mobi'
+        | 'cbz'
+        | 'cbr'
+        | 'jpg'
+        | 'png'
+        | 'gif'
+        | 'txt';
+      sizeInBytes: number | null;
+      /** @enum {string} */
+      linkStatus: 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL';
+      /** @enum {string} */
+      ratioExempt: 'NONE' | 'FREEPASS' | 'NEUTRALPASS';
+      user: {
+        id: number;
+        username: string;
+      };
+      _count: {
+        consumers: number;
+      };
+    };
+    ReleaseBrowseItem: {
+      id: number;
+      title: string;
+      communityId: number | null;
+      year?: number | null;
+      /** @enum {string} */
+      type:
+        | 'Music'
+        | 'Applications'
+        | 'EBooks'
+        | 'ELearningVideos'
+        | 'Audiobooks'
+        | 'Comedy'
+        | 'Comics';
+      /** @enum {string} */
+      releaseType:
+        | 'Album'
+        | 'Single'
+        | 'EP'
+        | 'Anthology'
+        | 'Compilation'
+        | 'DJMix'
+        | 'Live'
+        | 'Remix'
+        | 'Bootleg'
+        | 'Interview'
+        | 'Mixtape'
+        | 'Demo'
+        | 'ConcertRecording'
+        | 'Unknown';
+      image?: string | null;
+      description?: string | null;
+      descriptionHtml?: string;
+      createdAt?: string;
+      artist?: components['schemas']['ReleaseArtist'] & unknown;
+      credits?: components['schemas']['ReleaseCredit'][];
+      tags?: components['schemas']['ReleaseTag'][];
+      releaseTags?: components['schemas']['ReleaseTagEnriched'][];
+      /** @enum {string|null} */
+      myVote?: 'up' | 'down' | null;
+      voteAggregate?: {
+        ups: number;
+        total: number;
+        score: number;
+      } | null;
+      contributions: components['schemas']['ReleaseBrowseContribution'][];
+      isContributor?: boolean;
+      releaseGroupId?: number | null;
+      group?: components['schemas']['ReleaseGroupRef'];
+      _count: {
+        contributions: number;
+      };
     };
     CommunityVoteState: {
       /** @enum {string|null} */

@@ -14,6 +14,7 @@ type BadgeProps = {
   variant?: BadgeVariant;
   mono?: boolean;
   className?: string;
+  title?: string;
   children: ReactNode;
 };
 
@@ -29,6 +30,7 @@ const Badge = ({
   variant = 'default',
   mono,
   className,
+  title,
   children
 }: BadgeProps) => {
   const hook = variantHook[variant];
@@ -38,6 +40,7 @@ const Badge = ({
       {...(hook ? { [hook]: '' } : {})}
       {...(mono ? { 'data-st-mono': '' } : {})}
       className={className}
+      title={title}
     >
       {children}
     </span>
