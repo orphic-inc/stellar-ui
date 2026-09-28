@@ -20,6 +20,7 @@ is cited as `stellar-ui ADR-00NN`. Cross-system decisions live in stellar-api.
 | [0008](0008-registry-stylesheet-injection.md)                | Injector third source branch: adopted registry sheets link the API `/css` route; single-winner precedence; https-only; Settings Personal⟷Registry radio (ADR-0024) |
 | [0009](0009-codacy-eslint-is-off.md)                         | Codacy's ESLint tool is off (its 5,749 findings were four artifact classes, zero defects); Trivy + Semgrep stay                                                    |
 | [0010](0010-service-result-types-come-from-the-contract.md)  | RTK Query result types must come from the generated client; CI ratchet over a shrink-only baseline (#277)                                                          |
+| [0011](0011-nginx-serving-snippet.md)                        | The image serves the bundle from a snippet stellar-compose includes; its path and four rules are a cross-repo contract (#400)                                      |
 
 To add one: copy the heading/header shape of an existing ADR, take the next
 number, and link it from the table above.

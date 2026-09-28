@@ -14,7 +14,10 @@ RUN npm run build
 
 FROM nginx:1.31.2-alpine3.23
 
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# The snippet is the serving contract stellar-compose includes (ADR-0011);
+# default.conf wraps it in a server block for standalone use.
+COPY ./nginx/stellar-ui.conf /etc/nginx/snippets/stellar-ui.conf
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/stellar-ui/dist /usr/share/nginx/html
 
 EXPOSE 80
