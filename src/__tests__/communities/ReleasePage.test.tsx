@@ -96,6 +96,9 @@ jest.mock(
     }
 );
 
+// Calls a real RTK hook, which this file's store has no middleware for.
+jest.mock('../../components/communities/RatioExemptControl', () => () => null);
+
 jest.mock(
   '../../components/communities/DownloadButton',
   () =>

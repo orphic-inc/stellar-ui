@@ -35,6 +35,10 @@ All notable changes to stellar-ui are documented here.
   - **Freepass** (success) and **Neutralpass** (info) are `Badge` chips, and each one's tooltip says what it means for your ratio. An ordinary file shows nothing.
   - A value the build does not recognise shows nothing, rather than breaking the row.
   - The community release list reads its rows from the contract, where it used to hand-type them. `Badge` takes an optional `title`.
+- **Staff set Freepass and Neutralpass on the release page** (#392, stellar-api#728). With `contributions_manage` (which `admin` implies), each edition row has a None / Freepass / Neutralpass select.
+  - A change applies at once, with no confirmation: it is reversible, applies only to later downloads, and is audited.
+  - The select is disabled while saving. On failure it shows the api's message and returns to the saved value.
+  - Release page only. Setting a whole release or many releases at once is stellar-api#731.
 
 ### Changed
 

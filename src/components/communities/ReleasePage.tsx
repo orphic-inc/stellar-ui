@@ -11,11 +11,9 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
-import DownloadButton from './DownloadButton';
-import LinkStatusBadge from './LinkStatusBadge';
+import EditionRowActions from './EditionRowActions';
 import ReportContributionModal from './ReportContributionModal';
 import EditionStack from './EditionStack';
-import type { LinkHealthStatus } from '../../types';
 import { useReleaseWorkbench } from './useReleaseWorkbench';
 import { useGetReleaseContributionsQuery } from '../../store/services/communityApi';
 import { Modal } from '../ui';
@@ -240,23 +238,11 @@ const ReleasePage = () => {
               <EditionStack
                 contributions={editionContributions}
                 renderActions={(c) => (
-                  <span className="flex gap-2 items-center text-xs">
-                    <LinkStatusBadge
-                      status={(c.linkStatus ?? 'UNKNOWN') as LinkHealthStatus}
-                    />
-                    <DownloadButton
-                      contributionId={c.id}
-                      canDownload={user?.canDownload ?? false}
-                    />
-                    <button
-                      type="button"
-                      data-st="control"
-                      title="Report dead or misleading link"
-                      onClick={() => setReportingId(c.id)}
-                    >
-                      [Report]
-                    </button>
-                  </span>
+                  <EditionRowActions
+                    contribution={c}
+                    canDownload={user?.canDownload ?? false}
+                    onReport={setReportingId}
+                  />
                 )}
               />
             ) : (
