@@ -6,6 +6,20 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- **The image serves the bundle from a snippet** (#400,
+  [ADR-0011](docs/adr/0011-nginx-serving-snippet.md)). The serving config
+  moves to `/etc/nginx/snippets/stellar-ui.conf`: `root`, gzip, etag and the
+  SPA fallback. `default.conf` now only wraps it in a server block, so the
+  image run on its own behaves as before.
+  - stellar-compose will `include` the same file in its proxy, instead of
+    carrying its own copy, which dropped gzip
+    ([stellar-compose#58](https://github.com/orphic-inc/stellar-compose/issues/58)).
+  - `image/png` is no longer gzipped, since PNGs are already compressed.
+  - The `build` job now checks the running image: CSS arrives as `text/css`,
+    JS arrives gzipped, and a deep link falls back to the index.
+
 ## [0.9.8] — 2026-09-28
 
 ### Added

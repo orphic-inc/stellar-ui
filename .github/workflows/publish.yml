@@ -115,13 +115,43 @@ jobs:
         run: |
           set -euo pipefail
           docker run -d --name ui -p 8081:80 stellar-ui:ci
+          served=0
           for _ in $(seq 1 30); do
-            if curl -sf http://localhost:8081/ > /dev/null; then
-              echo "index served"; exit 0
-            fi
+            if curl -sf http://localhost:8081/ > /dev/null; then served=1; break; fi
             sleep 2
           done
-          echo "::error::nginx never served the bundle"; docker logs ui; exit 1
+          if [ "$served" != 1 ]; then
+            echo "::error::nginx never served the bundle"; docker logs ui; exit 1
+          fi
+      - name: The serving snippet keeps its contract
+        # nginx/stellar-ui.conf is what stellar-compose's proxy includes
+        # (ADR-0011), so a break here would first show in a deploy.
+        run: |
+          set -euo pipefail
+          base=http://localhost:8081
+          index=$(curl -sf "$base/") \
+            || { echo "::error::$base/ did not serve the index"; exit 1; }
+          css=$(printf '%s' "$index" | grep -oE 'href="/[^"]+\.css"' | head -1 | cut -d'"' -f2)
+          js=$(printf '%s' "$index" | grep -oE 'src="/[^"]+\.js"' | head -1 | cut -d'"' -f2)
+          fail=0
+          css_type=$(curl -sf -o /dev/null -w '%{content_type}' "$base$css")
+          case "$css_type" in
+            text/css*) echo "CSS $css: $css_type" ;;
+            *) echo "::error::$css was served as '$css_type', not text/css (is mime.types in scope?)"; fail=1 ;;
+          esac
+          encoding=$(curl -sf -H 'Accept-Encoding: gzip' -o /dev/null -w '%header{content-encoding}' "$base$js")
+          if [ "$encoding" = gzip ]; then
+            echo "JS $js: gzip"
+          else
+            echo "::error::$js was not gzipped (content-encoding '$encoding')"; fail=1
+          fi
+          # A deep link the router owns must fall back to the index.
+          if curl -sf "$base/communities/1" | grep -q '<div id="root"'; then
+            echo "SPA fallback: /communities/1 serves the index"
+          else
+            echo "::error::/communities/1 did not fall back to the index"; fail=1
+          fi
+          exit "$fail"
 
   dev-smoke:
     # `npm start` is covered by no other gate: `build` is production, where
