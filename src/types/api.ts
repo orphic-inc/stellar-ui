@@ -31309,7 +31309,8 @@ export interface components {
         | 'contribution_added'
         | 'credit_added'
         | 'credit_removed'
-        | 'credit_role_changed';
+        | 'credit_role_changed'
+        | 'ratio_exempt_changed';
       summary: string;
       changedFields: string[];
       before?: {
