@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.8] — 2026-09-28
+
 ### Added
 
 - **`ArtistPicker` and `TagPicker`** (#375): shared chip pickers in the UI kit, built on a generic `ChipPicker`, which uses `downshift` for keyboard handling and ARIA and renders only the kit's own `field`/`chip`/`list`/`row` hooks.
@@ -52,6 +54,7 @@ All notable changes to stellar-ui are documented here.
 - Re-vendored the api contract: the session's rank carries `notificationFilterLimit`, a filter carries its `artists` by name (stellar-api#715), and `POST /communities/{id}/members` answers `204` (stellar-api#711).
 - Re-vendored the api contract for stellar-api#719: `warned` clears once a warning expires (shape unchanged), the session carries `warnedUntil`, and an invite-tree node carries `donorRank`.
 - Re-vendored the api contract for stellar-api#721/#722/#723: percentile blocks can be `null` and gain `bountySpent`, `raw` is always present, `stats.buffer` needs both sides visible, `artistsAdded` counts credits attached, and releases carry `credits` with the new credit routes and history actions.
+- Re-vendored the api contract from stellar-api 0.9.8: `ReleaseHistoryEntry.action` gains `ratio_exempt_changed` (stellar-api#732). The release page lists it by its summary, with no diff or revert, like the credit actions.
 
 ### Fixed
 
@@ -1359,7 +1362,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.7...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.8...HEAD
+[0.9.8]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.7...v0.9.8
 [0.9.7]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.6...v0.9.7
 [0.9.6]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.3...v0.9.5
