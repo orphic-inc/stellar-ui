@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { AUTH_USER } from './auth-paths';
 
-// ─── P-09: Invite page — invite tree above the invite form (#74) ─────────────
+// ─── P-09: Invite page — invite tree below the invite form (#74, #329) ───────
 //
 // Asserts against the fixed subtree seeded under testuser by stellar-api's
 // `npm run db:seed-e2e` (e2e_alpha → e2e_charlie, e2e_bravo, e2e_delta). If
@@ -11,7 +11,7 @@ import { AUTH_USER } from './auth-paths';
 test.describe('as regular user', () => {
   test.use({ storageState: AUTH_USER });
 
-  test('P-09: invite page renders the seeded invite tree above the form', async ({
+  test('P-09: invite page renders the seeded invite tree below the form', async ({
     page
   }) => {
     await page.goto('/');
@@ -36,11 +36,12 @@ test.describe('as regular user', () => {
     await expect(emailInput).toBeVisible();
     await expect(page.getByRole('button', { name: /^invite$/i })).toBeVisible();
 
-    // …and the tree sits above it on the page (the placement #74 asked for).
+    // …and the tree sits below it. #74 put the tree above the form; #329/#331
+    // reordered the page to rules, send, pending invites, then the tree.
     const treeBox = await treeHeading.boundingBox();
     const formBox = await emailInput.boundingBox();
     expect(treeBox).not.toBeNull();
     expect(formBox).not.toBeNull();
-    expect(treeBox!.y).toBeLessThan(formBox!.y);
+    expect(treeBox!.y).toBeGreaterThan(formBox!.y);
   });
 });

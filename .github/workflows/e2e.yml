@@ -1,0 +1,146 @@
+name: e2e
+
+# The Playwright suite (e2e/) against a real api (#396). It had never run in CI,
+# so it drifted unnoticed: six failures by the time #191 looked, hiding a real
+# WCAG failure (#395) and tests that could never pass on a retry.
+#
+# The api is its published image, not a checkout: `:latest` (api main) on a
+# push to main, nightly and an opted-in PR, because ui main routinely depends
+# on api work no release carries yet. A ui release tag calls this from
+# publish.yml with the matching api version, so the pair that ships is the
+# pair that was tested.
+#
+# Report-only everywhere except that release-tag call, which gates `publish`.
+# `:latest` moves with api main, so a hard gate here would let an api-side
+# break freeze ui publishing.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    # A PR opts in with the `e2e` label; `labeled` runs it as soon as it is added.
+    types: [opened, synchronize, reopened, labeled]
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+    inputs:
+      api-tag:
+        description: stellar-api image tag to test against (a leading v is dropped)
+        default: latest
+  workflow_call:
+    inputs:
+      api-tag:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}-${{ inputs.api-tag || 'latest' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  e2e:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'e2e')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: stellar
+          POSTGRES_PASSWORD: changeme
+          POSTGRES_DB: stellar
+        ports:
+          - 5432:5432
+        # Disposable, so durability buys nothing; tmpfs as the api's integration job.
+        options: >-
+          --tmpfs /var/lib/postgresql/data:rw,size=1024m
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      API_TAG: ${{ inputs.api-tag || 'latest' }}
+      API_URL: http://localhost:8080
+      BASE_URL: http://localhost:9000
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start the api
+        run: |
+          set -euo pipefail
+          # publish.yml passes the ui tag (v0.9.8); the image is tagged 0.9.8.
+          API_IMAGE="ghcr.io/orphic-inc/stellar-api:${API_TAG#v}"
+          docker pull "$API_IMAGE"
+          # The digest says which api a red run was tested against.
+          digest=$(docker image inspect "$API_IMAGE" --format '{{index .RepoDigests 0}}')
+          echo "api image: \`$digest\`" >> "$GITHUB_STEP_SUMMARY"
+          # Host networking: the Postgres service is published on localhost.
+          # The image migrates the database and seeds its baseline on boot.
+          docker run -d --name api --network host \
+            -e STELLAR_PSQL_URI=postgresql://stellar:changeme@localhost:5432/stellar \
+            -e STELLAR_AUTH_JWT_SECRET=ci-only-e2e-jwt-secret-at-least-32-chars \
+            "$API_IMAGE"
+          for _ in $(seq 1 45); do
+            curl -sf "$API_URL/health" > /dev/null && exit 0
+            sleep 2
+          done
+          echo "::error::the api never became healthy"
+          docker logs api | tail -60
+          exit 1
+
+      - name: Install the site and seed the e2e fixtures
+        run: |
+          set -euo pipefail
+          status=$(curl -s -o install.json -w '%{http_code}' -X POST "$API_URL/api/install" \
+            -H 'content-type: application/json' \
+            -d '{"username":"sysop","email":"sysop@example.com","password":"ci-only-sysop-password"}')
+          if [ "$status" != "201" ]; then
+            echo "::error::POST /api/install answered $status"
+            cat install.json
+            exit 1
+          fi
+          # The users, invite tree, open invites and release the specs rely on.
+          docker exec api node dist/scripts/seed-e2e-users.js
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start the ui dev server
+        run: |
+          set -uo pipefail
+          # The dev server proxies /api to the api (STELLAR_API_URL defaults to
+          # localhost:8080). --no-open: no browser to open on a runner.
+          npm start -- --no-open > dev-server.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf "$BASE_URL/" > /dev/null && exit 0
+            sleep 2
+          done
+          echo "::error::the dev server never served $BASE_URL/"
+          tail -40 dev-server.log
+          exit 1
+
+      - name: Run the e2e suite
+        run: npx playwright test
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+      - name: Api log on failure
+        if: failure()
+        run: docker logs api 2>&1 | tail -100
