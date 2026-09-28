@@ -87,6 +87,8 @@ The learnable core. Each means the same thing on every page; styling it once re-
 
 > **Applied in WS12 (app chrome — shells, footer, banners; completes §7 item 4):** `PublicLayout` + `PrivateLayout` + `PrivateFooter` + `GlobalNoticeBanner` + `Alert`, **no new Roles or tokens** (`PrivateContent` is route wiring with zero colour utilities — nothing to migrate). The shells and footer repaint via surface/text leaf utilities (`bg-[var(--st-backdrop)]`/`-base`, `text-[var(--st-text)]`/`-faint`, `--st-border-subtle` dividers); `PublicLayout`'s Register CTA is the one Role — a `control -primary` filled button-link (it has no padded-pill conflict, so unlike `UserMenu` it can take the Role). The two **notice surfaces reuse the WS10 status-colour-without-chip recipe**: `GlobalNoticeBanner` (a full-width `--st-warning` banner) and `Alert` (a per-`alertType` toast) are notices, not chips/controls, so each paints straight from the `--st-success/warning/danger/info` tokens via the shared leaf pattern — `bg-[color-mix(in_oklch,var(--st-X)_12%,transparent)]` fill, `_40%` border, solid `text-[var(--st-X)]` — mirroring `RatioStats`. With WS11 + WS12 the **app-chrome section (§7 item 4) is complete.**
 
+> **Added in #392:** the `field[data-st-compact]` modifier sizes a field to sit level with the chips in a dense row: an edition row's ratio-exemption select, and a credit's role select. It changes padding, font size and line height only, so no new tokens are needed.
+
 ### 3.3 Tier-2 Parts — scoped inside a Role, must earn their place
 
 A Part is justified **only** when no composition of Tier-1 Roles expresses the structure. Each Part names the Role it lives in.
