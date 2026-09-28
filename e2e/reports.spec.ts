@@ -8,16 +8,43 @@
  * P-12b  Staff claims the report.
  * P-12c  Staff resolves the report with an action.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect, request } from '@playwright/test';
 import { AUTH_USER, AUTH_STAFF } from './auth-paths';
+
+const API_URL = process.env.API_URL ?? 'http://localhost:8080';
 
 // Target: report a User with ID 1 (the first admin, always exists after install).
 const REPORT_TARGET_TYPE = 'User';
 const REPORT_TARGET_ID = '1';
 const REPORT_CATEGORY = 'Other';
 
-// Set by P-11a and read by staff tests.
-let reportId: string;
+const REPORT_REASON =
+  'Automated E2E report test — please ignore and resolve as Dismissed.';
+
+/**
+ * Files a fresh report as the regular user, through the api, and returns its
+ * id. Each staff test files its own (#191): a failed test makes Playwright
+ * replace the worker, so an id handed down from an earlier test in module
+ * state is lost, and so is every test after the failure, including a CI retry.
+ */
+const fileReport = async (): Promise<number> => {
+  const ctx = await request.newContext({
+    baseURL: API_URL,
+    storageState: AUTH_USER
+  });
+  const res = await ctx.post('/api/reports', {
+    data: {
+      targetType: REPORT_TARGET_TYPE,
+      targetId: Number(REPORT_TARGET_ID),
+      category: REPORT_CATEGORY,
+      reason: REPORT_REASON
+    }
+  });
+  expect(res.status()).toBe(201);
+  const { id } = (await res.json()) as { id: number };
+  await ctx.dispose();
+  return id;
+};
 
 // ─── Regular user files and views report ─────────────────────────────────────
 
@@ -40,11 +67,7 @@ test.describe('as regular user', () => {
     await page.locator('#category').selectOption(REPORT_CATEGORY);
 
     // Fill reason
-    await page
-      .locator('#reason')
-      .fill(
-        'Automated E2E report test — please ignore and resolve as Dismissed.'
-      );
+    await page.locator('#reason').fill(REPORT_REASON);
 
     await page.getByRole('button', { name: /submit report/i }).click();
 
@@ -61,10 +84,6 @@ test.describe('as regular user', () => {
       .getByRole('link', { name: REPORT_CATEGORY })
       .first();
     await expect(reportLink).toBeVisible();
-
-    const href = await reportLink.getAttribute('href');
-    reportId = href?.split('/').pop() ?? '';
-    expect(reportId).toBeTruthy();
 
     // Status column shows Open
     const row = reportLink.locator('../..');
@@ -85,12 +104,20 @@ test.describe('as regular user', () => {
 test.describe('as staff user', () => {
   test.use({ storageState: AUTH_STAFF });
 
+  let reportId: number;
+  test.beforeEach(async () => {
+    reportId = await fileReport();
+  });
+
   test('P-12a: report appears in staff queue', async ({ page }) => {
     await page.goto('/staff/reports');
 
+    // The heading is "Reports"; "queue" is the tab beside it, a separate
+    // element, so no single accessible name spans both (#191).
     await expect(
-      page.getByRole('heading', { name: /reports queue/i })
+      page.getByRole('heading', { name: 'Reports', exact: true })
     ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'queue' })).toBeVisible();
 
     // The report link (category text) for our specific report
     await expect(
@@ -134,13 +161,15 @@ test.describe('as staff user', () => {
 
     await page.getByRole('button', { name: /confirm resolve/i }).click();
 
-    // Status badge changes to Resolved
-    await expect(page.getByText('Resolved')).toBeVisible();
+    // Status badge changes to Resolved. Exact: "Resolved by …" also matches the
+    // bare text (#191).
+    await expect(page.getByText('Resolved', { exact: true })).toBeVisible();
     // Resolve button no longer shows
     await expect(
       page.getByRole('button', { name: /^resolve$/i })
     ).not.toBeVisible();
-    // Resolution action appears in the resolution block
-    await expect(page.getByText('Dismissed')).toBeVisible();
+    // Resolution action appears in the resolution block. Exact: the reason and
+    // the notes both contain "dismissed" too (#191).
+    await expect(page.getByText('Dismissed', { exact: true })).toBeVisible();
   });
 });
