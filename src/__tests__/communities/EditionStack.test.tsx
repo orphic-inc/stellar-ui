@@ -143,4 +143,16 @@ describe('EditionStack', () => {
     await userEvent.click(screen.getByText('Original Release / CD'));
     expect(document.querySelectorAll('[data-st="edition"]')).toHaveLength(0);
   });
+
+  it('badges a ratio-exempt file beside its rip flags (ui#181)', () => {
+    renderWithProviders(
+      <EditionStack
+        contributions={[
+          contribution({ id: 1 }),
+          contribution({ id: 2, ratioExempt: 'FREEPASS' })
+        ]}
+      />
+    );
+    expect(screen.getAllByText('Freepass')).toHaveLength(1);
+  });
 });

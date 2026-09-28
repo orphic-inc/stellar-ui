@@ -108,7 +108,7 @@ const makeRelease = (id: number) => ({
       id: 100 + id,
       type: 'FLAC',
       sizeInBytes: 1073741824,
-      linkStatus: 'ALIVE',
+      linkStatus: 'PASS',
       user: { id: 10, username: 'alice' },
       _count: { consumers: 3 }
     }
@@ -541,7 +541,7 @@ describe('CommunityPage', () => {
               id: 101,
               type: 'FLAC',
               sizeInBytes: 1073741824,
-              linkStatus: 'ALIVE',
+              linkStatus: 'PASS',
               user: { id: 10, username: 'alice' },
               _count: { consumers: 1 }
             },
@@ -549,7 +549,7 @@ describe('CommunityPage', () => {
               id: 102,
               type: 'MP3',
               sizeInBytes: null as never,
-              linkStatus: null as never,
+              linkStatus: 'UNKNOWN',
               user: { id: 11, username: 'bob' },
               _count: { consumers: 0 }
             }
