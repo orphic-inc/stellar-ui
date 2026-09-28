@@ -167,14 +167,31 @@ jobs:
           fi
           echo "dev server booted and served the app"
 
+  # A release tag runs the e2e suite against the api version it ships with, and
+  # gates publish on it (#396). Everywhere else e2e.yml runs it, report-only.
+  # The api releases first, so its matching image exists by the time the ui tags.
+  e2e:
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/e2e.yml
+    with:
+      api-tag: ${{ github.ref_name }}
+
   publish:
-    needs: [test, build]
+    needs: [test, build, e2e]
     # This workflow's history lives in both the obrien-k fork and the canonical
     # orphic-inc repo (same file, same commits). Gate on repository rather than
     # deleting the job, so it fires in the canonical context and no-ops on the
     # fork's own CI runs — restores the publish path stripped by 51d7314, which
     # dropped it entirely to avoid the fork publishing under its own namespace.
-    if: github.repository == 'orphic-inc/stellar-ui' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    #
+    # `always()` because e2e is skipped off tags, and a skipped need would skip
+    # this job too; the result checks put the gate back. On a tag e2e must pass.
+    if: >-
+      always() &&
+      needs.test.result == 'success' && needs.build.result == 'success' &&
+      (needs.e2e.result == 'success' || needs.e2e.result == 'skipped') &&
+      github.repository == 'orphic-inc/stellar-ui' &&
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -40,6 +40,13 @@ All notable changes to stellar-ui are documented here.
   - The select is disabled while saving. On failure it shows the api's message and returns to the saved value.
   - Release page only. Setting a whole release or many releases at once is stellar-api#731.
 
+- **The e2e suite runs in CI** (#396). A new `e2e` workflow runs the Playwright suite against the published stellar-api image on a fresh Postgres, after `POST /install` and the api's e2e seed.
+  - It runs against `:latest` (api `main`) on a push to `main`, nightly, and on a PR labelled `e2e`. It only reports there; it gates nothing.
+  - A release tag runs it against the matching api version, and `publish` waits for it to pass.
+  - A failed run uploads the Playwright report and traces, and the run summary names the api image digest.
+  - Specs fixed for a fresh database: the release tests each open the release themselves instead of sharing a URL; P-07a now adds a format through the release page's [Add format]; P-07b fails rather than skips without a contribution; P-09 follows the invite page's current order.
+  - P-08b's axe scan is held by a ratchet until #395: only the two known rules, and no more than 16 nodes.
+
 ### Changed
 
 - Re-vendored the api contract: the session's rank carries `notificationFilterLimit`, a filter carries its `artists` by name (stellar-api#715), and `POST /communities/{id}/members` answers `204` (stellar-api#711).

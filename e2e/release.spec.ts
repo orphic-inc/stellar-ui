@@ -2,18 +2,44 @@
  * Release / Contribution / Download E2E
  *
  * P-06   Browse to a release and confirm contributions section renders.
- * P-07a  Submit a new contribution via the full contribute form.
+ * P-07a  Add a format to the release via its [Add format] action.
  * P-07b  Report a dead/misleading link via the inline report modal.
  *
  * Requires at least one Community with at least one Release in the test
  * database. P-07b additionally requires at least one seeded contribution
  * on the discovered release.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { AUTH_USER } from './auth-paths';
 
-// Release URL discovered during P-06 and reused in P-07b.
-let releaseUrl: string;
+/**
+ * Browse to the first release of the first community: the fixture release a
+ * fresh database gets from stellar-api's `npm run db:seed-e2e`. Each test
+ * browses there itself (#396). A URL handed down from P-06 in module state was
+ * lost whenever a test failed, because Playwright then replaces the worker, so
+ * one failure took P-07a and P-07b down with it, and every CI retry too.
+ */
+// The audio formats P-07a may add, in the order it tries them.
+const AUDIO_FORMATS = ['mp3', 'ogg', 'aac', 'm4a', 'wav', 'flac'];
+
+const openFirstRelease = async (page: Page) => {
+  await page.goto('/communities');
+
+  const communityLink = page.locator('a[href*="/communities/"]').first();
+  await expect(communityLink).toBeVisible({
+    message: 'No communities found — seed at least one before running E2E tests'
+  });
+  await communityLink.click();
+  await page.waitForURL('**/communities/**');
+
+  const releaseLink = page.locator('a[href*="/releases/"]').first();
+  await expect(releaseLink).toBeVisible({
+    message:
+      'No releases found — seed at least one release in the test community'
+  });
+  await releaseLink.click();
+  await page.waitForURL('**/releases/**');
+};
 
 test.describe('as regular user', () => {
   test.use({ storageState: AUTH_USER });
@@ -21,93 +47,68 @@ test.describe('as regular user', () => {
   test('P-06: browse to a release and see contributions section', async ({
     page
   }) => {
-    await page.goto('/communities');
-
-    // Click the first community in the list
-    const communityLink = page
-      .locator('a[href*="/communities/"]')
-      .first();
-    await expect(communityLink).toBeVisible({
-      message:
-        'No communities found — seed at least one before running E2E tests'
-    });
-    await communityLink.click();
-    await page.waitForURL('**/communities/**');
-
-    // Click the first release in the table
-    const releaseLink = page.locator('a[href*="/releases/"]').first();
-    await expect(releaseLink).toBeVisible({
-      message:
-        'No releases found — seed at least one release in the test community'
-    });
-    await releaseLink.click();
-    await page.waitForURL('**/releases/**');
-
-    releaseUrl = page.url();
+    await openFirstRelease(page);
 
     // Contributions section heading is visible
     await expect(page.getByText('Contributions')).toBeVisible();
 
-    // Either the table (has contributions) or the empty-state message renders
-    const hasTable = await page.locator('table.m_table').isVisible();
-    const hasEmpty = await page.getByText(/no contributions yet/i).isVisible();
-    expect(hasTable || hasEmpty).toBeTruthy();
-
-    // "Add your version" button is always visible
+    // Either the edition stack (has contributions) or the empty state renders.
+    // It checked for the old `table.m_table`, which the edition stack replaced,
+    // and with isVisible(), which does not wait for the page to render.
     await expect(
-      page.getByRole('button', { name: /add your version/i })
+      page
+        .locator('[data-st="edition-stack"]')
+        .or(page.getByText(/no contributions yet/i))
+    ).toBeVisible();
+
+    // The release page's contribute action (it read "Add your version" once).
+    await expect(
+      page.getByRole('button', { name: /add format/i })
     ).toBeVisible();
   });
 
-  test('P-07a: submit a contribution via the full contribute form', async ({
+  test('P-07a: add a format to a release via [Add format]', async ({
     page
   }) => {
-    const albumTitle = `E2E Album ${Date.now()}`;
-    const downloadUrl = `https://example.com/e2e-test/${Date.now()}.flac`;
+    await openFirstRelease(page);
+    await expect(page.locator('[data-st="edition-stack"]')).toBeVisible();
 
-    // Navigate via the release page's "Add your version" button
-    await page.goto(releaseUrl);
-    await page.getByRole('button', { name: /add your version/i }).click();
-    await page.waitForURL('**/contribute**');
+    // A release refuses a second copy of a format, so add one it lacks. That
+    // keeps a re-run on a long-lived dev database passing, not only a fresh one.
+    const present = (
+      await page.locator('[data-st="edition-format"]').allTextContents()
+    ).map((label) => label.split('/')[0].trim().toLowerCase());
+    const fileType = AUDIO_FORMATS.find((t) => !present.includes(t));
+    if (!fileType)
+      throw new Error('Every audio format is already on this release');
+    const downloadUrl = `https://example.com/e2e-format/${Date.now()}.${fileType}`;
 
-    // Wait for community options to load, then pick the first real option
+    await page.getByRole('button', { name: /add format/i }).click();
+    await page.waitForURL('**/releases/*/contribute');
+
+    await page.locator('#add-file-type').selectOption(fileType);
+    await page.locator('#add-download-url').fill(downloadUrl);
+    await page.getByRole('button', { name: /add contribution/i }).click();
+
+    // Back on the release, with the new format in its edition stack.
+    await page.waitForURL(/\/releases\/\d+$/);
+    await expect(page.getByText('Contribution added.')).toBeVisible();
     await expect(
-      page.locator('#contribute-community option').nth(1)
-    ).not.toHaveText('');
-    await page.locator('#contribute-community').selectOption({ index: 1 });
-
-    // File type: switch to flac
-    await page.locator('#contribute-filetype').selectOption('flac');
-
-    // Fill download URL
-    await page.getByPlaceholder(/https:\/\/example\.com/).fill(downloadUrl);
-
-    // Fill artist name (first collaborator row, required for Music type)
-    await page.getByPlaceholder(/artist name/i).fill('E2E Test Artist');
-
-    // Fill album title (Music type default)
-    await page.locator('#contribute-album').fill(albumTitle);
-
-    // Submit — form uses <input type="submit">
-    await page.locator('input[type="submit"]').click();
-
-    // Navigates to the contributions list on success
-    await page.waitForURL('**/contribute/list**');
-    await expect(page).toHaveURL(/\/contribute\/list/);
+      page.locator('[data-st="edition-format"]', {
+        hasText: `${fileType.toUpperCase()} /`
+      })
+    ).toBeVisible();
   });
 
   test('P-07b: report a dead link via the inline modal', async ({ page }) => {
-    await page.goto(releaseUrl);
+    await openFirstRelease(page);
 
-    // Require at least one contribution to report
-    const hasTable = await page.locator('table.m_table').isVisible();
-    if (!hasTable) {
-      test.skip(
-        true,
-        'No contributions on this release — seed at least one or run P-07a first'
-      );
-      return;
-    }
+    // The seeded release carries a contribution, so its absence is a failure,
+    // not a skip. The old `table.m_table` check never matched the edition
+    // stack, so this test had been skipping silently.
+    await expect(page.locator('[data-st="edition"]').first()).toBeVisible({
+      message: 'No contributions on this release — run npm run db:seed-e2e'
+    });
 
     // Click the Report button on the first contribution row
     const reportBtn = page.getByRole('button', { name: /report/i }).first();
