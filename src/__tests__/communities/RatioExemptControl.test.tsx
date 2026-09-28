@@ -76,6 +76,8 @@ describe('RatioExemptControl', () => {
       <RatioExemptControl contribution={{ ...flac, ratioExempt: 'FREEPASS' }} />
     );
     expect(control()).toHaveValue('FREEPASS');
+    // Row-height sizing, level with the chips beside it.
+    expect(control()).toHaveAttribute('data-st-compact');
   });
 
   it('applies a change at once, naming the contribution and its release', async () => {

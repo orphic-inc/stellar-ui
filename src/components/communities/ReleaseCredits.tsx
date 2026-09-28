@@ -29,11 +29,12 @@ const RoleSelect = ({
 }) => (
   <select
     data-st="field"
+    data-st-compact
+    className="shrink-0"
     aria-label={label}
     value={value}
     disabled={disabled}
     onChange={(e) => onChange(e.target.value as ArtistRole)}
-    className="text-xs rounded px-1 py-0.5"
   >
     {ARTIST_ROLES.map((role) => (
       <option key={role} value={role}>

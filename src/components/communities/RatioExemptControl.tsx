@@ -68,11 +68,12 @@ const RatioExemptControl = ({ contribution }: Props) => {
   return (
     <select
       data-st="field"
+      data-st-compact
+      className="shrink-0"
       aria-label={`Ratio exemption for ${contribution.type.toUpperCase()}`}
       value={shown}
       disabled={isLoading}
       onChange={(e) => void change(e.target.value as RatioExempt)}
-      className="text-xs rounded px-1 py-0.5"
     >
       {OPTIONS.map((o) => (
         <option key={o.value} value={o.value}>

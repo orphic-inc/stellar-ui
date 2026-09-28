@@ -346,6 +346,18 @@
 [data-st='field']:hover {
   border-color: var(--st-border-strong);
 }
+/* compact — a field inline in a dense row (an edition row's actions, a credit's
+ * role), sized to sit level with the chips beside it. */
+[data-st='field'][data-st-compact] {
+  padding: 0 0.3125rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+/* The forms plugin draws a select's arrow as a background image; keep it room. */
+select[data-st='field'][data-st-compact] {
+  padding-right: 1.5rem;
+  background-position: right 0.25rem center;
+}
 
 /* Table variant of `colhead` + `row` (ADR-0006). The SAME Roles paint a
  * <table>, so a theme that styles `row`/`colhead` reskins div listings and
