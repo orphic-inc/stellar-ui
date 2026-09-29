@@ -11,6 +11,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
 const pkg = require('./package.json');
+const { buildCsp } = require('./webpack.csp');
 
 dotenv.config();
 dotenv.config({ path: '.env.local', override: true });
@@ -18,26 +19,10 @@ dotenv.config({ path: '.env.local', override: true });
 const dev = process.env.NODE_ENV === 'development';
 const apiUrl = process.env.STELLAR_API_URL || 'http://localhost:8080';
 
-// Content-Security-Policy — the inject-time half of the stylesheet boundary
-// (ADR-0003). User themes may restyle anything, so the policy is permissive on
-// the *resource* axes (style/img/font/connect) to keep that freedom and avoid
-// breaking legit assets (avatars, cover art, Sentry ingest). Its teeth are the
-// code-execution axes: `script-src 'self'` (no inline/eval/remote script — the
-// real XSS gate), `object-src 'none'`, `base-uri`/`form-action 'self'`. Emitted
-// in production builds only — dev uses eval source-maps + ws: HMR that a strict
-// script-src/connect-src would break. (frame-ancestors can't be set via <meta>;
-// it needs a response header — tracked separately.)
-const CSP = [
-  "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self' 'unsafe-inline' https:",
-  "img-src 'self' data: https: http:",
-  "font-src 'self' data: https:",
-  "connect-src 'self' https:",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'"
-].join('; ');
+// Content-Security-Policy, production builds only: dev uses eval source-maps
+// and ws: HMR that a strict script-src/connect-src would break. The policy and
+// its reasons live in webpack.csp.js.
+const CSP = buildCsp({ sentryDsn: process.env.SENTRY_DSN });
 
 const plugins = [
   new webpack.DefinePlugin({
