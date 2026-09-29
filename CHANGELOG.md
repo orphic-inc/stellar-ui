@@ -6,6 +6,18 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.9.9] — 2026-09-28
+
+**Deploy order: stellar-api 0.9.9 first, then its image backfill, then this.**
+This release closes the CSP's `img-src`, `font-src` and `connect-src` (#402).
+It depends on stellar-api 0.9.9's `*Src` fields (#403), and any remote image
+the backfill has not imported renders as its link or the surface's default.
+Run the backfill (`node dist/scripts/backfill-remote-images.js` in the api
+container) and deploy this only on a clean report.
+
+The image also serves the bundle from `/etc/nginx/snippets/stellar-ui.conf`
+(#400), which stellar-compose's proxy includes from this release on.
+
 ### Changed
 
 - **The production CSP closes the resource axes** (#402,
@@ -1409,7 +1421,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.8...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.9...HEAD
+[0.9.9]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.8...v0.9.9
 [0.9.8]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.7...v0.9.8
 [0.9.7]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.6...v0.9.7
 [0.9.6]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.5...v0.9.6
