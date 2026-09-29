@@ -21,6 +21,7 @@ The injector stays a **plain `<link href>`** for URL themes, and the boundary is
 - **Scheme gate.** The user-controlled external URL is admitted only if its protocol is `http:` or `https:` (`isInjectableUrl`). No `javascript:`, `data:`, or other exotic schemes.
 - **No chrome lock.** Per the amendment, the UI does **not** render `@layer` chrome guards or `all: revert` reset containers. Themes may restyle anything; that is intended.
 - **CSP is the execution gate.** Production builds ship a CSP (via HtmlWebpackPlugin) that is permissive on resource axes (`style-src`/`img-src`/`font-src`/`connect-src`, to keep theming freedom) but strict on execution (`script-src 'self'`, `object-src 'none'`, `base-uri`/`form-action 'self'`). The CSP — not the injector — is the real XSS/exfiltration backstop.
+  - **Amended by #402 (stellar-api#457):** `img-src`, `font-src` and `connect-src` are now closed to `'self'` (plus `data:` images, and the Sentry ingest origin). Only `style-src` stays open, for a member's external stylesheet, and that sheet can no longer pull a remote image or font. The policy and its reasons are in `webpack.csp.js`.
 - **Author raw CSS (when adopted) arrives pre-sanitized.** `AuthorStylesheet.source` is sanitized at store time on the API (`lib/cssSanitize.ts`); the UI injects it as already-clean `<style>`. The UI does not re-sanitize and must not treat unsanitized source as safe.
 
 ## Consequences

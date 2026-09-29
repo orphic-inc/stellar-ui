@@ -8,6 +8,25 @@ All notable changes to stellar-ui are documented here.
 
 ### Changed
 
+- **The production CSP closes the resource axes** (#402,
+  [stellar-api#457](https://github.com/orphic-inc/stellar-api/issues/457)):
+  `img-src 'self' data:`, `font-src 'self'`, and `connect-src 'self'` plus
+  the Sentry ingest origin. No page loads an image, font or connection from
+  another host.
+  - The Sentry origin comes from `SENTRY_DSN` at build time. A build with a
+    DSN that is not an https URL now fails.
+  - `data:` images stay, because the form controls draw their chevrons and
+    ticks as `data:` SVGs, which make no request.
+  - **A member's external stylesheet can no longer load a remote image or
+    font.** `style-src` stays open for the sheet itself (ADR-0024), but
+    `img-src` and `font-src` hold for whatever it references.
+  - **Deploy only after the stellar-api release carrying #742 and #745, and
+    after its image backfill (#738) has reported clean.**
+  - The policy moves to `webpack.csp.js`. ADR-0003 is amended.
+  - A new e2e test, P-14, fails on any CSP violation on a community, a
+    release, a profile, a forum thread with an `[img]` and a form. The dev
+    server emits no CSP, so it only bites against a production build, which is
+    what stellar-compose's e2e runs.
 - **The image serves the bundle from a snippet** (#400,
   [ADR-0011](docs/adr/0011-nginx-serving-snippet.md)). The serving config
   moves to `/etc/nginx/snippets/stellar-ui.conf`: `root`, gzip, etag and the
