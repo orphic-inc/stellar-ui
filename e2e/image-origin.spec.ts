@@ -42,7 +42,8 @@ test.describe('image origin (as regular user)', () => {
     const origin = new URL(baseURL!).origin;
     const me = await page.request.get('/api/auth');
     expect(me.ok()).toBe(true);
-    const { user } = (await me.json()) as { user: { id: number } };
+    // GET /api/auth answers the AuthUser itself; only login wraps it in `user`.
+    const { id } = (await me.json()) as { id: number };
 
     const set = await page.request.put('/api/profile/me', {
       data: { avatar: REMOTE_AVATAR }
@@ -51,7 +52,7 @@ test.describe('image origin (as regular user)', () => {
 
     try {
       const offOrigin = recordOffOrigin(page, origin);
-      for (const path of [...PAGES, `/user/${user.id}`]) {
+      for (const path of [...PAGES, `/user/${id}`]) {
         await page.goto(path);
         await page.waitForLoadState('networkidle');
       }
