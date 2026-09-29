@@ -37,6 +37,7 @@ const mockUser = {
   id: 42,
   username: 'jazzfan',
   avatar: null,
+  avatarSrc: null,
   inviteCount: 3,
   userRank: {
     level: 100,

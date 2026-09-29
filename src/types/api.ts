@@ -3172,6 +3172,8 @@ export interface paths {
           content: {
             'application/json': components['schemas']['UserSettings'] & {
               avatar?: string;
+              /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+              avatarSrc?: string | null;
             };
           };
         };
@@ -3202,7 +3204,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -3732,7 +3734,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -4838,7 +4840,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -5108,7 +5110,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -5200,7 +5202,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -9354,7 +9356,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -9843,7 +9845,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -9973,7 +9975,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -10684,7 +10686,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -10842,7 +10844,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -11254,7 +11256,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -11759,7 +11761,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -12665,7 +12667,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -13018,7 +13020,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -13970,7 +13972,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -15573,7 +15575,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -15718,7 +15720,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -15857,7 +15859,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -17627,7 +17629,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -18099,7 +18101,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -20470,6 +20472,8 @@ export interface paths {
                   id: number;
                   username: string;
                   avatar: string | null;
+                  /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                  avatarSrc: string | null;
                 };
                 /** @enum {string} */
                 targetType:
@@ -20493,6 +20497,8 @@ export interface paths {
                   id: number;
                   username: string;
                   avatar: string | null;
+                  /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                  avatarSrc: string | null;
                 } | null;
                 claimedAt: string | null;
                 resolvedById: number | null;
@@ -20500,6 +20506,8 @@ export interface paths {
                   id: number;
                   username: string;
                   avatar: string | null;
+                  /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                  avatarSrc: string | null;
                 } | null;
                 resolvedAt: string | null;
                 resolution: string | null;
@@ -20521,6 +20529,8 @@ export interface paths {
                     id: number;
                     username: string;
                     avatar: string | null;
+                    /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                    avatarSrc: string | null;
                   };
                   body: string;
                   createdAt: string;
@@ -20647,6 +20657,8 @@ export interface paths {
                 id: number;
                 username: string;
                 avatar: string | null;
+                /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                avatarSrc: string | null;
               };
               /** @enum {string} */
               targetType:
@@ -20670,6 +20682,8 @@ export interface paths {
                 id: number;
                 username: string;
                 avatar: string | null;
+                /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                avatarSrc: string | null;
               } | null;
               claimedAt: string | null;
               resolvedById: number | null;
@@ -20677,6 +20691,8 @@ export interface paths {
                 id: number;
                 username: string;
                 avatar: string | null;
+                /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                avatarSrc: string | null;
               } | null;
               resolvedAt: string | null;
               resolution: string | null;
@@ -20698,6 +20714,8 @@ export interface paths {
                   id: number;
                   username: string;
                   avatar: string | null;
+                  /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                  avatarSrc: string | null;
                 };
                 body: string;
                 createdAt: string;
@@ -20774,6 +20792,8 @@ export interface paths {
                 id: number;
                 username: string;
                 avatar: string | null;
+                /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                avatarSrc: string | null;
               };
               /** @enum {string} */
               targetType:
@@ -20797,6 +20817,8 @@ export interface paths {
                 id: number;
                 username: string;
                 avatar: string | null;
+                /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                avatarSrc: string | null;
               } | null;
               claimedAt: string | null;
               resolvedById: number | null;
@@ -20804,6 +20826,8 @@ export interface paths {
                 id: number;
                 username: string;
                 avatar: string | null;
+                /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                avatarSrc: string | null;
               } | null;
               resolvedAt: string | null;
               resolution: string | null;
@@ -20825,6 +20849,8 @@ export interface paths {
                   id: number;
                   username: string;
                   avatar: string | null;
+                  /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                  avatarSrc: string | null;
                 };
                 body: string;
                 createdAt: string;
@@ -21212,6 +21238,8 @@ export interface paths {
                 id: number;
                 username: string;
                 avatar: string | null;
+                /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+                avatarSrc: string | null;
               };
               body: string;
               createdAt: string;
@@ -24231,7 +24259,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -24461,7 +24489,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -24619,7 +24647,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -25410,7 +25438,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -25639,7 +25667,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -26042,7 +26070,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Rate limited */
+        /** @description Rate limited, or the body adds more new remote images than the daily ceiling allows */
         429: {
           headers: {
             [name: string]: unknown;
@@ -30013,6 +30041,8 @@ export interface components {
         color: string;
       } | null;
       warned: string | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     LoginBody: {
       /** Format: email */
@@ -30063,6 +30093,8 @@ export interface components {
         assetLimit?: number | null;
         notificationFilterLimit: number | null;
       };
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     ChangePasswordBody: {
       currentPassword: string;
@@ -30109,7 +30141,11 @@ export interface components {
         profileTitle?: string | null;
         profileInfo?: string | null;
         profileInfoHtml?: string;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        avatarSrc?: string | null;
       };
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     ProfileDetails: {
       id: number;
@@ -30118,6 +30154,8 @@ export interface components {
       profileTitle?: string | null;
       profileInfo?: string | null;
       profileInfoHtml?: string;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc?: string | null;
     };
     UserRankSummary: {
       name: string;
@@ -30170,6 +30208,8 @@ export interface components {
           id: number;
           name: string;
         } | null;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        imageSrc: string | null;
       };
     };
     ProfilePercentile: {
@@ -30197,6 +30237,8 @@ export interface components {
       createdAt: string;
       updatedAt: string;
       coverImages: string[];
+      /** @description What a browser may load for the image list beside it: each image as a path on this origin, with any remote image not yet imported left out. Never a remote URL (ADR-0051). */
+      coverImagesSrc: string[];
     };
     ProfileCollageShelves: {
       featuredPersonalCollages: components['schemas']['ProfileCollageShelf'][];
@@ -30219,6 +30261,10 @@ export interface components {
         title: string;
         body: string;
       }[];
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      customIconSrc: string | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      secondAvatarSrc: string | null;
     };
     ProfileStaffPmSummary: {
       id: number;
@@ -30310,6 +30356,8 @@ export interface components {
       recentSnatches: components['schemas']['ProfileSnatch'][];
       inviteTree: components['schemas']['InviteNode'][];
       community: components['schemas']['CommunityStats'] | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     MyProfile: {
       id: number;
@@ -30343,6 +30391,8 @@ export interface components {
       inviteTree: components['schemas']['InviteNode'][];
       community: components['schemas']['CommunityStats'] | null;
       userSettings: components['schemas']['UserSettings'];
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     AdminCreatedUser: {
       id: number;
@@ -30477,6 +30527,8 @@ export interface components {
       profile: {
         profileTitle: string | null;
       } | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     CrsDimension: {
       name: string;
@@ -30544,6 +30596,10 @@ export interface components {
         profileInfo3: string;
         profileInfoTitle4: string;
         profileInfo4: string;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        customIconSrc: string | null;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        secondAvatarSrc: string | null;
       };
       perks: {
         [key: string]: boolean;
@@ -30569,6 +30625,8 @@ export interface components {
         id: number;
         name: string;
       } | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc?: string | null;
     };
     HomepageFeaturedAlbum: {
       id: number;
@@ -30592,6 +30650,8 @@ export interface components {
       user?: {
         username: string;
         avatar?: string | null;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        avatarSrc?: string | null;
       };
     };
     AnnouncementsResponse: {
@@ -30663,6 +30723,8 @@ export interface components {
         id: number;
         username: string;
         avatar?: string | null;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        avatarSrc?: string | null;
       } | null;
       /** @enum {string} */
       page:
@@ -30743,7 +30805,7 @@ export interface components {
       mime: string;
       size: number;
       /** @enum {string} */
-      kind: 'ThemeImage' | 'ThemeFont' | 'Avatar';
+      kind: 'ThemeImage' | 'ThemeFont' | 'Avatar' | 'Imported';
     };
     NotificationFilter: {
       id: number;
@@ -31065,6 +31127,8 @@ export interface components {
         contributors: number;
         consumers: number;
       };
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc?: string | null;
     };
     ReleaseTag: {
       id: number;
@@ -31297,6 +31361,8 @@ export interface components {
       year: number;
       tagIds: number[];
       tagNames: string[];
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc: string | null;
     };
     ReleaseHistoryEntry: {
       id: number;
@@ -31337,6 +31403,8 @@ export interface components {
     };
     ReleaseGroupRef: components['schemas']['ReleaseGroupIdentity'] & {
       image: string | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc: string | null;
     };
     Release: {
       id: number;
@@ -31387,6 +31455,8 @@ export interface components {
       isContributor?: boolean;
       releaseGroupId?: number | null;
       group?: components['schemas']['ReleaseGroupRef'];
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc?: string | null;
     };
     /** @enum {string} */
     PermissionKey:
@@ -31583,6 +31653,8 @@ export interface components {
       _count: {
         contributions: number;
       };
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc?: string | null;
     };
     CommunityVoteState: {
       /** @enum {string|null} */
@@ -31610,6 +31682,8 @@ export interface components {
         id: number;
         name: string;
       } | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc: string | null;
     };
     ReleaseGroupDetail: components['schemas']['ReleaseGroupIdentity'] & {
       releases: components['schemas']['ReleaseGroupMember'][];
@@ -31624,6 +31698,8 @@ export interface components {
         id: number;
         username: string;
       } | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc: string | null;
     };
     ReleaseGroupLogEntry: {
       id: number;
@@ -31936,6 +32012,8 @@ export interface components {
       bounties?: components['schemas']['RequestBountyEntry'][];
       artists?: components['schemas']['RequestArtistRef'][];
       filledContribution?: unknown;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc: string | null;
     };
     RequestDetail: components['schemas']['Request'] & {
       bounties?: components['schemas']['RequestBountyEntryWithUser'][];
@@ -32129,6 +32207,8 @@ export interface components {
       joinedAt: string;
       rankName: string;
       rankLevel: number;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     Top10TagItem: {
       rank: number;
@@ -32207,6 +32287,8 @@ export interface components {
       id: number;
       username: string;
       avatar: string | null;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      avatarSrc: string | null;
     };
     FriendEntry: {
       id: number;
@@ -32362,6 +32444,8 @@ export interface components {
       image: string;
       started: string;
       ended: string;
+      /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+      imageSrc: string | null;
     };
     DeletedCollageItem: {
       id: number;
@@ -32395,6 +32479,8 @@ export interface components {
         id: number;
         username: string;
         avatar: string | null;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        avatarSrc: string | null;
       };
       _count: {
         entries: number;
@@ -32447,6 +32533,8 @@ export interface components {
           id: number;
           name: string;
         } | null;
+        /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
+        imageSrc: string | null;
       };
       user: {
         id: number;

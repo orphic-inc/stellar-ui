@@ -51,6 +51,7 @@ const mockPost = {
     id: 10,
     username: 'alice',
     avatar: null,
+    avatarSrc: null,
     isDonor: false,
     donorRank: null,
     warned: null

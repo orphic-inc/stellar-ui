@@ -165,7 +165,7 @@ const ForumTopicPost = ({
         <div className="flex gap-4 p-4">
           <div className="flex-shrink-0">
             <img
-              src={avatarSrc(author?.avatar)}
+              src={avatarSrc(author?.avatarSrc, author?.avatar)}
               onError={onAvatarError}
               alt={`${author?.username}'s avatar`}
               className="w-16 h-16 rounded object-cover"

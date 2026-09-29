@@ -34,6 +34,7 @@ describe('authApi', () => {
     username: 'kai',
     email: 'kai@example.com',
     avatar: null,
+    avatarSrc: null,
     donorPresentation: null,
     userRank: {
       id: 1,

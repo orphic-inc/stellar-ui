@@ -1288,10 +1288,10 @@ const UserProfile = () => {
                 )}
               </div>
               <div className="p-4 space-y-4">
-                {(donorPresentation.customIcon ||
-                  donorPresentation.secondAvatar) && (
+                {(donorPresentation.customIconSrc ||
+                  donorPresentation.secondAvatarSrc) && (
                   <div className="flex flex-wrap gap-4 items-start">
-                    {donorPresentation.customIcon && (
+                    {donorPresentation.customIconSrc && (
                       <div className="space-y-2">
                         <div className="text-xs uppercase tracking-wide text-pink-200/80">
                           Custom Icon
@@ -1304,7 +1304,7 @@ const UserProfile = () => {
                             className="inline-block"
                           >
                             <img
-                              src={donorPresentation.customIcon}
+                              src={donorPresentation.customIconSrc}
                               alt=""
                               title={
                                 donorPresentation.iconMouseOverText ?? undefined
@@ -1314,7 +1314,7 @@ const UserProfile = () => {
                           </a>
                         ) : (
                           <img
-                            src={donorPresentation.customIcon}
+                            src={donorPresentation.customIconSrc}
                             alt=""
                             title={
                               donorPresentation.iconMouseOverText ?? undefined
@@ -1324,13 +1324,13 @@ const UserProfile = () => {
                         )}
                       </div>
                     )}
-                    {donorPresentation.secondAvatar && (
+                    {donorPresentation.secondAvatarSrc && (
                       <div className="space-y-2">
                         <div className="text-xs uppercase tracking-wide text-pink-200/80">
                           Donor Avatar
                         </div>
                         <img
-                          src={donorPresentation.secondAvatar}
+                          src={donorPresentation.secondAvatarSrc}
                           alt=""
                           title={
                             donorPresentation.avatarMouseOverText ?? undefined
@@ -1402,8 +1402,8 @@ const UserProfile = () => {
                         className="rounded border border-[var(--st-border)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors overflow-hidden"
                       >
                         <div className="grid grid-cols-2 gap-px bg-[var(--st-border)]">
-                          {collage.coverImages.length > 0 ? (
-                            collage.coverImages
+                          {collage.coverImagesSrc.length > 0 ? (
+                            collage.coverImagesSrc
                               .slice(0, 4)
                               .map((image, index) => (
                                 <img
@@ -1444,8 +1444,8 @@ const UserProfile = () => {
                         className="flex items-center gap-4 px-4 py-3 hover:bg-[var(--st-border)]/30 transition-colors"
                       >
                         <div className="grid h-16 w-20 shrink-0 grid-cols-2 gap-px overflow-hidden rounded bg-[var(--st-border)]">
-                          {collage.coverImages.length > 0 ? (
-                            collage.coverImages
+                          {collage.coverImagesSrc.length > 0 ? (
+                            collage.coverImagesSrc
                               .slice(0, 4)
                               .map((image, index) => (
                                 <img
@@ -1493,9 +1493,9 @@ const UserProfile = () => {
                     className="overflow-hidden rounded border border-[var(--st-border-subtle)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors"
                   >
                     <div className="aspect-square bg-[var(--st-base)]">
-                      {item.release.image ? (
+                      {item.release.imageSrc ? (
                         <img
-                          src={item.release.image}
+                          src={item.release.imageSrc}
                           alt=""
                           className="h-full w-full object-cover"
                         />
@@ -1583,7 +1583,10 @@ const UserProfile = () => {
                 width={150}
                 alt={`${profile.username}'s avatar`}
                 className="rounded object-cover w-full"
-                src={avatarSrc(profile.profile?.avatar ?? profile.avatar)}
+                src={avatarSrc(
+                  profile.profile?.avatarSrc ?? profile.avatarSrc,
+                  profile.profile?.avatar ?? profile.avatar
+                )}
                 onError={onAvatarError}
               />
             </div>

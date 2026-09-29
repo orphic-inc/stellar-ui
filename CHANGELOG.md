@@ -19,6 +19,20 @@ All notable changes to stellar-ui are documented here.
   - `image/png` is no longer gzipped, since PNGs are already compressed.
   - The `build` job now checks the running image: CSS arrives as `text/css`,
     JS arrives gzipped, and a deep link falls back to the index.
+- **Every image is drawn from its resolved `*Src` field** (#403,
+  [stellar-api ADR-0051](https://github.com/orphic-inc/stellar-api/blob/main/docs/adr/0051-remote-images-are-imported-on-write.md)).
+  Avatars, release and group covers, collage mosaics, donor icons and the
+  homepage features now render from `avatarSrc`, `imageSrc`, `customIconSrc`,
+  `secondAvatarSrc` and `coverImagesSrc`. Each is a same-origin path, or null
+  while a remote image is not imported, so no image loads from another host.
+  - A pending or failed image shows the surface's default. The seeded test
+    avatar still maps to its bundled image.
+  - Edit forms keep reading and saving the raw fields, so a member's URL
+    round-trips unchanged.
+  - Needs a stellar-api release carrying #742 and #745. This clears the way
+    for the CSP to close `img-src` (#402).
+  - A new e2e test, P-13, gives the member a remote avatar and fails on any
+    image request to another origin across the main pages and the profile.
 
 ## [0.9.8] — 2026-09-28
 

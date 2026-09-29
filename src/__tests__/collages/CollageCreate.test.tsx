@@ -30,6 +30,7 @@ const makeAuthUser = (personalCollageLimit: number): AuthUser => ({
   username: 'testuser',
   email: 'test@example.com',
   avatar: null,
+  avatarSrc: null,
   contributed: '0',
   consumed: '0',
   ratio: 1,
