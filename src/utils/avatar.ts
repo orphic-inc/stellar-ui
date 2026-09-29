@@ -12,28 +12,26 @@ export const SEEDED_AVATAR_SENTINEL = 'seeded';
 export { defaultAvatar as DEFAULT_AVATAR };
 
 /**
- * Resolve a user's stored avatar value to a renderable image source.
- * - null / undefined / empty → bundled default
- * - the seeded sentinel → bundled seeded marker (visually distinct test users)
- * - anything else → passed through as-is
+ * The image source for a member's avatar.
  *
- * The passthrough arm carries two forms since stellar-api #396: a remote
- * `https://…` URL, and `/api/asset/<sha256>` for an avatar stored in the
- * content-addressed asset store. The second is a same-origin relative path,
- * which needs no handling here — the store's `baseUrl` is already `/api`, the
- * dev server proxies `/api`, and the CSP's `img-src 'self'` covers it. It is
- * also the only form that survives if `img-src` is ever tightened to `'self'`
- * (stellar-api #457).
+ * Renders from `src`, the api's resolved `avatarSrc`: a same-origin path, or
+ * null while a remote avatar is not imported (stellar-api ADR-0051). It is never
+ * a remote URL, which is what lets the CSP close `img-src` to `'self'`
+ * (#402, #403). `raw` is the stored `avatar`, read only for the seeded sentinel,
+ * which resolves to null because it is not a URL.
+ *
+ * - the seeded sentinel → bundled seeded marker (visually distinct test users)
+ * - a resolved src → that
+ * - otherwise (none, pending, failed) → bundled default
  */
-export const avatarSrc = (avatar?: string | null): string => {
-  if (!avatar || !avatar.trim()) return defaultAvatar;
-  if (avatar === SEEDED_AVATAR_SENTINEL) return seededAvatar;
-  return avatar;
+export const avatarSrc = (src?: string | null, raw?: string | null): string => {
+  if (raw === SEEDED_AVATAR_SENTINEL) return seededAvatar;
+  return src || defaultAvatar;
 };
 
 /**
- * onError handler for avatar <img> tags — swaps to the bundled default when a
- * stored external URL fails to load (e.g. a stale link that now 404s). Guards
+ * onError handler for avatar <img> tags — swaps to the bundled default when an
+ * image fails to load (e.g. an asset that has since been collected). Guards
  * against a loop if the default itself somehow fails.
  */
 export const onAvatarError = (e: SyntheticEvent<HTMLImageElement>): void => {

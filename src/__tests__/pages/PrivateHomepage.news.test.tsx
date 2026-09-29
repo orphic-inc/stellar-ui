@@ -64,6 +64,7 @@ const render = (hash = '') => {
       id: 1,
       username: 'jazzfan',
       avatar: null,
+      avatarSrc: null,
       userRank: {
         level: 100,
         name: 'User',

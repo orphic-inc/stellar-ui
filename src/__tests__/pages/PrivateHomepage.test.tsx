@@ -35,6 +35,7 @@ const mockUser = {
   id: 1,
   username: 'jazzfan',
   avatar: null,
+  avatarSrc: null,
   userRank: {
     level: 100,
     name: 'User',
@@ -156,6 +157,7 @@ describe('PrivateHomepage', () => {
             id: 10,
             communityId: 1,
             image: null,
+            imageSrc: null,
             artist: { name: 'Miles Davis' },
             year: 1959
           }
@@ -180,6 +182,7 @@ describe('PrivateHomepage', () => {
           communityId: 2,
           title: 'VH Album',
           image: null,
+          imageSrc: null,
           year: 2020,
           artist: { name: 'VH Artist' }
         }
@@ -200,6 +203,7 @@ describe('PrivateHomepage', () => {
             id: 11,
             communityId: null,
             image: 'https://example.com/cover.jpg',
+            imageSrc: '/api/asset/cover',
             artist: null,
             year: null
           }
@@ -224,6 +228,7 @@ describe('PrivateHomepage', () => {
           communityId: null,
           title: 'Obscure House',
           image: 'https://example.com/vh.jpg',
+          imageSrc: '/api/asset/vh',
           year: null,
           artist: null
         }

@@ -47,6 +47,7 @@ export const makeAuthorRef = (
   id: 42,
   username: 'signed',
   avatar: null,
+  avatarSrc: null,
   isDonor: true,
   donorRank: { name: 'Patron', badge: '★', color: '#ffcc00' },
   warned: '2026-09-01T00:00:00.000Z',

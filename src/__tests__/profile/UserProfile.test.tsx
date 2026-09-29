@@ -457,6 +457,7 @@ describe('UserProfile', () => {
             name: 'Empty Shelf',
             numEntries: 0,
             coverImages: [],
+            coverImagesSrc: [],
             categoryId: 0
           }
         ],
@@ -466,6 +467,7 @@ describe('UserProfile', () => {
             name: 'Empty Public',
             numEntries: 0,
             coverImages: [],
+            coverImagesSrc: [],
             categoryId: 1,
             updatedAt: '2026-01-01T00:00:00Z'
           }
@@ -489,6 +491,7 @@ describe('UserProfile', () => {
             communityId: 1,
             title: 'No Image Release',
             image: null,
+            imageSrc: null,
             artist: null
           }
         }
@@ -547,6 +550,7 @@ describe('UserProfile', () => {
             name: 'My Jazz Picks',
             numEntries: 10,
             coverImages: ['https://img.example.com/cover1.jpg'],
+            coverImagesSrc: ['/api/asset/cover1'],
             categoryId: 0
           }
         ],
@@ -556,6 +560,7 @@ describe('UserProfile', () => {
             name: 'Disco',
             numEntries: 5,
             coverImages: ['https://img.example.com/disco.jpg'],
+            coverImagesSrc: ['/api/asset/disco'],
             categoryId: 1,
             updatedAt: '2026-01-01T00:00:00Z'
           }
@@ -1250,6 +1255,7 @@ describe('UserProfile', () => {
             communityId: 1,
             title: 'Kind of Blue',
             image: 'https://img.example.com/kob.jpg',
+            imageSrc: '/api/asset/kob',
             artist: { name: 'Miles Davis' }
           }
         }

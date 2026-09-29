@@ -340,7 +340,8 @@ describe('UserProfile RTK Query integration', () => {
               id: 10,
               name: 'My Jazz Collection',
               numEntries: 12,
-              coverImages: []
+              coverImages: [],
+              coverImagesSrc: []
             }
           ],
           publicCollages: [
@@ -350,6 +351,7 @@ describe('UserProfile RTK Query integration', () => {
               numEntries: 5,
               categoryId: 0,
               coverImages: [],
+              coverImagesSrc: [],
               updatedAt: '2024-01-01T00:00:00Z'
             }
           ]
@@ -381,6 +383,7 @@ describe('UserProfile RTK Query integration', () => {
               title: 'Kind of Blue',
               communityId: 2,
               image: null,
+              imageSrc: null,
               artist: { id: 3, name: 'Miles Davis' }
             }
           }

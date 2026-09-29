@@ -17,12 +17,16 @@
  *   - `group` null        — an ungrouped release, which is most of them
  *   - `group.image` null  — a real group that has no cover art yet
  *
+ * Both read `imageSrc`, the api's resolved cover: a same-origin path, or null
+ * while a remote cover is not imported (#403, stellar-api ADR-0051). A group
+ * cover still importing therefore falls back to the release's own for now.
+ *
  * Note the api picks a group's cover by *convention*: `CoverArt` carries no
  * primary flag, so it is the oldest row, resolved at read time. A member cannot
  * choose it. Requests to pick a different one are an api-side schema change (an
  * `isPrimary` flag), not something to work around here.
  */
 export const releaseCover = (
-  group?: { image?: string | null } | null,
-  release?: { image?: string | null } | null
-): string | null => group?.image ?? release?.image ?? null;
+  group?: { imageSrc?: string | null } | null,
+  release?: { imageSrc?: string | null } | null
+): string | null => group?.imageSrc ?? release?.imageSrc ?? null;

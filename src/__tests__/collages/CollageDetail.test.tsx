@@ -98,6 +98,7 @@ const defaultCollage = () => ({
       release: {
         title: 'Release',
         image: null,
+        imageSrc: null,
         communityId: 2,
         artist: { name: 'Artist' }
       }
@@ -298,6 +299,7 @@ describe('CollageDetail', () => {
             release: {
               title: 'Image Release',
               image: 'https://example.com/cover.jpg',
+              imageSrc: '/api/asset/cover',
               communityId: 1,
               artist: { name: 'Band' }
             }
@@ -422,6 +424,7 @@ describe('CollageDetail', () => {
             release: {
               title: 'Untitled',
               image: null,
+              imageSrc: null,
               communityId: 0,
               artist: null
             }
@@ -544,14 +547,24 @@ describe('CollageDetail', () => {
             releaseId: 11,
             userId: 7,
             user: { id: 7, username: 'alice' },
-            release: { title: 'A', image: 'https://e/1.jpg', communityId: 1 }
+            release: {
+              title: 'A',
+              image: 'https://e/1.jpg',
+              imageSrc: '/api/asset/1',
+              communityId: 1
+            }
           },
           {
             id: 2,
             releaseId: 12,
             userId: 7,
             user: { id: 7, username: 'alice' },
-            release: { title: 'B', image: 'https://e/2.jpg', communityId: 1 }
+            release: {
+              title: 'B',
+              image: 'https://e/2.jpg',
+              imageSrc: '/api/asset/2',
+              communityId: 1
+            }
           }
         ]
       },
@@ -600,7 +613,12 @@ describe('CollageDetail', () => {
             releaseId: 55,
             userId: 7,
             user: { id: 7, username: 'alice' },
-            release: { title: 'Release', image: null, communityId: 2 }
+            release: {
+              title: 'Release',
+              image: null,
+              imageSrc: null,
+              communityId: 2
+            }
           }
         ]
       },
@@ -629,14 +647,25 @@ describe('CollageDetail', () => {
         numVisibleEntries: 2,
         entries: [
           coverEntry(1, 55, {
-            group: { id: 3, title: 'Kid A', image: 'https://e/group.jpg' },
-            release: { title: 'Kid A', image: null, communityId: 2 }
+            group: {
+              id: 3,
+              title: 'Kid A',
+              image: 'https://e/group.jpg',
+              imageSrc: '/api/asset/group'
+            },
+            release: {
+              title: 'Kid A',
+              image: null,
+              imageSrc: null,
+              communityId: 2
+            }
           }),
           coverEntry(2, 56, {
-            group: { id: 4, title: 'Amnesiac', image: null },
+            group: { id: 4, title: 'Amnesiac', image: null, imageSrc: null },
             release: {
               title: 'Amnesiac',
               image: 'https://e/own.jpg',
+              imageSrc: '/api/asset/own',
               communityId: 2
             }
           })
@@ -656,15 +685,15 @@ describe('CollageDetail', () => {
       ...document.querySelectorAll('[data-st="coverart-cell"] img')
     ].map((i) => i.getAttribute('src'));
     // The group cover survives an entry whose own release art is null...
-    expect(mosaic).toContain('https://e/group.jpg');
+    expect(mosaic).toContain('/api/asset/group');
     // ...and a group with no cover art falls through to the release's own.
-    expect(mosaic).toContain('https://e/own.jpg');
+    expect(mosaic).toContain('/api/asset/own');
 
     const rowThumbs = [...document.querySelectorAll('[data-st="row"] img')].map(
       (i) => i.getAttribute('src')
     );
-    expect(rowThumbs).toContain('https://e/group.jpg');
-    expect(rowThumbs).toContain('https://e/own.jpg');
+    expect(rowThumbs).toContain('/api/asset/group');
+    expect(rowThumbs).toContain('/api/asset/own');
   });
   // ── #319 — the release-group collapse ──────────────────────────────────────
 
@@ -691,8 +720,13 @@ describe('CollageDetail', () => {
         releaseId: 41,
         userId: 7,
         user: { id: 7, username: 'alice' },
-        group: { id: 3, title: 'Kid A', image: null },
-        release: { title: 'Kid A', image: null, communityId: 2 },
+        group: { id: 3, title: 'Kid A', image: null, imageSrc: null },
+        release: {
+          title: 'Kid A',
+          image: null,
+          imageSrc: null,
+          communityId: 2
+        },
         groupedWith: [
           {
             id: 2,

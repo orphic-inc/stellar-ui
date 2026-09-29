@@ -106,9 +106,9 @@ const PrivateHomepage = () => {
               {aotm ? (
                 <div className="flex gap-3 items-center">
                   <div className="w-12 h-12 bg-[var(--st-raised)] rounded shrink-0 overflow-hidden flex items-center justify-center text-[var(--st-text-faint)] text-xs">
-                    {aotm.release.image ? (
+                    {aotm.release.imageSrc ? (
                       <img
-                        src={aotm.release.image}
+                        src={aotm.release.imageSrc}
                         alt={aotm.title}
                         className="w-full h-full object-cover"
                       />
@@ -157,9 +157,9 @@ const PrivateHomepage = () => {
               {vanityHouse ? (
                 <div className="flex gap-3 items-center">
                   <div className="w-12 h-12 bg-[var(--st-raised)] rounded shrink-0 overflow-hidden flex items-center justify-center text-[var(--st-text-faint)] text-xs">
-                    {vanityHouse.image ? (
+                    {vanityHouse.imageSrc ? (
                       <img
-                        src={vanityHouse.image}
+                        src={vanityHouse.imageSrc}
                         alt={vanityHouse.title}
                         className="w-full h-full object-cover"
                       />

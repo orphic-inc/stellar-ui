@@ -65,6 +65,7 @@ describe('UserBadges donor tier', () => {
           id: 9,
           username: 'lapsed',
           avatar: null,
+          avatarSrc: null,
           isDonor: true,
           donorRank: null,
           warned: null
@@ -119,6 +120,7 @@ describe('AuthorBadges', () => {
           id: 9,
           username: 'someone',
           avatar: null,
+          avatarSrc: null,
           isDonor: true,
           donorRank: PATRON,
           warned: '2026-09-01T00:00:00.000Z'

@@ -134,6 +134,7 @@ const makeRelease = (overrides: Record<string, unknown> = {}) => ({
   type: 'Album',
   description: 'A classic modal jazz album.',
   image: null,
+  imageSrc: null,
   artist: { id: 10, name: 'Miles Davis' },
   contributions: [
     {
@@ -756,14 +757,18 @@ describe('ReleasePage', () => {
 
   it('renders cover image when release has an image', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
-      data: makeRelease({ image: 'https://example.com/cover.jpg' }),
+      data: makeRelease({
+        image: 'https://example.com/cover.jpg',
+        imageSrc: '/api/asset/cover'
+      }),
       isLoading: false,
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
     const img = document.querySelector('img') as HTMLImageElement;
     expect(img).toBeInTheDocument();
-    expect(img.src).toContain('cover.jpg');
+    // The resolved cover, never the raw remote URL (#403).
+    expect(img.getAttribute('src')).toBe('/api/asset/cover');
   });
 
   it('renders a lossy MP3 row without lossless emphasis', () => {
@@ -860,7 +865,13 @@ describe('ReleasePage', () => {
   it('renders the group panel for a grouped release, keyed on the inline group id', () => {
     mockGetReleaseByIdQuery.mockReturnValue({
       data: makeRelease({
-        group: { id: 42, title: 'Kind of Blue', year: 1959, image: null }
+        group: {
+          id: 42,
+          title: 'Kind of Blue',
+          year: 1959,
+          image: null,
+          imageSrc: null
+        }
       }),
       isLoading: false,
       error: undefined
