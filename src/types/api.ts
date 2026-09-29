@@ -1824,6 +1824,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A concurrent grant changed this donor status; retry */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -3259,7 +3268,7 @@ export interface paths {
             'application/json': components['schemas']['AdminCreatedUser'];
           };
         };
-        /** @description User already exists */
+        /** @description User already exists, or userRankId names no rank */
         400: {
           headers: {
             [name: string]: unknown;
@@ -6524,6 +6533,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Request body exceeds the size limit */
+        413: {
           headers: {
             [name: string]: unknown;
           };
@@ -10262,6 +10280,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description The topic already has a poll */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -10406,6 +10433,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description A concurrent vote by the same member was being recorded; retry */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -17333,6 +17369,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /** @description A `forumTopicId` naming no topic answers `400` with `{ msg: "Topic not found" }`. */
     post: {
       parameters: {
         query?: never;
@@ -17777,6 +17814,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A racing toggle by the same member changed the vote first; reload and retry */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -18034,7 +18080,10 @@ export interface paths {
       };
     };
     put?: never;
-    /** Create a new request */
+    /**
+     * Create a new request
+     * @description Also answers `400` with `{ msg }` below the minimum bounty, on an insufficient contributed balance, or when `communityId` or an artist id names nothing. A community the caller cannot reach answers the same, so the answer does not reveal it exists. A repeated artist id is treated as one.
+     */
     post: {
       parameters: {
         query?: never;
@@ -18094,6 +18143,15 @@ export interface paths {
         };
         /** @description Missing requests_create */
         403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's balance changed while the bounty was debited; retry */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -18177,6 +18235,15 @@ export interface paths {
         };
         /** @description Request not found, or not open */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The caller's balance changed while the bounty was debited, or a racing first bounty by the same member was recorded first; retry */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -28836,7 +28903,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Balance changed concurrently — retry */
+        /** @description Balance changed concurrently, or another download by this member is being granted — retry */
         409: {
           headers: {
             [name: string]: unknown;
