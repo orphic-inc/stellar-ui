@@ -2695,6 +2695,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description No user has that id (an admin addressing another user) */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Nick already verified by another account */
         409: {
           headers: {
@@ -6660,6 +6669,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description The name is taken, or a concurrent change took it or the default */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -6844,6 +6862,15 @@ export interface paths {
         };
         /** @description Not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The name is taken, or a concurrent change took it or the default */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -11185,7 +11212,7 @@ export interface paths {
     put?: never;
     /**
      * Create a release in a community
-     * @description Requires `communities_manage`. At least one artist credit is required.
+     * @description Requires `communities_manage`. At least one artist credit is required. A credited artist id that names nothing, or an artist credited twice in the same role, also answers `400` (#596).
      */
     post: {
       parameters: {
@@ -11811,7 +11838,7 @@ export interface paths {
     post?: never;
     /**
      * Delete a release
-     * @description Requires `communities_manage`.
+     * @description Requires `communities_manage`. A release with editions or contributions is refused with `409`; every release keeps an edition, so this is every release until #793 decides what the verb should do.
      */
     delete: {
       parameters: {
@@ -11861,6 +11888,15 @@ export interface paths {
         };
         /** @description Release not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description A release with editions or contributions cannot be deleted */
+        409: {
           headers: {
             [name: string]: unknown;
           };
@@ -13127,7 +13163,16 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Release already has this tag */
+        /** @description Release not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Release already has this tag, including when a concurrent add of the same tag won (#809) */
         409: {
           headers: {
             [name: string]: unknown;
@@ -13791,6 +13836,15 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
+        /** @description A contribution of this format already exists for the release, or another upload is recording your contributor role (retry) */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
         /** @description Rate limited */
         429: {
           headers: {
@@ -14001,6 +14055,15 @@ export interface paths {
         };
         /** @description Community not found, or one you cannot see */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Another upload is recording your contributor role; retry */
+        409: {
           headers: {
             [name: string]: unknown;
           };
