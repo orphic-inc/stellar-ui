@@ -35,12 +35,19 @@ export const ensureRequestPolyfill = () => {
     append(name: string, value: string) {
       this.set(name, value);
     }
+
+    delete(name: string) {
+      delete this.values[name.toLowerCase()];
+    }
   }
 
   class MockRequest {
     url: string;
     method: string;
     headers: MockHeaders;
+    // A non-string body (a File for a raw upload) kept as given, so a test can
+    // assert the very object was sent.
+    bodyInit: unknown;
     private bodyText: string;
 
     constructor(
@@ -48,19 +55,21 @@ export const ensureRequestPolyfill = () => {
       init: {
         method?: string;
         headers?: Record<string, string>;
-        body?: string;
+        body?: unknown;
       } = {}
     ) {
+      this.bodyInit = init.body;
+      const text = typeof init.body === 'string' ? init.body : '';
       if (typeof input === 'string') {
         this.url = input;
         this.method = init.method ?? 'GET';
         this.headers = new MockHeaders(init.headers);
-        this.bodyText = init.body ?? '';
+        this.bodyText = text;
       } else {
         this.url = input.url;
         this.method = input.method ?? init.method ?? 'GET';
         this.headers = input.headers ?? new MockHeaders(init.headers);
-        this.bodyText = init.body ?? '';
+        this.bodyText = text;
       }
     }
 

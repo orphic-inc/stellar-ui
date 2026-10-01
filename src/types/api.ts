@@ -4979,10 +4979,10 @@ export interface paths {
           };
           content: {
             'application/json': {
-              albumOfTheMonth: components['schemas']['HomepageFeaturedAlbum'] &
-                unknown;
-              vanityHouse: components['schemas']['HomepageFeaturedRelease'] &
-                unknown;
+              albumOfTheMonth:
+                components['schemas']['HomepageFeaturedAlbum'] | null;
+              vanityHouse:
+                components['schemas']['HomepageFeaturedRelease'] | null;
             };
           };
         };
@@ -6512,7 +6512,12 @@ export interface paths {
     put?: never;
     post: {
       parameters: {
-        query?: never;
+        query?: {
+          /** @description A label on the bytes; both kinds run the same quota. */
+          kind?: 'ThemeImage' | 'Avatar';
+          /** @description The image field this upload will replace (#871). Its current asset does not count toward the quota, so a member at the limit can upload the replacement; saving it releases the old one. */
+          field?: 'avatar' | 'customIcon' | 'secondAvatar';
+        };
         header?: never;
         path?: never;
         cookie?: never;
@@ -11839,7 +11844,7 @@ export interface paths {
     post?: never;
     /**
      * Delete a release
-     * @description Requires `communities_manage`. A release with editions or contributions is refused with `409`; every release keeps an edition, so this is every release until #793 decides what the verb should do.
+     * @description Requires `communities_manage`. Deletes a release with no contributions, with its editions, credits, comments and bookmarks, and leaves an audit row (#793). A release with any contribution is refused with `409`.
      */
     delete: {
       parameters: {
@@ -11896,7 +11901,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description A release with editions or contributions cannot be deleted */
+        /** @description A release with contributions cannot be deleted */
         409: {
           headers: {
             [name: string]: unknown;
@@ -22244,7 +22249,7 @@ export interface paths {
           };
           content: {
             'application/json': {
-              main: components['schemas']['RulesPage'] & unknown;
+              main: components['schemas']['RulesPage'] | null;
               pages: components['schemas']['RulesPage'][];
             };
           };
@@ -30223,7 +30228,7 @@ export interface components {
         };
         personalCollageLimit?: number;
         authorStylesheetLimit?: number;
-        assetLimit?: number | null;
+        assetLimit: number | null;
         notificationFilterLimit: number | null;
       };
       /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
@@ -31258,7 +31263,7 @@ export interface components {
         data: components['schemas']['ForumPost'][];
         meta: components['schemas']['PaginationMeta'];
       };
-      poll?: components['schemas']['ForumPoll'] & unknown;
+      poll?: components['schemas']['ForumPoll'] | null;
       subscription: {
         isSubscribed: boolean;
       };
@@ -31515,7 +31520,7 @@ export interface components {
         id: number;
         name: string;
       }[];
-      releaseFile: components['schemas']['ReleaseFileQuality'] & unknown;
+      releaseFile: components['schemas']['ReleaseFileQuality'] | null;
       edition: components['schemas']['EditionIdentity'];
     };
     ReleaseTagEnriched: {
@@ -31567,7 +31572,7 @@ export interface components {
       after?: {
         [key: string]: unknown;
       } | null;
-      snapshot?: components['schemas']['ReleaseSnapshot'] & unknown;
+      snapshot?: components['schemas']['ReleaseSnapshot'] | null;
       createdAt: string;
       actor: {
         id: number;
@@ -31622,7 +31627,7 @@ export interface components {
       description?: string | null;
       descriptionHtml?: string;
       createdAt?: string;
-      artist?: components['schemas']['ReleaseArtist'] & unknown;
+      artist?: components['schemas']['ReleaseArtist'] | null;
       credits?: components['schemas']['ReleaseCredit'][];
       tags?: components['schemas']['ReleaseTag'][];
       releaseTags?: components['schemas']['ReleaseTagEnriched'][];
@@ -31839,7 +31844,7 @@ export interface components {
       description?: string | null;
       descriptionHtml?: string;
       createdAt?: string;
-      artist?: components['schemas']['ReleaseArtist'] & unknown;
+      artist?: components['schemas']['ReleaseArtist'] | null;
       credits?: components['schemas']['ReleaseCredit'][];
       tags?: components['schemas']['ReleaseTag'][];
       releaseTags?: components['schemas']['ReleaseTagEnriched'][];
@@ -32227,7 +32232,7 @@ export interface components {
       conversationId: number;
       body: string;
       createdAt: string;
-      sender?: components['schemas']['AuthorRef'] & unknown;
+      sender?: components['schemas']['AuthorRef'] | null;
     };
     PrivateConversationParticipant: {
       userId: number;
@@ -32278,13 +32283,13 @@ export interface components {
       createdAt: string;
       updatedAt: string;
       user: components['schemas']['AuthorRef'];
-      assignedUser?: components['schemas']['AuthorRef'] & unknown;
-      resolver?: components['schemas']['AuthorRef'] & unknown;
+      assignedUser?: components['schemas']['AuthorRef'] | null;
+      resolver?: components['schemas']['AuthorRef'] | null;
       messages?: {
         id: number;
         body: string;
         createdAt: string;
-        sender: components['schemas']['AuthorRef'] & unknown;
+        sender: components['schemas']['AuthorRef'] | null;
       }[];
     };
     PaginatedTickets: {
@@ -32297,7 +32302,7 @@ export interface components {
       id: number;
       body: string;
       createdAt: string;
-      sender: components['schemas']['AuthorRef'] & unknown;
+      sender: components['schemas']['AuthorRef'] | null;
     };
     StaffInboxResponse: {
       id: number;

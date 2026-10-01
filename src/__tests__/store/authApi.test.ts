@@ -42,6 +42,7 @@ describe('authApi', () => {
       level: 100,
       color: 'gray',
       permissions: {},
+      assetLimit: null,
       notificationFilterLimit: null
     }
   };

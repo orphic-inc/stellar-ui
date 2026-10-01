@@ -75,3 +75,26 @@ describe('DonorSettingsTab', () => {
     ).toBeInTheDocument();
   });
 });
+
+// #275: the two donor image fields take an upload, but only when the perk is
+// part of the member's donor rank; a locked field keeps its note instead.
+describe('DonorSettingsTab — image uploads (#275)', () => {
+  beforeEach(() => {
+    mockUseGetDonorRewardsQuery.mockReturnValue({
+      data: {
+        ...makeRewards(),
+        perks: { ...makeRewards().perks, secondAvatar: false }
+      },
+      isLoading: false
+    });
+  });
+
+  it('offers an upload for an unlocked image field only', () => {
+    renderWithProviders(<DonorSettingsTab />);
+    expect(document.getElementById('image-upload-customIcon')).not.toBeNull();
+    expect(document.getElementById('image-upload-secondAvatar')).toBeNull();
+    expect(
+      screen.getByText('Not included in your current donor rank.')
+    ).toBeInTheDocument();
+  });
+});

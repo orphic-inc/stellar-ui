@@ -9,6 +9,8 @@ import {
 import { addAlert } from '../../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
 import Spinner from '../../layout/Spinner';
+import ImageUpload from './ImageUpload';
+import type { ImageField } from '../../../store/services/assetApi';
 
 // Layout-only now; the paint comes from `data-st="field"` / `data-st="meta"` on
 // each site. Locked variants just dim + flag not-allowed; the token color stays.
@@ -21,6 +23,46 @@ const LockedNote = () => (
     Not included in your current donor rank.
   </p>
 );
+
+interface DonorImageFieldProps {
+  field: ImageField;
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  unlocked: boolean;
+}
+
+/** A donor image address, with its upload control once the perk is unlocked. */
+const DonorImageField = (props: DonorImageFieldProps) => {
+  const { field, id, label, value, onChange, unlocked } = props;
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        data-st="meta"
+        className={unlocked ? labelClass : lockedClass}
+      >
+        {label}
+      </label>
+      <input
+        id={id}
+        type="text"
+        data-st="field"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={!unlocked}
+        placeholder="https://… or /api/asset/…"
+        className={inputClass + (unlocked ? '' : ' opacity-40')}
+      />
+      {unlocked ? (
+        <ImageUpload field={field} onUploaded={onChange} />
+      ) : (
+        <LockedNote />
+      )}
+    </div>
+  );
+};
 
 const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
   const dispatch = useDispatch();
@@ -131,26 +173,14 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
 
         {/* Icons */}
         <div className="space-y-3">
-          <div>
-            <label
-              htmlFor="donor-custom-icon"
-              data-st="meta"
-              className={perks.customIcon ? labelClass : lockedClass}
-            >
-              Custom icon URL
-            </label>
-            <input
-              id="donor-custom-icon"
-              type="text"
-              data-st="field"
-              value={customIcon}
-              onChange={(e) => setCustomIcon(e.target.value)}
-              disabled={!perks.customIcon}
-              placeholder="https://… or /api/asset/…"
-              className={inputClass + (!perks.customIcon ? ' opacity-40' : '')}
-            />
-            {!perks.customIcon && <LockedNote />}
-          </div>
+          <DonorImageField
+            field="customIcon"
+            id="donor-custom-icon"
+            label="Custom icon URL"
+            value={customIcon}
+            onChange={setCustomIcon}
+            unlocked={!!perks.customIcon}
+          />
 
           <div>
             <label
@@ -200,26 +230,14 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
         </div>
 
         {/* Second avatar */}
-        <div>
-          <label
-            htmlFor="donor-second-avatar"
-            data-st="meta"
-            className={perks.secondAvatar ? labelClass : lockedClass}
-          >
-            Second (donor) avatar URL
-          </label>
-          <input
-            id="donor-second-avatar"
-            type="text"
-            data-st="field"
-            value={secondAvatar}
-            onChange={(e) => setSecondAvatar(e.target.value)}
-            disabled={!perks.secondAvatar}
-            placeholder="https://… or /api/asset/…"
-            className={inputClass + (!perks.secondAvatar ? ' opacity-40' : '')}
-          />
-          {!perks.secondAvatar && <LockedNote />}
-        </div>
+        <DonorImageField
+          field="secondAvatar"
+          id="donor-second-avatar"
+          label="Second (donor) avatar URL"
+          value={secondAvatar}
+          onChange={setSecondAvatar}
+          unlocked={!!perks.secondAvatar}
+        />
 
         {/* Avatar mouseover text */}
         <div>

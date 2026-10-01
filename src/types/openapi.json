@@ -321,6 +321,7 @@
               "level",
               "name",
               "color",
+              "assetLimit",
               "notificationFilterLimit"
             ]
           },
@@ -4069,11 +4070,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/ForumPoll"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "subscription": {
             "type": "object",
@@ -4778,11 +4777,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/ReleaseFileQuality"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "edition": {
             "$ref": "#/components/schemas/EditionIdentity"
@@ -4968,11 +4965,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/ReleaseSnapshot"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "createdAt": {
             "type": "string"
@@ -5130,11 +5125,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/ReleaseArtist"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "credits": {
             "type": "array",
@@ -5732,11 +5725,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/ReleaseArtist"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "credits": {
             "type": "array",
@@ -7195,11 +7186,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/AuthorRef"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           }
         },
         "required": [
@@ -7413,21 +7402,17 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/AuthorRef"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "resolver": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/AuthorRef"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           },
           "messages": {
             "type": "array",
@@ -7447,11 +7432,9 @@
                   "allOf": [
                     {
                       "$ref": "#/components/schemas/AuthorRef"
-                    },
-                    {
-                      "nullable": true
                     }
-                  ]
+                  ],
+                  "nullable": true
                 }
               },
               "required": [
@@ -7515,11 +7498,9 @@
             "allOf": [
               {
                 "$ref": "#/components/schemas/AuthorRef"
-              },
-              {
-                "nullable": true
               }
-            ]
+            ],
+            "nullable": true
           }
         },
         "required": [
@@ -15387,21 +15368,17 @@
                       "allOf": [
                         {
                           "$ref": "#/components/schemas/HomepageFeaturedAlbum"
-                        },
-                        {
-                          "nullable": true
                         }
-                      ]
+                      ],
+                      "nullable": true
                     },
                     "vanityHouse": {
                       "allOf": [
                         {
                           "$ref": "#/components/schemas/HomepageFeaturedRelease"
-                        },
-                        {
-                          "nullable": true
                         }
-                      ]
+                      ],
+                      "nullable": true
                     }
                   },
                   "required": [
@@ -17062,6 +17039,37 @@
       "post": {
         "tags": [
           "Assets"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ThemeImage",
+                "Avatar"
+              ],
+              "description": "A label on the bytes; both kinds run the same quota."
+            },
+            "required": false,
+            "description": "A label on the bytes; both kinds run the same quota.",
+            "name": "kind",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "avatar",
+                "customIcon",
+                "secondAvatar"
+              ],
+              "description": "The image field this upload will replace (#871). Its current asset does not count toward the quota, so a member at the limit can upload the replacement; saving it releases the old one."
+            },
+            "required": false,
+            "description": "The image field this upload will replace (#871). Its current asset does not count toward the quota, so a member at the limit can upload the replacement; saving it releases the old one.",
+            "name": "field",
+            "in": "query"
+          }
         ],
         "requestBody": {
           "content": {
@@ -23440,7 +23448,7 @@
           "Communities"
         ],
         "summary": "Delete a release",
-        "description": "Requires `communities_manage`. A release with editions or contributions is refused with `409`; every release keeps an edition, so this is every release until #793 decides what the verb should do.",
+        "description": "Requires `communities_manage`. Deletes a release with no contributions, with its editions, credits, comments and bookmarks, and leaves an audit row (#793). A release with any contribution is refused with `409`.",
         "parameters": [
           {
             "schema": {
@@ -23504,7 +23512,7 @@
             }
           },
           "409": {
-            "description": "A release with editions or contributions cannot be deleted",
+            "description": "A release with contributions cannot be deleted",
             "content": {
               "application/json": {
                 "schema": {
@@ -36876,11 +36884,9 @@
                       "allOf": [
                         {
                           "$ref": "#/components/schemas/RulesPage"
-                        },
-                        {
-                          "nullable": true
                         }
-                      ]
+                      ],
+                      "nullable": true
                     },
                     "pages": {
                       "type": "array",
