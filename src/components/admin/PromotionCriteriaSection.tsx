@@ -98,6 +98,14 @@ const OutOfDateRules = ({ rules }: { rules: PromotionRule[] }) => {
   );
 };
 
+/** Why a rank can hold no promotion rule (#383, #425). */
+const noRuleReason = (secondary: boolean, autoManaged: boolean) => {
+  if (secondary) return 'Secondary classes are not on the promotion ladder.';
+  if (!autoManaged)
+    return 'Staff classes are assigned by hand, never auto-promoted into or out of.';
+  return 'No auto-managed class sits above this one, so there is nothing to promote to.';
+};
+
 /** Scroll here when the rank page's stale-rule notice linked to this section. */
 const useScrollIntoViewOnHash = (ready: boolean) => {
   const { hash } = useLocation();
@@ -122,6 +130,7 @@ const PromotionCriteriaSection = ({ fromRankId }: { fromRankId: number }) => {
 
   const {
     secondary,
+    autoManaged,
     next,
     current: existingRule,
     outOfDate
@@ -199,9 +208,7 @@ const PromotionCriteriaSection = ({ fromRankId }: { fromRankId: number }) => {
           />
         ) : (
           <p data-st="meta" className="text-sm">
-            {secondary
-              ? 'Secondary classes are not on the promotion ladder.'
-              : 'No primary class sits above this one, so there is nothing to promote to.'}
+            {noRuleReason(secondary, autoManaged)}
           </p>
         )}
       </div>

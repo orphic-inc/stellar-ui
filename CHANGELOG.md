@@ -18,6 +18,14 @@ All notable changes to stellar-ui are documented here.
   - The api reports those rules in `staleRules` (stellar-api#718).
   - The page stays open and links each rule's rank to its promotion section.
   - This re-vendors the contract for that field.
+- **Staff ranks are no longer offered as a promotion target** (#425).
+  - The editor offered "Promotes to Staff" on Stellarige, though the api refuses that rule (stellar-api#866).
+  - The next rung is now the next rank with `autoManaged` set, so Stellarige is the top rung.
+  - The section is hidden on a staff rank, unless old rules leave it, which it lists for deletion with the reason.
+  - The ui reads the api's `autoManaged` and never copies the level threshold.
+- **A rank save that moves the rank on or off the auto-managed ladder now says so** (#425).
+  - The page stays open and names what changed for members holding the rank as their primary rank: auto-promotion and demotion, the inactivity sweep and the invite handout.
+  - The same notice still lists any promotion rules the save stranded.
 
 ### Changed
 
