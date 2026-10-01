@@ -19,6 +19,7 @@ import { useGetStylesheetsQuery } from '../../../store/services/siteApi';
 import Spinner from '../../layout/Spinner';
 import DonorSettingsTab from './DonorSettingsTab';
 import FeedSettings from './FeedSettings';
+import AvatarField from './AvatarField';
 import IrcNickSettings from './IrcNickSettings';
 import type { paths } from '../../../types/api';
 
@@ -325,30 +326,12 @@ const Settings = () => {
               Appearance
             </h3>
 
-            <div>
-              <label
-                htmlFor="settings-avatar"
-                data-st="meta"
-                className="block text-sm mb-1"
-              >
-                Avatar
-              </label>
-              <input
-                id="settings-avatar"
-                type="text"
-                {...register('avatar')}
-                data-st="field"
-                placeholder="https://… or /api/asset/…"
-                className="w-full"
-              />
-              <p data-st="meta" className="text-xs mt-1">
-                An <code>https://</code> address, or <code>/api/asset/…</code>
-                for an image stored on this site. Plain <code>http://</code> is
-                no longer accepted. Remember that whichever host you point at
-                sees the IP address of everyone who views your profile and posts
-                — a self-hosted image does not.
-              </p>
-            </div>
+            <AvatarField
+              input={register('avatar')}
+              onUploaded={(url) =>
+                setValue('avatar', url, { shouldDirty: true })
+              }
+            />
 
             <div>
               <label

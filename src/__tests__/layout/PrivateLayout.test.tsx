@@ -109,6 +109,7 @@ describe('PrivateLayout', () => {
           level: 100,
           color: 'gray',
           permissions: {},
+          assetLimit: null,
           notificationFilterLimit: null
         }
       })
@@ -178,6 +179,7 @@ describe('PrivateLayout', () => {
             level: 100,
             color: 'gray',
             permissions: {},
+            assetLimit: null,
             notificationFilterLimit: null
           },
           ...over

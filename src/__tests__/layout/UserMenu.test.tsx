@@ -43,6 +43,7 @@ const mockUser = {
     level: 100,
     name: 'User',
     color: '#fff',
+    assetLimit: null,
     notificationFilterLimit: null
   }
 };

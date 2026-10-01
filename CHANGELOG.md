@@ -13,6 +13,12 @@ All notable changes to stellar-ui are documented here.
   - It isn't shown on your own profile; your tree is on `/invite`.
   - It's hidden when the member is known to have invited nobody, as in the legacy implementation.
   - When the count is unknown (the member hides ratio stats from a viewer who isn't staff), the link still shows, so the permission never loses access to a tree that exists.
+- **Upload an image for your avatar, donor icon or second avatar from settings** (#275).
+  - Each of the three fields gets an "Or upload an image" picker. An upload fills the field with the stored image's `/api/asset/…` address, and the form's own save stores it.
+  - Each upload names the field it will replace, so a member at their rank's limit can still upload the replacement (stellar-api#871).
+  - A rank that can't upload (`assetLimit` 0) gets a note in place of the picker. The two donor fields show the picker only when the perk is unlocked.
+  - The type is checked before sending. An oversize image says so, and "limit reached" says how to free a slot.
+  - This re-vendors the contract for `userRank.assetLimit` on the session (stellar-api#716) and the upload's `field`.
 
 ### Fixed
 
