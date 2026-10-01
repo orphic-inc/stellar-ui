@@ -6,6 +6,14 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **A member's profile links to their invite tree for viewers holding `invites_manage`** (#423).
+  - The link opens `/user/{id}/invite-tree`, served under the same permission by `GET /users/{id}/invite-tree`. Before, nothing linked to it.
+  - It isn't shown on your own profile; your tree is on `/invite`.
+  - It's hidden when the member is known to have invited nobody, as in the legacy implementation.
+  - When the count is unknown (the member hides ratio stats from a viewer who isn't staff), the link still shows, so the permission never loses access to a tree that exists.
+
 ### Fixed
 
 - **The promotion editor follows the api's ladder rule** (#383).

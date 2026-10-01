@@ -48,7 +48,8 @@ jest.mock('react-redux', () => ({
 }));
 
 jest.mock('../../utils/permissions', () => ({
-  hasAnyPermission: () => false
+  hasAnyPermission: () => false,
+  hasPermission: () => false
 }));
 
 jest.mock('../../store/services/userApi', () => ({

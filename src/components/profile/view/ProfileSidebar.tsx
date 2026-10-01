@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import Time from '../../layout/Time';
 import { avatarSrc, onAvatarError } from '../../../utils/avatar';
 import PercentileRankings from '../PercentileRankings';
+import { useAppSelector } from '../../../store/hooks';
+import { selectCurrentUser } from '../../../store/slices/authSlice';
 import {
   formatByteStat,
+  showsInviteTreeLink,
   type MyRatioStats,
   type ProfileView
 } from './profileView';
@@ -105,6 +108,19 @@ const InviteRow = ({ profile }: { profile: ProfileView }) => {
   );
 };
 
+/** A link to the member's invite tree for an `invites_manage` viewer (#423). */
+const InviteTreeRow = ({ profile }: { profile: ProfileView }) => {
+  const viewer = useAppSelector(selectCurrentUser);
+  if (!showsInviteTreeLink(viewer, profile)) return null;
+  return (
+    <li>
+      <Link to={`/user/${profile.id}/invite-tree`} data-st="control">
+        Invite tree →
+      </Link>
+    </li>
+  );
+};
+
 const ByteRows = ({ stats }: { stats: ProfileView['stats'] }) => (
   <>
     <Row label="Contributed">{formatByteStat(stats.contributed)}</Row>
@@ -140,6 +156,7 @@ const StatisticsPanel = ({
     <ul className="px-3 py-2 space-y-1 text-xs text-[var(--st-text)]">
       <IdentityRows profile={profile} />
       <InviteRow profile={profile} />
+      <InviteTreeRow profile={profile} />
       {profile.isDonor && <li className="text-pink-400">Donor ♥</li>}
       <ByteRows stats={profile.stats} />
       <OwnRatioRows stats={myRatioStats} />
