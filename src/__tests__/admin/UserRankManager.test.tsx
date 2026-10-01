@@ -28,6 +28,7 @@ const makeRank = (
   level,
   permissions: {},
   secondary: false,
+  autoManaged: true,
   permittedForumIds: [],
   color: '',
   badge: '',

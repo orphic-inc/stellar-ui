@@ -19,6 +19,13 @@ All notable changes to stellar-ui are documented here.
   - The page stays open and links each rule's rank to its promotion section.
   - This re-vendors the contract for that field.
 
+### Changed
+
+- **The vendored contract drops the profile's `inviteTree` and its `InviteNode` schema, and gains `UserRank.autoManaged`** (#424).
+  - stellar-api#856 removed `inviteTree`, which the ui never read. The ui's invite tree reads `GET /users/{id}/invite-tree`, which is unchanged.
+  - The unused `InviteNode` type export is gone from `types/index.ts`.
+  - `autoManaged` (stellar-api#866) arrives with this re-vendor; ui#425 puts it to use.
+
 ## [0.10.0] — 2026-09-30
 
 Pairs with stellar-api 0.10.0, whose contract this re-vendors. Deploy after the

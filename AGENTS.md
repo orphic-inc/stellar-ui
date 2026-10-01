@@ -259,7 +259,7 @@ Hand-written types that belong in `index.ts` (not in the spec):
 
 - `Alert`, `AlertType` — Redux UI state
 - `AuthState` — Redux slice shape
-- `InviteNode`, `ProfileDetails`, `Profile` — complex profile tree
+- `ProfileDetails`, `Profile` — complex profile tree
 - `UserSettings` — settings form shape
 - `Announcement`, `BlogPost` — missing from spec
 - `HomepageFeaturedRelease`, `HomepageFeaturedAlbum`, `HomepageFeaturedContent`
