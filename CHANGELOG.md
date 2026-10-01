@@ -6,6 +6,11 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-09-30
+
+Pairs with stellar-api 0.10.0, whose contract this re-vendors. Deploy after the
+api.
+
 ### Added
 
 - **A member's ratio watch shows on their profile** (#417). It needs
@@ -26,6 +31,21 @@ All notable changes to stellar-ui are documented here.
   - **`invites_manage`:** the balance shows read-only in the sidebar.
   - **Staff:** unchanged; the Invites panel stays inside Staff Actions.
   - **Older api:** with neither field sent, nothing mounts.
+
+### Changed
+
+- **The vendored api contract is stellar-api 0.10.0's.** No operation is added
+  or removed.
+  - The profile responses gain `invitedBy` (#411 will show it), `ratioWatch`
+    and `ratioPolicy`. The last two are what #417 reads.
+  - Registration log entries gain `inviter`, `sameIp` and `lastIpAccounts`
+    (#412 will show them).
+  - The invite note on `POST /profile/referral/create-invite` and the rank
+    permission set now carry `invites_note` (#413 will hide the note field
+    without it).
+- **`/invite` passes the rules variables through unchanged** (#410). The api
+  now resolves `${irc}` to the public IRC page itself, so the page's override is
+  gone. Nothing visible changes.
 
 ## [0.9.11] — 2026-09-30
 
@@ -1467,7 +1487,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.11...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.11...v0.10.0
 [0.9.11]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.10...v0.9.11
 [0.9.10]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.9...v0.9.10
 [0.9.9]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.8...v0.9.9
