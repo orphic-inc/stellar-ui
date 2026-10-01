@@ -36,23 +36,11 @@ const selectQuoted = (
     ];
   });
 
-/**
- * `${irc}` resolves to a route stellar-ui does not have, so on this page it
- * points at the public IRC guide instead — the same URL a disabled member is
- * given at login (stellar-api#622). Both values come from the api's own
- * variables map; only the choice between them is this page's. Remove once
- * stellar-api#630 settles what `${irc}` means.
- */
-const withReachableIrc = (variables: Record<string, string>) => ({
-  ...variables,
-  irc: variables.irc_guide_article ?? variables.irc
-});
-
 const InviteRules = () => {
   const { data: tree } = useGetRulesTreeQuery();
   const quoted = selectQuoted(tree?.rules ?? []);
   if (quoted.length === 0) return null;
-  const variables = withReachableIrc(tree?.variables ?? {});
+  const variables = tree?.variables ?? {};
 
   return (
     <div className="box pad" data-st="panel">
