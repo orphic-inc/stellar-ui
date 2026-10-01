@@ -27,13 +27,21 @@ jest.mock('react-redux', () => ({
   useDispatch: () => mockDispatch
 }));
 
-// Member 150 → Power User 200 → Elite 300; Donor is secondary.
+// Member 150 → Power User 200 → Elite 300; Donor is secondary, and Staff is
+// primary but not auto-managed (#425).
 const ranks = [
-  { id: 1, name: 'User', level: 100, secondary: false },
-  { id: 2, name: 'Member', level: 150, secondary: false },
-  { id: 3, name: 'Power User', level: 200, secondary: false },
-  { id: 4, name: 'Elite', level: 300, secondary: false },
-  { id: 9, name: 'Donor', level: 120, secondary: true }
+  { id: 1, name: 'User', level: 100, secondary: false, autoManaged: true },
+  { id: 2, name: 'Member', level: 150, secondary: false, autoManaged: true },
+  {
+    id: 3,
+    name: 'Power User',
+    level: 200,
+    secondary: false,
+    autoManaged: true
+  },
+  { id: 4, name: 'Elite', level: 300, secondary: false, autoManaged: true },
+  { id: 9, name: 'Donor', level: 120, secondary: true, autoManaged: false },
+  { id: 8, name: 'Staff', level: 500, secondary: false, autoManaged: false }
 ];
 
 const rule = (id: number, fromRankId: number, toRankId: number) => ({
@@ -93,6 +101,13 @@ describe('PromotionCriteriaSection — the next rung', () => {
   it('renders nothing for a secondary rank with no rules', () => {
     const { container } = renderWithProviders(
       <PromotionCriteriaSection fromRankId={9} />
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders nothing on a staff rank with no rules (#425)', () => {
+    const { container } = renderWithProviders(
+      <PromotionCriteriaSection fromRankId={8} />
     );
     expect(container).toBeEmptyDOMElement();
   });
@@ -161,6 +176,31 @@ describe('PromotionCriteriaSection — rules matched by pair', () => {
     expect(
       screen.queryByRole('button', { name: /save promotion criteria/i })
     ).toBeNull();
+  });
+});
+
+describe('PromotionCriteriaSection — staff ranks (#425)', () => {
+  it('lists a rule into a staff rank as out of date on the top rung', () => {
+    mockGetPromotionRules.mockReturnValue({ data: [rule(6, 4, 8)] });
+    renderWithProviders(<PromotionCriteriaSection fromRankId={4} />);
+
+    expect(screen.getByText('→ Staff')).toBeInTheDocument();
+    expect(
+      screen.getByText(/no auto-managed class sits above this one/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /save promotion criteria/i })
+    ).toBeNull();
+  });
+
+  it('says why a staff rank holds no rule when old rules leave it', () => {
+    mockGetPromotionRules.mockReturnValue({ data: [rule(7, 8, 4)] });
+    renderWithProviders(<PromotionCriteriaSection fromRankId={8} />);
+
+    expect(screen.getByText('→ Elite')).toBeInTheDocument();
+    expect(
+      screen.getByText(/staff classes are assigned by hand/i)
+    ).toBeInTheDocument();
   });
 });
 

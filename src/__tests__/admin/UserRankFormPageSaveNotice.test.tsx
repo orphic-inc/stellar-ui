@@ -155,3 +155,68 @@ describe('UserRankFormPage — rules a save took off the ladder (#383)', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 });
+
+// A save that moves the rank on or off the auto-managed ladder (#425): the api
+// reports the new `autoManaged`, and the page names the three jobs it changes.
+describe('UserRankFormPage — a save that flips autoManaged (#425)', () => {
+  const saveFrom = async (before: boolean, after: boolean) => {
+    mockGetUserRankByIdQuery.mockReturnValue({
+      data: {
+        id: 2,
+        level: 450,
+        name: 'Stellarige',
+        permissions: {},
+        autoManaged: before
+      },
+      isLoading: false
+    });
+    mockUpdateUserRank.mockReturnValue({
+      unwrap: () => Promise.resolve({ id: 2, autoManaged: after })
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<UserRankFormPage />);
+    await waitFor(() =>
+      expect(
+        (screen.getByLabelText(/^level$/i) as HTMLInputElement).value
+      ).toBe('450')
+    );
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+    await waitFor(() => expect(mockUpdateUserRank).toHaveBeenCalled());
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    Element.prototype.scrollIntoView = jest.fn();
+    mockUseParams.mockReturnValue({ id: '2' });
+    mockGetPromotionRules.mockReturnValue({ data: [] });
+    mockGetUserRanks.mockReturnValue({ data: [] });
+  });
+
+  it('stays and warns when the rank leaves the auto-managed ladder', async () => {
+    await saveFrom(true, false);
+
+    const notice = await screen.findByRole('alert');
+    expect(notice).toHaveTextContent(/no longer auto-managed/i);
+    expect(notice).toHaveTextContent(
+      /auto-promoted or demoted, disabled for inactivity, or granted invites/i
+    );
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('stays and says so when the rank joins the auto-managed ladder', async () => {
+    await saveFrom(false, true);
+
+    const notice = await screen.findByRole('alert');
+    expect(notice).toHaveTextContent(/is now auto-managed/i);
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('returns to the rank list when autoManaged held', async () => {
+    await saveFrom(true, true);
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith('/staff/tools/user-ranks')
+    );
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+});

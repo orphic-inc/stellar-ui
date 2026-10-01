@@ -454,8 +454,20 @@ describe('UserRankFormPage — promotion criteria (#170)', () => {
     mockUpdateUserRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockGetUserRanks.mockReturnValue({
       data: [
-        { id: 3, name: 'Elite', level: 300, permissions: {} },
-        { id: 4, name: 'Stellarific', level: 350, permissions: {} }
+        {
+          id: 3,
+          name: 'Elite',
+          level: 300,
+          permissions: {},
+          autoManaged: true
+        },
+        {
+          id: 4,
+          name: 'Stellarific',
+          level: 350,
+          permissions: {},
+          autoManaged: true
+        }
       ]
     });
     mockCreatePromotionRule.mockReturnValue({
