@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { formatBytes } from '../../utils';
-import { Modal, BBCodeContent } from '../ui';
+import { Modal } from '../ui';
 
 import {
   useGetMyRatioStatsQuery,
@@ -34,41 +33,42 @@ import {
   type UserRankAssignment,
   type UserRankRecord
 } from '../../store/services/userApi';
-import {
-  useGetFriendStatusQuery,
-  useAddFriendMutation,
-  useAcceptFriendRequestMutation,
-  useRemoveFriendMutation
-} from '../../store/services/friendApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
-import { avatarSrc, onAvatarError } from '../../utils/avatar';
-import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
-import UserBadges from '../layout/UserBadges';
 import { InviteControls, type InviteProfile } from './InviteControlsPanel';
 import RatioPolicyNotice from './RatioPolicyNotice';
-import PercentileRankings from './PercentileRankings';
+import ProfileHeader from './view/ProfileHeader';
+import DonorPresentationPanel from './view/DonorPresentationPanel';
+import CollageShelves from './view/CollageShelves';
+import {
+  ProfileInfoPanel,
+  RecentContributionsPanel,
+  RecentSnatchesPanel
+} from './view/ProfileFeedPanels';
+import ProfileSidebar from './view/ProfileSidebar';
+import {
+  canEditOwnStaffBio,
+  isStaffViewer,
+  profileErrorMessage,
+  type MyRatioStats,
+  type ProfileView
+} from './view/profileView';
 
-const COLLAGE_CATEGORY_LABELS: Record<number, string> = {
-  0: 'Personal',
-  1: 'Theme / Genre',
-  2: 'Discography',
-  3: 'Label',
-  4: 'Charts',
-  5: 'Staff Picks',
-  6: 'Other'
-};
-
-const formatByteStat = (value: number | string | null | undefined) => {
-  if (value === null || value === undefined) return 'Hidden';
-  try {
-    return formatBytes(Number(BigInt(String(value))));
-  } catch {
-    return formatBytes(Number(value));
-  }
-};
+// The staff controls on another member's profile. Staff get Staff Actions,
+// which hold the Invites panel. A rank holding only an invite permission is
+// not staff, and gets that panel on its own (#414): stellar-api#655 serves it
+// the balance and privilege the panel needs, and nothing else Staff Actions
+// shows.
+function StaffOrInviteControls(props: {
+  isStaff: boolean;
+  profile: InviteProfile;
+}) {
+  const { isStaff, profile } = props;
+  if (isStaff) return <StaffActionsPanel profileId={profile.id} />;
+  return <InviteControls profile={profile} />;
+}
 
 // Ticket status → status-chip modifier (WS7). Resolved / unknown stay a neutral
 // chip; the chip Role paints the box, the modifier only sets the hue.
@@ -1053,746 +1053,77 @@ const SnatchListSection = () => {
   );
 };
 
-// Staff get Staff Actions, which hold the Invites panel. A rank holding only an
-// invite permission gets that panel on its own (#414).
-function StaffOrInviteControls(props: {
+const ProfileMain = ({
+  profile,
+  myRatioStats,
+  isOwnProfile,
+  isStaff,
+  canEditBio
+}: {
+  profile: ProfileView;
+  myRatioStats?: MyRatioStats;
+  isOwnProfile: boolean;
   isStaff: boolean;
-  profile: InviteProfile;
-}) {
-  const { isStaff, profile } = props;
-  if (isStaff) return <StaffActionsPanel profileId={profile.id} />;
-  return <InviteControls profile={profile} />;
-}
+  canEditBio: boolean;
+}) => (
+  <div className="flex-1 space-y-4 min-w-0">
+    {/* Own profile only: `myRatioStats` is skipped off it. Mounted here
+        rather than in the Statistics panel because that column is 176px
+        wide (ui#334) — the notice is prose and needs the main column. */}
+    {myRatioStats && <RatioPolicyNotice stats={myRatioStats} />}
+    <ProfileInfoPanel html={profile.profile?.profileInfoHtml} />
+    <DonorPresentationPanel presentation={profile.donorPresentation} />
+    <CollageShelves shelves={profile.collageShelves} />
+    <RecentContributionsPanel items={profile.recentContributions} />
+    <RecentSnatchesPanel items={profile.recentSnatches} />
+    {isOwnProfile && <SnatchListSection />}
+    {canEditBio && (
+      <StaffBioEditor
+        key={profile.id}
+        profileId={profile.id}
+        initialBio={profile.staffBio}
+      />
+    )}
+    {!isOwnProfile && (
+      <StaffOrInviteControls isStaff={isStaff} profile={profile} />
+    )}
+  </div>
+);
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
   const currentUser = useSelector(selectCurrentUser);
   const { data: profile, isLoading, error } = useGetProfileByUserIdQuery(id!);
   // id may be a username string, so derive isOwnProfile from the loaded profile's id
-  const isOwnProfile =
-    !!currentUser && !!profile && currentUser.id === profile.id;
+  const isOwnProfile = !!profile && currentUser?.id === profile.id;
   const { data: myRatioStats } = useGetMyRatioStatsQuery(undefined, {
     skip: !isOwnProfile
   });
-  const dispatch = useDispatch();
-  const { data: friendStatus } = useGetFriendStatusQuery(profile?.id ?? 0, {
-    skip: !profile || isOwnProfile || !currentUser
-  });
-  const [addFriend] = useAddFriendMutation();
-  const [acceptRequest] = useAcceptFriendRequestMutation();
-  const [removeFriend] = useRemoveFriendMutation();
 
   if (isLoading) return <Spinner />;
   if (error) {
-    const status =
-      'status' in error && typeof error.status === 'number' ? error.status : 0;
-    let message = 'Unable to load profile.';
-    if (status === 401) {
-      message = 'You must be signed in to view this profile.';
-    } else if (status === 403) {
-      message = 'You do not have permission to view this profile.';
-    } else if (status === 404) {
-      message = 'User not found.';
-    }
-
-    return <div className="text-red-400">{message}</div>;
+    return <div className="text-red-400">{profileErrorMessage(error)}</div>;
   }
   if (!profile) return <Spinner />;
 
-  const isStaff = hasAnyPermission(currentUser, [
-    'staff',
-    'admin',
-    'users_edit',
-    'users_warn',
-    'users_disable'
-  ]);
-  const canEditOwnStaffBio =
-    isOwnProfile &&
-    (profile.userRank.displayStaff || hasAnyPermission(currentUser, ['admin']));
-
-  const profileDisabled = profile.disabled;
-  const profileWarned = profile.warned;
-  const profileIsDonor = profile.isDonor;
-  const profileStats = profile.stats;
-  const activitySummary = profile.activitySummary;
-  // Paranoia-gated (stellar-api #193): null when the viewer's tier hides stats.
-  const communityStats = profile.community;
-  const donorPresentation = profile.donorPresentation;
-  const featuredShelves = profile.collageShelves.featuredPersonalCollages;
-  const publicShelves = profile.collageShelves.publicCollages;
-
+  const isStaff = isStaffViewer(currentUser);
+  const ownRatioStats = isOwnProfile ? myRatioStats : undefined;
   return (
     <div>
-      {/* Page header */}
-      <div className="mb-6 flex items-center gap-3 flex-wrap">
-        <h1 data-st="prose" data-st-strong className="text-2xl">
-          {profile.username}
-        </h1>
-        {profile.profile?.profileTitle && (
-          <span data-st="meta" className="text-sm">
-            {profile.profile.profileTitle}
-          </span>
-        )}
-        <UserBadges
-          userId={profile.id}
-          disabled={profileDisabled}
-          warned={profileWarned}
-          donorRank={donorPresentation?.rank ?? null}
-        />
-        <div className="flex items-center gap-3 ml-auto text-sm">
-          {isOwnProfile && (
-            <Link to={`/user/edit/${profile.id}`} data-st="control">
-              Settings
-            </Link>
-          )}
-          {(isOwnProfile || isStaff) && (
-            <Link to={`/user/${profile.id}/stats`} data-st="control">
-              Stats
-            </Link>
-          )}
-          {!isOwnProfile && (
-            <>
-              <Link
-                to={`/messages/new?to=${profile.username}`}
-                data-st="control"
-              >
-                Send Message
-              </Link>
-              {friendStatus?.status === 'accepted' ? (
-                <button
-                  onClick={async () => {
-                    try {
-                      await removeFriend(profile.id).unwrap();
-                      dispatch(
-                        addAlert(
-                          `${profile.username} removed from friends.`,
-                          'success'
-                        )
-                      );
-                    } catch (err) {
-                      dispatch(
-                        addAlert(
-                          getApiErrorMessage(err) ?? 'Failed to remove friend.',
-                          'danger'
-                        )
-                      );
-                    }
-                  }}
-                  data-st="control"
-                >
-                  Remove Friend
-                </button>
-              ) : friendStatus?.status === 'pending_received' ? (
-                <button
-                  onClick={async () => {
-                    try {
-                      await acceptRequest(profile.id).unwrap();
-                      dispatch(
-                        addAlert(
-                          `You and ${profile.username} are now friends.`,
-                          'success'
-                        )
-                      );
-                    } catch (err) {
-                      dispatch(
-                        addAlert(
-                          getApiErrorMessage(err) ??
-                            'Failed to accept request.',
-                          'danger'
-                        )
-                      );
-                    }
-                  }}
-                  data-st="control"
-                  data-st-success
-                >
-                  Accept Friend Request
-                </button>
-              ) : friendStatus?.status === 'pending_sent' ? (
-                <span data-st="meta">Friend Request Sent</span>
-              ) : (
-                <button
-                  onClick={async () => {
-                    try {
-                      await addFriend(profile.id).unwrap();
-                      dispatch(
-                        addAlert(
-                          `Friend request sent to ${profile.username}.`,
-                          'success'
-                        )
-                      );
-                    } catch (err) {
-                      dispatch(
-                        addAlert(
-                          getApiErrorMessage(err) ?? 'Failed to add friend.',
-                          'danger'
-                        )
-                      );
-                    }
-                  }}
-                  data-st="control"
-                >
-                  Add to Friends
-                </button>
-              )}
-              <Link
-                to={`/reports/new?targetType=User&targetId=${profile.id}`}
-                data-st="control"
-              >
-                Report
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-
+      <ProfileHeader
+        profile={profile}
+        isOwnProfile={isOwnProfile}
+        isStaff={isStaff}
+      />
       <div className="flex gap-6 items-start">
-        {/* Main content (left) */}
-        <div className="flex-1 space-y-4 min-w-0">
-          {/* Own profile only: `myRatioStats` is skipped off it. Mounted here
-              rather than in the Statistics panel because that column is 176px
-              wide (ui#334) — the notice is prose and needs the main column. */}
-          {isOwnProfile && myRatioStats && (
-            <RatioPolicyNotice stats={myRatioStats} />
-          )}
-
-          {profile.profile?.profileInfoHtml && (
-            <div data-st="panel">
-              <div data-st="colhead" data-st-title>
-                <span>Profile</span>
-              </div>
-              {/* Was the one BBCode surface rendering WITHOUT `.bbcode-content`,
-                  so its quotes, code blocks and lists went unstyled. The shared
-                  component owns the wrapper, which is how that stops recurring. */}
-              <BBCodeContent
-                data-st="prose"
-                className="p-4 text-sm"
-                html={profile.profile.profileInfoHtml}
-              />
-            </div>
-          )}
-
-          {donorPresentation && (
-            <div className="rounded border border-pink-900/50 bg-gradient-to-br from-pink-950/40 via-gray-900 to-gray-900 overflow-hidden">
-              <div className="bg-pink-900/20 border-b border-pink-900/40 px-4 py-2 flex items-center justify-between">
-                <span className="text-sm font-semibold text-pink-200">
-                  Donor Presentation
-                </span>
-                {donorPresentation.rank && (
-                  <span
-                    className="text-xs font-semibold"
-                    style={{ color: donorPresentation.rank.color || undefined }}
-                  >
-                    {donorPresentation.rank.badge} {donorPresentation.rank.name}
-                  </span>
-                )}
-              </div>
-              <div className="p-4 space-y-4">
-                {(donorPresentation.customIconSrc ||
-                  donorPresentation.secondAvatarSrc) && (
-                  <div className="flex flex-wrap gap-4 items-start">
-                    {donorPresentation.customIconSrc && (
-                      <div className="space-y-2">
-                        <div className="text-xs uppercase tracking-wide text-pink-200/80">
-                          Custom Icon
-                        </div>
-                        {donorPresentation.customIconLink ? (
-                          <a
-                            href={donorPresentation.customIconLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-block"
-                          >
-                            <img
-                              src={donorPresentation.customIconSrc}
-                              alt=""
-                              title={
-                                donorPresentation.iconMouseOverText ?? undefined
-                              }
-                              className="h-12 w-12 object-contain rounded border border-pink-900/40 bg-black/20"
-                            />
-                          </a>
-                        ) : (
-                          <img
-                            src={donorPresentation.customIconSrc}
-                            alt=""
-                            title={
-                              donorPresentation.iconMouseOverText ?? undefined
-                            }
-                            className="h-12 w-12 object-contain rounded border border-pink-900/40 bg-black/20"
-                          />
-                        )}
-                      </div>
-                    )}
-                    {donorPresentation.secondAvatarSrc && (
-                      <div className="space-y-2">
-                        <div className="text-xs uppercase tracking-wide text-pink-200/80">
-                          Donor Avatar
-                        </div>
-                        <img
-                          src={donorPresentation.secondAvatarSrc}
-                          alt=""
-                          title={
-                            donorPresentation.avatarMouseOverText ?? undefined
-                          }
-                          className="h-20 w-20 object-cover rounded border border-pink-900/40"
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {donorPresentation.rank && (
-                  <div className="text-sm text-[var(--st-text)]">
-                    Granted{' '}
-                    <span className="text-[var(--st-text-strong)]">
-                      {new Date(
-                        donorPresentation.rank.grantedAt
-                      ).toLocaleDateString()}
-                    </span>
-                    {donorPresentation.rank.expiresAt && (
-                      <>
-                        {' '}
-                        · Expires{' '}
-                        <span className="text-[var(--st-text-strong)]">
-                          {new Date(
-                            donorPresentation.rank.expiresAt
-                          ).toLocaleDateString()}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {donorPresentation.profileBlocks.length > 0 && (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {donorPresentation.profileBlocks.map((block, index) => (
-                      <div
-                        key={`${block.title}-${index}`}
-                        className="rounded border border-pink-900/30 bg-black/10 p-3"
-                      >
-                        {block.title && (
-                          <div className="mb-2 text-xs uppercase tracking-wide text-pink-200/80">
-                            {block.title}
-                          </div>
-                        )}
-                        <div className="text-sm text-[var(--st-text)] whitespace-pre-wrap">
-                          {block.body}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {(featuredShelves.length > 0 || publicShelves.length > 0) && (
-            <div className="space-y-4">
-              {featuredShelves.length > 0 && (
-                <div data-st="panel">
-                  <div data-st="colhead" data-st-title>
-                    <span>Featured Shelves</span>
-                  </div>
-                  <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
-                    {featuredShelves.map((collage) => (
-                      <Link
-                        key={collage.id}
-                        to={`/collages/${collage.id}`}
-                        className="rounded border border-[var(--st-border)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors overflow-hidden"
-                      >
-                        <div className="grid grid-cols-2 gap-px bg-[var(--st-border)]">
-                          {collage.coverImagesSrc.length > 0 ? (
-                            collage.coverImagesSrc
-                              .slice(0, 4)
-                              .map((image, index) => (
-                                <img
-                                  key={`${collage.id}-${index}`}
-                                  src={image}
-                                  alt=""
-                                  className="aspect-square w-full object-cover"
-                                />
-                              ))
-                          ) : (
-                            <div className="col-span-2 aspect-[2/1] bg-[var(--st-base)]" />
-                          )}
-                        </div>
-                        <div className="p-3">
-                          <div className="text-sm font-medium text-[var(--st-text-strong)]">
-                            {collage.name}
-                          </div>
-                          <div className="mt-1 text-xs text-[var(--st-text-muted)]">
-                            {collage.numEntries} entries
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {publicShelves.length > 0 && (
-                <div data-st="panel">
-                  <div data-st="colhead" data-st-title>
-                    <span>Public Collages</span>
-                  </div>
-                  <div className="divide-y divide-[var(--st-border-subtle)]">
-                    {publicShelves.map((collage) => (
-                      <Link
-                        key={collage.id}
-                        to={`/collages/${collage.id}`}
-                        className="flex items-center gap-4 px-4 py-3 hover:bg-[var(--st-border)]/30 transition-colors"
-                      >
-                        <div className="grid h-16 w-20 shrink-0 grid-cols-2 gap-px overflow-hidden rounded bg-[var(--st-border)]">
-                          {collage.coverImagesSrc.length > 0 ? (
-                            collage.coverImagesSrc
-                              .slice(0, 4)
-                              .map((image, index) => (
-                                <img
-                                  key={`${collage.id}-public-${index}`}
-                                  src={image}
-                                  alt=""
-                                  className="h-full w-full object-cover"
-                                />
-                              ))
-                          ) : (
-                            <div className="col-span-2 h-full w-full bg-[var(--st-base)]" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-sm font-medium text-[var(--st-text-strong)]">
-                            {collage.name}
-                          </div>
-                          <div className="mt-1 text-xs text-[var(--st-text-muted)]">
-                            {COLLAGE_CATEGORY_LABELS[collage.categoryId] ??
-                              'Collage'}{' '}
-                            · {collage.numEntries} entries
-                          </div>
-                        </div>
-                        <div className="shrink-0 text-xs text-[var(--st-text-muted)]">
-                          {new Date(collage.updatedAt).toLocaleDateString()}
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div data-st="panel">
-            <div data-st="colhead" data-st-title>
-              <span>Recent Contributions</span>
-            </div>
-            {profile.recentContributions.length ? (
-              <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-5">
-                {profile.recentContributions.map((item) => (
-                  <Link
-                    key={item.id}
-                    to={`/communities/${item.release.communityId}/releases/${item.release.id}`}
-                    className="overflow-hidden rounded border border-[var(--st-border-subtle)] bg-[var(--st-base)] hover:border-[var(--st-accent-ring)] transition-colors"
-                  >
-                    <div className="aspect-square bg-[var(--st-base)]">
-                      {item.release.imageSrc ? (
-                        <img
-                          src={item.release.imageSrc}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      ) : null}
-                    </div>
-                    <div className="p-3">
-                      <div className="truncate text-sm font-medium text-[var(--st-text-strong)]">
-                        {item.release.title}
-                      </div>
-                      {item.release.artist && (
-                        <div className="mt-1 truncate text-xs text-[var(--st-text-muted)]">
-                          {item.release.artist.name}
-                        </div>
-                      )}
-                      <div className="mt-2 text-xs text-[var(--st-text-muted)]">
-                        <Time date={item.createdAt} />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="px-4 py-3 text-sm text-[var(--st-text-muted)]">
-                No recent contributions.
-              </div>
-            )}
-          </div>
-
-          {profile.recentSnatches.length > 0 && (
-            <div data-st="panel">
-              <div data-st="colhead" data-st-title>
-                <span>Recent Snatches</span>
-              </div>
-              <div className="divide-y divide-[var(--st-border-subtle)]">
-                {profile.recentSnatches.map((item) => (
-                  <div
-                    key={item.id}
-                    className="px-4 py-3 flex items-center justify-between gap-4 text-sm"
-                  >
-                    <div className="min-w-0">
-                      <Link
-                        to={`/communities/${item.release.communityId}/releases/${item.release.id}`}
-                        data-st="control"
-                      >
-                        {item.release.title}
-                      </Link>
-                      {item.artist && (
-                        <div className="text-xs text-[var(--st-text-muted)]">
-                          {item.artist.name}
-                        </div>
-                      )}
-                    </div>
-                    <span className="shrink-0 text-xs text-[var(--st-text-muted)]">
-                      <Time date={item.downloadedAt} />
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {isOwnProfile && <SnatchListSection />}
-
-          {canEditOwnStaffBio && (
-            <StaffBioEditor
-              key={profile.id}
-              profileId={profile.id}
-              initialBio={profile.staffBio}
-            />
-          )}
-
-          {!isOwnProfile && (
-            <StaffOrInviteControls isStaff={isStaff} profile={profile} />
-          )}
-        </div>
-
-        {/* Sidebar (right) */}
-        <div className="w-44 shrink-0 space-y-4">
-          <div data-st="panel">
-            <div data-st="colhead">
-              <span>Avatar</span>
-            </div>
-            <div className="p-3 flex justify-center">
-              <img
-                width={150}
-                alt={`${profile.username}'s avatar`}
-                className="rounded object-cover w-full"
-                src={avatarSrc(
-                  profile.profile?.avatarSrc ?? profile.avatarSrc,
-                  profile.profile?.avatar ?? profile.avatar
-                )}
-                onError={onAvatarError}
-              />
-            </div>
-          </div>
-
-          <div data-st="panel">
-            <div data-st="colhead">
-              <span>Statistics</span>
-            </div>
-            <ul className="px-3 py-2 space-y-1 text-xs text-[var(--st-text)]">
-              {profile.dateRegistered && (
-                <li>
-                  <span data-st="meta">Joined:</span>{' '}
-                  <Time date={profile.dateRegistered} />
-                </li>
-              )}
-              {profile.lastSeen && (
-                <li>
-                  <span data-st="meta">Last seen:</span>{' '}
-                  <Time date={profile.lastSeen} />
-                </li>
-              )}
-              {profile.email && (
-                <li className="break-all">
-                  <span data-st="meta">Email:</span> {profile.email}
-                </li>
-              )}
-              {profile.userRank && (
-                <li>
-                  <span data-st="meta">Class:</span>{' '}
-                  <span style={{ color: profile.userRank.color }}>
-                    {profile.userRank.badge ? `${profile.userRank.badge} ` : ''}
-                    {profile.userRank.name}
-                  </span>
-                </li>
-              )}
-              {profile.inviteCount !== null &&
-                profile.inviteCount !== undefined && (
-                  <li>
-                    <span data-st="meta">Invites:</span> {profile.inviteCount}
-                    {profile.canInvite === false && (
-                      <span className="text-[var(--st-warning)]">
-                        {' '}
-                        (revoked)
-                      </span>
-                    )}
-                  </li>
-                )}
-              {profileIsDonor && <li className="text-pink-400">Donor ♥</li>}
-              <li>
-                <span data-st="meta">Contributed:</span>{' '}
-                {formatByteStat(profileStats.contributed)}
-              </li>
-              <li>
-                <span data-st="meta">Consumed:</span>{' '}
-                {formatByteStat(profileStats.consumed)}
-              </li>
-              <li>
-                <span data-st="meta">Ratio:</span>{' '}
-                {profileStats.ratio ?? 'Hidden'}
-              </li>
-              <li>
-                <span data-st="meta">Buffer:</span>{' '}
-                {formatByteStat(profileStats.buffer)}
-              </li>
-              {isOwnProfile && myRatioStats && (
-                <>
-                  <li>
-                    <span data-st="meta">Required ratio:</span>{' '}
-                    {myRatioStats.requiredRatio.toFixed(3)}
-                  </li>
-                  <li>
-                    <span data-st="meta">Bracket:</span>{' '}
-                    {myRatioStats.bracket.label}
-                  </li>
-                  <li>
-                    <Link to="/ratio" data-st="control">
-                      Ratio rules →
-                    </Link>
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
-
-          {communityStats && (
-            <div data-st="panel">
-              <div data-st="colhead">
-                <span>Reputation</span>
-              </div>
-              <div className="px-3 py-2 border-b border-[var(--st-border-subtle)]">
-                <div className="text-[var(--st-text-muted)] text-xs uppercase tracking-wide">
-                  Community Reputation Score
-                </div>
-                <div
-                  data-st="prose"
-                  data-st-strong
-                  className="mt-0.5 text-lg font-semibold text-[var(--st-link)]"
-                >
-                  {communityStats.reputation.score.toFixed(2)}
-                </div>
-              </div>
-              <ul className="divide-y divide-[var(--st-border-subtle)] text-xs">
-                {communityStats.reputation.dimensions.map((dim) => (
-                  <li
-                    key={dim.name}
-                    className="flex items-center justify-between px-3 py-1.5"
-                  >
-                    <span className="capitalize text-[var(--st-text-muted)]">
-                      {dim.name}
-                    </span>
-                    <span className="text-[var(--st-text)]">
-                      {dim.subScore.toFixed(2)}
-                      <span className="text-[var(--st-text-faint)] ml-1">
-                        (×wt {dim.weighted.toFixed(2)})
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="grid gap-px bg-[var(--st-border)] grid-cols-2 border-t border-[var(--st-border-subtle)]">
-                <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
-                  <div data-st="meta" className="uppercase tracking-wide">
-                    Friends
-                  </div>
-                  <div
-                    data-st="prose"
-                    data-st-strong
-                    className="mt-0.5 text-sm"
-                  >
-                    {communityStats.friends}
-                  </div>
-                </div>
-                <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
-                  <div data-st="meta" className="uppercase tracking-wide">
-                    Invites
-                  </div>
-                  <div
-                    data-st="prose"
-                    data-st-strong
-                    className="mt-0.5 text-sm"
-                  >
-                    {communityStats.invites.direct} direct /{' '}
-                    {communityStats.invites.total} total
-                    <span data-st="meta">
-                      {' '}
-                      (depth {communityStats.invites.depth})
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div data-st="panel">
-            <div data-st="colhead">
-              <span>Activity</span>
-            </div>
-            <div className="grid gap-px bg-[var(--st-border)] grid-cols-1">
-              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
-                <div data-st="meta" className="uppercase tracking-wide">
-                  Contributions
-                </div>
-                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
-                  {activitySummary.contributions}
-                </div>
-              </div>
-              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
-                <div data-st="meta" className="uppercase tracking-wide">
-                  Requests
-                </div>
-                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
-                  {activitySummary.requestsCreated} created /{' '}
-                  {activitySummary.requestsFilled} filled
-                </div>
-              </div>
-              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
-                <div data-st="meta" className="uppercase tracking-wide">
-                  Forums
-                </div>
-                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
-                  {activitySummary.forumTopics} topics /{' '}
-                  {activitySummary.forumPosts} posts
-                </div>
-              </div>
-              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
-                <div data-st="meta" className="uppercase tracking-wide">
-                  Collections
-                </div>
-                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
-                  {activitySummary.collagesStarted} collages
-                </div>
-              </div>
-              <div className="bg-[var(--st-panel)] px-3 py-2 text-xs">
-                <div data-st="meta" className="uppercase tracking-wide">
-                  Comments
-                </div>
-                <div data-st="prose" data-st-strong className="mt-0.5 text-sm">
-                  {activitySummary.comments}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <PercentileRankings percentiles={profile.percentiles} />
-        </div>
+        <ProfileMain
+          profile={profile}
+          myRatioStats={ownRatioStats}
+          isOwnProfile={isOwnProfile}
+          isStaff={isStaff}
+          canEditBio={canEditOwnStaffBio(currentUser, profile, isOwnProfile)}
+        />
+        <ProfileSidebar profile={profile} myRatioStats={ownRatioStats} />
       </div>
     </div>
   );
