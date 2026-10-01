@@ -57,8 +57,7 @@ const tree = (overrides: { rules?: unknown[]; variables?: unknown } = {}) => ({
     ],
     variables: overrides.variables ?? {
       disabled_channel: '#disabled',
-      irc: '/irc',
-      irc_guide_article: 'https://korin.pink/wiki/irc',
+      irc: 'https://korin.pink/wiki/irc',
       staffpm: '/inbox/staff'
     }
   }
@@ -95,7 +94,7 @@ describe('InviteRules (#331)', () => {
     expect(screen.getByText(/#disabled/)).toBeInTheDocument();
   });
 
-  it('sends ${irc} to the public guide, not the dead route (api#630)', () => {
+  it('passes ${irc} through as the api resolves it (api#630)', () => {
     renderWithProviders(<InviteRules />);
     expect(screen.getByRole('link', { name: 'IRC' })).toHaveAttribute(
       'href',

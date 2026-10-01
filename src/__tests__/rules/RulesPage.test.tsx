@@ -31,7 +31,10 @@ const TREE = {
       ]
     }
   ],
-  variables: { disabled_channel: '#disabled', irc: '/irc' }
+  variables: {
+    disabled_channel: '#disabled',
+    irc: 'https://korin.pink/wiki/irc'
+  }
 };
 
 beforeEach(() => {
@@ -55,14 +58,15 @@ describe('RulesPage', () => {
     expect(
       screen.getByText('Do not create more than one account.')
     ).toBeInTheDocument();
-    // ${disabled_channel} → text, ${irc} → an internal link labelled IRC
+    // ${disabled_channel} → text; ${irc} → the public IRC page (api#630), an
+    // external link labelled IRC
     expect(
       screen.getByText(/contact staff in #disabled on/)
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'IRC' })).toHaveAttribute(
-      'href',
-      '/irc'
-    );
+    const irc = screen.getByRole('link', { name: 'IRC' });
+    expect(irc).toHaveAttribute('href', 'https://korin.pink/wiki/irc');
+    expect(irc).toHaveAttribute('target', '_blank');
+    expect(irc).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('anchors each rule and sub-rule by its positional number for [rule] links', () => {
