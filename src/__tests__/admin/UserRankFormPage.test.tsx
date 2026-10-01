@@ -474,9 +474,9 @@ describe('UserRankFormPage — promotion criteria (#170)', () => {
         (screen.getByLabelText(/min contributed/i) as HTMLInputElement).value
       ).toBe('536870912000');
     });
-    expect(
-      (screen.getByLabelText(/promotes to/i) as HTMLSelectElement).value
-    ).toBe('4');
+    expect(screen.getByLabelText(/promotes to/i)).toHaveTextContent(
+      'Stellarific'
+    );
   });
 
   it('updates the existing rule with minContributed kept as a string', async () => {
@@ -505,7 +505,6 @@ describe('UserRankFormPage — promotion criteria (#170)', () => {
     mockGetPromotionRules.mockReturnValue({ data: [] });
     const user = userEvent.setup();
     renderWithProviders(<UserRankFormPage />);
-    await user.selectOptions(screen.getByLabelText(/promotes to/i), '4');
     await user.click(
       screen.getByRole('button', { name: /save promotion criteria/i })
     );

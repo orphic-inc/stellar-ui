@@ -14737,13 +14737,13 @@ export interface paths {
         };
       };
       responses: {
-        /** @description User rank updated */
+        /** @description User rank updated. `staleRules` is present only when this level or secondary change took promotion rules off the ladder; the change is not refused, and the evaluator skips those rules (#718). */
         200: {
           headers: {
             [name: string]: unknown;
           };
           content: {
-            'application/json': components['schemas']['UserRank'];
+            'application/json': components['schemas']['UserRankUpdated'];
           };
         };
         /** @description Invalid path parameters or request body */
@@ -15005,7 +15005,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description fromRank or toRank not found */
+        /** @description fromRank or toRank not found, secondary, or not adjacent on the ladder */
         422: {
           headers: {
             [name: string]: unknown;
@@ -15175,7 +15175,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description fromRank or toRank not found */
+        /** @description fromRank or toRank not found, secondary, or not adjacent on the ladder */
         422: {
           headers: {
             [name: string]: unknown;
@@ -31736,6 +31736,25 @@ export interface components {
       secondaryUserCount: number;
       userCount: number;
     };
+    PromotionRule: {
+      id: number;
+      fromRankId: number;
+      fromRankName: string | null;
+      toRankId: number;
+      toRankName: string | null;
+      minContributed: string;
+      minRatio: number;
+      minContributions: number;
+      minAccountAgeDays: number;
+      /** @enum {string|null} */
+      extra: 'DISTINCT_RELEASES_500' | 'QUALITY_CONTRIB_500' | null;
+      enabled: boolean;
+      createdAt: string;
+      updatedAt: string;
+    };
+    UserRankUpdated: components['schemas']['UserRank'] & {
+      staleRules?: components['schemas']['PromotionRule'][];
+    };
     StaffGroup: {
       id: number;
       name: string;
@@ -31989,22 +32008,6 @@ export interface components {
     PaginatedComments: {
       data: components['schemas']['CommentWithEditor'][];
       meta: components['schemas']['PaginationMeta'];
-    };
-    PromotionRule: {
-      id: number;
-      fromRankId: number;
-      fromRankName: string | null;
-      toRankId: number;
-      toRankName: string | null;
-      minContributed: string;
-      minRatio: number;
-      minContributions: number;
-      minAccountAgeDays: number;
-      /** @enum {string|null} */
-      extra: 'DISTINCT_RELEASES_500' | 'QUALITY_CONTRIB_500' | null;
-      enabled: boolean;
-      createdAt: string;
-      updatedAt: string;
     };
     Artist: {
       id: number;

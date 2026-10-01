@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Controller, useForm, useWatch } from 'react-hook-form';
@@ -13,7 +13,9 @@ import { useGetForumCategoriesQuery } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
 import Spinner from '../layout/Spinner';
 import PromotionCriteriaSection from './PromotionCriteriaSection';
+import StaleRulesNotice from './StaleRulesNotice';
 import NullableLimitField from './NullableLimitField';
+import type { components } from '../../types/api';
 
 interface FormValues {
   level: number;
@@ -28,6 +30,8 @@ interface FormValues {
   displayStaff: boolean;
   staffGroupId: number | '';
 }
+
+type StaleRules = components['schemas']['PromotionRule'][];
 
 const NUMBER_INPUT_CLASS =
   'w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm';
@@ -80,6 +84,7 @@ const UserRankFormPage = () => {
   const [createUserRank] = useCreateUserRankMutation();
   const [updateUserRank] = useUpdateUserRankMutation();
   const dispatch = useDispatch();
+  const [staleRules, setStaleRules] = useState<StaleRules>([]);
 
   const { register, handleSubmit, reset, control, setValue } =
     useForm<FormValues>({
@@ -141,7 +146,13 @@ const UserRankFormPage = () => {
     };
     try {
       if (isEditing && id) {
-        await updateUserRank({ id: parseInt(id), ...payload }).unwrap();
+        const saved = await updateUserRank({
+          id: parseInt(id),
+          ...payload
+        }).unwrap();
+        // Stay put so staff see the rules this change stranded (#383).
+        setStaleRules(saved.staleRules ?? []);
+        if (saved.staleRules?.length) return;
       } else {
         await createUserRank(payload).unwrap();
       }
@@ -182,6 +193,8 @@ const UserRankFormPage = () => {
           </h2>
         </div>
       </div>
+
+      <StaleRulesNotice rules={staleRules} />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Basic info */}
