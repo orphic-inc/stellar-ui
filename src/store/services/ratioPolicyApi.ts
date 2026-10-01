@@ -22,8 +22,11 @@ export const ratioPolicyApi = api.injectEndpoints({
         method: 'POST',
         body
       }),
+      // The whole Profile tag: a profile opened by username is tagged by
+      // `Number(username)`, so an id-targeted entry would miss it (ui#417).
       invalidatesTags: (_, __, { userId }) => [
-        { type: 'RatioPolicy', id: userId }
+        { type: 'RatioPolicy', id: userId },
+        'Profile'
       ]
     })
   })

@@ -38,7 +38,7 @@ import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 import { InviteControls, type InviteProfile } from './InviteControlsPanel';
-import RatioPolicyNotice from './RatioPolicyNotice';
+import ProfileRatioPolicy from './view/ProfileRatioPolicy';
 import ProfileHeader from './view/ProfileHeader';
 import DonorPresentationPanel from './view/DonorPresentationPanel';
 import CollageShelves from './view/CollageShelves';
@@ -1067,10 +1067,10 @@ const ProfileMain = ({
   canEditBio: boolean;
 }) => (
   <div className="flex-1 space-y-4 min-w-0">
-    {/* Own profile only: `myRatioStats` is skipped off it. Mounted here
-        rather than in the Statistics panel because that column is 176px
-        wide (ui#334) — the notice is prose and needs the main column. */}
-    {myRatioStats && <RatioPolicyNotice stats={myRatioStats} />}
+    {/* Not in the Statistics panel: that column is 176px wide (ui#334),
+        and the notice is prose. `myRatioStats` is skipped off the own
+        profile; another member's comes from the profile (ui#417). */}
+    <ProfileRatioPolicy profile={profile} ownStats={myRatioStats} />
     <ProfileInfoPanel html={profile.profile?.profileInfoHtml} />
     <DonorPresentationPanel presentation={profile.donorPresentation} />
     <CollageShelves shelves={profile.collageShelves} />

@@ -8,6 +8,16 @@ All notable changes to stellar-ui are documented here.
 
 ### Added
 
+- **A member's ratio watch shows on their profile** (#417). It needs
+  stellar-api #658, which sends `ratioWatch` to every viewer and `ratioPolicy`
+  to `ratio_policy_manage`.
+  - **Any viewer:** an active watch, as present facts: when it ends, how far
+    short of the required ratio the member currently is, and what they have
+    consumed since it began.
+  - **`ratio_policy_manage`:** the status instead, including a download
+    disable and its cause, with a link into the ratio policy tool already on
+    that member (`/staff/tools/ratio-policy?user=<id>`).
+  - An override in that tool now refreshes any profile already loaded.
 - **A rank holding only an invite permission can see and manage invites on a
   profile** (#414). It needs stellar-api #655, which sends `inviteCount` and
   `canInvite` to a viewer holding `invites_manage` or `invites_edit`.

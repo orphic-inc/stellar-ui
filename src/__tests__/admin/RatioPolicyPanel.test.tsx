@@ -101,6 +101,52 @@ describe('RatioPolicyPanel', () => {
     });
   });
 
+  describe('the ?user= deep link from a profile (ui#417)', () => {
+    beforeEach(() => {
+      mockGetRatioPolicyQuery.mockImplementation((userId: unknown) =>
+        userId === 7
+          ? { data: policyData, isLoading: false }
+          : { data: undefined, isLoading: false }
+      );
+    });
+
+    it('loads the member it names, with the field filled in', async () => {
+      renderWithProviders(<RatioPolicyPanel />, {
+        initialEntries: ['/staff/tools/ratio-policy?user=7']
+      });
+
+      expect(screen.getByLabelText(/user id/i)).toHaveValue(7);
+      await waitFor(() =>
+        expect(screen.getByText(/override status/i)).toBeInTheDocument()
+      );
+    });
+
+    it('ignores a value that is not a member id', () => {
+      renderWithProviders(<RatioPolicyPanel />, {
+        initialEntries: ['/staff/tools/ratio-policy?user=abc']
+      });
+
+      expect(screen.getByLabelText(/user id/i)).toHaveValue(null);
+      expect(screen.queryByText(/override status/i)).not.toBeInTheDocument();
+    });
+
+    it('a manual Load replaces the linked member', async () => {
+      const user = userEvent.setup();
+      renderWithProviders(<RatioPolicyPanel />, {
+        initialEntries: ['/staff/tools/ratio-policy?user=9']
+      });
+      expect(screen.queryByText(/override status/i)).not.toBeInTheDocument();
+
+      await user.clear(screen.getByLabelText(/user id/i));
+      await user.type(screen.getByLabelText(/user id/i), '7');
+      await user.click(screen.getByRole('button', { name: /^load$/i }));
+
+      await waitFor(() =>
+        expect(screen.getByText(/override status/i)).toBeInTheDocument()
+      );
+    });
+  });
+
   it('shows current status badge in policy view', async () => {
     mockGetRatioPolicyQuery.mockReturnValue({
       data: policyData,
