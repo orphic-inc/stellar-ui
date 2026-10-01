@@ -15005,7 +15005,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description fromRank or toRank not found, secondary, or not adjacent on the ladder */
+        /** @description fromRank or toRank not found, not auto-managed (secondary or staff), or not adjacent on the ladder */
         422: {
           headers: {
             [name: string]: unknown;
@@ -15175,7 +15175,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description fromRank or toRank not found, secondary, or not adjacent on the ladder */
+        /** @description fromRank or toRank not found, not auto-managed (secondary or staff), or not adjacent on the ladder */
         422: {
           headers: {
             [name: string]: unknown;
@@ -30430,18 +30430,6 @@ export interface components {
         name: string;
       } | null;
     };
-    InviteNode: {
-      id: number;
-      username: string;
-      /** Format: email */
-      email?: string;
-      joinedAt: string;
-      lastSeen?: string | null;
-      contributed?: string;
-      consumed?: string;
-      ratio?: string;
-      children?: components['schemas']['InviteNode'][];
-    };
     CommunityStats: {
       friends: number;
       invites: {
@@ -30509,7 +30497,6 @@ export interface components {
       staffPmOverview: components['schemas']['ProfileStaffPmOverview'] | null;
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
-      inviteTree: components['schemas']['InviteNode'][];
       community: components['schemas']['CommunityStats'] | null;
       /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
       avatarSrc: string | null;
@@ -30565,7 +30552,6 @@ export interface components {
       staffPmOverview: components['schemas']['ProfileStaffPmOverview'] | null;
       recentContributions: components['schemas']['ProfileContribution'][];
       recentSnatches: components['schemas']['ProfileSnatch'][];
-      inviteTree: components['schemas']['InviteNode'][];
       community: components['schemas']['CommunityStats'] | null;
       userSettings: components['schemas']['UserSettings'];
       /** @description What a browser may load for the image field beside it: a path on this origin (an imported or uploaded image is /api/asset/<hash>), or null while a remote image is not imported. Never a remote URL (ADR-0051). */
@@ -31721,6 +31707,8 @@ export interface components {
         [key: string]: boolean;
       };
       secondary: boolean;
+      /** @description False for a secondary rank, and for a primary rank at level 500 or above (staff). Promotion rules join only auto-managed ranks. A member whose primary rank isn't auto-managed is never auto-promoted or demoted, disabled for inactivity, or granted invites by the handout (#866). */
+      autoManaged: boolean;
       permittedForumIds: number[];
       color: string;
       badge: string;
