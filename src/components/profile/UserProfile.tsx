@@ -47,7 +47,7 @@ import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 import UserBadges from '../layout/UserBadges';
-import { InviteControls } from './InviteControlsPanel';
+import { InviteControls, type InviteProfile } from './InviteControlsPanel';
 import RatioPolicyNotice from './RatioPolicyNotice';
 import PercentileRankings from './PercentileRankings';
 
@@ -1053,22 +1053,16 @@ const SnatchListSection = () => {
   );
 };
 
-/**
- * Staff get Staff Actions, which hold the Invites panel. A rank holding only
- * an invite permission gets that panel on its own (#414, stellar-api#655).
- */
-const StaffOrInviteControls = ({
-  isStaff,
-  profile
-}: {
+// Staff get Staff Actions, which hold the Invites panel. A rank holding only an
+// invite permission gets that panel on its own (#414).
+function StaffOrInviteControls(props: {
   isStaff: boolean;
-  profile: Parameters<typeof InviteControls>[0]['profile'];
-}) =>
-  isStaff ? (
-    <StaffActionsPanel profileId={profile.id} />
-  ) : (
-    <InviteControls profile={profile} />
-  );
+  profile: InviteProfile;
+}) {
+  const { isStaff, profile } = props;
+  if (isStaff) return <StaffActionsPanel profileId={profile.id} />;
+  return <InviteControls profile={profile} />;
+}
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();

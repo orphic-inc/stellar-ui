@@ -414,15 +414,17 @@ const InviteControlsPanel = ({
  * on its own for an invite-only rank, which the api serves the fields since
  * stellar-api#655 (#414).
  */
+export type InviteProfile = {
+  id: number;
+  inviteCount?: number | null;
+  canInvite?: boolean | null;
+};
+
 export const InviteControls = ({
   profile,
   bodyClass = 'px-4 py-3'
 }: {
-  profile: {
-    id: number;
-    inviteCount?: number | null;
-    canInvite?: boolean | null;
-  };
+  profile: InviteProfile;
   bodyClass?: string;
 }) => {
   const currentUser = useAppSelector(selectCurrentUser);
