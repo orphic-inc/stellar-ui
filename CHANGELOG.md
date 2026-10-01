@@ -6,6 +6,17 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **A rank holding only an invite permission can see and manage invites on a
+  profile** (#414). It needs stellar-api #655, which sends `inviteCount` and
+  `canInvite` to a viewer holding `invites_manage` or `invites_edit`.
+  - **`invites_edit`:** the Invites panel mounts on its own, without the rest
+    of Staff Actions.
+  - **`invites_manage`:** the balance shows read-only in the sidebar.
+  - **Staff:** unchanged; the Invites panel stays inside Staff Actions.
+  - **Older api:** with neither field sent, nothing mounts.
+
 ## [0.9.11] — 2026-09-30
 
 Pairs with stellar-api 0.9.11, whose contract this re-vendors. No ui code

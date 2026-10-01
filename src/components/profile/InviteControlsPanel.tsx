@@ -4,7 +4,9 @@ import {
   useSetUserInviteCountMutation
 } from '../../store/services/userApi';
 import { useGetProfileByUserIdQuery } from '../../store/services/profileApi';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { selectCurrentUser } from '../../store/slices/authSlice';
+import { hasPermission } from '../../utils/permissions';
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { Button, Modal } from '../ui';
@@ -346,8 +348,7 @@ const InviteBalanceModal = ({
 
 /**
  * Staff controls for a member's invites (stellar-ui#329, stellar-api#636).
- * Mounted by the profile's staff actions only for `invites_edit`, and only when
- * the api disclosed both fields to this viewer.
+ * Mount it through `InviteControls`, which decides whether it appears.
  */
 const InviteControlsPanel = ({
   profileId,
@@ -403,6 +404,39 @@ const InviteControlsPanel = ({
         />
       )}
     </div>
+  );
+};
+
+/**
+ * The controls, for a viewer holding `invites_edit`, and only when the api
+ * disclosed both fields: the count is what the compare-and-set sends back, so
+ * no fields, no panel. Staff Actions mounts it for staff; the profile mounts it
+ * on its own for an invite-only rank, which the api serves the fields since
+ * stellar-api#655 (#414).
+ */
+export const InviteControls = ({
+  profile,
+  bodyClass = 'px-4 py-3'
+}: {
+  profile: {
+    id: number;
+    inviteCount?: number | null;
+    canInvite?: boolean | null;
+  };
+  bodyClass?: string;
+}) => {
+  const currentUser = useAppSelector(selectCurrentUser);
+  const { inviteCount, canInvite } = profile;
+  if (inviteCount == null || canInvite == null) return null;
+  if (!hasPermission(currentUser, 'invites_edit')) return null;
+  return (
+    <InviteControlsPanel
+      key={profile.id}
+      profileId={profile.id}
+      inviteCount={inviteCount}
+      canInvite={canInvite}
+      bodyClass={bodyClass}
+    />
   );
 };
 

@@ -43,11 +43,11 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { avatarSrc, onAvatarError } from '../../utils/avatar';
-import { hasAnyPermission, hasPermission } from '../../utils/permissions';
+import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 import UserBadges from '../layout/UserBadges';
-import InviteControlsPanel from './InviteControlsPanel';
+import { InviteControls } from './InviteControlsPanel';
 import RatioPolicyNotice from './RatioPolicyNotice';
 import PercentileRankings from './PercentileRankings';
 
@@ -395,7 +395,6 @@ const RankAssignmentPanel = ({
 
 const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
   const dispatch = useDispatch();
-  const currentUser = useSelector(selectCurrentUser);
   const [showWarnModal, setShowWarnModal] = useState(false);
   const [showIpHistory, setShowIpHistory] = useState(false);
   const [showEmailHistory, setShowEmailHistory] = useState(false);
@@ -698,19 +697,9 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
             />
           )}
 
-          {/* The api discloses both only to staff it recognises (#329), and the
-              count is what the compare-and-set sends back, so no fields, no panel. */}
-          {profile?.inviteCount != null &&
-            profile.canInvite != null &&
-            hasPermission(currentUser, 'invites_edit') && (
-              <InviteControlsPanel
-                key={profileId}
-                profileId={profileId}
-                inviteCount={profile.inviteCount}
-                canInvite={profile.canInvite}
-                bodyClass={bodyClass}
-              />
-            )}
+          {profile && (
+            <InviteControls profile={profile} bodyClass={bodyClass} />
+          )}
 
           {/* Donor status */}
           <div data-st="panel">
@@ -1023,6 +1012,23 @@ const StaffActionsPanel = ({ profileId }: { profileId: number }) => {
     </>
   );
 };
+
+/**
+ * Staff get Staff Actions, which hold the Invites panel. A rank holding only
+ * an invite permission gets that panel on its own (#414, stellar-api#655).
+ */
+const StaffOrInviteControls = ({
+  isStaff,
+  profile
+}: {
+  isStaff: boolean;
+  profile: Parameters<typeof InviteControls>[0]['profile'];
+}) =>
+  isStaff ? (
+    <StaffActionsPanel profileId={profile.id} />
+  ) : (
+    <InviteControls profile={profile} />
+  );
 
 const SnatchListSection = () => {
   const { data: snatchList, isLoading } = useGetSnatchListQuery();
@@ -1567,8 +1573,8 @@ const UserProfile = () => {
             />
           )}
 
-          {!isOwnProfile && isStaff && (
-            <StaffActionsPanel profileId={profile.id} />
+          {!isOwnProfile && (
+            <StaffOrInviteControls isStaff={isStaff} profile={profile} />
           )}
         </div>
 
