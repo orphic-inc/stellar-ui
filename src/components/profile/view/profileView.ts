@@ -1,7 +1,7 @@
 import type { paths } from '../../../types/api';
 import type { AuthUser } from '../../../types';
 import { formatBytes } from '../../../utils';
-import { hasAnyPermission } from '../../../utils/permissions';
+import { hasAnyPermission, hasPermission } from '../../../utils/permissions';
 
 /** What `GET /profile/user/{userId}` answers: the profile every section reads. */
 export type ProfileView =
@@ -61,3 +61,22 @@ export const canEditOwnStaffBio = (
 ) =>
   isOwnProfile &&
   (profile.userRank.displayStaff || hasAnyPermission(user, ['admin']));
+
+/**
+ * Whether a profile links to the member's invite tree (#423), the page
+ * `GET /users/{id}/invite-tree` serves under the same `invites_manage` gate.
+ * Never on your own profile: your tree is on /invite.
+ *
+ * Hidden when the member is known to have invited nobody, as the legacy
+ * implementation did. `community` is null when the member hides ratio stats
+ * from a viewer who isn't staff, so an unknown count still shows the link: a
+ * viewer with the permission never loses access to a tree that exists.
+ */
+export const showsInviteTreeLink = (
+  viewer: AuthUser | null | undefined,
+  profile: Pick<ProfileView, 'id' | 'community'>
+): boolean =>
+  !!viewer &&
+  viewer.id !== profile.id &&
+  hasPermission(viewer, 'invites_manage') &&
+  profile.community?.invites.direct !== 0;

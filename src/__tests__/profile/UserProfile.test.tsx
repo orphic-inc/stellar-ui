@@ -52,7 +52,9 @@ jest.mock('react-redux', () => ({
 }));
 
 jest.mock('../../utils/permissions', () => ({
-  hasAnyPermission: () => mockHasAnyPermission
+  hasAnyPermission: () => mockHasAnyPermission,
+  // The sidebar's invite tree link (#423); covered by ProfileInviteTreeLink.
+  hasPermission: () => false
 }));
 
 // Named mocks for userApi mutations
