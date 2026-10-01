@@ -6,6 +6,19 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The promotion editor follows the api's ladder rule** (#383).
+  - "Promotes to" is now fixed: it shows the next primary rank up, the only target the api accepts, instead of a select listing every rank.
+  - The section is hidden on secondary ranks and on the top rung, which can hold no valid rule.
+  - Rules are matched by their rank pair rather than by the first one leaving the rank.
+  - Every other rule leaving the rank is listed as out of date, with a Delete button.
+  - A refused save now shows the api's own message.
+- **A rank save that takes promotion rules off the ladder now says so** (#383).
+  - The api reports those rules in `staleRules` (stellar-api#718).
+  - The page stays open and links each rule's rank to its promotion section.
+  - This re-vendors the contract for that field.
+
 ## [0.10.0] — 2026-09-30
 
 Pairs with stellar-api 0.10.0, whose contract this re-vendors. Deploy after the
