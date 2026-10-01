@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
 import {
@@ -210,14 +211,21 @@ const PolicyView = ({ userId }: { userId: number }) => {
   );
 };
 
+/** `?user=<id>`, as a profile's link sends it (ui#417); null when absent or bad. */
+const userIdParam = (params: URLSearchParams) => {
+  const id = parseInt(params.get('user') ?? '', 10);
+  return id > 0 ? id : null;
+};
+
 const RatioPolicyPanel = () => {
-  const [inputId, setInputId] = useState('');
-  const [activeUserId, setActiveUserId] = useState<number | null>(null);
+  const [params, setParams] = useSearchParams();
+  const activeUserId = userIdParam(params);
+  const [inputId, setInputId] = useState(activeUserId?.toString() ?? '');
 
   const handleLookup = (e: React.FormEvent) => {
     e.preventDefault();
     const id = parseInt(inputId, 10);
-    if (id > 0) setActiveUserId(id);
+    if (id > 0) setParams({ user: String(id) });
   };
 
   return (

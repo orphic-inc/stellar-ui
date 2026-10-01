@@ -1312,11 +1312,88 @@
           },
           "inviteCount": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "description": "The member's invite balance. Null unless the viewer is the owner, is staff, or holds invites_manage or invites_edit."
           },
           "canInvite": {
             "type": "boolean",
-            "nullable": true
+            "nullable": true,
+            "description": "Whether the member may send invites. The same audience as inviteCount; null for anyone else."
+          },
+          "invitedBy": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "inviter": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "username"
+                ]
+              }
+            },
+            "required": [
+              "inviter"
+            ],
+            "description": "Who invited this member. Null unless the viewer holds invites_manage; `inviter` is null when nobody did."
+          },
+          "ratioWatch": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "expiresAt": {
+                "type": "string"
+              },
+              "deficit": {
+                "type": "string"
+              },
+              "consumedSinceWatch": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expiresAt",
+              "deficit",
+              "consumedSinceWatch"
+            ],
+            "description": "An active ratio watch, shown to every viewer. Null unless the member is on an unexpired watch and still short of the required ratio. `deficit` is the bytes still to contribute; byte figures are strings."
+          },
+          "ratioPolicy": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "OK",
+                  "WATCH",
+                  "DOWNLOAD_DISABLED"
+                ]
+              },
+              "disabledCause": {
+                "type": "string",
+                "nullable": true,
+                "enum": [
+                  "RATIO",
+                  "STAFF",
+                  null
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "disabledCause"
+            ],
+            "description": "The member's ratio policy status. Null unless the viewer holds ratio_policy_manage; `disabledCause` is null unless DOWNLOAD_DISABLED."
           },
           "staffBio": {
             "type": "string",
@@ -1417,6 +1494,9 @@
           "standing",
           "inviteCount",
           "canInvite",
+          "invitedBy",
+          "ratioWatch",
+          "ratioPolicy",
           "staffBio",
           "stats",
           "userRank",
@@ -1483,11 +1563,88 @@
           },
           "inviteCount": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "description": "The member's invite balance. Null unless the viewer is the owner, is staff, or holds invites_manage or invites_edit."
           },
           "canInvite": {
             "type": "boolean",
-            "nullable": true
+            "nullable": true,
+            "description": "Whether the member may send invites. The same audience as inviteCount; null for anyone else."
+          },
+          "invitedBy": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "inviter": {
+                "type": "object",
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "username"
+                ]
+              }
+            },
+            "required": [
+              "inviter"
+            ],
+            "description": "Who invited this member. Null unless the viewer holds invites_manage; `inviter` is null when nobody did."
+          },
+          "ratioWatch": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "expiresAt": {
+                "type": "string"
+              },
+              "deficit": {
+                "type": "string"
+              },
+              "consumedSinceWatch": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "expiresAt",
+              "deficit",
+              "consumedSinceWatch"
+            ],
+            "description": "An active ratio watch, shown to every viewer. Null unless the member is on an unexpired watch and still short of the required ratio. `deficit` is the bytes still to contribute; byte figures are strings."
+          },
+          "ratioPolicy": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "OK",
+                  "WATCH",
+                  "DOWNLOAD_DISABLED"
+                ]
+              },
+              "disabledCause": {
+                "type": "string",
+                "nullable": true,
+                "enum": [
+                  "RATIO",
+                  "STAFF",
+                  null
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "disabledCause"
+            ],
+            "description": "The member's ratio policy status. Null unless the viewer holds ratio_policy_manage; `disabledCause` is null unless DOWNLOAD_DISABLED."
           },
           "staffBio": {
             "type": "string",
@@ -1591,6 +1748,9 @@
           "standing",
           "inviteCount",
           "canInvite",
+          "invitedBy",
+          "ratioWatch",
+          "ratioPolicy",
           "staffBio",
           "stats",
           "userRank",
@@ -1780,6 +1940,11 @@
             "type": "string",
             "nullable": true
           },
+          "lastIpAccounts": {
+            "type": "integer",
+            "nullable": true,
+            "description": "How many accounts currently hold `lastIp`, this one included. Null when `lastIp` is null."
+          },
           "userRank": {
             "type": "object",
             "properties": {
@@ -1794,6 +1959,66 @@
               "id",
               "name"
             ]
+          },
+          "inviter": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "username": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "dateRegistered": {
+                "type": "string"
+              },
+              "disabled": {
+                "type": "boolean"
+              },
+              "lastIp": {
+                "type": "string",
+                "nullable": true
+              },
+              "lastIpAccounts": {
+                "type": "integer",
+                "nullable": true,
+                "description": "How many accounts currently hold `lastIp`, this one included. Null when `lastIp` is null."
+              },
+              "userRank": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "username",
+              "email",
+              "dateRegistered",
+              "disabled",
+              "lastIp",
+              "lastIpAccounts",
+              "userRank"
+            ],
+            "description": "Who invited this account; null when nobody did."
+          },
+          "sameIp": {
+            "type": "boolean",
+            "description": "True when this account's current IP equals its inviter's. Current IPs, not IPs at registration."
           }
         },
         "required": [
@@ -1803,7 +2028,10 @@
           "dateRegistered",
           "disabled",
           "lastIp",
-          "userRank"
+          "lastIpAccounts",
+          "userRank",
+          "inviter",
+          "sameIp"
         ]
       },
       "UserRankState": {
@@ -5075,6 +5303,7 @@
           "invites_manage",
           "invites_edit",
           "invites_unlimited",
+          "invites_note",
           "ratio_policy_manage",
           "site_history_manage",
           "ip_bans_manage",
@@ -14187,7 +14416,8 @@
                   },
                   "reason": {
                     "type": "string",
-                    "maxLength": 1000
+                    "maxLength": 1000,
+                    "description": "A staff note, carried to the invitee's moderation notes. Ignored unless the sender holds `invites_note` (#851)."
                   }
                 },
                 "required": [
@@ -26635,6 +26865,9 @@
                       "invites_unlimited": {
                         "type": "boolean"
                       },
+                      "invites_note": {
+                        "type": "boolean"
+                      },
                       "ratio_policy_manage": {
                         "type": "boolean"
                       },
@@ -27101,6 +27334,9 @@
                         "type": "boolean"
                       },
                       "invites_unlimited": {
+                        "type": "boolean"
+                      },
+                      "invites_note": {
                         "type": "boolean"
                       },
                       "ratio_policy_manage": {

@@ -4092,6 +4092,7 @@ export interface paths {
           'application/json': {
             /** Format: email */
             email: string;
+            /** @description A staff note, carried to the invitee's moderation notes. Ignored unless the sender holds `invites_note` (#851). */
             reason?: string;
           };
         };
@@ -14426,6 +14427,7 @@ export interface paths {
               invites_manage?: boolean;
               invites_edit?: boolean;
               invites_unlimited?: boolean;
+              invites_note?: boolean;
               ratio_policy_manage?: boolean;
               site_history_manage?: boolean;
               ip_bans_manage?: boolean;
@@ -14702,6 +14704,7 @@ export interface paths {
               invites_manage?: boolean;
               invites_edit?: boolean;
               invites_unlimited?: boolean;
+              invites_note?: boolean;
               ratio_policy_manage?: boolean;
               site_history_manage?: boolean;
               ip_bans_manage?: boolean;
@@ -30469,8 +30472,30 @@ export interface components {
       warned: string | null;
       /** @enum {string} */
       standing: 'pristine' | 'clean' | 'neutral' | 'poor' | 'hammer';
+      /** @description The member's invite balance. Null unless the viewer is the owner, is staff, or holds invites_manage or invites_edit. */
       inviteCount: number | null;
+      /** @description Whether the member may send invites. The same audience as inviteCount; null for anyone else. */
       canInvite: boolean | null;
+      /** @description Who invited this member. Null unless the viewer holds invites_manage; `inviter` is null when nobody did. */
+      invitedBy: {
+        inviter: {
+          id: number;
+          username: string;
+        } | null;
+      } | null;
+      /** @description An active ratio watch, shown to every viewer. Null unless the member is on an unexpired watch and still short of the required ratio. `deficit` is the bytes still to contribute; byte figures are strings. */
+      ratioWatch: {
+        expiresAt: string;
+        deficit: string;
+        consumedSinceWatch: string;
+      } | null;
+      /** @description The member's ratio policy status. Null unless the viewer holds ratio_policy_manage; `disabledCause` is null unless DOWNLOAD_DISABLED. */
+      ratioPolicy: {
+        /** @enum {string} */
+        status: 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
+        /** @enum {string|null} */
+        disabledCause: 'RATIO' | 'STAFF' | null;
+      } | null;
       staffBio: string | null;
       stats: components['schemas']['ProfileStats'];
       userRank: components['schemas']['UserRankSummary'] & {
@@ -30503,8 +30528,30 @@ export interface components {
       warned: string | null;
       /** @enum {string} */
       standing: 'pristine' | 'clean' | 'neutral' | 'poor' | 'hammer';
+      /** @description The member's invite balance. Null unless the viewer is the owner, is staff, or holds invites_manage or invites_edit. */
       inviteCount: number | null;
+      /** @description Whether the member may send invites. The same audience as inviteCount; null for anyone else. */
       canInvite: boolean | null;
+      /** @description Who invited this member. Null unless the viewer holds invites_manage; `inviter` is null when nobody did. */
+      invitedBy: {
+        inviter: {
+          id: number;
+          username: string;
+        } | null;
+      } | null;
+      /** @description An active ratio watch, shown to every viewer. Null unless the member is on an unexpired watch and still short of the required ratio. `deficit` is the bytes still to contribute; byte figures are strings. */
+      ratioWatch: {
+        expiresAt: string;
+        deficit: string;
+        consumedSinceWatch: string;
+      } | null;
+      /** @description The member's ratio policy status. Null unless the viewer holds ratio_policy_manage; `disabledCause` is null unless DOWNLOAD_DISABLED. */
+      ratioPolicy: {
+        /** @enum {string} */
+        status: 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
+        /** @enum {string|null} */
+        disabledCause: 'RATIO' | 'STAFF' | null;
+      } | null;
       staffBio: string | null;
       stats: components['schemas']['ProfileStats'];
       userRank: components['schemas']['UserRankSummary'] & {
@@ -30569,10 +30616,29 @@ export interface components {
       dateRegistered: string;
       disabled: boolean;
       lastIp: string | null;
+      /** @description How many accounts currently hold `lastIp`, this one included. Null when `lastIp` is null. */
+      lastIpAccounts: number | null;
       userRank: {
         id: number;
         name: string;
       };
+      /** @description Who invited this account; null when nobody did. */
+      inviter: {
+        id: number;
+        username: string;
+        email: string;
+        dateRegistered: string;
+        disabled: boolean;
+        lastIp: string | null;
+        /** @description How many accounts currently hold `lastIp`, this one included. Null when `lastIp` is null. */
+        lastIpAccounts: number | null;
+        userRank: {
+          id: number;
+          name: string;
+        };
+      } | null;
+      /** @description True when this account's current IP equals its inviter's. Current IPs, not IPs at registration. */
+      sameIp: boolean;
     };
     UserRankState: {
       userRankId: number;
@@ -31621,6 +31687,7 @@ export interface components {
       | 'invites_manage'
       | 'invites_edit'
       | 'invites_unlimited'
+      | 'invites_note'
       | 'ratio_policy_manage'
       | 'site_history_manage'
       | 'ip_bans_manage'

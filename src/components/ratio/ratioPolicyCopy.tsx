@@ -72,6 +72,10 @@ export const DisabledNotice = ({
  * No "you must upload X" figure on either. The required ratio is computed from
  * eligible contribution bytes, so it falls as you upload, and any deficit
  * printed here would overstate what a member owes.
+ *
+ * Another member's profile does print one (ui#417), as a present fact: "they
+ * are currently X short". That is true when it is read, and claims nothing
+ * about what they must still contribute.
  */
 export const WatchNotice = ({
   expiresAt,

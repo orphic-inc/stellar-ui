@@ -151,6 +151,20 @@ const baseStats = {
   contributionCoverage: 1
 };
 
+type PeerView = {
+  ratioWatch: {
+    expiresAt: string;
+    deficit: string;
+    consumedSinceWatch: string;
+  } | null;
+  ratioPolicy: {
+    status: 'OK' | 'WATCH' | 'DOWNLOAD_DISABLED';
+    disabledCause: 'RATIO' | 'STAFF' | null;
+  } | null;
+};
+
+let mockPeerView: PeerView = { ratioWatch: null, ratioPolicy: null };
+
 let mockMyRatioStats: typeof baseStats & { policy: Policy | null } = {
   ...baseStats,
   policy: null
@@ -158,7 +172,7 @@ let mockMyRatioStats: typeof baseStats & { policy: Policy | null } = {
 
 jest.mock('../../store/services/profileApi', () => ({
   useGetProfileByUserIdQuery: () => ({
-    data: mockProfile,
+    data: { ...mockProfile, ...mockPeerView },
     isLoading: false,
     error: undefined
   }),
@@ -194,6 +208,7 @@ describe('UserProfile — ratio policy notice', () => {
     jest.clearAllMocks();
     mockCurrentUser = { id: 99, username: 'bob' };
     mockMyRatioStats = { ...baseStats, policy: null };
+    mockPeerView = { ratioWatch: null, ratioPolicy: null };
   });
 
   describe('is mounted on the own profile', () => {
@@ -378,5 +393,139 @@ describe('UserProfile — ratio policy notice', () => {
 
       expect(screen.queryByText(/Ratio watch\./)).not.toBeInTheDocument();
     });
+  });
+});
+
+/**
+ * Another member's ratio policy (ui#417, stellar-api#658). The api decides
+ * who gets which field: `ratioWatch` goes to every viewer, `ratioPolicy` only
+ * to `ratio_policy_manage`. So these cases set the fields, not permissions.
+ */
+describe("UserProfile — another member's ratio policy", () => {
+  const GiB = 1024 ** 3;
+  const watch = () => ({
+    expiresAt: inDays(2),
+    deficit: String(20 * GiB),
+    consumedSinceWatch: String(3 * GiB)
+  });
+  const TOOL = '/staff/tools/ratio-policy?user=42';
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockCurrentUser = { id: 99, username: 'bob' };
+    mockMyRatioStats = { ...baseStats, policy: null };
+    mockPeerView = { ratioWatch: null, ratioPolicy: null };
+  });
+
+  const box = () => screen.getByRole('status');
+
+  describe('any viewer', () => {
+    it('sees an active watch as present facts', () => {
+      mockPeerView = { ratioWatch: watch(), ratioPolicy: null };
+
+      renderWithProviders(<UserProfile />);
+
+      expect(box()).toHaveTextContent("This member's watch ends in 2 days");
+      expect(box()).toHaveTextContent(
+        'currently 20.00 GB short of their required ratio'
+      );
+      expect(box()).toHaveTextContent('consumed 3.00 GB since it began');
+      expect(box()).not.toHaveTextContent(/must/);
+    });
+
+    it('gets no link into the staff tool', () => {
+      mockPeerView = { ratioWatch: watch(), ratioPolicy: null };
+
+      renderWithProviders(<UserProfile />);
+
+      expect(
+        screen.queryByRole('link', { name: /ratio policy tool/ })
+      ).not.toBeInTheDocument();
+    });
+
+    it('sees nothing when there is no active watch', () => {
+      renderWithProviders(<UserProfile />);
+
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('ratio_policy_manage', () => {
+    it('sees the watch with a link into the tool on this member', () => {
+      mockPeerView = {
+        ratioWatch: watch(),
+        ratioPolicy: { status: 'WATCH', disabledCause: null }
+      };
+
+      renderWithProviders(<UserProfile />);
+
+      expect(box()).toHaveTextContent('currently 20.00 GB short');
+      expect(
+        within(box()).getByRole('link', { name: /ratio policy tool/ })
+      ).toHaveAttribute('href', TOOL);
+    });
+
+    it('sees a watch the sweep has yet to settle, without figures', () => {
+      mockPeerView = {
+        ratioWatch: null,
+        ratioPolicy: { status: 'WATCH', disabledCause: null }
+      };
+
+      renderWithProviders(<UserProfile />);
+
+      expect(box()).toHaveTextContent(
+        'On ratio watch. The daily sweep will settle it.'
+      );
+      expect(box()).not.toHaveTextContent('short');
+    });
+
+    it.each([
+      ['STAFF' as const, 'Downloads disabled by staff.'],
+      ['RATIO' as const, 'Downloads disabled for ratio.'],
+      [null, 'Downloads disabled.']
+    ])('sees a %s download disable', (cause, text) => {
+      mockPeerView = {
+        ratioWatch: null,
+        ratioPolicy: { status: 'DOWNLOAD_DISABLED', disabledCause: cause }
+      };
+
+      renderWithProviders(<UserProfile />);
+
+      expect(box()).toHaveTextContent(text);
+      expect(
+        within(box()).getByRole('link', { name: /ratio policy tool/ })
+      ).toHaveAttribute('href', TOOL);
+    });
+
+    it('sees nothing for a member in good standing', () => {
+      mockPeerView = {
+        ratioWatch: null,
+        ratioPolicy: { status: 'OK', disabledCause: null }
+      };
+
+      renderWithProviders(<UserProfile />);
+
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    });
+  });
+
+  it('the owner sees only their own notice', () => {
+    asOwner();
+    mockPeerView = {
+      ratioWatch: watch(),
+      ratioPolicy: { status: 'WATCH', disabledCause: null }
+    };
+    mockMyRatioStats = {
+      ...baseStats,
+      policy: policy({ status: 'WATCH', watchExpiresAt: inDays(2) })
+    };
+
+    renderWithProviders(<UserProfile />);
+
+    expect(screen.getByText(/Ratio watch\./)).toBeInTheDocument();
+    expect(screen.queryByText(/This member/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: /ratio policy tool/ })
+    ).not.toBeInTheDocument();
   });
 });
