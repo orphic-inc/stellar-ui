@@ -423,4 +423,35 @@ describe('NotificationCorner', () => {
     await user.click(closeBtn!);
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument();
   });
+
+  // A leadership handoff (stellar-api#896, ADR-0053 §6).
+  it.each([
+    ['community_leader_offered', /dave offered you leadership of Jazz Vault/i],
+    ['community_leader_accepted', /dave accepted leadership of Jazz Vault/i],
+    ['community_leader_declined', /dave declined leadership of Jazz Vault/i]
+  ] as const)('renders %s linking to the community', async (type, text) => {
+    mockNotificationsData = [
+      {
+        id: 9,
+        userId: 1,
+        type,
+        actorId: 14,
+        createdAt: '2024-01-09',
+        readAt: null,
+        pageId: 3,
+        page: 'communities',
+        postId: null,
+        source: { title: 'Jazz Vault' },
+        actor: { id: 14, username: 'dave', avatar: null }
+      }
+    ];
+    const user = userEvent.setup();
+    renderWithProviders(<NotificationCorner />);
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
+
+    expect(screen.getByRole('link', { name: text })).toHaveAttribute(
+      'href',
+      '/communities/3'
+    );
+  });
 });

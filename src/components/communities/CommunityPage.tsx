@@ -19,6 +19,7 @@ import DownloadButton from './DownloadButton';
 import LinkStatusBadge from './LinkStatusBadge';
 import RatioExemptBadge from './RatioExemptBadge';
 import ReportContributionModal from './ReportContributionModal';
+import LeaderOfferPanel from './LeaderOfferPanel';
 import { formatSize } from '../../utils';
 import { releaseCover } from '../../utils/releaseCover';
 import { Pagination } from '../ui';
@@ -206,6 +207,12 @@ const CommunityPage = () => {
           </Link>
         </p>
       )}
+
+      <LeaderOfferPanel
+        community={community}
+        userId={user?.id}
+        leaderName={leader?.username ?? `User #${community.leaderId}`}
+      />
 
       {canManageMembers && (
         <div data-st="panel" className="mb-4">

@@ -45,6 +45,14 @@ jest.mock('../../store/services/bookmarkApi', () => ({
   ]
 }));
 
+// The handoff panel has its own spec (LeaderOfferPanel.test.tsx).
+jest.mock('../../components/communities/LeaderOfferPanel', () => ({
+  __esModule: true,
+  default: ({ leaderName }: { leaderName: string }) => (
+    <div data-testid="leader-offer-panel">{leaderName}</div>
+  )
+}));
+
 jest.mock('../../components/communities/ReportContributionModal', () => ({
   __esModule: true,
   default: ({ onClose }: { onClose: () => void }) => (
@@ -204,6 +212,18 @@ describe('CommunityPage', () => {
     const leaderLink = screen.getByRole('link', { name: 'curatormember' });
     expect(leaderLink).toHaveAttribute('href', '/user/curatormember');
     expect(screen.getByText(/leader:/i)).toBeInTheDocument();
+  });
+
+  it('mounts the handoff panel with the resolved leader name (#458)', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity({ leaderId: 99 }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(screen.getByTestId('leader-offer-panel')).toHaveTextContent(
+      'curatormember'
+    );
   });
 
   it('falls back to a profile-by-id link when the leader is not in the members roster', () => {
