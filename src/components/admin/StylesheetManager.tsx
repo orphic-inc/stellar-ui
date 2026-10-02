@@ -91,9 +91,13 @@ const StylesheetManager = () => {
         rowKey={(s) => s.id}
         empty="No stylesheets found."
       />
+      {/* What the count can't see (#203): the Site Stylesheet slot wins over
+          the selection (ADR-0024 §4), and a row with no CSS URL draws nothing. */}
       <p data-st="meta" className="text-xs">
-        User counts reflect stored stylesheet selections and may differ from
-        active rendering when an external stylesheet URL is set.
+        User counts are members whose saved selection is this stylesheet,
+        disabled accounts included. A member using a Personal or Registry
+        stylesheet sees that instead, and a stylesheet with no CSS URL adds no
+        styling.
       </p>
     </PageShell>
   );
