@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetVanityHouseArtistsQuery,
   useSetVanityHouseMutation
 } from '../../store/services/adminApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { PageShell, DataTable, Pagination, Button, type Column } from '../ui';
 
 type VanityArtist = NonNullable<
@@ -18,9 +21,19 @@ const VanityHousePage = () => {
   const { data, isLoading } = useGetVanityHouseArtistsQuery(page);
   const [setVanityHouse, { isLoading: isSetting }] =
     useSetVanityHouseMutation();
+  const dispatch = useDispatch();
 
   const handleRemove = async (id: number) => {
-    await setVanityHouse({ id, vanityHouse: false });
+    try {
+      await setVanityHouse({ id, vanityHouse: false }).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to remove the artist.',
+          'danger'
+        )
+      );
+    }
   };
 
   const handleAdd = async (e: React.FormEvent) => {

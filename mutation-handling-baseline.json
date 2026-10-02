@@ -4,13 +4,6 @@
     "components/communities/CommunityPage.tsx#addCommunityCurator": 1,
     "components/communities/CommunityPage.tsx#addCommunityMember": 1,
     "components/communities/CommunityPage.tsx#removeCommunityCurator": 1,
-    "components/communities/CommunityPage.tsx#removeCommunityMember": 1,
-    "components/staff/AlbumOfMonthPage.tsx#deleteAlbum": 1,
-    "components/staff/DncPage.tsx#deleteEntry": 1,
-    "components/staff/GlobalNoticesPage.tsx#createGlobalNotice": 1,
-    "components/staff/GlobalNoticesPage.tsx#deleteGlobalNotice": 1,
-    "components/staff/TagAliasesPage.tsx#deleteTagAlias": 1,
-    "components/staff/TagAliasesPage.tsx#updateTagAlias": 1,
-    "components/staff/VanityHousePage.tsx#setVanityHouse": 1
+    "components/communities/CommunityPage.tsx#removeCommunityMember": 1
   }
 }

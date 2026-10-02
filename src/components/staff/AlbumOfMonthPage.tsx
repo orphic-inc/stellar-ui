@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useGetAlbumOfMonthQuery,
   useCreateAlbumOfMonthMutation,
   useDeleteAlbumOfMonthMutation
 } from '../../store/services/adminApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Time from '../layout/Time';
 import {
   PageShell,
@@ -27,6 +30,20 @@ const AlbumOfMonthPage = () => {
   const [createAlbum, { isLoading: isCreating }] =
     useCreateAlbumOfMonthMutation();
   const [deleteAlbum] = useDeleteAlbumOfMonthMutation();
+  const dispatch = useDispatch();
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteAlbum(id).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to delete the album.',
+          'danger'
+        )
+      );
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +105,7 @@ const AlbumOfMonthPage = () => {
       header: '',
       tdClassName: 'text-right',
       cell: (a) => (
-        <Button variant="link-danger" onClick={() => deleteAlbum(a.id)}>
+        <Button variant="link-danger" onClick={() => handleDelete(a.id)}>
           Delete
         </Button>
       )

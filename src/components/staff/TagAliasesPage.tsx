@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useGetTagAliasesQuery,
   useCreateTagAliasMutation,
   useUpdateTagAliasMutation,
   useDeleteTagAliasMutation
 } from '../../store/services/tagAliasApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 import { PageShell, Panel, Button, Pagination } from '../ui';
@@ -22,6 +25,9 @@ const TagAliasesPage = () => {
   const [createTagAlias, { isLoading: creating }] = useCreateTagAliasMutation();
   const [updateTagAlias] = useUpdateTagAliasMutation();
   const [deleteTagAlias] = useDeleteTagAliasMutation();
+  const dispatch = useDispatch();
+  const fail = (err: unknown, fallback: string) =>
+    dispatch(addAlert(getApiErrorMessage(err) ?? fallback, 'danger'));
 
   const aliases = data?.data ?? [];
   const meta = data?.meta;
@@ -48,12 +54,25 @@ const TagAliasesPage = () => {
   };
 
   const handleSaveEdit = async (id: number) => {
-    await updateTagAlias({
-      id,
-      badTag: editBadTag.trim(),
-      goodTag: editGoodTag.trim()
-    });
-    setEditingId(null);
+    // A refused edit keeps the row open with what was typed (#463).
+    try {
+      await updateTagAlias({
+        id,
+        badTag: editBadTag.trim(),
+        goodTag: editGoodTag.trim()
+      }).unwrap();
+      setEditingId(null);
+    } catch (err) {
+      fail(err, 'Failed to save the alias.');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteTagAlias(id).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to delete the alias.');
+    }
   };
 
   return (
@@ -150,7 +169,7 @@ const TagAliasesPage = () => {
                         </Button>
                         <Button
                           variant="link-danger"
-                          onClick={() => deleteTagAlias(a.id)}
+                          onClick={() => handleDelete(a.id)}
                         >
                           Delete
                         </Button>

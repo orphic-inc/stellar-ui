@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import TagAliasesPage from '../../components/staff/TagAliasesPage';
@@ -27,6 +27,9 @@ describe('TagAliasesPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreate.mockResolvedValue({ data: {} });
+    // RTK's trigger returns a promise with .unwrap() (#463).
+    mockUpdate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockDelete.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('shows a spinner while loading', () => {
@@ -80,6 +83,29 @@ describe('TagAliasesPage', () => {
     renderWithProviders(<TagAliasesPage />);
     await user.click(screen.getByRole('button', { name: /delete/i }));
     expect(mockDelete).toHaveBeenCalledWith(5);
+  });
+
+  // The delete was fire-and-forget, so a refusal said nothing (#463).
+  it('alerts when deleting an alias fails', async () => {
+    mockDelete.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Alias not found.' } })
+    });
+    mockQuery.mockReturnValue({
+      data: { data: [makeAlias(5)], meta: { page: 1, totalPages: 1 } },
+      isLoading: false
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<TagAliasesPage />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Alias not found.'
+        })
+      ]);
+    });
   });
 
   it('shows the pager when there is more than one page', () => {
