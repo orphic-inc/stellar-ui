@@ -41,8 +41,14 @@ jest.mock('../../components/profile/invite/PendingInvites', () => ({
   default: () => <div data-testid="pending-invites" />
 }));
 
+/** The signed-in sender; `invites_note` decides whether the note shows (#413). */
+let mockPermissions: Record<string, boolean> = {};
 jest.mock('../../store/slices/authSlice', () => ({
-  selectCurrentUser: () => ({ id: 7, username: 'testuser' })
+  selectCurrentUser: () => ({
+    id: 7,
+    username: 'testuser',
+    userRank: { permissions: mockPermissions }
+  })
 }));
 
 jest.mock('react-redux', () => ({
@@ -54,6 +60,7 @@ jest.mock('react-redux', () => ({
 describe('InviteForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPermissions = {};
     mockEligibility = {
       data: { canSend: true, reason: null, msg: null, unlimited: false },
       isLoading: false
@@ -102,6 +109,7 @@ describe('InviteForm', () => {
   });
 
   it('submits invite with email and optional reason', async () => {
+    mockPermissions = { invites_note: true };
     mockCreateInvite.mockReturnValue({
       unwrap: () => Promise.resolve({ emailSent: true })
     });
@@ -198,6 +206,33 @@ describe('InviteForm', () => {
         })
       })
     );
+  });
+
+  it('hides the staff note from a sender without invites_note, and sends none (#413)', async () => {
+    mockCreateInvite.mockReturnValue({
+      unwrap: () => Promise.resolve({ emailSent: true })
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<InviteForm />);
+    expect(screen.queryByText(/staff note/i)).not.toBeInTheDocument();
+    expect(document.querySelector('input[type="text"]')).toBeNull();
+    await user.type(
+      document.querySelector('input[type="email"]') as HTMLInputElement,
+      'friend@example.com'
+    );
+    await user.click(screen.getByRole('button', { name: /invite/i }));
+    expect(mockCreateInvite).toHaveBeenCalledWith({
+      email: 'friend@example.com',
+      reason: undefined
+    });
+  });
+
+  it('labels the note as carried to the invitee for an invites_note holder (#413)', () => {
+    mockPermissions = { invites_note: true };
+    renderWithProviders(<InviteForm />);
+    const note = screen.getByLabelText(/staff note/i);
+    expect(note).toHaveAccessibleName(/moderation notes/i);
+    expect(note).toHaveAttribute('maxLength', '1000');
   });
 
   it('clears form fields after successful invite', async () => {

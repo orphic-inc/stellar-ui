@@ -14,6 +14,10 @@ All notable changes to stellar-ui are documented here.
   - Each IP carries how many accounts hold it now.
   - A row whose account and inviter share an IP is highlighted and marked _Same IP_.
   - The column is now **Current IP**, since both addresses are where each account is now, not where it registered from.
+- **The invite form shows its staff note only to holders of `invites_note`** (#413, stellar-api#851).
+  - Its label now says the note is added to the invitee's moderation notes when they register.
+  - The api ignores a note from anyone else, so the field is hidden from them and the form sends none.
+  - The note now takes up to 1000 characters, the api's limit, where the input stopped at 255.
 
 ### Fixed
 
