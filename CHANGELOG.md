@@ -49,6 +49,10 @@ All notable changes to stellar-ui are documented here.
 
 ### Fixed
 
+- **The forum and comments say when a write fails** (#461, part of #456). Ten writes ignored or swallowed the api's answer. Each now shows the api's message, and an edit or comment keeps what was typed:
+  - on a thread: lock, sticky, subscribe, catch up, poll vote, and moving it to the Trash;
+  - on a post: a failed edit closed the editor as if it had saved, and a failed delete did nothing visible;
+  - on comments: a refused comment kept its text but said nothing, and a failed delete did nothing visible.
 - **The admin panels say when a save or delete fails** (#460, part of #456). Twelve writes ignored the api's answer. A failed create cleared its form and a failed edit closed its row as if they had worked; a failed delete or dismiss did nothing visible. Each now shows the api's message, and a form keeps what was typed:
   - the forum category and forum managers: create, edit and delete;
   - the News Manager: post and delete, for announcements and blog entries;
