@@ -188,6 +188,44 @@ export const communityApi = api.injectEndpoints({
       ]
     }),
 
+    // Leadership handoff (stellar-api#896, ADR-0053): the leader offers, the
+    // named successor accepts or declines. Each answers 204, and the result
+    // lands as `leaderId` and `leaderOffer` on the refetched community.
+    offerCommunityLeadership: build.mutation<
+      void,
+      { communityId: number; userId: number }
+    >({
+      query: ({ communityId, userId }) => ({
+        url: `/communities/${communityId}/leader-offer`,
+        method: 'POST',
+        body: { userId }
+      }),
+      invalidatesTags: (_, __, { communityId }) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+    withdrawLeaderOffer: build.mutation<void, number>({
+      query: (communityId) => ({
+        url: `/communities/${communityId}/leader-offer`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: (_, __, communityId) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+    answerLeaderOffer: build.mutation<
+      void,
+      { communityId: number; answer: 'accept' | 'decline' }
+    >({
+      query: ({ communityId, answer }) => ({
+        url: `/communities/${communityId}/leader-offer/${answer}`,
+        method: 'POST'
+      }),
+      invalidatesTags: (_, __, { communityId }) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+
     // Contributions
     getContributions: build.query<ContributionsResponse, void>({
       query: () => '/contributions',
@@ -340,6 +378,9 @@ export const {
   useRemoveCommunityMemberMutation,
   useAddCommunityCuratorMutation,
   useRemoveCommunityCuratorMutation,
+  useOfferCommunityLeadershipMutation,
+  useWithdrawLeaderOfferMutation,
+  useAnswerLeaderOfferMutation,
   useGetReleasesByCommunityQuery,
   useGetReleaseByIdQuery,
   useCreateReleaseMutation,

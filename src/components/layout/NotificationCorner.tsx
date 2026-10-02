@@ -15,33 +15,43 @@ import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { useGetNotificationFilterHitUnreadCountQuery } from '../../store/services/notificationFilterApi';
 
+// One line per type. A Record, not a switch, so a type the api adds fails the
+// type-check here instead of rendering a generic line.
+const NOTIFICATION_TEXT: Record<
+  NotificationType,
+  (actor: string, title: string) => string
+> = {
+  forum_quote: (actor, title) => `${actor} quoted you in ${title}`,
+  forum_sub: (actor, title) => `${actor} posted in ${title}`,
+  request_filled: (actor, title) => `${actor} filled a request for ${title}`,
+  collage_updated: (actor, title) => `${actor} added to ${title}`,
+  comment_sub: (actor, title) => `${actor} commented on ${title}`,
+  artist_release: (actor, title) =>
+    `${actor} added a new contribution for ${title}`,
+  site_news: (_, title) => `New announcement: ${title}`,
+  global_notice: (_, title) => title,
+  rank_promoted: (_, title) => `New notification in ${title}`,
+  rank_demoted: (_, title) => `New notification in ${title}`,
+  // A leadership handoff (stellar-api#896, ADR-0053 §6).
+  community_leader_offered: (actor, title) =>
+    `${actor} offered you leadership of ${title}`,
+  community_leader_accepted: (actor, title) =>
+    `${actor} accepted leadership of ${title}`,
+  community_leader_declined: (actor, title) =>
+    `${actor} declined leadership of ${title}`
+};
+
 function renderNotificationText(
   type: NotificationType,
   actorName: string | undefined,
   sourceTitle: string | undefined
 ): string {
-  const actor = actorName ?? 'Someone';
+  const text = NOTIFICATION_TEXT[type] as
+    ((actor: string, title: string) => string) | undefined;
   const title = sourceTitle ?? 'an item';
-  switch (type) {
-    case 'forum_quote':
-      return `${actor} quoted you in ${title}`;
-    case 'forum_sub':
-      return `${actor} posted in ${title}`;
-    case 'request_filled':
-      return `${actor} filled a request for ${title}`;
-    case 'collage_updated':
-      return `${actor} added to ${title}`;
-    case 'comment_sub':
-      return `${actor} commented on ${title}`;
-    case 'artist_release':
-      return `${actor} added a new contribution for ${title}`;
-    case 'site_news':
-      return `New announcement: ${title}`;
-    case 'global_notice':
-      return title;
-    default:
-      return `New notification in ${title}`;
-  }
+  return text
+    ? text(actorName ?? 'Someone', title)
+    : `New notification in ${title}`;
 }
 
 function sourcePath(n: Notification): string | null {

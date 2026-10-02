@@ -10,6 +10,7 @@ const mockUpdateCommunity = jest.fn();
 const mockDispatch = jest.fn();
 
 let mockIsCreating = false;
+let mockCommunityDetail: unknown;
 
 jest.mock('../../store/services/communityApi', () => ({
   useGetCommunitiesQuery: (...args: unknown[]) =>
@@ -18,7 +19,9 @@ jest.mock('../../store/services/communityApi', () => ({
     mockCreateCommunity,
     { isLoading: mockIsCreating }
   ],
-  useUpdateCommunityMutation: () => [mockUpdateCommunity, { isLoading: false }]
+  useUpdateCommunityMutation: () => [mockUpdateCommunity, { isLoading: false }],
+  // The edit row's pending handoff reads the community's detail (#458).
+  useGetCommunityByIdQuery: () => ({ data: mockCommunityDetail })
 }));
 
 jest.mock('react-redux', () => ({
@@ -48,6 +51,7 @@ describe('CommunityManager', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsCreating = false;
+    mockCommunityDetail = undefined;
     mockCreateCommunity.mockReturnValue({
       unwrap: () => Promise.resolve({ id: 99 })
     });
@@ -576,5 +580,33 @@ describe('CommunityManager', () => {
     const initial = editCheckbox.checked;
     await user.click(editCheckbox);
     expect(editCheckbox.checked).toBe(!initial);
+  });
+
+  // stellar-api#896: staff see a pending handoff, and that a reassign here
+  // cancels it.
+  it('shows a pending leadership offer in the edit row', async () => {
+    const user = userEvent.setup();
+    mockCommunityDetail = {
+      ...makeCommunity(8),
+      leaderOffer: {
+        to: { id: 2, username: 'heir' },
+        offeredAt: '2026-10-01T12:00:00.000Z'
+      }
+    };
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(8)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    expect(screen.queryByText(/leadership offered/i)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+
+    expect(
+      screen.getByText(
+        /leadership offered to heir on Oct 1, 2026, awaiting their answer\. Changing the leader here cancels the offer\./i
+      )
+    ).toBeInTheDocument();
   });
 });

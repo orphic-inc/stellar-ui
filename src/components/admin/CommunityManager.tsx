@@ -9,6 +9,7 @@ import {
 import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
+import PendingLeaderOffer from './PendingLeaderOffer';
 import type { Community, CommunityType, RegistrationStatus } from '../../types';
 import { PageShell, Panel, Button, SectionHeading } from '../ui';
 
@@ -196,6 +197,7 @@ const EditRow = ({
               </label>
             </div>
           </div>
+          <PendingLeaderOffer communityId={community.id} />
 
           {/* Curator management (ADR-0033) */}
           <div className="border border-[var(--st-border)] rounded p-3 space-y-2">

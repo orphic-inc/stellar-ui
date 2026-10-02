@@ -6,6 +6,15 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **A community's leader hands off leadership by offer, and the successor accepts or declines** (#458, stellar-api#896, ADR-0053).
+  - **The leader** picks one of the community's curators on the community page and offers leadership, after a confirm. They can see a pending offer and withdraw it. With no other curator, the panel says to appoint one first.
+  - **The named successor** sees the offer on the community page and accepts (after a confirm) or declines.
+  - **Staff** see a pending offer read-only on the community page, and in Community Manager's edit row, which says that changing the leader there cancels it.
+  - Every write reports its failure with the api's message, such as an offer that has lapsed.
+  - **The three new notifications render:** "offered you leadership of", "accepted leadership of" and "declined leadership of", each linking to the community. The notification text is now a table keyed on the notification type, so a type the api adds fails the type-check instead of rendering a generic line.
+
 ## [0.10.2] — 2026-10-02
 
 ### Added
