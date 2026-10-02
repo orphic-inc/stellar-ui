@@ -14,6 +14,8 @@ const linkEl = () => document.getElementById(LINK_ID) as HTMLLinkElement | null;
 beforeEach(() => {
   linkEl()?.remove();
   window.localStorage.clear();
+  window.sessionStorage.clear();
+  window.history.replaceState(null, '', '/');
 });
 
 describe('preapply-theme.js', () => {
@@ -51,5 +53,32 @@ describe('preapply-theme.js', () => {
     expect(window.localStorage.getItem(STORAGE_KEY)).toBe(
       '/stylesheets/kuro.css'
     );
+  });
+
+  describe('the recovery hatch (#449)', () => {
+    it('applies no theme with ?notheme=1, and remembers it for the tab', () => {
+      window.localStorage.setItem(STORAGE_KEY, HREF);
+      window.history.replaceState(null, '', '/user/edit/3?notheme=1');
+      runPreapply();
+
+      expect(linkEl()).toBeNull();
+      expect(window.sessionStorage.getItem('stellar-notheme')).toBe('1');
+      // The stored theme survives, so turning themes back on finds it.
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBe(HREF);
+    });
+
+    it('applies no theme on a later load in the same tab, without the parameter', () => {
+      window.localStorage.setItem(STORAGE_KEY, HREF);
+      window.sessionStorage.setItem('stellar-notheme', '1');
+      runPreapply();
+      expect(linkEl()).toBeNull();
+    });
+
+    it('ignores any other value of the parameter', () => {
+      window.localStorage.setItem(STORAGE_KEY, HREF);
+      window.history.replaceState(null, '', '/?notheme=0');
+      runPreapply();
+      expect(linkEl()?.getAttribute('href')).toBe(HREF);
+    });
   });
 });

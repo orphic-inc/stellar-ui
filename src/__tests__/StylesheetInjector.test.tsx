@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 
 const mockUseGetMyProfileQuery = jest.fn();
 const mockUseGetStylesheetsQuery = jest.fn();
@@ -11,6 +11,7 @@ jest.mock('../store/services/siteApi', () => ({
 }));
 
 import StylesheetInjector from '../components/layout/StylesheetInjector';
+import { __resetThemeHatch, setThemesOff } from '../utils/themeHatch';
 
 const LINK_ID = 'stellar-theme';
 const STORAGE_KEY = 'stellar-theme-href';
@@ -21,6 +22,8 @@ beforeEach(() => {
   mockUseGetStylesheetsQuery.mockReturnValue({ data: undefined });
   linkEl()?.remove();
   window.localStorage.clear();
+  window.sessionStorage.clear();
+  __resetThemeHatch();
 });
 
 describe('StylesheetInjector', () => {
@@ -284,6 +287,59 @@ describe('StylesheetInjector', () => {
 
       expect(document.querySelectorAll(`#${LINK_ID}`)).toHaveLength(1);
       expect(linkEl()?.getAttribute('href')).toBe('/stylesheets/kuro-v2.css');
+    });
+  });
+
+  describe('the recovery hatch (#449)', () => {
+    it.each([
+      [
+        'a Personal URL',
+        { externalStylesheet: 'https://cdn.example.com/me.css' }
+      ],
+      ['an adopted Registry sheet', { activeAuthorStylesheetId: 42 }],
+      ['a registry selection', { siteAppearance: 'kuro' }]
+    ])(
+      'injects no theme for %s while themes are off',
+      (_label, userSettings) => {
+        window.sessionStorage.setItem('stellar-notheme', '1');
+        mockUseGetMyProfileQuery.mockReturnValue({ data: { userSettings } });
+        mockUseGetStylesheetsQuery.mockReturnValue({
+          data: [{ name: 'kuro', cssUrl: '/stylesheets/kuro.css' }]
+        });
+
+        render(<StylesheetInjector />);
+        expect(linkEl()).toBeNull();
+      }
+    );
+
+    it('removes a pre-applied theme but keeps its stored href', () => {
+      window.localStorage.setItem(STORAGE_KEY, '/stylesheets/kuro.css');
+      const pre = document.createElement('link');
+      pre.id = LINK_ID;
+      pre.href = '/stylesheets/kuro.css';
+      document.head.appendChild(pre);
+      window.sessionStorage.setItem('stellar-notheme', '1');
+
+      render(<StylesheetInjector />);
+      expect(linkEl()).toBeNull();
+      expect(window.localStorage.getItem(STORAGE_KEY)).toBe(
+        '/stylesheets/kuro.css'
+      );
+    });
+
+    it('brings the theme back when themes are turned back on', () => {
+      window.sessionStorage.setItem('stellar-notheme', '1');
+      mockUseGetMyProfileQuery.mockReturnValue({
+        data: { userSettings: { activeAuthorStylesheetId: 42 } }
+      });
+      render(<StylesheetInjector />);
+      expect(linkEl()).toBeNull();
+
+      act(() => setThemesOff(false));
+      expect(linkEl()?.getAttribute('href')).toBe(
+        '/api/stylesheet/author-stylesheet/42/css'
+      );
+      expect(window.sessionStorage.getItem('stellar-notheme')).toBeNull();
     });
   });
 });

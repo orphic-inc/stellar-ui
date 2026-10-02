@@ -6,6 +6,16 @@
 // LINK_ID / STORAGE_KEY must stay in sync with StylesheetInjector.tsx, which
 // adopts this link in place once the real query resolves.
 (function () {
+  // The recovery hatch (#449): `?notheme=1` keeps member themes off in this tab.
+  // Keep the key and parameter in sync with src/utils/themeHatch.ts.
+  var off = /(?:^|[?&])notheme=1(?:&|$)/.test(window.location.search);
+  try {
+    if (off) window.sessionStorage.setItem('stellar-notheme', '1');
+    else off = window.sessionStorage.getItem('stellar-notheme') === '1';
+  } catch {
+    // sessionStorage unavailable: the parameter alone still counts.
+  }
+  if (off) return;
   try {
     var href = window.localStorage.getItem('stellar-theme-href');
     if (!href) return;

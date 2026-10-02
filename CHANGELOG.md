@@ -23,6 +23,10 @@ All notable changes to stellar-ui are documented here.
   - It opens `/inbox/staff/new?template=community-request`. The subject starts with a fixed `[Create a Community Request]` tag, and the member types only their line after it.
   - The message greets the site's staff by name (from `GET /rules/tree`, or "Hey there staff," when that can't be read) and asks for the community's name, what it would hold, and why the member would lead it. It is signed with their username.
   - Staff create the community in Community Manager with the member as leader. A request flow that does this on approval is stellar-api#890.
+- **`?notheme=1` turns member themes off for the tab, so a stylesheet can't lock a member out** (#449).
+  - Load any page with it, such as `/?notheme=1`, and no Personal, Registry or registry theme renders in that tab until it closes. The member can then open Settings (**Edit**) and switch the theme away. A banner says why the page looks plain, and its **Turn themes back on** button restores the theme. No theme is loaded while the banner shows, so a theme can't hide it.
+  - It's for a sheet whose CSS hides the control needed to switch away from it. Staff can paste the link into a reply.
+  - The cold-load pre-apply script honours it, so the theme doesn't flash in first. The chosen theme is kept, so turning themes back on, or another tab, still finds it.
 
 ### Fixed
 
