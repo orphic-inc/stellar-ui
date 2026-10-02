@@ -13,6 +13,7 @@
     "contract:check": "node scripts/check-contract-drift.mjs",
     "changelog:check": "node scripts/check-changelog.mjs",
     "service-types:check": "node scripts/check-service-types.mjs",
+    "mutations:check": "node scripts/check-mutation-handling.mjs",
     "build": "cross-env NODE_ENV=production webpack",
     "clean": "rm -rf dist",
     "start": "cross-env NODE_ENV=development webpack serve",

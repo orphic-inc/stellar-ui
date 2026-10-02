@@ -43,6 +43,8 @@ const ForumTopicPage = () => {
   const postBoxRef = useRef<PostBoxHandle>(null);
 
   // Mark the last visible post as read whenever the posts list refreshes.
+  // Best-effort and not unwrapped: the reader did not act, and the next view
+  // retries (#456).
   useEffect(() => {
     const lastPostId = session?.readState.lastVisiblePostId;
     if (lastPostId != null) {

@@ -49,6 +49,7 @@ All notable changes to stellar-ui are documented here.
 
 ### Fixed
 
+- **Community Manager's edit row stays open when a save fails, and says why** (#456). The save ignored the api's answer and closed the row either way, so a refused save looked like it had worked, with nothing saved. It now shows the api's message and keeps what was typed, including the new refusal to leave an invite-only or closed community without a leader (stellar-api#892).
 - **An emptied donor rank colour or badge now clears** (#437). Saving an edited donor rank sent each as `value || undefined`, and the api leaves an `undefined` field alone, so the save reported success and kept the old value. An edit now sends both as staff left them, and `''` clears. Creating a rank still omits an empty field, so the api's defaults apply (a new rank's badge is `♥`).
 - **The stylesheet manager's user-count note now gives the real reasons a count can differ from what members see** (#203). It blamed an external stylesheet URL on a registry row, which can no longer happen. It now says the count is members whose saved selection is the stylesheet, disabled accounts included; that a member's Personal or Registry stylesheet shows instead; and that a stylesheet with no CSS URL adds no styling.
 

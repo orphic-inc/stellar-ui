@@ -145,7 +145,8 @@ const useHitActions = (filterId?: number) => {
   };
 
   return {
-    // Opening a hit is what reads it; loading the page reads nothing.
+    // Opening a hit is what reads it; loading the page reads nothing. The
+    // read is best-effort and not unwrapped: opening is the act (#456).
     open: (hit: NotificationFilterHit) => {
       if (!hit.read) markRead({ contributionId: hit.contributionId, filterId });
     },

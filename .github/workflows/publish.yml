@@ -37,6 +37,14 @@ jobs:
         # hand-typed result fails here, and so does a baseline entry that has
         # gone stale, so the list can only shrink.
         run: npm run service-types:check
+      - name: Mutation failures are handled
+        if: ${{ !cancelled() }}
+        # An RTK Query mutation resolves on an HTTP error; only .unwrap()
+        # rejects. A call that neither unwraps nor inspects its result treats a
+        # failed write as a success (#456). Grandfathered calls live in
+        # mutation-handling-baseline.json; a new one fails here, and so does an
+        # entry that has gone stale, so the list can only shrink.
+        run: npm run mutations:check
       # Ported from stellar-api (#386, #537). The `release` job publishes a
       # version's CHANGELOG section verbatim as the Release notes, so an entry
       # missing, dropped, or filed under a duplicate heading here is that way in

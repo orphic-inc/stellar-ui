@@ -300,6 +300,7 @@ const NotificationCorner = ({ showFilterHits = false }: Props) => {
                   key={n.id}
                   n={n}
                   onOpen={() => {
+                    // Best-effort, not unwrapped: opening is the act (#456).
                     if (!n.readAt) markRead(n.id);
                     setOpen(false);
                   }}
