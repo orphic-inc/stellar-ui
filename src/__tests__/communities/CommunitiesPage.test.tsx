@@ -59,6 +59,18 @@ describe('CommunitiesPage', () => {
     expect(screen.getByText('Rock Vault')).toBeInTheDocument();
   });
 
+  it('links to a pre-filled Staff PM for a community that does not exist (#100)', () => {
+    mockUseGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(1, 'Jazz Lovers')], meta: { total: 1 } },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunitiesPage />);
+    expect(
+      screen.getByRole('link', { name: /ask staff to create one/i })
+    ).toHaveAttribute('href', '/inbox/staff/new?template=community-request');
+  });
+
   it('hides pagination when only one page', () => {
     mockUseGetCommunitiesQuery.mockReturnValue({
       data: {

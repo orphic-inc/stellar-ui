@@ -338,10 +338,10 @@ const ContributeForm = () => {
             <p className={helpClass}>
               Can&apos;t find your community?{' '}
               <Link
-                to="/requests"
+                to="/inbox/staff/new?template=community-request"
                 className="text-indigo-400 hover:text-indigo-300"
               >
-                Submit a request.
+                Ask staff to create one.
               </Link>
             </p>
           </div>

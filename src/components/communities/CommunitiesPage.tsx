@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useGetCommunitiesQuery } from '../../store/services/communityApi';
 import Spinner from '../layout/Spinner';
 import { Pagination } from '../ui';
-import CommunitiesTable from './CommunitiesTable';
+import CommunitiesTable, { MissingCommunityHint } from './CommunitiesTable';
 
 const CommunitiesPage = () => {
   const [page, setPage] = useState(1);
@@ -14,8 +14,7 @@ const CommunitiesPage = () => {
 
   const communities = data?.data ?? [];
   const total = data?.meta?.total ?? 0;
-  const pageSize = data?.meta?.limit ?? 25;
-  const totalPages = Math.ceil(total / pageSize);
+  const totalPages = Math.ceil(total / (data?.meta?.limit ?? 25));
 
   return (
     <div>
@@ -30,6 +29,7 @@ const CommunitiesPage = () => {
         onChange={setPage}
         className="mt-4"
       />
+      <MissingCommunityHint />
     </div>
   );
 };

@@ -1,9 +1,21 @@
 import type { Community } from '../../types';
+import { Link } from 'react-router-dom';
 import CommunityRow from './CommunityRow';
+import { COMMUNITY_REQUEST_HREF } from '../staffInbox/ticketTemplates';
 
 interface Props {
   communities: Community[];
 }
+
+/** For a member whose community isn't listed (#100). */
+export const MissingCommunityHint = () => (
+  <p data-st="meta" className="text-sm mt-4">
+    Can&apos;t find your community?{' '}
+    <Link to={COMMUNITY_REQUEST_HREF} data-st="control">
+      Ask staff to create one.
+    </Link>
+  </p>
+);
 
 const CommunitiesTable = ({ communities }: Props) => (
   <table data-st="grid" className="w-full text-sm">
