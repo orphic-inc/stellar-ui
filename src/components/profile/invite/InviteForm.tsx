@@ -9,6 +9,7 @@ import {
 } from '../../../store/services/profileApi';
 import { addAlert } from '../../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
+import { hasPermission } from '../../../utils/permissions';
 import Spinner from '../../layout/Spinner';
 import InviteTree from './InviteTree';
 import InviteRules from './InviteRules';
@@ -40,6 +41,9 @@ const InviteRefusal = ({ msg }: { msg: string }) => {
 
 const SendInviteForm = () => {
   const dispatch = useDispatch();
+  // The api ignores a note from anyone without `invites_note` (#413), so only
+  // a holder sees the field, and nobody else sends one.
+  const canNote = hasPermission(useSelector(selectCurrentUser), 'invites_note');
   const [createInvite, { isLoading }] = useCreateInviteMutation();
   const [email, setEmail] = useState('');
   const [reason, setReason] = useState('');
@@ -49,7 +53,7 @@ const SendInviteForm = () => {
     try {
       const result = await createInvite({
         email,
-        reason: reason || undefined
+        reason: (canNote && reason) || undefined
       }).unwrap();
       if (result.emailSent) {
         dispatch(addAlert('Invitation sent successfully.', 'success'));
@@ -100,21 +104,25 @@ const SendInviteForm = () => {
             />
           </div>
         </div>
-        <div className="field_div">
-          <div className="label" data-st="meta">
-            Staff note:
+        {canNote && (
+          <div className="field_div">
+            <div className="label" data-st="meta" id="invite-staff-note">
+              Staff note, added to the invitee&rsquo;s moderation notes when
+              they register:
+            </div>
+            <div className="input">
+              <input
+                type="text"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                size={60}
+                maxLength={1000}
+                aria-labelledby="invite-staff-note"
+                data-st="field"
+              />
+            </div>
           </div>
-          <div className="input">
-            <input
-              type="text"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              size={60}
-              maxLength={255}
-              data-st="field"
-            />
-          </div>
-        </div>
+        )}
       </form>
     </div>
   );
