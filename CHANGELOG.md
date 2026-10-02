@@ -49,6 +49,8 @@ All notable changes to stellar-ui are documented here.
 
 ### Fixed
 
+- **A community's member and curator controls say when a write fails** (#464, part of #456). Adding or removing a member, and making or demoting a curator, ignored the api's answer. Each now shows the api's message, such as that a curator has to lose that role before being removed as a member, and a refused add keeps the typed user ID. With this, every write in the ui reports its failure, and `mutations:check` has nothing left in its baseline.
+
 - **The staff tools say when a write fails** (#463, part of #456). Seven writes ignored the api's answer. Each now shows the api's message:
   - Global Notices: a refused notice cleared the form as if it had been sent, and now keeps it; a failed delete did nothing visible;
   - Tag Aliases: a refused edit closed the row as if it had saved, and now stays open; a failed delete did nothing visible;

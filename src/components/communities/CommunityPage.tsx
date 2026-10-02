@@ -12,6 +12,7 @@ import {
 } from '../../store/services/communityApi';
 import { useToggleCommunityBookmarkMutation } from '../../store/services/bookmarkApi';
 import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { hasAnyPermission } from '../../utils/permissions';
 import Spinner from '../layout/Spinner';
 import DownloadButton from './DownloadButton';
@@ -61,6 +62,23 @@ const CommunityPage = () => {
     }
   };
   const [removeCommunityCurator] = useRemoveCommunityCuratorMutation();
+
+  // The roster's writes, unwrapped so a refusal is said rather than dropped
+  // (#464). The api's message names the reason, such as a role to remove first.
+  const fail = (err: unknown, what: string) =>
+    dispatch(
+      addAlert(getApiErrorMessage(err) ?? `Failed to ${what}.`, 'danger')
+    );
+  const run = async (
+    write: { unwrap: () => Promise<unknown> },
+    what: string
+  ) => {
+    try {
+      await write.unwrap();
+    } catch (err) {
+      fail(err, what);
+    }
+  };
 
   const {
     data: community,
@@ -122,9 +140,31 @@ const CommunityPage = () => {
     e.preventDefault();
     const uid = parseInt(newMemberUserId, 10);
     if (!uid) return;
-    await addCommunityMember({ communityId: id, userId: uid });
-    setNewMemberUserId('');
+    // A refused add keeps the typed ID (#464).
+    try {
+      await addCommunityMember({ communityId: id, userId: uid }).unwrap();
+      setNewMemberUserId('');
+    } catch (err) {
+      fail(err, 'add the member');
+    }
   };
+
+  const toggleCurator = (userId: number, isCurator: boolean) =>
+    isCurator
+      ? run(
+          removeCommunityCurator({ communityId: id, userId }),
+          'demote the curator'
+        )
+      : run(
+          addCommunityCurator({ communityId: id, userId }),
+          'make them a curator'
+        );
+
+  const removeMember = (userId: number) =>
+    run(
+      removeCommunityMember({ communityId: id, userId }),
+      'remove the member'
+    );
 
   const releaseList = releases?.data ?? [];
   const total = releases?.meta?.total ?? 0;
@@ -214,17 +254,7 @@ const CommunityPage = () => {
                       {canManageCurators && !memberIsLeader && (
                         <button
                           type="button"
-                          onClick={() =>
-                            memberIsCurator
-                              ? removeCommunityCurator({
-                                  communityId: id,
-                                  userId: m.id
-                                })
-                              : addCommunityCurator({
-                                  communityId: id,
-                                  userId: m.id
-                                })
-                          }
+                          onClick={() => toggleCurator(m.id, memberIsCurator)}
                           className="text-xs text-gray-500 hover:text-indigo-400 transition-colors"
                         >
                           {memberIsCurator ? 'Demote' : 'Make Curator'}
@@ -243,12 +273,7 @@ const CommunityPage = () => {
                         )}
                       <button
                         type="button"
-                        onClick={() =>
-                          removeCommunityMember({
-                            communityId: id,
-                            userId: m.id
-                          })
-                        }
+                        onClick={() => removeMember(m.id)}
                         className="text-xs text-red-500 hover:text-red-400 transition-colors"
                       >
                         Remove

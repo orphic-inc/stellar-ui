@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import CommunityPage from '../../components/communities/CommunityPage';
@@ -132,7 +132,19 @@ describe('CommunityPage', () => {
       userRank: { permissions: {} }
     };
     mockToggleBookmark.mockResolvedValue({ bookmarked: true });
-    mockAddCommunityMember.mockResolvedValue({});
+    // RTK's trigger returns a promise with .unwrap() (#464).
+    mockAddCommunityMember.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
+    mockRemoveCommunityMember.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
+    mockAddCommunityCurator.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
+    mockRemoveCommunityCurator.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
     mockUseGetReleasesByCommunityQuery.mockReturnValue({
       data: makeReleasesResponse([makeRelease(1)]),
       isLoading: false
@@ -325,6 +337,40 @@ describe('CommunityPage', () => {
       communityId: 3,
       userId: 42
     });
+  });
+
+  // A refused add cleared the field as if it had worked (#464).
+  it('keeps the user ID and alerts when adding a member fails', async () => {
+    mockAddCommunityMember.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'User not found' } })
+    });
+    const user = userEvent.setup();
+    mockCurrentUser = {
+      id: 99,
+      username: 'curatormember',
+      canDownload: true,
+      userRank: { permissions: {} }
+    };
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    await user.type(screen.getByPlaceholderText('User ID'), '42');
+    await user.click(screen.getByRole('button', { name: /add member/i }));
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            alertType: 'danger',
+            msg: 'User not found'
+          })
+        })
+      );
+    });
+    expect(screen.getByPlaceholderText('User ID')).toHaveValue(42);
   });
 
   it('lists a curator who holds no consumer role — the regression this exists to prevent', () => {
@@ -583,6 +629,58 @@ describe('CommunityPage', () => {
 
       await user.click(screen.getAllByRole('button', { name: /^remove$/i })[0]);
       expect(mockRemoveCommunityMember).toHaveBeenCalled();
+    });
+
+    // Removing a curator as a member is refused with 409 (ADR-0033 §5); the
+    // reason used to be dropped (#464).
+    it("shows the api's reason when removing a member is refused", async () => {
+      mockRemoveCommunityMember.mockReturnValue({
+        unwrap: () =>
+          Promise.reject({
+            status: 409,
+            data: {
+              msg: 'User is the community curator; remove that role first'
+            }
+          })
+      });
+      const user = userEvent.setup();
+      signIn(99);
+      render();
+
+      await user.click(screen.getAllByRole('button', { name: /^remove$/i })[0]);
+
+      await waitFor(() => {
+        expect(mockDispatch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            payload: expect.objectContaining({
+              alertType: 'danger',
+              msg: 'User is the community curator; remove that role first'
+            })
+          })
+        );
+      });
+    });
+
+    it('alerts when the leader demoting a curator fails', async () => {
+      mockRemoveCommunityCurator.mockReturnValue({
+        unwrap: () => Promise.reject({ data: { msg: 'Permission denied' } })
+      });
+      const user = userEvent.setup();
+      signIn(50);
+      render();
+
+      await user.click(screen.getByRole('button', { name: /demote/i }));
+
+      await waitFor(() => {
+        expect(mockDispatch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            payload: expect.objectContaining({
+              alertType: 'danger',
+              msg: 'Permission denied'
+            })
+          })
+        );
+      });
     });
   });
 
