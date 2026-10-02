@@ -1,11 +1,30 @@
+import { useDispatch } from 'react-redux';
 import {
   useGetNotificationsQuery,
   useMarkNotificationReadMutation
 } from '../../store/services/notificationApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 
 const GlobalNoticeBanner = () => {
   const { data: notifications } = useGetNotificationsQuery();
   const [markRead] = useMarkNotificationReadMutation();
+  const dispatch = useDispatch();
+
+  // Dismissing is something the reader does, unlike a read on opening, so a
+  // refusal is said (#462).
+  const handleDismiss = async (id: number) => {
+    try {
+      await markRead(id).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to dismiss the notice.',
+          'danger'
+        )
+      );
+    }
+  };
 
   const unreadNotices = (notifications ?? []).filter(
     (n) => n.readAt === null && n.type === 'global_notice'
@@ -34,7 +53,7 @@ const GlobalNoticeBanner = () => {
           </span>
           <button
             type="button"
-            onClick={() => markRead(n.id)}
+            onClick={() => handleDismiss(n.id)}
             className="shrink-0 hover:text-[var(--st-text-strong)] transition-colors text-xs"
             aria-label="Dismiss"
           >

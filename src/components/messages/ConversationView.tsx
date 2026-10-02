@@ -10,6 +10,7 @@ import {
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import { AuthorBadges } from '../layout/UserBadges';
 
@@ -37,18 +38,37 @@ const ConversationView = () => {
     }
   };
 
-  const handleSticky = () => {
+  const fail = (err: unknown, fallback: string) =>
+    dispatch(addAlert(getApiErrorMessage(err) ?? fallback, 'danger'));
+
+  const handleSticky = async () => {
     const myPart = conv?.participants?.find(
       (p) => p.userId === currentUser?.id
     );
-    updateFlags({ id: convId, isSticky: !myPart?.isSticky });
+    try {
+      await updateFlags({ id: convId, isSticky: !myPart?.isSticky }).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to update the conversation.');
+    }
   };
 
-  const handleMarkUnread = () => updateFlags({ id: convId, isRead: false });
+  const handleMarkUnread = async () => {
+    try {
+      await updateFlags({ id: convId, isRead: false }).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to mark the conversation unread.');
+    }
+  };
 
+  // Leaves only once the delete has landed, so a refusal stays on the page
+  // and says why (#462).
   const handleDelete = async () => {
-    await deleteConv(convId);
-    window.history.back();
+    try {
+      await deleteConv(convId).unwrap();
+      window.history.back();
+    } catch (err) {
+      fail(err, 'Failed to delete the conversation.');
+    }
   };
 
   if (isLoading) return <Spinner />;

@@ -49,6 +49,12 @@ All notable changes to stellar-ui are documented here.
 
 ### Fixed
 
+- **Messages, notifications and logout say when a write fails** (#462, part of #456). Nine writes ignored the api's answer. Each now shows the api's message:
+  - the inbox: a failed bulk action cleared the selection as if it had worked, and now keeps it; a single delete did nothing visible;
+  - a conversation: sticky, mark unread and delete. A failed delete went back to the inbox as if it had worked, and now stays;
+  - the notification corner: mark all read and dismiss; and dismissing a global notice.
+  - **Logout signs out only once the server has.** A failed logout used to clear the session here and go to the login page while the session cookie still worked, so a reload signed back in. It now keeps the session and says it couldn't sign out.
+
 - **The forum and comments say when a write fails** (#461, part of #456). Ten writes ignored or swallowed the api's answer. Each now shows the api's message, and an edit or comment keeps what was typed:
   - on a thread: lock, sticky, subscribe, catch up, poll vote, and moving it to the Trash;
   - on a post: a failed edit closed the editor as if it had saved, and a failed delete did nothing visible;

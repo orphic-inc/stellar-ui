@@ -54,6 +54,13 @@ describe('InboxPage', () => {
       isLoading: false,
       error: undefined
     });
+    // RTK's trigger returns a promise with .unwrap() (#462).
+    mockBulkUpdate.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
+    mockDeleteConversation.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
   });
 
   it('renders inbox rows, supports bulk actions, direct delete, and pagination', async () => {
@@ -155,8 +162,9 @@ describe('InboxPage', () => {
       error: undefined
     });
 
-    const { rerender } = renderWithProviders(<InboxPage />);
+    const { unmount } = renderWithProviders(<InboxPage />);
     expect(screen.getByText('Your inbox is empty.')).toBeInTheDocument();
+    unmount();
 
     mockUseGetInboxQuery.mockReturnValue({
       data: undefined,
@@ -164,8 +172,30 @@ describe('InboxPage', () => {
       error: { status: 500 }
     });
 
-    rerender(<InboxPage />);
+    renderWithProviders(<InboxPage />);
     expect(screen.getByText('Failed to load inbox.')).toBeInTheDocument();
+  });
+
+  // A refused bulk action cleared the selection as if it had worked (#462).
+  it('keeps the selection and alerts when a bulk action fails', async () => {
+    mockBulkUpdate.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Not your conversation.' } })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<InboxPage />);
+    const [, row1Checkbox] = screen.getAllByRole('checkbox');
+    await user.click(row1Checkbox);
+    await user.click(screen.getByRole('button', { name: /mark read/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Not your conversation.'
+        })
+      ]);
+    });
+    expect(row1Checkbox).toBeChecked();
   });
 });
 

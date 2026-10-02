@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../testUtils';
 import GlobalNoticeBanner from '../../components/layout/GlobalNoticeBanner';
 import type { Notification } from '../../store/services/notificationApi';
 
@@ -30,11 +31,13 @@ describe('GlobalNoticeBanner', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockNotifications = [notice()];
+    // RTK's trigger returns a promise with .unwrap() (#462).
+    mockMarkRead.mockReturnValue({ unwrap: () => Promise.resolve(undefined) });
   });
 
   it('renders nothing when there are no unread global notices', () => {
     mockNotifications = [];
-    const { container } = render(<GlobalNoticeBanner />);
+    const { container } = renderWithProviders(<GlobalNoticeBanner />);
     expect(container.firstChild).toBeNull();
   });
 
@@ -43,12 +46,12 @@ describe('GlobalNoticeBanner', () => {
       notice({ id: 2, readAt: '2024-01-02' }),
       notice({ id: 3, type: 'forum_quote' })
     ];
-    const { container } = render(<GlobalNoticeBanner />);
+    const { container } = renderWithProviders(<GlobalNoticeBanner />);
     expect(container.firstChild).toBeNull();
   });
 
   it('shows an unread global notice and dismisses it', () => {
-    render(<GlobalNoticeBanner />);
+    renderWithProviders(<GlobalNoticeBanner />);
     expect(
       screen.getByText('Scheduled maintenance tonight')
     ).toBeInTheDocument();
@@ -56,8 +59,25 @@ describe('GlobalNoticeBanner', () => {
     expect(mockMarkRead).toHaveBeenCalledWith(1);
   });
 
+  it('alerts when dismissing fails', async () => {
+    mockMarkRead.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Notice not found.' } })
+    });
+    const { store } = renderWithProviders(<GlobalNoticeBanner />);
+    fireEvent.click(screen.getByRole('button', { name: /dismiss/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Notice not found.'
+        })
+      ]);
+    });
+  });
+
   it('paints the warning status token (data-st contract)', () => {
-    const { container } = render(<GlobalNoticeBanner />);
+    const { container } = renderWithProviders(<GlobalNoticeBanner />);
     const banner = screen
       .getByText('Scheduled maintenance tonight')
       .closest('div');

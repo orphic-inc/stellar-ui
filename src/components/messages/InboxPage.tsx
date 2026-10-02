@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetInboxQuery,
   useDeleteConversationMutation,
   useBulkUpdateConversationsMutation
 } from '../../store/services/messagesApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import { Pagination } from '../ui';
 import { AuthorBadges } from '../layout/UserBadges';
@@ -16,6 +19,9 @@ const InboxPage = () => {
   const { data, isLoading, error } = useGetInboxQuery({ page });
   const [deleteConversation] = useDeleteConversationMutation();
   const [bulkUpdate] = useBulkUpdateConversationsMutation();
+  const dispatch = useDispatch();
+  const fail = (err: unknown, fallback: string) =>
+    dispatch(addAlert(getApiErrorMessage(err) ?? fallback, 'danger'));
 
   const conversations = data?.conversations ?? [];
   const total = data?.total ?? 0;
@@ -36,8 +42,21 @@ const InboxPage = () => {
 
   const handleBulk = async (action: 'delete' | 'markRead' | 'markUnread') => {
     if (selected.length === 0) return;
-    await bulkUpdate({ ids: selected, action });
-    setSelected([]);
+    // A refusal keeps the selection, so it can be tried again (#462).
+    try {
+      await bulkUpdate({ ids: selected, action }).unwrap();
+      setSelected([]);
+    } catch (err) {
+      fail(err, 'Failed to update the selected conversations.');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteConversation(id).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to delete the conversation.');
+    }
   };
 
   if (isLoading) return <Spinner />;
@@ -166,7 +185,7 @@ const InboxPage = () => {
                   </td>
                   <td className="py-2">
                     <button
-                      onClick={() => deleteConversation(conv.id)}
+                      onClick={() => handleDelete(conv.id)}
                       data-st="control"
                       data-st-danger
                       className="text-xs"
