@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Time from '../layout/Time';
 import {
   useLazyGetPostEditHistoryQuery,
   useUpdatePostMutation,
   useDeletePostMutation
 } from '../../store/services/forumApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { quotePost } from '../../utils/quoteBBCode';
 import { BBCodeContent } from '../ui';
 import { avatarSrc, onAvatarError } from '../../utils/avatar';
@@ -30,6 +33,9 @@ const ForumTopicPost = ({
   onQuote
 }: Props) => {
   const { id, author, body, createdAt, lastEdit } = post;
+  const dispatch = useDispatch();
+  const fail = (err: unknown, fallback: string) =>
+    dispatch(addAlert(getApiErrorMessage(err) ?? fallback, 'danger'));
   const [editing, setEditing] = useState(false);
   const [showEditHistory, setShowEditHistory] = useState(false);
   const [editBody, setEditBody] = useState(body);
@@ -48,13 +54,27 @@ const ForumTopicPost = ({
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editBody.trim()) return;
-    await updatePost({ forumId, topicId, postId: id, body: editBody });
-    setEditing(false);
+    // A refused edit keeps the editor open with the text (#461).
+    try {
+      await updatePost({
+        forumId,
+        topicId,
+        postId: id,
+        body: editBody
+      }).unwrap();
+      setEditing(false);
+    } catch (err) {
+      fail(err, 'Failed to save the post.');
+    }
   };
 
   const handleDelete = async () => {
     if (!confirm('Delete this post?')) return;
-    await deletePost({ forumId, topicId, postId: id });
+    try {
+      await deletePost({ forumId, topicId, postId: id }).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to delete the post.');
+    }
   };
 
   const handleQuote = () => {

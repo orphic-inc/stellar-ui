@@ -112,6 +112,15 @@ describe('ForumTopicPage', () => {
       data: defaultSession,
       isLoading: false
     });
+    // RTK's trigger returns a promise with .unwrap() (#461).
+    for (const m of [
+      mockVotePoll,
+      mockSubscribe,
+      mockUpdateTopic,
+      mockTrashTopic,
+      mockCatchupForum
+    ])
+      m.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('marks the topic read and lets a moderator manage poll and topic actions', async () => {
@@ -163,6 +172,36 @@ describe('ForumTopicPage', () => {
       topicId: 44
     });
     expect(screen.getByTestId('post-box')).toBeInTheDocument();
+    // Every write succeeded, so nothing was reported.
+    expect(store.getState().alert).toEqual([]);
+  });
+
+  // The topic controls were fire-and-forget, so a refusal said nothing (#461).
+  it('alerts when locking the thread fails', async () => {
+    mockUpdateTopic.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Thread is archived.' } })
+    });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 9,
+        username: 'mod',
+        userRank: { permissions: { forums_moderate: true } }
+      } as never)
+    );
+    renderWithProviders(<ForumTopicPage />, { store });
+
+    await user.click(screen.getByRole('button', { name: /^lock$/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Thread is archived.'
+        })
+      ]);
+    });
   });
 
   it('shows poll results for a closed poll and clears quote text via onQuoteConsumed', async () => {

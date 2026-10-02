@@ -100,8 +100,9 @@ describe('ForumTopicPost', () => {
     mockIsSaving = false;
     mockEditHistoryData = undefined;
     mockEditHistoryLoading = false;
-    mockUpdatePost.mockResolvedValue({});
-    mockDeletePost.mockResolvedValue({});
+    // RTK's trigger returns a promise with .unwrap() (#461).
+    mockUpdatePost.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockDeletePost.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockLoadEditHistory.mockResolvedValue({});
     window.confirm = jest.fn(() => true);
   });
@@ -319,6 +320,37 @@ describe('ForumTopicPost', () => {
     expect(mockOnQuote).toHaveBeenCalledWith(
       '[quote=unknown]Hello forum world[/quote]'
     );
+  });
+
+  // A refused edit used to close the editor as if it had saved (#461).
+  it('keeps the editor open and alerts when the save fails', async () => {
+    mockUpdatePost.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Topic is locked.' } })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(
+      <ForumTopicPost
+        post={mockPost}
+        forumId={1}
+        topicId={5}
+        currentUserId={10}
+      />
+    );
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    const textarea = screen.getByRole('textbox');
+    await user.clear(textarea);
+    await user.type(textarea, 'Updated body');
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Topic is locked.'
+        })
+      ]);
+    });
+    expect(screen.getByRole('textbox')).toHaveValue('Updated body');
   });
 
   it('shows "Saving…" in save button when saving is true', async () => {

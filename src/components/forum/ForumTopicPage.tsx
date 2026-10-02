@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   useGetTopicSessionQuery,
   useMarkTopicReadMutation,
@@ -11,6 +11,8 @@ import {
 } from '../../store/services/forumApi';
 import { useSubscribeMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import PostBox, { type PostBoxHandle } from '../layout/PostBox';
 import ForumTopicPost from './ForumTopicPost';
@@ -38,6 +40,24 @@ const ForumTopicPage = () => {
   const [updateTopic, { isLoading: updatingTopic }] = useUpdateTopicMutation();
   const [trashTopic, { isLoading: trashing }] = useTrashTopicMutation();
   const [catchupForum] = useCatchupForumMutation();
+  const dispatch = useDispatch();
+
+  // Each control's write, unwrapped so a refusal is said rather than dropped
+  // (#461).
+  const fail = (err: unknown, what: string) =>
+    dispatch(
+      addAlert(getApiErrorMessage(err) ?? `Failed to ${what}.`, 'danger')
+    );
+  const run = async (
+    write: { unwrap: () => Promise<unknown> },
+    what: string
+  ) => {
+    try {
+      await write.unwrap();
+    } catch (err) {
+      fail(err, what);
+    }
+  };
 
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const postBoxRef = useRef<PostBoxHandle>(null);
@@ -77,11 +97,10 @@ const ForumTopicPage = () => {
   const handleVote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedAnswer === null || !poll) return;
-    await votePoll({
-      forumPollId: poll.id,
-      vote: selectedAnswer,
-      topicId: tId
-    });
+    await run(
+      votePoll({ forumPollId: poll.id, vote: selectedAnswer, topicId: tId }),
+      'record your vote'
+    );
   };
 
   const handleTrash = async () => {
@@ -89,8 +108,8 @@ const ForumTopicPage = () => {
     try {
       await trashTopic({ forumId: fId, topicId: tId }).unwrap();
       navigate(`/forums/${fId}`);
-    } catch {
-      return;
+    } catch (err) {
+      fail(err, 'move the thread to the Trash');
     }
   };
 
@@ -135,11 +154,14 @@ const ForumTopicPage = () => {
                   type="button"
                   data-st="control"
                   onClick={() =>
-                    updateTopic({
-                      forumId: fId,
-                      topicId: tId,
-                      isLocked: !topic.isLocked
-                    })
+                    run(
+                      updateTopic({
+                        forumId: fId,
+                        topicId: tId,
+                        isLocked: !topic.isLocked
+                      }),
+                      topic.isLocked ? 'unlock the thread' : 'lock the thread'
+                    )
                   }
                   disabled={updatingTopic}
                 >
@@ -149,11 +171,16 @@ const ForumTopicPage = () => {
                   type="button"
                   data-st="control"
                   onClick={() =>
-                    updateTopic({
-                      forumId: fId,
-                      topicId: tId,
-                      isSticky: !topic.isSticky
-                    })
+                    run(
+                      updateTopic({
+                        forumId: fId,
+                        topicId: tId,
+                        isSticky: !topic.isSticky
+                      }),
+                      topic.isSticky
+                        ? 'unsticky the thread'
+                        : 'sticky the thread'
+                    )
                   }
                   disabled={updatingTopic}
                 >
@@ -174,12 +201,15 @@ const ForumTopicPage = () => {
               type="button"
               data-st="control"
               onClick={() =>
-                subscribe({
-                  topicId: tId,
-                  action: subscription.isSubscribed
-                    ? 'unsubscribe'
-                    : 'subscribe'
-                })
+                run(
+                  subscribe({
+                    topicId: tId,
+                    action: subscription.isSubscribed
+                      ? 'unsubscribe'
+                      : 'subscribe'
+                  }),
+                  subscription.isSubscribed ? 'unsubscribe' : 'subscribe'
+                )
               }
               disabled={subscribing}
             >
@@ -188,7 +218,7 @@ const ForumTopicPage = () => {
             <button
               type="button"
               data-st="control"
-              onClick={() => catchupForum(fId)}
+              onClick={() => run(catchupForum(fId), 'catch up the forum')}
             >
               Catch Up
             </button>

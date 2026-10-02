@@ -89,6 +89,7 @@ describe('CommentsSection', () => {
     mockError = undefined;
     mockCurrentUser = { id: 99, username: 'bob' };
     mockCreateComment.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockDeleteComment.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockSubscribeComments.mockReturnValue({
       unwrap: () => Promise.resolve({})
     });
@@ -332,10 +333,12 @@ describe('CommentsSection', () => {
 
   it('keeps form state when comment creation fails', async () => {
     mockCreateComment.mockReturnValue({
-      unwrap: () => Promise.reject(new Error('nope'))
+      unwrap: () => Promise.reject({ data: { msg: 'Comments are closed.' } })
     });
     const user = userEvent.setup();
-    renderWithProviders(<CommentsSection context="artist" pageId={3} />);
+    const { store } = renderWithProviders(
+      <CommentsSection context="artist" pageId={3} />
+    );
     const checkbox = screen.getByRole('checkbox', {
       name: /subscribe to comments/i
     });
@@ -349,6 +352,33 @@ describe('CommentsSection', () => {
       expect(mockSubscribeComments).not.toHaveBeenCalled();
       expect((textarea as HTMLTextAreaElement).value).toBe('Great');
       expect(checkbox).toBeChecked();
+    });
+    // It used to fail silently (#461).
+    expect(store.getState().alert).toEqual([
+      expect.objectContaining({
+        alertType: 'danger',
+        msg: 'Comments are closed.'
+      })
+    ]);
+  });
+
+  it('alerts when deleting a comment fails', async () => {
+    mockDeleteComment.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Not your comment.' } })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(
+      <CommentsSection context="artist" pageId={3} />
+    );
+    await user.click(screen.getByRole('button', { name: /delete comment/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Not your comment.'
+        })
+      ]);
     });
   });
 });

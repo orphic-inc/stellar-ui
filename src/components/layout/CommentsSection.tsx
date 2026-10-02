@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   type CommentPage,
   useGetCommentsQuery,
@@ -9,6 +9,8 @@ import {
 } from '../../store/services/commentApi';
 import { useSubscribeCommentsMutation } from '../../store/services/subscriptionApi';
 import { selectCurrentUser } from '../../store/slices/authSlice';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { BBCodeContent } from '../ui';
 import Time from './Time';
 import { AuthorBadges } from './UserBadges';
@@ -47,6 +49,9 @@ const CommentsSection = ({
   const closed = !!error && 'status' in error && error.status === 404;
   const [createComment, { isLoading: posting }] = useCreateCommentMutation();
   const [deleteComment] = useDeleteCommentMutation();
+  const dispatch = useDispatch();
+  const fail = (err: unknown, fallback: string) =>
+    dispatch(addAlert(getApiErrorMessage(err) ?? fallback, 'danger'));
 
   const [body, setBody] = useState('');
   const [subscribe, setSubscribe] = useState(false);
@@ -103,8 +108,17 @@ const CommentsSection = ({
 
       setBody('');
       setSubscribe(false);
-    } catch {
-      return;
+    } catch (err) {
+      // The text stays in the box; say why it didn't post (#461).
+      fail(err, 'Failed to post the comment.');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteComment(id).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to delete the comment.');
     }
   };
 
@@ -161,7 +175,7 @@ const CommentsSection = ({
                 {currentUser?.id === c.authorId && (
                   <button
                     type="button"
-                    onClick={() => deleteComment(c.id)}
+                    onClick={() => handleDelete(c.id)}
                     className="text-xs text-[var(--st-text-faint)] hover:text-[var(--st-danger)]"
                     aria-label="Delete comment"
                   >
