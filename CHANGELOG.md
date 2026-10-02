@@ -27,6 +27,12 @@ All notable changes to stellar-ui are documented here.
   - Load any page with it, such as `/?notheme=1`, and no Personal, Registry or registry theme renders in that tab until it closes. The member can then open Settings (**Edit**) and switch the theme away. A banner says why the page looks plain, and its **Turn themes back on** button restores the theme. No theme is loaded while the banner shows, so a theme can't hide it.
   - It's for a sheet whose CSS hides the control needed to switch away from it. Staff can paste the link into a reply.
   - The cold-load pre-apply script honours it, so the theme doesn't flash in first. The chosen theme is kept, so turning themes back on, or another tab, still finds it.
+- **Members can write, edit and delete their own stylesheets** (#450, part of #108).
+  - **My stylesheets** (`/stylesheets`, linked from Settings' Site Stylesheet section) lists your sheets with the space they use: "3 of 5 stylesheet spaces used", or "(no limit)". At the cap, or for a class without spaces, **New stylesheet** is disabled and says why.
+  - The editor takes a name and the CSS, up to 100,000 characters, with a live count. A `.css` file can be read into the field; nothing is uploaded.
+  - When the api refuses a sheet, every violation it found is listed under the field.
+  - Saving an edit says it updates the sheet for everyone who adopted it. Deleting frees a space, and the confirmation says adopters keep the sheet until they switch away.
+  - Adopting someone's sheet from its page is the next slice (#451).
 
 ### Fixed
 

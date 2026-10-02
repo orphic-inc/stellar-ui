@@ -21,6 +21,7 @@ import DonorSettingsTab from './DonorSettingsTab';
 import FeedSettings from './FeedSettings';
 import AvatarField from './AvatarField';
 import IrcNickSettings from './IrcNickSettings';
+import StylesheetSourceNote from './StylesheetSourceNote';
 import type { paths } from '../../../types/api';
 
 export type ProfileForm = NonNullable<
@@ -458,10 +459,7 @@ const Settings = () => {
                 </p>
               </div>
 
-              <p data-st="meta" className="text-xs">
-                One source at a time — choosing one clears the other. With
-                neither set, the built-in stylesheet selected above is used.
-              </p>
+              <StylesheetSourceNote />
             </div>
 
             <div className="flex items-center gap-3">
