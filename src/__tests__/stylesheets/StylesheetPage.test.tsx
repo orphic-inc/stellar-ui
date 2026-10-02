@@ -73,7 +73,7 @@ describe('StylesheetPage (#451)', () => {
     );
     expect(screen.getByLabelText('CSS').tagName).toBe('PRE');
     expect(
-      screen.getByRole('link', { name: /author's profile/i })
+      screen.getByRole('link', { name: /author.s profile/i })
     ).toHaveAttribute('href', '/user/5');
   });
 
