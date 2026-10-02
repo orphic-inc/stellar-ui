@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useGetMyProfileQuery } from '../../store/services/profileApi';
 import { useGetStylesheetsQuery } from '../../store/services/siteApi';
+import { useThemesOff } from '../../utils/themeHatch';
 
 const LINK_ID = 'stellar-theme';
 // Keep in sync with src/preapply-theme.js, which pre-applies this key's value
@@ -38,6 +39,7 @@ const registryCssHref = (id: number): string =>
 const StylesheetInjector = () => {
   const { data: profile } = useGetMyProfileQuery();
   const { data: stylesheets } = useGetStylesheetsQuery();
+  const themesOff = useThemesOff();
 
   const siteAppearance = profile?.userSettings?.siteAppearance;
   const externalStylesheet = profile?.userSettings?.externalStylesheet;
@@ -75,9 +77,16 @@ const StylesheetInjector = () => {
   })();
 
   useEffect(() => {
+    const existing = document.getElementById(LINK_ID) as HTMLLinkElement | null;
+    // The recovery hatch (#449): no theme while it's on. The stored href stays,
+    // so turning themes back on, or the next cold load in another tab, still
+    // finds it.
+    if (themesOff) {
+      existing?.remove();
+      return;
+    }
     if (href === undefined) return;
 
-    const existing = document.getElementById(LINK_ID) as HTMLLinkElement | null;
     if (!href) {
       existing?.remove();
       window.localStorage.removeItem(STORAGE_KEY);
@@ -100,7 +109,7 @@ const StylesheetInjector = () => {
     // every href change instead of mutating it in place like the adopt branch
     // above — a churn asymmetry between "started from an adopted link" and
     // "started from one we created" that's otherwise invisible but needless.
-  }, [href]);
+  }, [href, themesOff]);
 
   // Unmount-only, unlike the effect above, so it adds none of that churn. The
   // injector lives in PrivateLayout, so unmounting means leaving the session

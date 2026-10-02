@@ -13,6 +13,7 @@ import NotificationCorner from '../../../layout/NotificationCorner';
 import GlobalNoticeBanner from '../../../layout/GlobalNoticeBanner';
 import RatioPolicyBanner from '../../../ratio/RatioPolicyBanner';
 import StylesheetInjector from '../../../layout/StylesheetInjector';
+import ThemesOffBanner from '../../../layout/ThemesOffBanner';
 import Spinner from '../../../layout/Spinner';
 
 // The ratio policy banner reads the session, and three of the four things that
@@ -48,6 +49,7 @@ const PrivateLayout = ({ children }: Props) => {
   return (
     <div className="min-h-screen bg-[var(--st-base)] text-[var(--st-text)] flex flex-col">
       <StylesheetInjector />
+      <ThemesOffBanner />
       <PrivateHeader user={user} />
       {/* Above the global notices: those are announcements addressed to
           everyone and are dismissible, this is enforcement addressed to you,
