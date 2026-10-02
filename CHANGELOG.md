@@ -9,6 +9,11 @@ All notable changes to stellar-ui are documented here.
 ### Added
 
 - **A member's profile shows "Invited by" to viewers holding `invites_manage`** (#411, stellar-api#849). It links to the inviter's profile, or says _Nobody_ for a member no one invited. The api withholds the field from anyone else, so the row is hidden for them.
+- **The registration log shows each account's inviter and flags a shared IP** (#412, stellar-api#850).
+  - Each cell shows the new account's value with its inviter's beneath, muted: name, email, rank, registration date and IP.
+  - Each IP carries how many accounts hold it now.
+  - A row whose account and inviter share an IP is highlighted and marked _Same IP_.
+  - The column is now **Current IP**, since both addresses are where each account is now, not where it registered from.
 
 ### Fixed
 
