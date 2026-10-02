@@ -40,6 +40,7 @@ All notable changes to stellar-ui are documented here.
 - **A rank save that moves the rank on or off the auto-managed ladder now says so** (#425).
   - The page stays open and names what changed for members holding the rank as their primary rank: auto-promotion and demotion, the inactivity sweep and the invite handout.
   - The same notice still lists any promotion rules the save stranded.
+- **An emptied donor field now clears** (#432). The donor rewards and forum-title saves sent each field as `value || undefined`, and the api leaves an `undefined` field alone. So emptying any reward field, or the title prefix or suffix, reported success and kept the old value. Each field is now sent as the member left it. This is also what lets clearing the donor icon or second avatar free its upload slot (stellar-api#871).
 
 ### Changed
 

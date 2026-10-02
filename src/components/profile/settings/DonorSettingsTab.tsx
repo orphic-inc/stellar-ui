@@ -111,20 +111,22 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
   const handleSaveRewards = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Every field as the member left it: '' clears a field (#432), where
+      // `undefined` would tell the api to leave the old value in place.
       await updateRewards({
-        iconMouseOverText: iconMouseOverText || undefined,
-        avatarMouseOverText: avatarMouseOverText || undefined,
-        customIcon: customIcon || undefined,
-        customIconLink: customIconLink || undefined,
-        secondAvatar: secondAvatar || undefined,
-        profileInfoTitle1: profileInfoTitle1 || undefined,
-        profileInfo1: profileInfo1 || undefined,
-        profileInfoTitle2: profileInfoTitle2 || undefined,
-        profileInfo2: profileInfo2 || undefined,
-        profileInfoTitle3: profileInfoTitle3 || undefined,
-        profileInfo3: profileInfo3 || undefined,
-        profileInfoTitle4: profileInfoTitle4 || undefined,
-        profileInfo4: profileInfo4 || undefined
+        iconMouseOverText,
+        avatarMouseOverText,
+        customIcon,
+        customIconLink,
+        secondAvatar,
+        profileInfoTitle1,
+        profileInfo1,
+        profileInfoTitle2,
+        profileInfo2,
+        profileInfoTitle3,
+        profileInfo3,
+        profileInfoTitle4,
+        profileInfo4
       }).unwrap();
       dispatch(addAlert('Donor settings saved.', 'success'));
     } catch (err) {
@@ -141,8 +143,8 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
     e.preventDefault();
     try {
       await updateTitle({
-        prefix: titlePrefix || undefined,
-        suffix: titleSuffix || undefined,
+        prefix: titlePrefix,
+        suffix: titleSuffix,
         useComma: titleUseComma
       }).unwrap();
       dispatch(addAlert('Forum title saved.', 'success'));

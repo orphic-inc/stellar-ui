@@ -1,5 +1,6 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import DonorSettingsTab from '../../components/profile/settings/DonorSettingsTab';
 
@@ -96,5 +97,42 @@ describe('DonorSettingsTab — image uploads (#275)', () => {
     expect(
       screen.getByText('Not included in your current donor rank.')
     ).toBeInTheDocument();
+  });
+});
+
+// #432: an emptied field must reach the api as '', which clears it. Sending
+// `undefined` told the api to keep the old value, so nothing could be cleared.
+describe('DonorSettingsTab — clearing a field (#432)', () => {
+  beforeEach(() => {
+    mockUseGetDonorRewardsQuery.mockReturnValue({
+      data: makeRewards(),
+      isLoading: false
+    });
+    mockUpdateRewards.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockUpdateTitle.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+  });
+
+  it('sends an emptied reward field as an empty string', async () => {
+    renderWithProviders(<DonorSettingsTab />);
+    await userEvent.clear(screen.getByLabelText(/custom icon url/i));
+    await userEvent.click(
+      screen.getByRole('button', { name: /save donor settings/i })
+    );
+    expect(mockUpdateRewards).toHaveBeenCalledWith(
+      expect.objectContaining({ customIcon: '' })
+    );
+  });
+
+  it('sends an emptied forum title prefix as an empty string', async () => {
+    renderWithProviders(<DonorSettingsTab />);
+    await userEvent.clear(screen.getByLabelText(/^prefix$/i));
+    await userEvent.click(
+      screen.getByRole('button', { name: /save forum title/i })
+    );
+    expect(mockUpdateTitle).toHaveBeenCalledWith({
+      prefix: '',
+      suffix: 'the Generous',
+      useComma: true
+    });
   });
 });
