@@ -21,6 +21,8 @@ type CommunitiesResponse =
   paths['/communities']['get']['responses'][200]['content']['application/json'];
 type CommunityResponse =
   paths['/communities/{id}']['get']['responses'][200]['content']['application/json'];
+export type LeadershipLogResponse =
+  paths['/communities/{id}/leadership-log']['get']['responses'][200]['content']['application/json'];
 type CommunityReleasesResponse =
   paths['/communities/{communityId}/releases']['get']['responses'][200]['content']['application/json'];
 export type ReleaseResponse =
@@ -184,6 +186,21 @@ export const communityApi = api.injectEndpoints({
         method: 'DELETE'
       }),
       invalidatesTags: (_, __, { communityId }) => [
+        { type: 'Community', id: communityId }
+      ]
+    }),
+
+    // A community's leadership log (stellar-api#897, ADR-0054). Tagged with the
+    // community, so a handoff or a staff change refetches it.
+    getCommunityLeadershipLog: build.query<
+      LeadershipLogResponse,
+      { communityId: number; page: number }
+    >({
+      query: ({ communityId, page }) => ({
+        url: `/communities/${communityId}/leadership-log`,
+        params: { page }
+      }),
+      providesTags: (_, __, { communityId }) => [
         { type: 'Community', id: communityId }
       ]
     }),
@@ -378,6 +395,7 @@ export const {
   useRemoveCommunityMemberMutation,
   useAddCommunityCuratorMutation,
   useRemoveCommunityCuratorMutation,
+  useGetCommunityLeadershipLogQuery,
   useOfferCommunityLeadershipMutation,
   useWithdrawLeaderOfferMutation,
   useAnswerLeaderOfferMutation,
