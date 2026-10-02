@@ -49,6 +49,9 @@ All notable changes to stellar-ui are documented here.
   - stellar-api#856 removed `inviteTree`, which the ui never read. The ui's invite tree reads `GET /users/{id}/invite-tree`, which is unchanged.
   - The unused `InviteNode` type export is gone from `types/index.ts`.
   - `autoManaged` (stellar-api#866) arrives with this re-vendor; ui#425 puts it to use.
+- **The three image fields are upload-only** (#434). Avatar, donor icon and second avatar each show a small preview of the current image, a `[Browse]` button that opens a file picker and names the chosen file, and `[Remove]`, which empties the field so the save clears it (and releases the upload, stellar-api#871).
+  - There is no address box any more, so a new `https://` address can't be entered. A saved one still previews through the api's resolved `*Src`, never loading the remote host, and can be removed or replaced.
+  - A rank with `assetLimit` 0 gets no `[Browse]` but can still remove. A locked donor field shows its preview and lock note only.
 
 ## [0.10.0] — 2026-09-30
 

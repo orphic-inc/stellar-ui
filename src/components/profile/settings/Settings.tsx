@@ -23,10 +23,10 @@ import AvatarField from './AvatarField';
 import IrcNickSettings from './IrcNickSettings';
 import type { paths } from '../../../types/api';
 
-type ProfileForm = NonNullable<
+export type ProfileForm = NonNullable<
   paths['/profile/me']['put']['requestBody']
 >['content']['application/json'];
-type MyProfileResponse =
+export type MyProfileResponse =
   paths['/profile/me']['get']['responses'][200]['content']['application/json'];
 
 type Tab = 'appearance' | 'privacy' | 'security' | 'feeds' | 'donor';
@@ -128,7 +128,8 @@ const Settings = () => {
   const { data: profile, isLoading } = useGetMyProfileQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateMyProfileMutation();
   const { data: stylesheets } = useGetStylesheetsQuery();
-  const { register, handleSubmit, reset, setValue } = useForm<ProfileForm>();
+  const { register, handleSubmit, reset, setValue, control } =
+    useForm<ProfileForm>();
 
   useEffect(() => {
     if (profile) reset(toProfileForm(profile));
@@ -326,12 +327,7 @@ const Settings = () => {
               Appearance
             </h3>
 
-            <AvatarField
-              input={register('avatar')}
-              onUploaded={(url) =>
-                setValue('avatar', url, { shouldDirty: true })
-              }
-            />
+            <AvatarField control={control} profile={profile} />
 
             <div>
               <label

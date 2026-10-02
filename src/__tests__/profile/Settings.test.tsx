@@ -124,7 +124,9 @@ describe('Settings', () => {
 
   it('renders appearance tab by default', () => {
     renderWithProviders(<Settings />);
-    expect(screen.getByLabelText(/^avatar$/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('group', { name: /^avatar$/i })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/profile bio/i)).toBeInTheDocument();
   });
 
@@ -457,7 +459,9 @@ describe('Settings', () => {
       // and a field label, hence getAllByText).
       expect(screen.getAllByText(distinctive).length).toBeGreaterThan(0);
       expect(screen.queryByLabelText(/^stylesheet$/i)).not.toBeInTheDocument();
-      expect(screen.queryByLabelText(/^avatar$/i)).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('group', { name: /^avatar$/i })
+      ).not.toBeInTheDocument();
     }
   );
 
@@ -503,9 +507,8 @@ describe('Settings', () => {
       isLoading: false
     });
     renderWithProviders(<Settings />);
-    expect((screen.getByLabelText(/^avatar$/i) as HTMLInputElement).value).toBe(
-      'https://example.com/avatar.png'
-    );
+    // A saved remote avatar with no resolved src describes itself instead.
+    expect(screen.getByText(/address on another site/i)).toBeInTheDocument();
   });
 
   it('shows "Saving…" on Security tab when isChangingPw is true', async () => {

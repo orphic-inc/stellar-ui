@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import DonorSettingsTab from '../../components/profile/settings/DonorSettingsTab';
@@ -30,7 +30,12 @@ const makeRewards = () => ({
     profileInfo1: true,
     forumTitle: true
   },
-  rewards: { customIcon: 'https://example.com/icon.png' },
+  rewards: {
+    customIcon: 'https://example.com/icon.png',
+    customIconSrc: `/api/asset/${'d'.repeat(64)}`,
+    secondAvatar: '',
+    secondAvatarSrc: null
+  },
   forumTitle: { prefix: 'Lord', suffix: 'the Generous', useComma: true }
 });
 
@@ -56,7 +61,9 @@ describe('DonorSettingsTab', () => {
     renderWithProviders(<DonorSettingsTab />);
     expect(screen.getByText('Donor Rewards')).toBeInTheDocument();
     expect(screen.getByText('Forum Title')).toBeInTheDocument();
-    expect(screen.getByLabelText(/custom icon url/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('group', { name: 'Custom icon' })
+    ).toBeInTheDocument();
   });
 
   it('paints both forms from the data-st panel/field/control contract', () => {
@@ -77,9 +84,9 @@ describe('DonorSettingsTab', () => {
   });
 });
 
-// #275: the two donor image fields take an upload, but only when the perk is
-// part of the member's donor rank; a locked field keeps its note instead.
-describe('DonorSettingsTab — image uploads (#275)', () => {
+// #275, #434: the two donor image fields take an upload, but only when the perk
+// is part of the member's donor rank; a locked field keeps its note instead.
+describe('DonorSettingsTab — image uploads (#275, #434)', () => {
   beforeEach(() => {
     mockUseGetDonorRewardsQuery.mockReturnValue({
       data: {
@@ -90,13 +97,21 @@ describe('DonorSettingsTab — image uploads (#275)', () => {
     });
   });
 
-  it('offers an upload for an unlocked image field only', () => {
+  it('offers [Browse] for an unlocked image field only', () => {
     renderWithProviders(<DonorSettingsTab />);
-    expect(document.getElementById('image-upload-customIcon')).not.toBeNull();
-    expect(document.getElementById('image-upload-secondAvatar')).toBeNull();
+    const icon = screen.getByRole('group', { name: 'Custom icon' });
+    const second = screen.getByRole('group', { name: 'Second (donor) avatar' });
+    expect(within(icon).getByRole('button', { name: 'Browse' })).toBeVisible();
+    expect(within(second).queryByRole('button')).toBeNull();
     expect(
-      screen.getByText('Not included in your current donor rank.')
+      within(second).getByText('Not included in your current donor rank.')
     ).toBeInTheDocument();
+  });
+
+  it('has no address box for either image field', () => {
+    renderWithProviders(<DonorSettingsTab />);
+    expect(screen.queryByLabelText(/custom icon url/i)).toBeNull();
+    expect(screen.queryByLabelText(/second \(donor\) avatar url/i)).toBeNull();
   });
 });
 
@@ -114,7 +129,8 @@ describe('DonorSettingsTab — clearing a field (#432)', () => {
 
   it('sends an emptied reward field as an empty string', async () => {
     renderWithProviders(<DonorSettingsTab />);
-    await userEvent.clear(screen.getByLabelText(/custom icon url/i));
+    const icon = screen.getByRole('group', { name: 'Custom icon' });
+    await userEvent.click(within(icon).getByRole('button', { name: 'Remove' }));
     await userEvent.click(
       screen.getByRole('button', { name: /save donor settings/i })
     );
