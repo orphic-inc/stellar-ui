@@ -328,8 +328,8 @@ export const userApi = api.injectEndpoints({
         rankId: number;
         name?: string;
         minDonation?: number;
-        badge?: string;
-        color?: string;
+        badge: string;
+        color: string;
         expiresAfterDays?: number;
         perks?: Record<string, boolean>;
       }

@@ -6,6 +6,10 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- **An emptied donor rank colour or badge now clears** (#437). Saving an edited donor rank sent each as `value || undefined`, and the api leaves an `undefined` field alone, so the save reported success and kept the old value. An edit now sends both as staff left them, and `''` clears. Creating a rank still omits an empty field, so the api's defaults apply (a new rank's badge is `♥`).
+
 ## [0.10.1] — 2026-10-02
 
 ### Added
