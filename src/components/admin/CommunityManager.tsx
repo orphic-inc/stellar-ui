@@ -45,6 +45,7 @@ const EditRow = ({
   community: Community;
   onDone: () => void;
 }) => {
+  const dispatch = useDispatch();
   const [updateCommunity] = useUpdateCommunityMutation();
   const [name, setName] = useState(community.name);
   const [description, setDescription] = useState(community.description ?? '');
@@ -74,16 +75,27 @@ const EditRow = ({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateCommunity({
-      id: community.id,
-      name,
-      description,
-      registrationStatus,
-      allowDuplicateFormats,
-      curatorIds: curators.map((s) => s.id),
-      leaderId: leaderId.trim() === '' ? null : parseInt(leaderId, 10)
-    });
-    onDone();
+    // Unwrapped, so a refused save keeps the row open with what was typed
+    // rather than closing as if it had saved (#456).
+    try {
+      await updateCommunity({
+        id: community.id,
+        name,
+        description,
+        registrationStatus,
+        allowDuplicateFormats,
+        curatorIds: curators.map((s) => s.id),
+        leaderId: leaderId.trim() === '' ? null : parseInt(leaderId, 10)
+      }).unwrap();
+      onDone();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to save the community.',
+          'danger'
+        )
+      );
+    }
   };
 
   return (

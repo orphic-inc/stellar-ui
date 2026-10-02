@@ -180,6 +180,56 @@ describe('CommunityManager', () => {
     });
   });
 
+  // A failed save used to close the row as if it had saved (#456): the
+  // mutation resolves on an HTTP error unless it is unwrapped.
+  it('keeps the edit row open and alerts when the save fails', async () => {
+    mockUpdateCommunity.mockReturnValue({
+      unwrap: () =>
+        Promise.reject({
+          data: {
+            msg: 'Leader user ID is required for invite-only and closed communities'
+          }
+        })
+    });
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(3)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            alertType: 'danger',
+            msg: 'Leader user ID is required for invite-only and closed communities'
+          })
+        })
+      );
+    });
+    expect(screen.getByDisplayValue('Community 3')).toBeInTheDocument();
+  });
+
+  it('closes the edit row once the save succeeds', async () => {
+    const user = userEvent.setup();
+    mockGetCommunitiesQuery.mockReturnValue({
+      data: { data: [makeCommunity(3)] },
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityManager />);
+    await user.click(screen.getByRole('button', { name: /edit/i }));
+    await user.click(screen.getByRole('button', { name: /^save$/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByDisplayValue('Community 3')).not.toBeInTheDocument();
+    });
+  });
+
   it('shows leader ID field when status is not open', async () => {
     const user = userEvent.setup();
     mockGetCommunitiesQuery.mockReturnValue({
