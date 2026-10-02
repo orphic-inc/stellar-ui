@@ -1,9 +1,4 @@
 {
   "$comment": "Grandfathered unhandled RTK Query mutation calls (#456), as file#trigger: count. This list only ever SHRINKS: unwrap a call and lower its count, or delete the line at zero. A stale entry fails the check. Regenerate with `npm run mutations:check -- --write-baseline`.",
-  "unhandled": {
-    "components/communities/CommunityPage.tsx#addCommunityCurator": 1,
-    "components/communities/CommunityPage.tsx#addCommunityMember": 1,
-    "components/communities/CommunityPage.tsx#removeCommunityCurator": 1,
-    "components/communities/CommunityPage.tsx#removeCommunityMember": 1
-  }
+  "unhandled": {}
 }
