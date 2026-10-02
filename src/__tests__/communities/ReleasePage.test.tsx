@@ -46,10 +46,8 @@ jest.mock('../../store/services/communityApi', () => ({
     mockRevertHistory,
     { isLoading: false }
   ],
-  useUpdateReleaseMutation: () => [
-    jest.fn().mockResolvedValue({}),
-    { isLoading: false }
-  ]
+  useUpdateReleaseMutation: () => [jest.fn(), { isLoading: false }],
+  useDeleteReleaseMutation: () => [jest.fn(), { isLoading: false }]
 }));
 
 jest.mock('../../store/services/releaseGroupApi', () => ({

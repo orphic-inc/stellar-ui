@@ -20,6 +20,7 @@ import { Modal } from '../ui';
 import { releaseCover } from '../../utils/releaseCover';
 import ReleaseGroupPanel from './ReleaseGroupPanel';
 import ReleaseCredits from './ReleaseCredits';
+import DeleteReleaseButton from './DeleteReleaseButton';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -223,6 +224,11 @@ const ReleasePage = () => {
         >
           [Report release]
         </Link>
+        <DeleteReleaseButton
+          communityId={cId}
+          releaseId={rId}
+          contributionCount={editionContributions?.length}
+        />
       </div>
 
       {/* Two-column layout */}
