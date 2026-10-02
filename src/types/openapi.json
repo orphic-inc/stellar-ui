@@ -22264,7 +22264,7 @@
           "Communities"
         ],
         "summary": "Update a community",
-        "description": "Gated on `communities_manage` ALONE — a community leader or curator cannot configure their own community, so everything here including `announceVisibility` is site-staff-only. That is the settled position, not an oversight: ADR-0030 section 5 was amended to match the code (PR #469).",
+        "description": "Gated on `communities_manage` ALONE — a community leader or curator cannot configure their own community, so everything here including `announceVisibility` is site-staff-only. That is the settled position, not an oversight: ADR-0030 section 5 was amended to match the code (PR #469).\n\n`leaderId: null` clears the leader and removes their curator role; a new `leaderId` hands off and leaves the outgoing leader a curator. An invite-only or closed community needs a leader, so a call that would leave one leaderless answers `409` (#892).",
         "parameters": [
           {
             "schema": {
@@ -22322,6 +22322,7 @@
                   },
                   "leaderId": {
                     "type": "integer",
+                    "nullable": true,
                     "minimum": 0,
                     "exclusiveMinimum": true
                   }
@@ -22382,7 +22383,7 @@
             }
           },
           "409": {
-            "description": "A community with that name already exists",
+            "description": "A community with that name already exists, or the change would leave an invite-only or closed community without a leader",
             "content": {
               "application/json": {
                 "schema": {
@@ -23138,6 +23139,7 @@
           "Communities"
         ],
         "summary": "Promote a user to community curator",
+        "description": "Staff (`communities_manage` or `admin`), or this community's leader. A curator who is not the leader is refused (#895, ADR-0053).",
         "parameters": [
           {
             "schema": {
@@ -23192,7 +23194,7 @@
             }
           },
           "403": {
-            "description": "Not a community admin or curator",
+            "description": "Not staff or the community leader",
             "content": {
               "application/json": {
                 "schema": {
@@ -23235,6 +23237,7 @@
           "Communities"
         ],
         "summary": "Demote a community curator",
+        "description": "Staff (`communities_manage` or `admin`), this community's leader, or the curator themselves, stepping down (#895, ADR-0053). The leader is always a curator, so removing them is refused for every caller; reassign the leader through `PUT /communities/{id}` first (#891).",
         "parameters": [
           {
             "schema": {
@@ -23278,7 +23281,7 @@
             }
           },
           "403": {
-            "description": "Not a community admin or curator",
+            "description": "Not staff, the community leader, or the curator",
             "content": {
               "application/json": {
                 "schema": {
@@ -23289,6 +23292,16 @@
           },
           "404": {
             "description": "Community or user not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MsgResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The target is the community leader",
             "content": {
               "application/json": {
                 "schema": {

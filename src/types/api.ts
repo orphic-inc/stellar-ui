@@ -10831,6 +10831,8 @@ export interface paths {
     /**
      * Update a community
      * @description Gated on `communities_manage` ALONE — a community leader or curator cannot configure their own community, so everything here including `announceVisibility` is site-staff-only. That is the settled position, not an oversight: ADR-0030 section 5 was amended to match the code (PR #469).
+     *
+     *     `leaderId: null` clears the leader and removes their curator role; a new `leaderId` hands off and leaves the outgoing leader a curator. An invite-only or closed community needs a leader, so a call that would leave one leaderless answers `409` (#892).
      */
     put: {
       parameters: {
@@ -10854,7 +10856,7 @@ export interface paths {
             announceVisibility?: 'PUBLIC' | 'PRIVATE';
             allowDuplicateFormats?: boolean;
             curatorIds?: number[];
-            leaderId?: number;
+            leaderId?: number | null;
           };
         };
       };
@@ -10904,7 +10906,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description A community with that name already exists */
+        /** @description A community with that name already exists, or the change would leave an invite-only or closed community without a leader */
         409: {
           headers: {
             [name: string]: unknown;
@@ -11540,7 +11542,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Promote a user to community curator */
+    /**
+     * Promote a user to community curator
+     * @description Staff (`communities_manage` or `admin`), or this community's leader. A curator who is not the leader is refused (#895, ADR-0053).
+     */
     post: {
       parameters: {
         query?: never;
@@ -11583,7 +11588,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not a community admin or curator */
+        /** @description Not staff or the community leader */
         403: {
           headers: {
             [name: string]: unknown;
@@ -11628,7 +11633,10 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
-    /** Demote a community curator */
+    /**
+     * Demote a community curator
+     * @description Staff (`communities_manage` or `admin`), this community's leader, or the curator themselves, stepping down (#895, ADR-0053). The leader is always a curator, so removing them is refused for every caller; reassign the leader through `PUT /communities/{id}` first (#891).
+     */
     delete: {
       parameters: {
         query?: never;
@@ -11666,7 +11674,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Not a community admin or curator */
+        /** @description Not staff, the community leader, or the curator */
         403: {
           headers: {
             [name: string]: unknown;
@@ -11677,6 +11685,15 @@ export interface paths {
         };
         /** @description Community or user not found */
         404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The target is the community leader */
+        409: {
           headers: {
             [name: string]: unknown;
           };
