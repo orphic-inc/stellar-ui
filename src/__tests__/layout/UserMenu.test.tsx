@@ -53,7 +53,8 @@ const mockUser = {
 describe('UserMenu', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockLogout.mockResolvedValue({});
+    // RTK's trigger returns a promise with .unwrap() (#462).
+    mockLogout.mockReturnValue({ unwrap: () => Promise.resolve(undefined) });
   });
 
   it('renders username link and action links', () => {
@@ -105,6 +106,30 @@ describe('UserMenu', () => {
       expect(mockDispatch).toHaveBeenCalledTimes(2);
       expect(mockNavigate).toHaveBeenCalledWith('/login');
     });
+  });
+
+  // Signing out locally while the session cookie still worked only looked
+  // like a sign-out (#462): a failed logout keeps the session and says so.
+  it('stays signed in and alerts when the logout fails', async () => {
+    mockLogout.mockReturnValue({
+      unwrap: () => Promise.reject({ status: 'FETCH_ERROR' })
+    });
+    const user = userEvent.setup();
+    renderWithProviders(<UserMenu user={mockUser} />);
+    await user.click(screen.getByRole('button', { name: /logout/i }));
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({
+            alertType: 'danger',
+            msg: "Couldn't sign out; try again."
+          })
+        })
+      );
+    });
+    expect(mockDispatch).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('paints actions from the role tokens (data-st contract)', () => {

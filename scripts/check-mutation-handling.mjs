@@ -17,6 +17,11 @@
 //   - it is passed to a function, which is the local `run(write, what)` pattern
 //     (NotificationFilterHitsPage) that unwraps on the caller's behalf.
 //
+// A trigger handed on by reference (`onMarkAllRead={markAllRead}`) is counted
+// as unhandled too: whoever calls it gets the same resolving promise, and the
+// call is out of this file's sight (#462). Passing it as an argument to a
+// helper that unwraps (`useFriendAction(addFriend, …)`) is still handled.
+//
 // The baseline is a RATCHET, as in check-service-types.mjs (#277): a new
 // unhandled call FAILS, and a baselined one that is now handled, or gone, FAILS
 // as stale, so the list only shrinks. Entries are `file#trigger` with a count,
@@ -123,6 +128,34 @@ const isHandled = (call) => {
   return false;
 };
 
+/**
+ * A trigger named somewhere other than as a call: handed on as a value.
+ * Declarations, call positions, helper arguments, hook dependency arrays and
+ * identifiers that are only a property, import or attribute NAME are not.
+ */
+// Parents under which the trigger is not handed on at all.
+const NOT_PASSED = [
+  ts.isBindingElement,
+  ts.isArrayLiteralExpression,
+  ts.isImportSpecifier,
+  ts.isExportSpecifier
+];
+// Parents whose NAME the identifier may merely be, sharing a trigger's name.
+const NAMED_BY = [
+  ts.isPropertyAssignment,
+  ts.isPropertyAccessExpression,
+  ts.isJsxAttribute,
+  ts.isMethodDeclaration
+];
+
+const isPassedByReference = (id) => {
+  const p = id.parent;
+  if (ts.isCallExpression(p))
+    return p.expression !== id && !p.arguments.includes(id);
+  if (NOT_PASSED.some((is) => is(p))) return false;
+  return !(NAMED_BY.some((is) => is(p)) && p.name === id);
+};
+
 const unhandledCalls = () => {
   const calls = [];
   for (const file of sourceFiles(SRC)) {
@@ -138,18 +171,23 @@ const unhandledCalls = () => {
     if (triggers.size === 0) continue;
     const rel = relative(SRC, file);
     const visit = (n) => {
+      const record = (name) => {
+        const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
+        calls.push({ key: `${rel}#${name}`, where: `src/${rel}:${line + 1}` });
+      };
       if (
         ts.isCallExpression(n) &&
         ts.isIdentifier(n.expression) &&
         triggers.has(n.expression.text) &&
         !isHandled(n)
-      ) {
-        const { line } = sf.getLineAndCharacterOfPosition(n.getStart(sf));
-        calls.push({
-          key: `${rel}#${n.expression.text}`,
-          where: `src/${rel}:${line + 1}`
-        });
-      }
+      )
+        record(n.expression.text);
+      else if (
+        ts.isIdentifier(n) &&
+        triggers.has(n.text) &&
+        isPassedByReference(n)
+      )
+        record(n.text);
       ts.forEachChild(n, visit);
     };
     visit(sf);

@@ -91,6 +91,13 @@ describe('NotificationCorner', () => {
     mockNotificationsData = mockNotifications;
     mockUnreadCount = 2;
     mockPmCount = 0;
+    // RTK's trigger returns a promise with .unwrap() (#462).
+    mockMarkAllRead.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
+    mockDeleteNotification.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
   });
 
   it('paints the open panel from the data-st contract', async () => {
@@ -156,6 +163,27 @@ describe('NotificationCorner', () => {
     await user.click(screen.getByRole('button', { name: /notifications/i }));
     await user.click(screen.getByRole('button', { name: /mark all read/i }));
     expect(mockMarkAllRead).toHaveBeenCalled();
+  });
+
+  // Mark all read was handed to the panel by reference, so its result was
+  // never looked at (#462).
+  it('alerts when marking all read fails', async () => {
+    mockMarkAllRead.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Try again later.' } })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<NotificationCorner />);
+    await user.click(screen.getByRole('button', { name: /notifications/i }));
+    await user.click(screen.getByRole('button', { name: /mark all read/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Try again later.'
+        })
+      ]);
+    });
   });
 
   it('renders forum_quote notification as a link with correct text', async () => {

@@ -73,6 +73,13 @@ describe('ConversationView', () => {
     mockReply.mockReturnValue({
       unwrap: () => Promise.resolve(undefined)
     });
+    // RTK's trigger returns a promise with .unwrap() (#462).
+    mockUpdateFlags.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
+    mockDeleteConv.mockReturnValue({
+      unwrap: () => Promise.resolve(undefined)
+    });
   });
 
   it('carries the data-st contract hooks (panel/field/control)', () => {
@@ -221,6 +228,35 @@ describe('ConversationView', () => {
     );
     renderWithProviders(<ConversationView />, { store });
     expect(screen.getByText('Anon Conv')).toBeInTheDocument();
+  });
+
+  // The delete went back to the inbox whether or not it landed (#462).
+  it('stays and alerts when deleting the conversation fails', async () => {
+    mockDeleteConv.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Already deleted.' } })
+    });
+    const user = userEvent.setup();
+    const store = createTestStore();
+    store.dispatch(
+      setCredentials({
+        id: 7,
+        username: 'me',
+        userRank: { permissions: {} }
+      } as never)
+    );
+    renderWithProviders(<ConversationView />, { store });
+
+    await user.click(screen.getByTitle('Delete conversation'));
+
+    await waitFor(() => {
+      expect(selectAlerts(store.getState())).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Already deleted.'
+        })
+      ]);
+    });
+    expect(backMock).not.toHaveBeenCalled();
   });
 
   it('shows not found and reply failure states', async () => {

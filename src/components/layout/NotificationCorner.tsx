@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetNotificationsQuery,
   useGetUnreadNotificationCountQuery,
@@ -10,6 +11,8 @@ import {
   type NotificationType
 } from '../../store/services/notificationApi';
 import { useGetUnreadCountQuery } from '../../store/services/messagesApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { useGetNotificationFilterHitUnreadCountQuery } from '../../store/services/notificationFilterApi';
 
 function renderNotificationText(
@@ -247,6 +250,31 @@ const NotificationCorner = ({ showFilterHits = false }: Props) => {
   const [markRead] = useMarkNotificationReadMutation();
   const [markAllRead] = useMarkAllNotificationsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
+  const dispatch = useDispatch();
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllRead().unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to mark notifications read.',
+          'danger'
+        )
+      );
+    }
+  };
+  const handleDismiss = async (id: number) => {
+    try {
+      await deleteNotification(id).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to dismiss the notification.',
+          'danger'
+        )
+      );
+    }
+  };
   const { data: pmData } = useGetUnreadCountQuery();
   const { data: hitData } = useGetNotificationFilterHitUnreadCountQuery(
     undefined,
@@ -280,7 +308,7 @@ const NotificationCorner = ({ showFilterHits = false }: Props) => {
       {open && (
         <div data-st="panel" className="w-80 shadow-2xl">
           <PanelHeader
-            onMarkAllRead={unreadNotifCount > 0 ? markAllRead : undefined}
+            onMarkAllRead={unreadNotifCount > 0 ? handleMarkAllRead : undefined}
             onClose={() => setOpen(false)}
           />
           <SummaryLinks
@@ -304,7 +332,7 @@ const NotificationCorner = ({ showFilterHits = false }: Props) => {
                     if (!n.readAt) markRead(n.id);
                     setOpen(false);
                   }}
-                  onDismiss={() => deleteNotification(n.id)}
+                  onDismiss={() => handleDismiss(n.id)}
                 />
               ))}
             </ul>

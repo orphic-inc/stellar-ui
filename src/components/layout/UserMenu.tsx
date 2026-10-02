@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import { useLogoutMutation } from '../../store/services/authApi';
 import { api } from '../../store/api';
 import { logout as logoutAction } from '../../store/slices/authSlice';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { hasPermission } from '../../utils/permissions';
 import type { AuthUser } from '../../types';
 
@@ -15,11 +17,23 @@ const UserMenu = ({ user }: Props) => {
   const dispatch = useDispatch();
   const [logout] = useLogoutMutation();
 
+  // Signs out here only once the server has ended the session. Until then
+  // the session cookie still works, so clearing the ui would only claim a
+  // sign-out a reload undoes (#462).
   const handleLogout = async () => {
-    await logout();
-    dispatch(logoutAction());
-    dispatch(api.util.resetApiState());
-    navigate('/login');
+    try {
+      await logout().unwrap();
+      dispatch(logoutAction());
+      dispatch(api.util.resetApiState());
+      navigate('/login');
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? "Couldn't sign out; try again.",
+          'danger'
+        )
+      );
+    }
   };
 
   // `invites_unlimited` (stellar-api#637) is what makes a balance meaningless;
