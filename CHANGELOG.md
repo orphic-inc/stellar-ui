@@ -40,6 +40,13 @@ All notable changes to stellar-ui are documented here.
   - On My stylesheets, a sheet's name now opens its page, with **Edit** beside it.
   - In Settings, the Registry option says "None adopted yet — open a stylesheet's page to adopt it", or links to the adopted sheet's page.
 
+### Changed
+
+- **On a community's page, only its leader and staff see the curator controls** (#457, stellar-api#895). The api now refuses a curator who isn't the leader when they add or remove another curator, so their **Make Curator** and **Demote** buttons are gone.
+  - A curator who isn't the leader gets a **Step down** button on their own row instead. It asks first, because it ends their member management at once, and it says whether it worked.
+  - The leader's row has no **Demote** for anyone, because the api refuses removing the leader as a curator. A leader is reassigned or cleared in Community Manager.
+  - Member **Add** and **Remove** are unchanged: curators and staff still see them.
+
 ### Fixed
 
 - **An emptied donor rank colour or badge now clears** (#437). Saving an edited donor rank sent each as `value || undefined`, and the api leaves an `undefined` field alone, so the save reported success and kept the old value. An edit now sends both as staff left them, and `''` clears. Creating a rank still omits an empty field, so the api's defaults apply (a new rank's badge is `♥`).

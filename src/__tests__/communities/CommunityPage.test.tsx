@@ -448,51 +448,141 @@ describe('CommunityPage', () => {
     );
   });
 
-  it('demotes staff member and removes a member', async () => {
-    const user = userEvent.setup();
-    mockCurrentUser = {
-      id: 99,
-      username: 'curatormember',
-      canDownload: true,
-      userRank: { permissions: {} }
+  // Only the leader, or staff, adds or removes curators; a curator may step
+  // down (#457, stellar-api#895). The leader's own row offers neither: the api
+  // refuses removing the leader as a curator (stellar-api#891).
+  describe('curator controls', () => {
+    const leaderCommunity = () =>
+      makeCommunity({
+        leaderId: 50,
+        curators: [
+          { id: 50, username: 'leader' },
+          { id: 99, username: 'curatormember' }
+        ],
+        members: [
+          { id: 10, username: 'alice', roles: ['consumer'] },
+          { id: 50, username: 'leader', roles: ['curator', 'leader'] },
+          { id: 99, username: 'curatormember', roles: ['curator'] }
+        ]
+      });
+    const signIn = (id: number, permissions: Record<string, boolean> = {}) => {
+      mockCurrentUser = {
+        id,
+        username: `user${id}`,
+        canDownload: true,
+        userRank: { permissions }
+      };
     };
-    mockUseGetCommunityByIdQuery.mockReturnValue({
-      data: makeCommunity(),
-      isLoading: false,
-      error: undefined
-    });
-    renderWithProviders(<CommunityPage />);
-
-    await user.click(screen.getByRole('button', { name: /demote/i }));
-    expect(mockRemoveCommunityCurator).toHaveBeenCalledWith({
-      communityId: 3,
-      userId: 99
-    });
-
-    await user.click(screen.getAllByRole('button', { name: /remove/i })[0]);
-    expect(mockRemoveCommunityMember).toHaveBeenCalled();
-  });
-
-  it('promotes a plain member to curator via the Make Curator button', async () => {
-    const user = userEvent.setup();
-    mockCurrentUser = {
-      id: 99,
-      username: 'curatormember',
-      canDownload: true,
-      userRank: { permissions: {} }
+    const render = () => {
+      mockUseGetCommunityByIdQuery.mockReturnValue({
+        data: leaderCommunity(),
+        isLoading: false,
+        error: undefined
+      });
+      renderWithProviders(<CommunityPage />);
     };
-    mockUseGetCommunityByIdQuery.mockReturnValue({
-      data: makeCommunity(),
-      isLoading: false,
-      error: undefined
-    });
-    renderWithProviders(<CommunityPage />);
 
-    // alice (id:10) holds no curator role — "Make Curator" is shown for her
-    await user.click(screen.getByRole('button', { name: /make curator/i }));
-    expect(mockAddCommunityCurator).toHaveBeenCalledWith({
-      communityId: 3,
-      userId: 10
+    it('lets the leader promote a member and demote another curator', async () => {
+      const user = userEvent.setup();
+      signIn(50);
+      render();
+
+      await user.click(screen.getByRole('button', { name: /make curator/i }));
+      expect(mockAddCommunityCurator).toHaveBeenCalledWith({
+        communityId: 3,
+        userId: 10
+      });
+
+      // One Demote: curatormember's. The leader's own row has none.
+      const demotes = screen.getAllByRole('button', { name: /demote/i });
+      expect(demotes).toHaveLength(1);
+      await user.click(demotes[0]);
+      expect(mockRemoveCommunityCurator).toHaveBeenCalledWith({
+        communityId: 3,
+        userId: 99
+      });
+    });
+
+    it('gives staff the same controls, but none on the leader row', () => {
+      signIn(7, { communities_manage: true });
+      render();
+
+      expect(
+        screen.getByRole('button', { name: /make curator/i })
+      ).toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: /demote/i })).toHaveLength(
+        1
+      );
+    });
+
+    it('gives a curator who is not the leader no curator controls, only Step down', () => {
+      signIn(99);
+      render();
+
+      expect(
+        screen.queryByRole('button', { name: /make curator/i })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /demote/i })
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getAllByRole('button', { name: /step down/i })
+      ).toHaveLength(1);
+    });
+
+    it('steps a curator down after they confirm', async () => {
+      const user = userEvent.setup();
+      signIn(99);
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      mockRemoveCommunityCurator.mockReturnValue({
+        unwrap: () => Promise.resolve()
+      });
+      render();
+
+      await user.click(screen.getByRole('button', { name: /step down/i }));
+
+      expect(mockRemoveCommunityCurator).toHaveBeenCalledWith({
+        communityId: 3,
+        userId: 99
+      });
+    });
+
+    it('does nothing when the curator cancels stepping down', async () => {
+      const user = userEvent.setup();
+      signIn(99);
+      jest.spyOn(window, 'confirm').mockReturnValue(false);
+      render();
+
+      await user.click(screen.getByRole('button', { name: /step down/i }));
+
+      expect(mockRemoveCommunityCurator).not.toHaveBeenCalled();
+    });
+
+    it('alerts when stepping down fails', async () => {
+      const user = userEvent.setup();
+      signIn(99);
+      jest.spyOn(window, 'confirm').mockReturnValue(true);
+      mockRemoveCommunityCurator.mockReturnValue({
+        unwrap: () => Promise.reject({ status: 403 })
+      });
+      render();
+
+      await user.click(screen.getByRole('button', { name: /step down/i }));
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          payload: expect.objectContaining({ alertType: 'danger' })
+        })
+      );
+    });
+
+    it('still lets a curator remove a member', async () => {
+      const user = userEvent.setup();
+      signIn(99);
+      render();
+
+      await user.click(screen.getAllByRole('button', { name: /^remove$/i })[0]);
+      expect(mockRemoveCommunityMember).toHaveBeenCalled();
     });
   });
 
