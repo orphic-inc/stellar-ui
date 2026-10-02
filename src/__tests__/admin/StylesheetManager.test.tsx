@@ -53,6 +53,18 @@ describe('StylesheetManager', () => {
     expect(screen.getByText('Default')).toBeInTheDocument();
   });
 
+  it('says what the user counts cannot see (#203)', () => {
+    mockGetStylesheets.mockReturnValue({
+      data: [makeSheet(1, 'kuro', true)],
+      isLoading: false
+    });
+    renderWithProviders(<StylesheetManager />);
+    const caveat = screen.getByText(/^User counts are members/);
+    expect(caveat).toHaveTextContent(/Personal or Registry stylesheet/);
+    expect(caveat).toHaveTextContent(/no CSS URL adds no styling/);
+    expect(caveat).not.toHaveTextContent(/external stylesheet URL/);
+  });
+
   it('shows the empty state', () => {
     mockGetStylesheets.mockReturnValue({ data: [], isLoading: false });
     renderWithProviders(<StylesheetManager />);
