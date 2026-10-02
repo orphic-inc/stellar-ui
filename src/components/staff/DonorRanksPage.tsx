@@ -251,12 +251,15 @@ const DonorRanksPage = () => {
     e.preventDefault();
     if (editingId == null) return;
     try {
+      // Colour and badge as staff left them: '' clears one (#437), where
+      // `undefined` would tell the api to leave the old value in place. Create
+      // still omits an empty field, so the api's defaults apply there.
       await updateRank({
         rankId: editingId,
         name: editForm.name,
         minDonation: Number(editForm.minDonation),
-        badge: editForm.badge || undefined,
-        color: editForm.color || undefined,
+        badge: editForm.badge,
+        color: editForm.color,
         expiresAfterDays: editForm.expiresAfterDays
           ? Number(editForm.expiresAfterDays)
           : undefined,

@@ -210,6 +210,40 @@ describe('DonorRanksPage', () => {
     });
   });
 
+  it('omits an empty badge and colour on create, so the api defaults apply (#437)', async () => {
+    const user = userEvent.setup();
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    await user.click(screen.getByRole('button', { name: /\+ create rank/i }));
+    await user.type(screen.getByLabelText(/^name$/i), 'Silver');
+    await user.type(screen.getByLabelText(/min donation/i), '25');
+    await user.click(screen.getByRole('button', { name: /^create rank$/i }));
+    expect(mockCreateDonorRank).toHaveBeenCalledWith(
+      expect.objectContaining({ badge: undefined, color: undefined })
+    );
+  });
+
+  it('sends an emptied badge and colour as empty strings on edit, so they clear (#437)', async () => {
+    const user = userEvent.setup();
+    mockGetDonorRanksQuery.mockReturnValue({
+      data: [{ ...makeRank(1), color: '#ff69b4', perks: {} }],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<DonorRanksPage />);
+    await user.click(screen.getByRole('button', { name: /^edit$/i }));
+    await user.clear(screen.getByLabelText(/badge/i));
+    await user.clear(screen.getByLabelText(/color/i));
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+    expect(mockUpdateDonorRank).toHaveBeenCalledWith(
+      expect.objectContaining({ rankId: 1, badge: '', color: '' })
+    );
+  });
+
   it('dispatches fallback danger alert when create fails with no API message', async () => {
     mockCreateDonorRank.mockReturnValue({
       unwrap: () => Promise.reject({})
