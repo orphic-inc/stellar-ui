@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { useGetReportCountsQuery } from '../../store/services/reportsApi';
 import {
@@ -156,8 +158,22 @@ const ModBar = () => {
     pollingInterval: SITE_FULL_POLL_MS
   });
   const [dismissChecklistItem] = useDismissInstallChecklistItemMutation();
+  const dispatch = useAppDispatch();
 
   if (!canSeeModBar(user)) return null;
+
+  const handleDismiss = async (id: string) => {
+    try {
+      await dismissChecklistItem(id).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to dismiss the checklist item.',
+          'danger'
+        )
+      );
+    }
+  };
 
   const openReports = reportCounts?.open ?? 0;
   const setupChecklist = installStatus?.setupChecklist ?? [];
@@ -175,7 +191,7 @@ const ModBar = () => {
         {installStatus?.registrationFull && <SiteFullBanner />}
         <SetupChecklist
           items={setupChecklist}
-          onDismiss={(id) => void dismissChecklistItem(id)}
+          onDismiss={(id) => void handleDismiss(id)}
         />
       </div>
     </div>

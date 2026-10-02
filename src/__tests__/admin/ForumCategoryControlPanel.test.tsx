@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import ForumCategoryControlPanel from '../../components/admin/ForumCategoryControlPanel';
@@ -113,6 +113,29 @@ describe('ForumCategoryControlPanel', () => {
     expect(mockCreateForumCategory).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Jazz Talk' })
     );
+  });
+
+  // A failed create used to clear the form as if it had worked (#460).
+  it('keeps the name and alerts when creating a category fails', async () => {
+    mockCreateForumCategory.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Name taken.' } })
+    });
+    const user = userEvent.setup();
+    mockGetForumCategoriesAdminQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: undefined
+    });
+    const { store } = renderWithProviders(<ForumCategoryControlPanel />);
+    await user.type(screen.getByLabelText(/name/i), 'Jazz Talk');
+    await user.click(screen.getByRole('button', { name: /^create$/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({ alertType: 'danger', msg: 'Name taken.' })
+      ]);
+    });
+    expect(screen.getByLabelText(/name/i)).toHaveValue('Jazz Talk');
   });
 
   it('shows edit form on Edit click and saves on submit', async () => {

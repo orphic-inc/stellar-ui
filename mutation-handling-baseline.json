@@ -1,18 +1,6 @@
 {
   "$comment": "Grandfathered unhandled RTK Query mutation calls (#456), as file#trigger: count. This list only ever SHRINKS: unwrap a call and lower its count, or delete the line at zero. A stale entry fails the check. Regenerate with `npm run mutations:check -- --write-baseline`.",
   "unhandled": {
-    "components/admin/ForumCategoryControlPanel.tsx#createCategory": 1,
-    "components/admin/ForumCategoryControlPanel.tsx#deleteCategory": 1,
-    "components/admin/ForumCategoryControlPanel.tsx#updateCategory": 1,
-    "components/admin/ForumControlPanel.tsx#createForum": 1,
-    "components/admin/ForumControlPanel.tsx#deleteForum": 1,
-    "components/admin/ForumControlPanel.tsx#updateForum": 1,
-    "components/admin/ModBar.tsx#dismissChecklistItem": 1,
-    "components/admin/NewsManager.tsx#createAnnouncement": 1,
-    "components/admin/NewsManager.tsx#createBlogPost": 1,
-    "components/admin/NewsManager.tsx#deleteAnnouncement": 1,
-    "components/admin/NewsManager.tsx#deleteBlogPost": 1,
-    "components/admin/UserRankManager.tsx#deleteUserRank": 1,
     "components/communities/CommunityPage.tsx#addCommunityCurator": 1,
     "components/communities/CommunityPage.tsx#addCommunityMember": 1,
     "components/communities/CommunityPage.tsx#removeCommunityCurator": 1,

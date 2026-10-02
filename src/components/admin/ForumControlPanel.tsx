@@ -1,5 +1,6 @@
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetForumCategoriesQuery,
   useGetForumsQuery,
@@ -8,6 +9,8 @@ import {
   useDeleteForumMutation
 } from '../../store/services/forumApi';
 import type { Forum } from '../../types';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import { PageShell, Panel, Button, SectionHeading } from '../ui';
 
@@ -17,6 +20,7 @@ interface EditRowProps {
 }
 
 const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
+  const dispatch = useDispatch();
   const [updateForum, { isLoading }] = useUpdateForumMutation();
   const [name, setName] = useState(forum.name);
   const [description, setDescription] = useState(forum.description ?? '');
@@ -27,16 +31,25 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateForum({
-      id: forum.id,
-      name,
-      description,
-      sort: parseInt(sort) || 0,
-      minClassRead: parseInt(minRead) || 0,
-      minClassWrite: parseInt(minWrite) || 0,
-      minClassCreate: parseInt(minCreate) || 0
-    });
-    onDone();
+    try {
+      await updateForum({
+        id: forum.id,
+        name,
+        description,
+        sort: parseInt(sort) || 0,
+        minClassRead: parseInt(minRead) || 0,
+        minClassWrite: parseInt(minWrite) || 0,
+        minClassCreate: parseInt(minCreate) || 0
+      }).unwrap();
+      onDone();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to save the forum.',
+          'danger'
+        )
+      );
+    }
   };
 
   return (
@@ -163,6 +176,7 @@ const ForumEditRow = ({ forum, onDone }: EditRowProps) => {
 };
 
 const ForumControlPanel = () => {
+  const dispatch = useDispatch();
   const {
     data: categories,
     isLoading: loadingCategories,
@@ -188,27 +202,45 @@ const ForumControlPanel = () => {
 
   const handleDelete = async (id: number, forumName: string) => {
     if (!confirm(`Delete forum "${forumName}"? This cannot be undone.`)) return;
-    await deleteForum(id);
+    try {
+      await deleteForum(id).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to delete the forum.',
+          'danger'
+        )
+      );
+    }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createForum({
-      forumCategoryId: parseInt(categoryId),
-      name,
-      description,
-      sort: parseInt(sort) || 0,
-      minClassRead: parseInt(minClassRead) || 0,
-      minClassWrite: parseInt(minClassWrite) || 0,
-      minClassCreate: parseInt(minClassCreate) || 0
-    });
-    setName('');
-    setDescription('');
-    setSort('');
-    setMinClassRead('');
-    setMinClassWrite('');
-    setMinClassCreate('');
-    setCategoryId('');
+    try {
+      await createForum({
+        forumCategoryId: parseInt(categoryId),
+        name,
+        description,
+        sort: parseInt(sort) || 0,
+        minClassRead: parseInt(minClassRead) || 0,
+        minClassWrite: parseInt(minClassWrite) || 0,
+        minClassCreate: parseInt(minClassCreate) || 0
+      }).unwrap();
+      setName('');
+      setDescription('');
+      setSort('');
+      setMinClassRead('');
+      setMinClassWrite('');
+      setMinClassCreate('');
+      setCategoryId('');
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to create the forum.',
+          'danger'
+        )
+      );
+    }
   };
 
   return (

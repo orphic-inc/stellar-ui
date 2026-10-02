@@ -54,7 +54,12 @@ describe('ForumControlPanel', () => {
       isLoading: false,
       error: undefined
     });
-    mockCreateForum.mockResolvedValue({ data: { id: 11 } });
+    // RTK's trigger returns a promise with .unwrap() (#460).
+    mockCreateForum.mockReturnValue({
+      unwrap: () => Promise.resolve({ id: 11 })
+    });
+    mockUpdateForum.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockDeleteForum.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('shows spinner while loading', () => {
@@ -160,5 +165,24 @@ describe('ForumControlPanel', () => {
         })
       );
     });
+  });
+
+  // A failed create used to clear the form as if it had worked (#460).
+  it('keeps the form and alerts when creating a forum fails', async () => {
+    mockCreateForum.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Name taken.' } })
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<ForumControlPanel />);
+    await user.selectOptions(screen.getByLabelText(/^category/i), 'General');
+    await user.type(screen.getByLabelText(/^name/i), 'Intro Forum');
+    await user.click(screen.getByRole('button', { name: /create forum/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({ alertType: 'danger', msg: 'Name taken.' })
+      ]);
+    });
+    expect(screen.getByLabelText(/^name/i)).toHaveValue('Intro Forum');
   });
 });

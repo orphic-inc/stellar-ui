@@ -8,9 +8,11 @@ const mockUseAppSelector = jest.fn();
 const mockUseGetReportCountsQuery = jest.fn();
 const mockUseGetInstallStatusQuery = jest.fn();
 const mockDismissInstallChecklistItem = jest.fn();
+const mockDispatch = jest.fn();
 
 jest.mock('../../store/hooks', () => ({
-  useAppSelector: (...args: unknown[]) => mockUseAppSelector(...args)
+  useAppSelector: (...args: unknown[]) => mockUseAppSelector(...args),
+  useAppDispatch: () => mockDispatch
 }));
 
 jest.mock('../../store/services/reportsApi', () => ({
@@ -172,6 +174,39 @@ describe('ModBar', () => {
 
     expect(mockDismissInstallChecklistItem).toHaveBeenCalledWith(
       'max-users-default'
+    );
+  });
+
+  // The dismiss was fire-and-forget, so a refused one said nothing (#460).
+  it('alerts when dismissing a checklist item fails', async () => {
+    const user = userEvent.setup();
+    mockUseAppSelector.mockReturnValue(staffUser);
+    mockDismissInstallChecklistItem.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Not allowed.' } })
+    });
+    mockUseGetInstallStatusQuery.mockReturnValue({
+      data: {
+        setupChecklist: [
+          {
+            id: 'max-users-default',
+            message: 'maxUsers is still the default value.'
+          }
+        ]
+      }
+    });
+
+    renderWithProviders(<ModBar />);
+    await user.click(
+      screen.getByRole('button', { name: /dismiss max-users-default/i })
+    );
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Not allowed.'
+        })
+      })
     );
   });
 

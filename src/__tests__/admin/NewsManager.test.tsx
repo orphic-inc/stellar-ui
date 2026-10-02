@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import NewsManager from '../../components/admin/NewsManager';
@@ -46,8 +46,15 @@ describe('NewsManager', () => {
     jest.clearAllMocks();
     mockCreatingNews = false;
     mockCreatingBlog = false;
-    mockCreateAnnouncement.mockResolvedValue({});
-    mockCreateBlogPost.mockResolvedValue({});
+    // RTK's trigger returns a promise with .unwrap() (#460).
+    mockCreateAnnouncement.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+    mockCreateBlogPost.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    mockDeleteAnnouncement.mockReturnValue({
+      unwrap: () => Promise.resolve({})
+    });
+    mockDeleteBlogPost.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('shows spinner while loading', () => {
@@ -147,6 +154,37 @@ describe('NewsManager', () => {
       title: 'Important Update',
       body: 'Details here.'
     });
+  });
+
+  // A failed post used to clear the form as if it had worked (#460).
+  it('keeps the announcement and alerts when posting fails', async () => {
+    mockCreateAnnouncement.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Body is required.' } })
+    });
+    const user = userEvent.setup();
+    mockGetAnnouncementsQuery.mockReturnValue({
+      data: emptyData,
+      isLoading: false,
+      error: undefined
+    });
+    const { store } = renderWithProviders(<NewsManager />);
+    const [announcementTitle] = screen.getAllByPlaceholderText('Title');
+    const [announcementBody] = screen.getAllByPlaceholderText('Body');
+    await user.type(announcementTitle, 'Important Update');
+    await user.type(announcementBody, 'Details here.');
+    await user.click(
+      screen.getByRole('button', { name: /post announcement/i })
+    );
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Body is required.'
+        })
+      ]);
+    });
+    expect(announcementTitle).toHaveValue('Important Update');
   });
 
   it('renders blog post title and author', () => {
