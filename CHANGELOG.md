@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.10.2] — 2026-10-02
+
 ### Added
 
 - **A member's profile shows "Invited by" to viewers holding `invites_manage`** (#411, stellar-api#849). It links to the inviter's profile, or says _Nobody_ for a member no one invited. The api withholds the field from anyone else, so the row is hidden for them.
@@ -1612,7 +1614,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.2...HEAD
+[0.10.2]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.11...v0.10.0
 [0.9.11]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.10...v0.9.11
