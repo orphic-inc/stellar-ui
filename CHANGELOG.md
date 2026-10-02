@@ -19,6 +19,7 @@ All notable changes to stellar-ui are documented here.
   - A rank that can't upload (`assetLimit` 0) gets a note in place of the picker. The two donor fields show the picker only when the perk is unlocked.
   - The type is checked before sending. An oversize image says so, and "limit reached" says how to free a slot.
   - This re-vendors the contract for `userRank.assetLimit` on the session (stellar-api#716) and the upload's `field`.
+- **Staff can delete a release that has no contributions** (#429). A `[Delete release]` action in the release page's links shows to `communities_manage` once the release's contributions have loaded and there are none, which is the only release `DELETE /communities/{id}/releases/{id}` accepts (stellar-api#793). It asks for confirmation, and returns to the community on success. A refusal shows the api's message.
 
 ### Fixed
 
