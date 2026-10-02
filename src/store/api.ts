@@ -35,6 +35,7 @@ export const api = createApi({
     'Notification',
     'Announcement',
     'Stylesheet',
+    'AuthorStylesheet',
     'Contribution',
     'UserRank',
     'PromotionRule',
