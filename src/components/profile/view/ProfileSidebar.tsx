@@ -108,6 +108,27 @@ const InviteRow = ({ profile }: { profile: ProfileView }) => {
   );
 };
 
+/**
+ * Who invited the member (#411). The api sends `invitedBy` only to an
+ * `invites_manage` viewer, so a `null` hides the row; a `null` inviter means
+ * nobody did.
+ */
+const InvitedByRow = ({ profile }: { profile: ProfileView }) => {
+  if (!profile.invitedBy) return null;
+  const { inviter } = profile.invitedBy;
+  return (
+    <Row label="Invited by">
+      {inviter ? (
+        <Link to={`/user/${inviter.username}`} data-st="control">
+          {inviter.username}
+        </Link>
+      ) : (
+        'Nobody'
+      )}
+    </Row>
+  );
+};
+
 /** A link to the member's invite tree for an `invites_manage` viewer (#423). */
 const InviteTreeRow = ({ profile }: { profile: ProfileView }) => {
   const viewer = useAppSelector(selectCurrentUser);
@@ -156,6 +177,7 @@ const StatisticsPanel = ({
     <ul className="px-3 py-2 space-y-1 text-xs text-[var(--st-text)]">
       <IdentityRows profile={profile} />
       <InviteRow profile={profile} />
+      <InvitedByRow profile={profile} />
       <InviteTreeRow profile={profile} />
       {profile.isDonor && <li className="text-pink-400">Donor ♥</li>}
       <ByteRows stats={profile.stats} />
