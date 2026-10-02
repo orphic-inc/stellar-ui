@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import VanityHousePage from '../../components/staff/VanityHousePage';
@@ -62,5 +62,28 @@ describe('VanityHousePage', () => {
     renderWithProviders(<VanityHousePage />);
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     expect(mockSet).toHaveBeenCalledWith({ id: 7, vanityHouse: false });
+  });
+
+  // The remove's outcome was ignored, so a refusal said nothing (#463).
+  it('alerts when removing an artist fails', async () => {
+    mockSet.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Artist not found.' } })
+    });
+    const user = userEvent.setup();
+    mockQuery.mockReturnValue({
+      data: { data: [artist], meta: { totalPages: 1 } },
+      isLoading: false
+    });
+    const { store } = renderWithProviders(<VanityHousePage />);
+    await user.click(screen.getByRole('button', { name: 'Remove' }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Artist not found.'
+        })
+      ]);
+    });
   });
 });

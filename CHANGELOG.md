@@ -49,6 +49,11 @@ All notable changes to stellar-ui are documented here.
 
 ### Fixed
 
+- **The staff tools say when a write fails** (#463, part of #456). Seven writes ignored the api's answer. Each now shows the api's message:
+  - Global Notices: a refused notice cleared the form as if it had been sent, and now keeps it; a failed delete did nothing visible;
+  - Tag Aliases: a refused edit closed the row as if it had saved, and now stays open; a failed delete did nothing visible;
+  - the deletes on Album of the Month and Do Not Contribute, and removing an artist from Vanity House.
+
 - **Messages, notifications and logout say when a write fails** (#462, part of #456). Nine writes ignored the api's answer. Each now shows the api's message:
   - the inbox: a failed bulk action cleared the selection as if it had worked, and now keeps it; a single delete did nothing visible;
   - a conversation: sticky, mark unread and delete. A failed delete went back to the inbox as if it had worked, and now stays;

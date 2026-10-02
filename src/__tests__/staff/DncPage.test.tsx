@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import DncPage from '../../components/staff/DncPage';
@@ -23,6 +23,8 @@ describe('DncPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    // RTK's trigger returns a promise with .unwrap() (#463).
+    mockDelete.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockUseGetDncQuery.mockReturnValue({ data: [], isLoading: false });
   });
 
@@ -45,6 +47,39 @@ describe('DncPage', () => {
     expect(
       screen.getByText(/no dnc entries for this community/i)
     ).toBeInTheDocument();
+  });
+
+  // The delete was fire-and-forget, so a refusal said nothing (#463).
+  it('alerts when deleting an entry fails', async () => {
+    mockDelete.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Entry not found.' } })
+    });
+    mockUseGetDncQuery.mockReturnValue({
+      data: [
+        {
+          id: 4,
+          name: 'Some Label',
+          comment: null,
+          createdAt: '2026-01-01T00:00:00.000Z',
+          user: null
+        }
+      ],
+      isLoading: false
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<DncPage />);
+    await user.selectOptions(screen.getByRole('combobox'), '1');
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+
+    expect(mockDelete).toHaveBeenCalledWith({ communityId: 1, dncId: 4 });
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Entry not found.'
+        })
+      ]);
+    });
   });
 
   it('creates an entry', async () => {

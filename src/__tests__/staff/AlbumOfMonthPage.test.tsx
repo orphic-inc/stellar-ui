@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import AlbumOfMonthPage from '../../components/staff/AlbumOfMonthPage';
@@ -27,6 +27,8 @@ describe('AlbumOfMonthPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    // RTK's trigger returns a promise with .unwrap() (#463).
+    mockDelete.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('shows a spinner while loading', () => {
@@ -69,5 +71,25 @@ describe('AlbumOfMonthPage', () => {
     renderWithProviders(<AlbumOfMonthPage />);
     await user.click(screen.getByRole('button', { name: /delete/i }));
     expect(mockDelete).toHaveBeenCalledWith(3);
+  });
+
+  // The delete was fire-and-forget, so a refusal said nothing (#463).
+  it('alerts when deleting an album fails', async () => {
+    mockDelete.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Album not found.' } })
+    });
+    mockQuery.mockReturnValue({ data: [makeAlbum(3)], isLoading: false });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<AlbumOfMonthPage />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Album not found.'
+        })
+      ]);
+    });
   });
 });

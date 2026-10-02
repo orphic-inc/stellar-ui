@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import GlobalNoticesPage from '../../components/staff/GlobalNoticesPage';
@@ -27,6 +27,8 @@ describe('GlobalNoticesPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+    // RTK's trigger returns a promise with .unwrap() (#463).
+    mockDelete.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   });
 
   it('shows a spinner while loading', () => {
@@ -81,5 +83,28 @@ describe('GlobalNoticesPage', () => {
     renderWithProviders(<GlobalNoticesPage />);
     await user.click(screen.getByRole('button', { name: /delete/i }));
     expect(mockDelete).toHaveBeenCalledWith(7);
+  });
+
+  // A refused notice used to clear the form as if it had been sent (#463).
+  it('keeps the message and alerts when sending fails', async () => {
+    mockCreate.mockReturnValue({
+      unwrap: () => Promise.reject({ data: { msg: 'Message is too long.' } })
+    });
+    mockQuery.mockReturnValue({ data: [], isLoading: false });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<GlobalNoticesPage />);
+    const message = screen.getByPlaceholderText(/message \(max 500/i);
+    await user.type(message, 'Maintenance tonight');
+    await user.click(screen.getByRole('button', { name: /send notice/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'Message is too long.'
+        })
+      ]);
+    });
+    expect(message).toHaveValue('Maintenance tonight');
   });
 });

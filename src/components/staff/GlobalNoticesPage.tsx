@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useGetGlobalNoticesQuery,
   useCreateGlobalNoticeMutation,
   useDeleteGlobalNoticeMutation
 } from '../../store/services/announcementApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Time from '../layout/Time';
 import {
   PageShell,
@@ -19,6 +22,9 @@ const GlobalNoticesPage = () => {
   const [createGlobalNotice, { isLoading: creating }] =
     useCreateGlobalNoticeMutation();
   const [deleteGlobalNotice] = useDeleteGlobalNoticeMutation();
+  const dispatch = useDispatch();
+  const fail = (err: unknown, fallback: string) =>
+    dispatch(addAlert(getApiErrorMessage(err) ?? fallback, 'danger'));
 
   const [message, setMessage] = useState('');
   const [url, setUrl] = useState('');
@@ -26,14 +32,27 @@ const GlobalNoticesPage = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createGlobalNotice({
-      message,
-      ...(url ? { url } : {}),
-      ...(expiry ? { expiresAt: new Date(expiry).toISOString() } : {})
-    });
-    setMessage('');
-    setUrl('');
-    setExpiry('');
+    // A refused notice keeps the form filled in (#463).
+    try {
+      await createGlobalNotice({
+        message,
+        ...(url ? { url } : {}),
+        ...(expiry ? { expiresAt: new Date(expiry).toISOString() } : {})
+      }).unwrap();
+      setMessage('');
+      setUrl('');
+      setExpiry('');
+    } catch (err) {
+      fail(err, 'Failed to send the notice.');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteGlobalNotice(id).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to delete the notice.');
+    }
   };
 
   type Notice = NonNullable<typeof globalNotices>[number];
@@ -58,7 +77,7 @@ const GlobalNoticesPage = () => {
       header: '',
       tdClassName: 'text-right',
       cell: (n) => (
-        <Button variant="link-danger" onClick={() => deleteGlobalNotice(n.id)}>
+        <Button variant="link-danger" onClick={() => handleDelete(n.id)}>
           Delete
         </Button>
       )

@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetDncQuery,
   useCreateDncEntryMutation,
   useDeleteDncEntryMutation
 } from '../../store/services/adminApi';
 import { useGetCommunitiesQuery } from '../../store/services/communityApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Time from '../layout/Time';
 import {
   PageShell,
@@ -36,6 +39,20 @@ const DncPage = () => {
   });
   const [createEntry, { isLoading: isCreating }] = useCreateDncEntryMutation();
   const [deleteEntry] = useDeleteDncEntryMutation();
+  const dispatch = useDispatch();
+
+  const handleDelete = async (dncId: number) => {
+    try {
+      await deleteEntry({ communityId: communityId!, dncId }).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to delete the entry.',
+          'danger'
+        )
+      );
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,12 +109,7 @@ const DncPage = () => {
       header: '',
       tdClassName: 'text-right',
       cell: (entry) => (
-        <Button
-          variant="link-danger"
-          onClick={() =>
-            deleteEntry({ communityId: communityId!, dncId: entry.id })
-          }
-        >
+        <Button variant="link-danger" onClick={() => handleDelete(entry.id)}>
           Delete
         </Button>
       )
