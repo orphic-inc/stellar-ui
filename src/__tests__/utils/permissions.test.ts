@@ -1,11 +1,7 @@
-import {
-  canSeeModBar,
-  hasPermission,
-  hasAnyPermission,
-  isStaffUser
-} from '../../utils/permissions';
+import { hasPermission, hasAnyPermission } from '../../utils/permissions';
 import {
   canAccessStaffQueue,
+  canSeeModBar,
   canSeeTop10History,
   canUseReportActions,
   canUseRequestModeration
@@ -32,11 +28,9 @@ describe('permissions helpers', () => {
     ).toBe(true);
   });
 
-  it('gates staff UI on the staff permission', () => {
-    expect(isStaffUser(makeUser({ staff: true }))).toBe(true);
-    expect(isStaffUser(makeUser({ admin: true }))).toBe(true);
-    expect(isStaffUser(makeUser({ forums_moderate: true }))).toBe(false);
-    expect(isStaffUser(makeUser({}))).toBe(false);
+  // Nothing maps another key onto admin: staff alone is not admin (#407).
+  it('does not let a staff-only user satisfy admin', () => {
+    expect(hasPermission(makeUser({ staff: true }), 'admin')).toBe(false);
   });
 
   it('gates the modbar on the staff permission', () => {

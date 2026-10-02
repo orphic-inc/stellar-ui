@@ -20,13 +20,3 @@ export const hasAnyPermission = (
   user: AuthUser | null | undefined,
   permissions: Permission[]
 ): boolean => permissions.some((permission) => hasPermission(user, permission));
-
-export const canSeeModBar = (user: AuthUser | null | undefined): boolean =>
-  hasPermission(user, 'staff');
-
-export const isStaffUser = (user: AuthUser | null | undefined): boolean =>
-  hasPermission(user, 'staff');
-
-// Admits only users with literal 'admin' permission — staff alone does not pass.
-export const hasStrictAdmin = (user: AuthUser | null | undefined): boolean =>
-  !!getPermissions(user)['admin'];
