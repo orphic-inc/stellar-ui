@@ -752,6 +752,45 @@ describe('UserProfile staff invite controls (#329)', () => {
   );
 });
 
+describe('UserProfile "Invited by" (#411)', () => {
+  beforeAll(() => {
+    ensureRequestPolyfill();
+  });
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    fetchMock().mockReset();
+  });
+
+  it('links to the inviter', async () => {
+    setupFetch({
+      profile: makeProfile({
+        invitedBy: { inviter: { id: 7, username: 'carol' } }
+      })
+    });
+    renderAs(REGULAR_USER);
+    expect(await screen.findByText('Invited by:')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'carol' })).toHaveAttribute(
+      'href',
+      '/user/carol'
+    );
+  });
+
+  it('says Nobody when the member had no inviter', async () => {
+    setupFetch({ profile: makeProfile({ invitedBy: { inviter: null } }) });
+    renderAs(REGULAR_USER);
+    const label = await screen.findByText('Invited by:');
+    expect(label.closest('li')).toHaveTextContent('Invited by: Nobody');
+  });
+
+  it('hides the row when the api withholds it', async () => {
+    setupFetch({ profile: makeProfile({ invitedBy: null }) });
+    renderAs(REGULAR_USER);
+    await screen.findByText('Invites:');
+    expect(screen.queryByText('Invited by:')).not.toBeInTheDocument();
+  });
+});
+
 describe('UserProfile invite balance conflict, end to end (#329)', () => {
   beforeAll(() => {
     ensureRequestPolyfill();

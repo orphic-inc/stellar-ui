@@ -6,6 +6,10 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- **A member's profile shows "Invited by" to viewers holding `invites_manage`** (#411, stellar-api#849). It links to the inviter's profile, or says _Nobody_ for a member no one invited. The api withholds the field from anyone else, so the row is hidden for them.
+
 ### Fixed
 
 - **An emptied donor rank colour or badge now clears** (#437). Saving an edited donor rank sent each as `value || undefined`, and the api leaves an `undefined` field alone, so the save reported success and kept the old value. An edit now sends both as staff left them, and `''` clears. Creating a rank still omits an empty field, so the api's defaults apply (a new rank's badge is `♥`).
