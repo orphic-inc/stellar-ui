@@ -109,6 +109,13 @@ describe('ContributeForm', () => {
     ).toBeInTheDocument();
   });
 
+  it('sends a member who cannot find their community to a pre-filled Staff PM (#100)', () => {
+    renderWithProviders(<ContributeForm />);
+    expect(
+      screen.getByRole('link', { name: /ask staff to create one/i })
+    ).toHaveAttribute('href', '/inbox/staff/new?template=community-request');
+  });
+
   it('renders all key fields by default (Music type)', () => {
     renderWithProviders(<ContributeForm />);
     expect(screen.getByLabelText(/content type/i)).toBeInTheDocument();
@@ -393,13 +400,6 @@ describe('ContributeForm', () => {
     renderWithProviders(<ContributeForm />);
     expect(
       screen.getByRole('button', { name: /submitting…/i })
-    ).toBeInTheDocument();
-  });
-
-  it('shows submit request link when community not found', () => {
-    renderWithProviders(<ContributeForm />);
-    expect(
-      screen.getByRole('link', { name: /submit a request/i })
     ).toBeInTheDocument();
   });
 

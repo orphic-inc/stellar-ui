@@ -18,6 +18,11 @@ All notable changes to stellar-ui are documented here.
   - Its label now says the note is added to the invitee's moderation notes when they register.
   - The api ignores a note from anyone else, so the field is hidden from them and the form sends none.
   - The note now takes up to 1000 characters, the api's limit, where the input stopped at 255.
+- **"Can't find your community?" now opens a pre-filled Staff PM asking staff to create one** (#100).
+  - The link is on the contribute form and, new, under the list on the Communities page. It read "Submit a request." and went to the release request list, which can't create a community.
+  - It opens `/inbox/staff/new?template=community-request`. The subject starts with a fixed `[Create a Community Request]` tag, and the member types only their line after it.
+  - The message greets the site's staff by name (from `GET /rules/tree`, or "Hey there staff," when that can't be read) and asks for the community's name, what it would hold, and why the member would lead it. It is signed with their username.
+  - Staff create the community in Community Manager with the member as leader. A request flow that does this on approval is stellar-api#890.
 
 ### Fixed
 
