@@ -108,7 +108,7 @@ src/
   types/
     globals.d.ts              # Declare __SENTRY_DSN__, *.png, *.jpg module types
   utils/
-    permissions.ts            # hasPermission, hasAnyPermission, isStaffUser, canSeeModBar, hasStrictAdmin
+    permissions.ts            # hasPermission, hasAnyPermission
     avatar.ts                 # avatarSrc(avatar?) → string; onAvatarError handler; SEEDED_AVATAR_SENTINEL
   stylesheets/                # One tenant left — built-in themes are api-canonical (ui#168).
                               # Contents pinned as an exact set by stylesheetsDir.test.ts
@@ -295,14 +295,14 @@ Access error details as `err.data?.msg` (single message) or `err.data?.errors` (
 ```ts
 hasPermission(user, 'admin'); // boolean; admin bypasses all checks
 hasAnyPermission(user, ['staff', 'admin']);
-isStaffUser(user); // any staff/admin permission present
-canSeeModBar(user); // requires 'staff'
-hasStrictAdmin(user); // literal 'admin' only — staff alone does not pass
 ```
+
+`admin` satisfies every key, but no key satisfies `admin`: a staff-only user fails `hasPermission(user, 'admin')` (#407).
 
 `src/components/staff/staffAffordances.ts` exports role-specific checks that combine permission keys:
 
 ```ts
+canSeeModBar(user); // 'staff'
 canAccessStaffQueue(user); // 'staff_inbox_manage'
 canUseReportActions(user); // 'reports_manage' | 'staff'
 canUseTicketStaffActions(user); // 'staff_inbox_manage' | 'staff'
