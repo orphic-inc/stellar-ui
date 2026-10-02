@@ -52,6 +52,14 @@ All notable changes to stellar-ui are documented here.
 - **The three image fields are upload-only** (#434). Avatar, donor icon and second avatar each show a small preview of the current image, a `[Browse]` button that opens a file picker and names the chosen file, and `[Remove]`, which empties the field so the save clears it (and releases the upload, stellar-api#871).
   - There is no address box any more, so a new `https://` address can't be entered. A saved one still previews through the api's resolved `*Src`, never loading the remote host, and can be removed or replaced.
   - A rank with `assetLimit` 0 gets no `[Browse]` but can still remove. A locked donor field shows its preview and lock note only.
+- **The rank editor sets every rank field the api accepts** (#342, absorbing #376).
+  - **New fields:** the author stylesheet limit, the image upload limit (`assetLimit`), and the rank's colour and badge, with a preview of the name in them. An emptied colour or badge clears it.
+  - **Every limit that can be unlimited reads the same way:** personal collages, author stylesheets, image uploads and notification filters each have a number, where `0` is none, and an Unlimited checkbox, which sends `null`. Before, the collage limit read `0` as unlimited, beside fields where `0` meant none. The api changed its meaning in stellar-api#881.
+  - **A new rank starts every limit at `0`.**
+  - **The rank list** shows each rank in its colour with its badge, and its collage limit as `∞`, `none` or the cap.
+  - **Creating a personal collage** reads the session's `null` as unlimited and `0` as none, which says the rank can't create one.
+  - **A refused save shows the api's reason**, such as the entry rank keeping level 100 (stellar-api#882), instead of a generic failure.
+  - This re-vendors the contract for stellar-api#881 (both limits nullable on the session and on ranks) and #882 (the entry rank's `409`).
 
 ## [0.10.0] — 2026-09-30
 

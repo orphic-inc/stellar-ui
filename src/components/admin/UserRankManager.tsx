@@ -25,7 +25,13 @@ const UserRankManager = () => {
   const columns: Column<UserRankRecord>[] = [
     {
       header: 'Name',
-      cell: (r) => <span className="font-medium">{r.name}</span>
+      // As the profile sidebar shows the rank: badge first, in its colour (#342).
+      cell: (r) => (
+        <span className="font-medium" style={{ color: r.color || undefined }}>
+          {r.badge ? `${r.badge} ` : ''}
+          {r.name}
+        </span>
+      )
     },
     { header: 'Level', cell: (r) => r.level, numeric: true },
     { header: 'Type', cell: (r) => (r.secondary ? 'Secondary' : 'Primary') },
@@ -38,8 +44,13 @@ const UserRankManager = () => {
     },
     {
       header: 'Collage Limit',
+      // `null` is unlimited and `0` is none (stellar-api#881).
       cell: (r) =>
-        r.personalCollageLimit === 0 ? '∞' : (r.personalCollageLimit ?? '∞'),
+        r.personalCollageLimit === null
+          ? '∞'
+          : r.personalCollageLimit === 0
+            ? 'none'
+            : r.personalCollageLimit,
       numeric: true
     },
     {

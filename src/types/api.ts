@@ -14454,8 +14454,8 @@ export interface paths {
             permittedForumIds?: number[];
             color?: string;
             badge?: string;
-            personalCollageLimit?: number;
-            authorStylesheetLimit?: number;
+            personalCollageLimit?: number | null;
+            authorStylesheetLimit?: number | null;
             assetLimit?: number | null;
             inviteGrantPerPeriod?: number;
             inviteCap?: number;
@@ -14730,8 +14730,8 @@ export interface paths {
             permittedForumIds?: number[];
             color?: string;
             badge?: string;
-            personalCollageLimit?: number;
-            authorStylesheetLimit?: number;
+            personalCollageLimit?: number | null;
+            authorStylesheetLimit?: number | null;
             assetLimit?: number | null;
             inviteGrantPerPeriod?: number;
             inviteCap?: number;
@@ -14787,7 +14787,7 @@ export interface paths {
             'application/json': components['schemas']['MsgResponse'];
           };
         };
-        /** @description Duplicate rank name or level */
+        /** @description Duplicate rank name or level, or the change would move the entry rank off level 100, where new members join (#882) */
         409: {
           headers: {
             [name: string]: unknown;
@@ -30226,8 +30226,8 @@ export interface components {
         permissions?: {
           [key: string]: boolean;
         };
-        personalCollageLimit?: number;
-        authorStylesheetLimit?: number;
+        personalCollageLimit: number | null;
+        authorStylesheetLimit: number | null;
         assetLimit: number | null;
         notificationFilterLimit: number | null;
       };
@@ -31717,8 +31717,8 @@ export interface components {
       permittedForumIds: number[];
       color: string;
       badge: string;
-      personalCollageLimit: number;
-      authorStylesheetLimit: number;
+      personalCollageLimit: number | null;
+      authorStylesheetLimit: number | null;
       assetLimit: number | null;
       inviteGrantPerPeriod: number;
       inviteCap: number;

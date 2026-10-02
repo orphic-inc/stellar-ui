@@ -28,13 +28,14 @@ const CollageCreate = () => {
   const [tagsInput, setTagsInput] = useState('');
   const [error, setError] = useState('');
 
-  const limit = currentUser?.userRank?.personalCollageLimit ?? 0;
+  // `null` is unlimited and `0` is none (stellar-api#881).
+  const limit = currentUser?.userRank?.personalCollageLimit ?? null;
   const { data: personalData } = useListCollagesQuery(
     { userId: currentUser?.id, categoryId: 0 },
     { skip: categoryId !== 0 || !currentUser }
   );
   const personalCount = personalData?.meta?.total ?? 0;
-  const atLimit = categoryId === 0 && limit > 0 && personalCount >= limit;
+  const atLimit = categoryId === 0 && limit !== null && personalCount >= limit;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,13 +109,15 @@ const CollageCreate = () => {
               </option>
             ))}
           </select>
-          {categoryId === 0 && limit > 0 && (
+          {categoryId === 0 && limit !== null && (
             <p
               className={`text-xs mt-1 ${
                 atLimit ? 'text-red-400' : 'text-gray-400'
               }`}
             >
-              {personalCount} / {limit} personal collages used
+              {limit === 0
+                ? "Your rank can't create personal collages."
+                : `${personalCount} / ${limit} personal collages used`}
             </p>
           )}
         </div>

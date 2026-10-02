@@ -98,6 +98,34 @@ describe('UserRankManager', () => {
     ).toBeInTheDocument();
   });
 
+  // #342: the Name cell shows the rank as the profile sidebar does, and the
+  // collage cell reads null as unlimited and 0 as none (stellar-api#881).
+  it('shows each rank in its colour with its badge, and its collage limit', () => {
+    mockUseGetUserRanksQuery.mockReturnValue({
+      data: [
+        makeRank(1, 'Member', 100, { personalCollageLimit: 0 }),
+        makeRank(2, 'Staff', 500, {
+          color: '#e22a2a',
+          badge: '★',
+          personalCollageLimit: null
+        }),
+        makeRank(3, 'Elite', 300, { personalCollageLimit: 3 })
+      ],
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<UserRankManager />);
+    const staff = screen.getByText('★ Staff');
+    expect(staff).toHaveStyle({ color: '#e22a2a' });
+    const cell = (rank: string) =>
+      screen.getByText(rank).closest('tr')!.querySelectorAll('td')[6];
+    expect(cell('Member')).toHaveTextContent('none');
+    expect(staff.closest('tr')!.querySelectorAll('td')[6]).toHaveTextContent(
+      '∞'
+    );
+    expect(cell('Elite')).toHaveTextContent('3');
+  });
+
   it('renders the Type and Forum Overrides columns off the real fields', () => {
     mockUseGetUserRanksQuery.mockReturnValue({
       data: [
