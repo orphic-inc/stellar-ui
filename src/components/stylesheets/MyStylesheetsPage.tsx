@@ -40,7 +40,8 @@ const sheetColumns = (
   {
     header: 'Name',
     cell: (sheet) => (
-      <Link to={`/stylesheets/${sheet.id}/edit`} data-st="control">
+      // Its page is the link a member shares (#451).
+      <Link to={`/stylesheets/${sheet.id}`} data-st="control">
         {sheet.name}
       </Link>
     )
@@ -49,9 +50,14 @@ const sheetColumns = (
   {
     header: '',
     cell: (sheet) => (
-      <Button variant="link-danger" onClick={() => onDelete(sheet)}>
-        Delete
-      </Button>
+      <span className="flex gap-3">
+        <Link to={`/stylesheets/${sheet.id}/edit`} data-st="control">
+          Edit
+        </Link>
+        <Button variant="link-danger" onClick={() => onDelete(sheet)}>
+          Delete
+        </Button>
+      </span>
     )
   }
 ];

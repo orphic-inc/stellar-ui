@@ -11,4 +11,20 @@ const StylesheetSourceNote = () => (
   </p>
 );
 
+/** The Registry option's hint: where to adopt one, or which is in use (#451). */
+export const AdoptedSheetHint = ({ id }: { id: number | null }) => (
+  <p data-st="meta" className="text-xs pl-7">
+    {id === null ? (
+      "None adopted yet — open a stylesheet's page to adopt it."
+    ) : (
+      <>
+        Using adopted stylesheet #{id}.{' '}
+        <Link to={`/stylesheets/${id}`} data-st="control">
+          Its page →
+        </Link>
+      </>
+    )}
+  </p>
+);
+
 export default StylesheetSourceNote;

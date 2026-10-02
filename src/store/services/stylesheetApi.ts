@@ -8,6 +8,8 @@ type AuthorStylesheetList =
 export type AuthorStylesheetListItem = AuthorStylesheetList['data'][number];
 export type AuthorStylesheet =
   paths['/stylesheet/author-stylesheet/{id}']['get']['responses'][200]['content']['application/json'];
+type AdoptionResult =
+  paths['/stylesheet/author-stylesheet/{id}/adopt']['post']['responses'][200]['content']['application/json'];
 export type AuthorStylesheetBody = NonNullable<
   paths['/stylesheet/author']['post']['requestBody']
 >['content']['application/json'];
@@ -44,6 +46,15 @@ export const stylesheetApi = api.injectEndpoints({
       }),
       invalidatesTags: ['AuthorStylesheet']
     }),
+    // The injector and Settings read the adopted id off the profile, so the
+    // profile refetches and the page re-themes (#451).
+    adoptAuthorStylesheet: build.mutation<AdoptionResult, number>({
+      query: (id) => ({
+        url: `/stylesheet/author-stylesheet/${id}/adopt`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['Profile']
+    }),
     deleteAuthorStylesheet: build.mutation<void, number>({
       query: (id) => ({
         url: `/stylesheet/author-stylesheet/${id}`,
@@ -59,5 +70,6 @@ export const {
   useGetAuthorStylesheetQuery,
   useCreateAuthorStylesheetMutation,
   useUpdateAuthorStylesheetMutation,
+  useAdoptAuthorStylesheetMutation,
   useDeleteAuthorStylesheetMutation
 } = stylesheetApi;

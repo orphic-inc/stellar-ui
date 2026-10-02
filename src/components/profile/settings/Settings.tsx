@@ -21,7 +21,7 @@ import DonorSettingsTab from './DonorSettingsTab';
 import FeedSettings from './FeedSettings';
 import AvatarField from './AvatarField';
 import IrcNickSettings from './IrcNickSettings';
-import StylesheetSourceNote from './StylesheetSourceNote';
+import StylesheetSourceNote, { AdoptedSheetHint } from './StylesheetSourceNote';
 import type { paths } from '../../../types/api';
 
 export type ProfileForm = NonNullable<
@@ -452,11 +452,7 @@ const Settings = () => {
                     Registry — a stylesheet adopted from the community
                   </span>
                 </label>
-                <p data-st="meta" className="text-xs pl-7">
-                  {adoptedSheetId != null
-                    ? `Using adopted stylesheet #${adoptedSheetId}. Adopt a different one from its page.`
-                    : 'None adopted yet — adopt one from its page to use this option.'}
-                </p>
+                <AdoptedSheetHint id={adoptedSheetId} />
               </div>
 
               <StylesheetSourceNote />

@@ -33,6 +33,12 @@ All notable changes to stellar-ui are documented here.
   - When the api refuses a sheet, every violation it found is listed under the field.
   - Saving an edit says it updates the sheet for everyone who adopted it. Deleting frees a space, and the confirmation says adopters keep the sheet until they switch away.
   - Adopting someone's sheet from its page is the next slice (#451).
+- **Every stylesheet has a page a member can share, read and adopt** (#451; with #449 and #450 this completes #108).
+  - `/stylesheets/{id}` shows the sheet's name, its CSS read-only, a link to its author's profile, and **Adopt**. Its author also sees **Edit**. The page's address is the link to share; there's no gallery.
+  - Adopting says "Adopted — your site now uses {name}", and the site switches to it straight away. The sheet already in use shows **In use** instead.
+  - A missing or deleted sheet says "This stylesheet isn't available".
+  - On My stylesheets, a sheet's name now opens its page, with **Edit** beside it.
+  - In Settings, the Registry option says "None adopted yet — open a stylesheet's page to adopt it", or links to the adopted sheet's page.
 
 ### Fixed
 
