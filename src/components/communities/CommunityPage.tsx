@@ -83,8 +83,16 @@ const CommunityPage = () => {
   }
 
   const isCurator = community.curators?.some((c) => c.id === user?.id) ?? false;
-  const canManageMembers =
-    isCurator || hasAnyPermission(user, ['communities_manage', 'admin']);
+  const isCommunityAdmin = hasAnyPermission(user, [
+    'communities_manage',
+    'admin'
+  ]);
+  const canManageMembers = isCurator || isCommunityAdmin;
+  // Curators admit members; only the leader, or staff, appoints curators
+  // (stellar-api#895, ADR-0053).
+  const canManageCurators =
+    isCommunityAdmin ||
+    (community.leaderId != null && community.leaderId === user?.id);
 
   // The leader (ADR-0021) is a first-class role, surfaced separately from the
   // curator roster. The contract carries only leaderId, so resolve a username
@@ -93,6 +101,22 @@ const CommunityPage = () => {
     community.leaderId != null
       ? community.members?.find((m) => m.id === community.leaderId)
       : undefined;
+
+  // A curator may remove themselves (stellar-api#895). It ends their member
+  // management at once, so it asks first.
+  const handleStepDown = async () => {
+    if (!user || !window.confirm('Step down as a curator of this community?'))
+      return;
+    try {
+      await removeCommunityCurator({
+        communityId: id,
+        userId: user.id
+      }).unwrap();
+      dispatch(addAlert('You are no longer a curator here.', 'success'));
+    } catch {
+      dispatch(addAlert('Failed to step down.', 'danger'));
+    }
+  };
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,6 +201,9 @@ const CommunityPage = () => {
                 // ADR-0033 §Decision 4: the roster reports its own roles, so
                 // this no longer reconstructs one by cross-referencing lists.
                 const memberIsCurator = m.roles.includes('curator');
+                // The api refuses removing the leader as a curator: they are
+                // reassigned or cleared instead (stellar-api#891).
+                const memberIsLeader = m.id === community.leaderId;
                 return (
                   <div key={m.id} data-st="row" className="justify-between">
                     <div className="flex items-center gap-2">
@@ -184,23 +211,36 @@ const CommunityPage = () => {
                       {memberIsCurator && <span data-st="chip">Curator</span>}
                     </div>
                     <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          memberIsCurator
-                            ? removeCommunityCurator({
-                                communityId: id,
-                                userId: m.id
-                              })
-                            : addCommunityCurator({
-                                communityId: id,
-                                userId: m.id
-                              })
-                        }
-                        className="text-xs text-gray-500 hover:text-indigo-400 transition-colors"
-                      >
-                        {memberIsCurator ? 'Demote' : 'Make Curator'}
-                      </button>
+                      {canManageCurators && !memberIsLeader && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            memberIsCurator
+                              ? removeCommunityCurator({
+                                  communityId: id,
+                                  userId: m.id
+                                })
+                              : addCommunityCurator({
+                                  communityId: id,
+                                  userId: m.id
+                                })
+                          }
+                          className="text-xs text-gray-500 hover:text-indigo-400 transition-colors"
+                        >
+                          {memberIsCurator ? 'Demote' : 'Make Curator'}
+                        </button>
+                      )}
+                      {!canManageCurators &&
+                        memberIsCurator &&
+                        m.id === user?.id && (
+                          <button
+                            type="button"
+                            onClick={handleStepDown}
+                            className="text-xs text-gray-500 hover:text-indigo-400 transition-colors"
+                          >
+                            Step down
+                          </button>
+                        )}
                       <button
                         type="button"
                         onClick={() =>
