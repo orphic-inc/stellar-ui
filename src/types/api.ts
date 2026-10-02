@@ -12052,6 +12052,89 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/{id}/leadership-log': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The community's leadership log
+     * @description Each change of leader, newest first: founded, assigned (by staff), handed off (an accepted offer) or cleared. Offers, declines and withdrawals are not logged. Anyone who can read the community reads it; `actor` is sent to `communities_manage` or `admin` only (#897, ADR-0054).
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: string;
+          limit?: string;
+        };
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated leadership events */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['CommunityLeadershipEvent'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Invalid path or query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Not a member of this community */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Community not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{communityId}/releases/{releaseId}': {
     parameters: {
       query?: never;
@@ -32237,6 +32320,16 @@ export interface components {
         score: number;
         updatedAt: string;
       } | null;
+    };
+    CommunityLeadershipEvent: {
+      id: number;
+      /** @enum {string} */
+      kind: 'founded' | 'assigned' | 'handed_off' | 'cleared';
+      from: components['schemas']['CommunityCurator'] | null;
+      to: components['schemas']['CommunityCurator'] | null;
+      actor: components['schemas']['CommunityCurator'] | null;
+      /** Format: date-time */
+      at: string;
     };
     ReleaseGroupMember: {
       id: number;

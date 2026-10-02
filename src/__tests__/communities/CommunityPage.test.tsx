@@ -226,6 +226,19 @@ describe('CommunityPage', () => {
     );
   });
 
+  it("links the Leader line to the community's leadership history (#473)", () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity({ leaderId: 99 }),
+      isLoading: false,
+      error: undefined
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(screen.getByRole('link', { name: '(history)' })).toHaveAttribute(
+      'href',
+      '/communities/3/leadership'
+    );
+  });
+
   it('falls back to a profile-by-id link when the leader is not in the members roster', () => {
     mockUseGetCommunityByIdQuery.mockReturnValue({
       data: makeCommunity({ leaderId: 555 }),

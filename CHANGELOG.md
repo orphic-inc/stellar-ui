@@ -14,6 +14,10 @@ All notable changes to stellar-ui are documented here.
   - **Staff** see a pending offer read-only on the community page, and in Community Manager's edit row, which says that changing the leader there cancels it.
   - Every write reports its failure with the api's message, such as an offer that has lapsed.
   - **The three new notifications render:** "offered you leadership of", "accepted leadership of" and "declined leadership of", each linking to the community. The notification text is now a table keyed on the notification type, so a type the api adds fails the type-check instead of rendering a generic line.
+- **A community's leadership history** (#473, stellar-api#897, ADR-0054). A new page, `/communities/:id/leadership`, linked as "(history)" from the community page's Leader line.
+  - **Each change of leader is one line,** newest first and paginated: the first leader, a staff reassignment ("replacing" whoever led), a handoff, and a staff clear.
+  - **Staff also see who made the change,** as "· by" a name. The api sends that to staff only, and it is left off a handoff, where it is always the successor.
+  - **Anyone who can read the community can open it.** A refusal reads as the community page's does.
 
 ## [0.10.2] — 2026-10-02
 

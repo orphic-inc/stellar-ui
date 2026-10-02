@@ -204,6 +204,12 @@ const CommunityPage = () => {
             className="text-indigo-400 hover:text-indigo-300"
           >
             {leader?.username ?? `User #${community.leaderId}`}
+          </Link>{' '}
+          <Link
+            to={`/communities/${community.id}/leadership`}
+            className="text-xs text-gray-500 hover:text-gray-300"
+          >
+            (history)
           </Link>
         </p>
       )}

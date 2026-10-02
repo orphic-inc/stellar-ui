@@ -18,6 +18,7 @@ import NewTopicForm from '../../../forum/NewTopicForm';
 
 import CommunitiesPage from '../../../communities/CommunitiesPage';
 import CommunityPage from '../../../communities/CommunityPage';
+import LeadershipLogPage from '../../../communities/LeadershipLogPage';
 import ReleasePage from '../../../communities/ReleasePage';
 import AddContributionForm from '../../../communities/AddContributionForm';
 import ArtistPage from '../../../communities/ArtistPage';
@@ -148,6 +149,10 @@ const PrivateContent = () => (
     <Route
       path="communities/:communityId/releases/:releaseId"
       element={wrap(ReleasePage)}
+    />
+    <Route
+      path="communities/:communityId/leadership"
+      element={wrap(LeadershipLogPage)}
     />
     <Route path="communities/:communityId" element={wrap(CommunityPage)} />
     <Route path="communities" element={wrap(CommunitiesPage)} />
