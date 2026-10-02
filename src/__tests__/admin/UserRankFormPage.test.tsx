@@ -152,13 +152,13 @@ describe('UserRankFormPage — create mode', () => {
       await user.type(field, value);
     };
 
-    it('says 0 = none on both, not the collage field 0 = unlimited', () => {
+    it('says 0 = none on both, and no field on the form reads 0 as unlimited', () => {
       renderWithProviders(<UserRankFormPage />);
-      // Personal Collage Limit means the opposite by 0 and sits in this same
-      // grid. Both readings must be present and distinct.
+      // Every limit reads 0 as none since stellar-api#881; unlimited is only
+      // ever the checkbox (#342).
       expect(within(rate().parentElement!).getByText('0 = none')).toBeTruthy();
       expect(within(cap().parentElement!).getByText('0 = none')).toBeTruthy();
-      expect(screen.getByText('0 = unlimited')).toBeInTheDocument();
+      expect(screen.queryByText(/0 = unlimited/)).toBeNull();
     });
 
     it('sends both fields on create', async () => {

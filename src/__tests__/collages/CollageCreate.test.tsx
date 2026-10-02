@@ -25,7 +25,7 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate
 }));
 
-const makeAuthUser = (personalCollageLimit: number): AuthUser => ({
+const makeAuthUser = (personalCollageLimit: number | null): AuthUser => ({
   id: 1,
   username: 'testuser',
   email: 'test@example.com',
@@ -47,12 +47,13 @@ const makeAuthUser = (personalCollageLimit: number): AuthUser => ({
     badge: '',
     permissions: {},
     personalCollageLimit,
+    authorStylesheetLimit: null,
     assetLimit: null,
     notificationFilterLimit: null
   }
 });
 
-const makeStoreWithUser = (personalCollageLimit: number) => {
+const makeStoreWithUser = (personalCollageLimit: number | null) => {
   const store = createTestStore();
   store.dispatch(setCredentials(makeAuthUser(personalCollageLimit)));
   return store;
@@ -175,6 +176,35 @@ describe('CollageCreate', () => {
     expect(
       screen.getByText('1 / 2 personal collages used')
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create collage/i })
+    ).not.toBeDisabled();
+  });
+
+  // stellar-api#881: 0 is none, so the rank can't create one at all.
+  it('says the rank has no personal collages at a limit of 0', async () => {
+    const user = userEvent.setup();
+    mockListCollagesData = { data: [], meta: { total: 0 } };
+    renderWithProviders(<CollageCreate />, { store: makeStoreWithUser(0) });
+
+    await user.selectOptions(screen.getByLabelText(/category/i), '0');
+
+    expect(
+      screen.getByText("Your rank can't create personal collages.")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /create collage/i })
+    ).toBeDisabled();
+  });
+
+  it('shows no counter and allows submit when unlimited (null)', async () => {
+    const user = userEvent.setup();
+    mockListCollagesData = { data: [], meta: { total: 40 } };
+    renderWithProviders(<CollageCreate />, { store: makeStoreWithUser(null) });
+
+    await user.selectOptions(screen.getByLabelText(/category/i), '0');
+
+    expect(screen.queryByText(/personal collages/)).toBeNull();
     expect(
       screen.getByRole('button', { name: /create collage/i })
     ).not.toBeDisabled();

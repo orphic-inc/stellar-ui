@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import {
   useGetUserRankByIdQuery,
   useCreateUserRankMutation,
@@ -11,6 +11,7 @@ import {
 } from '../../store/services/userApi';
 import { useGetForumCategoriesQuery } from '../../store/services/forumApi';
 import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import PromotionCriteriaSection from './PromotionCriteriaSection';
 import RankSaveNotice from './RankSaveNotice';
@@ -19,21 +20,13 @@ import {
   NOTHING_TO_REPORT,
   rankSaveOutcome
 } from '../../utils/promotionLadder';
-import NullableLimitField from './NullableLimitField';
-
-interface FormValues {
-  level: number;
-  name: string;
-  permissions: Record<string, boolean>;
-  secondary: boolean;
-  permittedForumIds: number[];
-  personalCollageLimit: number;
-  notificationFilterLimit: number | null;
-  inviteGrantPerPeriod: number;
-  inviteCap: number;
-  displayStaff: boolean;
-  staffGroupId: number | '';
-}
+import {
+  RANK_FORM_DEFAULTS,
+  RankIdentityFields,
+  RankLimitFields,
+  toRankFormValues,
+  type RankFormValues
+} from './RankFormFields';
 
 const NUMBER_INPUT_CLASS =
   'w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm';
@@ -67,11 +60,6 @@ const grantConfigNote = (
   return null;
 };
 
-// Only an explicit null is unlimited: an absent value must not become a grant
-// on save, so it reads as 0, like the other limits.
-const savedNullableLimit = (limit: number | null | undefined) =>
-  limit === undefined ? 0 : limit;
-
 const UserRankFormPage = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
@@ -89,20 +77,8 @@ const UserRankFormPage = () => {
   const [saveOutcome, setSaveOutcome] = useState(NOTHING_TO_REPORT);
 
   const { register, handleSubmit, reset, control, setValue } =
-    useForm<FormValues>({
-      defaultValues: {
-        level: 0,
-        name: '',
-        permissions: {},
-        secondary: false,
-        permittedForumIds: [],
-        personalCollageLimit: 0,
-        notificationFilterLimit: 0,
-        inviteGrantPerPeriod: 0,
-        inviteCap: 0,
-        displayStaff: false,
-        staffGroupId: ''
-      }
+    useForm<RankFormValues>({
+      defaultValues: RANK_FORM_DEFAULTS
     });
 
   const displayStaff = useWatch({ control, name: 'displayStaff' });
@@ -115,23 +91,7 @@ const UserRankFormPage = () => {
   const inviteNote = grantConfigNote(inviteGrantPerPeriod, inviteCap);
 
   useEffect(() => {
-    if (existing) {
-      reset({
-        level: existing.level,
-        name: existing.name,
-        permissions: existing.permissions ?? {},
-        secondary: existing.secondary ?? false,
-        permittedForumIds: existing.permittedForumIds ?? [],
-        personalCollageLimit: existing.personalCollageLimit ?? 0,
-        notificationFilterLimit: savedNullableLimit(
-          existing.notificationFilterLimit
-        ),
-        inviteGrantPerPeriod: existing.inviteGrantPerPeriod ?? 0,
-        inviteCap: existing.inviteCap ?? 0,
-        displayStaff: existing.displayStaff ?? false,
-        staffGroupId: existing.staffGroupId ?? ''
-      });
-    }
+    if (existing) reset(toRankFormValues(existing));
   }, [existing, reset]);
 
   const togglePermittedForum = (forumId: number) => {
@@ -141,7 +101,7 @@ const UserRankFormPage = () => {
     setValue('permittedForumIds', next, { shouldDirty: true });
   };
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: RankFormValues) => {
     const payload = {
       ...data,
       staffGroupId: data.staffGroupId !== '' ? Number(data.staffGroupId) : null
@@ -161,10 +121,13 @@ const UserRankFormPage = () => {
         await createUserRank(payload).unwrap();
       }
       navigate('/staff/tools/user-ranks');
-    } catch {
+    } catch (err) {
+      // The api's reason when it gives one, such as the entry rank keeping
+      // level 100 (stellar-api#882).
       dispatch(
         addAlert(
-          `Failed to ${isEditing ? 'update' : 'create'} user rank.`,
+          getApiErrorMessage(err) ??
+            `Failed to ${isEditing ? 'update' : 'create'} user rank.`,
           'danger'
         )
       );
@@ -241,34 +204,8 @@ const UserRankFormPage = () => {
                   className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                 />
               </div>
-              <div>
-                <label
-                  htmlFor="perm-collage-limit"
-                  className="block text-sm font-medium text-gray-300 mb-1"
-                >
-                  Personal Collage Limit
-                </label>
-                <input
-                  id="perm-collage-limit"
-                  type="number"
-                  min={0}
-                  {...register('personalCollageLimit', { valueAsNumber: true })}
-                  className="w-full rounded bg-gray-700 border border-gray-600 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                />
-                <p className="text-xs text-gray-500 mt-1">0 = unlimited</p>
-              </div>
-              <Controller
-                control={control}
-                name="notificationFilterLimit"
-                render={({ field }) => (
-                  <NullableLimitField
-                    id="perm-notification-filter-limit"
-                    label="Notification Filters"
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                )}
-              />
+              <RankIdentityFields register={register} control={control} />
+              <RankLimitFields control={control} />
               <div>
                 <label
                   htmlFor="perm-invite-rate"

@@ -40,6 +40,8 @@ const mockUser = {
     level: 100,
     name: 'User',
     color: '#fff',
+    personalCollageLimit: null,
+    authorStylesheetLimit: null,
     assetLimit: null,
     notificationFilterLimit: null
   }
