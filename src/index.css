@@ -88,8 +88,11 @@ input[type='radio']:focus-visible {
    may visually override anything — there is deliberately no "protected chrome"
    reset. CSS cascade cannot contain an `!important` theme anyway, and the
    product goal is maximal theming freedom. The boundary is code injection only,
-   held outside the cascade: store-time CSS sanitization on the API
-   (lib/cssSanitize.ts) plus the app-wide CSP in index.html. */
+   held outside the cascade: stellar-api validates author CSS at store time and
+   rejects a sheet that breaks its rules (lib/cssValidate.ts), and the
+   production CSP (webpack.csp.js) blocks script and closes img-src and
+   font-src. That CSP is a partial backstop, since style-src stays open to
+   https (stellar-api ADR-0031 §6, #195). */
 
 /* BBCode rendered content */
 .bbcode-content h2,

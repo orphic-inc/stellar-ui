@@ -8,9 +8,13 @@ const LINK_ID = 'stellar-theme';
 const STORAGE_KEY = 'stellar-theme-href';
 
 // A theme may restyle anything it likes — visual freedom is the point (ADR-0003).
-// The only boundary is code injection, which is held elsewhere: author CSS is
-// sanitized at store time on the API (lib/cssSanitize.ts) and the app-wide CSP
-// (index.html) blocks script execution + exfiltration. So the injector stays a
+// The only boundary is code injection, which is held elsewhere. stellar-api
+// validates author CSS at store time and rejects a sheet that breaks its rules
+// (lib/cssValidate.ts, its ADR-0031). The production CSP (webpack.csp.js) blocks
+// script execution and closes img-src and font-src to this origin, so a theme
+// cannot pull a remote image or font. That makes it a partial backstop, not the
+// whole one: style-src stays open to https for a member's external sheet
+// (stellar-api ADR-0031 §6, #195). So the injector stays a
 // plain <link href>: the browser treats href as a URL, never as CSS text, so it
 // carries no CSS-injection surface. We only gate the *scheme* of the
 // user-controlled external URL — https only (ADR-0024 §3: the API stores only
