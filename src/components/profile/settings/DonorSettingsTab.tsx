@@ -9,7 +9,7 @@ import {
 import { addAlert } from '../../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../../utils/apiError';
 import Spinner from '../../layout/Spinner';
-import ImageUpload from './ImageUpload';
+import ImageUpload, { type SavedImage } from './ImageUpload';
 import type { ImageField } from '../../../store/services/assetApi';
 
 // Layout-only now; the paint comes from `data-st="field"` / `data-st="meta"` on
@@ -26,43 +26,17 @@ const LockedNote = () => (
 
 interface DonorImageFieldProps {
   field: ImageField;
-  id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
+  saved: SavedImage;
   unlocked: boolean;
 }
 
-/** A donor image address, with its upload control once the perk is unlocked. */
-const DonorImageField = (props: DonorImageFieldProps) => {
-  const { field, id, label, value, onChange, unlocked } = props;
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        data-st="meta"
-        className={unlocked ? labelClass : lockedClass}
-      >
-        {label}
-      </label>
-      <input
-        id={id}
-        type="text"
-        data-st="field"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        disabled={!unlocked}
-        placeholder="https://… or /api/asset/…"
-        className={inputClass + (unlocked ? '' : ' opacity-40')}
-      />
-      {unlocked ? (
-        <ImageUpload field={field} onUploaded={onChange} />
-      ) : (
-        <LockedNote />
-      )}
-    </div>
-  );
-};
+/** A donor image, upload-only (#434), and locked until the perk is unlocked. */
+const DonorImageField = ({ unlocked, ...props }: DonorImageFieldProps) => (
+  <ImageUpload {...props} lockedNote={unlocked ? undefined : <LockedNote />} />
+);
 
 const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
   const dispatch = useDispatch();
@@ -177,10 +151,10 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
         <div className="space-y-3">
           <DonorImageField
             field="customIcon"
-            id="donor-custom-icon"
-            label="Custom icon URL"
+            label="Custom icon"
             value={customIcon}
             onChange={setCustomIcon}
+            saved={{ value: rewards.customIcon, src: rewards.customIconSrc }}
             unlocked={!!perks.customIcon}
           />
 
@@ -234,10 +208,10 @@ const DonorSettingsForm = ({ data }: { data: DonorRewardsResponse }) => {
         {/* Second avatar */}
         <DonorImageField
           field="secondAvatar"
-          id="donor-second-avatar"
-          label="Second (donor) avatar URL"
+          label="Second (donor) avatar"
           value={secondAvatar}
           onChange={setSecondAvatar}
+          saved={{ value: rewards.secondAvatar, src: rewards.secondAvatarSrc }}
           unlocked={!!perks.secondAvatar}
         />
 
