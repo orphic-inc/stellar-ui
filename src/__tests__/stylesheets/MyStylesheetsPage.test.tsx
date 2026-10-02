@@ -66,7 +66,12 @@ describe('MyStylesheetsPage (#450)', () => {
       { userId: 7, page: 1 },
       { skip: false }
     );
+    // The name opens the sheet's page, the link a member shares (#451).
     expect(screen.getByRole('link', { name: 'Dusk' })).toHaveAttribute(
+      'href',
+      '/stylesheets/1'
+    );
+    expect(screen.getAllByRole('link', { name: 'Edit' })[0]).toHaveAttribute(
       'href',
       '/stylesheets/1/edit'
     );

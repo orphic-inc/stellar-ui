@@ -32,6 +32,7 @@ import CollageCreate from '../../../collages/CollageCreate';
 import CollageDetail from '../../../collages/CollageDetail';
 import MyStylesheetsPage from '../../../stylesheets/MyStylesheetsPage';
 import StylesheetEditorPage from '../../../stylesheets/StylesheetEditorPage';
+import StylesheetPage from '../../../stylesheets/StylesheetPage';
 import CollageEdit from '../../../collages/CollageEdit';
 import InboxPage from '../../../messages/InboxPage';
 import SentboxPage from '../../../messages/SentboxPage';
@@ -179,6 +180,7 @@ const PrivateContent = () => (
 
     <Route path="stylesheets/new" element={wrap(StylesheetEditorPage)} />
     <Route path="stylesheets/:id/edit" element={wrap(StylesheetEditorPage)} />
+    <Route path="stylesheets/:id" element={wrap(StylesheetPage)} />
     <Route path="stylesheets" element={wrap(MyStylesheetsPage)} />
 
     <Route path="inbox/staff/new" element={wrap(NewTicketForm)} />
