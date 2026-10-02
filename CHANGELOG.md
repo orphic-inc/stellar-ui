@@ -6,6 +6,8 @@ All notable changes to stellar-ui are documented here.
 
 ## [Unreleased]
 
+## [0.10.1] — 2026-10-02
+
 ### Added
 
 - **A member's profile links to their invite tree for viewers holding `invites_manage`** (#423).
@@ -14,9 +16,9 @@ All notable changes to stellar-ui are documented here.
   - It's hidden when the member is known to have invited nobody, as in the legacy implementation.
   - When the count is unknown (the member hides ratio stats from a viewer who isn't staff), the link still shows, so the permission never loses access to a tree that exists.
 - **Upload an image for your avatar, donor icon or second avatar from settings** (#275).
-  - Each of the three fields gets an "Or upload an image" picker. An upload fills the field with the stored image's `/api/asset/…` address, and the form's own save stores it.
+  - Each of the three fields takes an upload, through the control described under Changed (#434). An upload fills the field with the stored image's `/api/asset/…` address, and the form's own save stores it.
   - Each upload names the field it will replace, so a member at their rank's limit can still upload the replacement (stellar-api#871).
-  - A rank that can't upload (`assetLimit` 0) gets a note in place of the picker. The two donor fields show the picker only when the perk is unlocked.
+  - A rank that can't upload (`assetLimit` 0) gets a note instead. The two donor fields take an upload only when the perk is unlocked.
   - The type is checked before sending. An oversize image says so, and "limit reached" says how to free a slot.
   - This re-vendors the contract for `userRank.assetLimit` on the session (stellar-api#716) and the upload's `field`.
 - **Staff can delete a release that has no contributions** (#429). A `[Delete release]` action in the release page's links shows to `communities_manage` once the release's contributions have loaded and there are none, which is the only release `DELETE /communities/{id}/releases/{id}` accepts (stellar-api#793). It asks for confirmation, and returns to the community on success. A refusal shows the api's message.
@@ -1542,7 +1544,8 @@ The `--st-*` Role Token theming contract + initial surface conversion.
 - Replace "Stellar" gradient text logo in `PrivateHeader` with kuro logo image (`kuro-logo.png` / `kuro-logo-hover.png`), with mouse-over swap
 - Add `declare module '*.png'` to `globals.d.ts` for typed PNG imports
 
-[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/orphic-inc/stellar-ui/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.11...v0.10.0
 [0.9.11]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.10...v0.9.11
 [0.9.10]: https://github.com/orphic-inc/stellar-ui/compare/v0.9.9...v0.9.10
