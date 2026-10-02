@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useGetAnnouncementsQuery,
   useCreateAnnouncementMutation,
@@ -6,6 +7,8 @@ import {
   useCreateBlogPostMutation,
   useDeleteBlogPostMutation
 } from '../../store/services/announcementApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Time from '../layout/Time';
 import {
   PageShell,
@@ -26,6 +29,9 @@ type AnnouncementRow = {
 type BlogRow = AnnouncementRow & { user?: { username: string } | null };
 
 const NewsManager = () => {
+  const dispatch = useDispatch();
+  const fail = (err: unknown, fallback: string) =>
+    dispatch(addAlert(getApiErrorMessage(err) ?? fallback, 'danger'));
   const {
     data: announcements,
     isLoading,
@@ -44,16 +50,40 @@ const NewsManager = () => {
 
   const handleCreateNews = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createAnnouncement({ title: newsTitle, body: newsBody });
-    setNewsTitle('');
-    setNewsBody('');
+    try {
+      await createAnnouncement({ title: newsTitle, body: newsBody }).unwrap();
+      setNewsTitle('');
+      setNewsBody('');
+    } catch (err) {
+      fail(err, 'Failed to post the announcement.');
+    }
   };
 
   const handleCreateBlog = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createBlogPost({ title: blogTitle, body: blogBody });
-    setBlogTitle('');
-    setBlogBody('');
+    try {
+      await createBlogPost({ title: blogTitle, body: blogBody }).unwrap();
+      setBlogTitle('');
+      setBlogBody('');
+    } catch (err) {
+      fail(err, 'Failed to post the blog entry.');
+    }
+  };
+
+  const handleDeleteNews = async (id: number) => {
+    try {
+      await deleteAnnouncement(id).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to delete the announcement.');
+    }
+  };
+
+  const handleDeleteBlog = async (id: number) => {
+    try {
+      await deleteBlogPost(id).unwrap();
+    } catch (err) {
+      fail(err, 'Failed to delete the blog entry.');
+    }
   };
 
   const announcementColumns: Column<AnnouncementRow>[] = [
@@ -72,7 +102,7 @@ const NewsManager = () => {
     {
       header: 'Actions',
       cell: (n) => (
-        <Button variant="link-danger" onClick={() => deleteAnnouncement(n.id)}>
+        <Button variant="link-danger" onClick={() => handleDeleteNews(n.id)}>
           Delete
         </Button>
       )
@@ -96,7 +126,7 @@ const NewsManager = () => {
     {
       header: 'Actions',
       cell: (b) => (
-        <Button variant="link-danger" onClick={() => deleteBlogPost(b.id)}>
+        <Button variant="link-danger" onClick={() => handleDeleteBlog(b.id)}>
           Delete
         </Button>
       )

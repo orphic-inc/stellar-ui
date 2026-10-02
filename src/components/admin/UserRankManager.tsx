@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   useGetUserRanksQuery,
   useDeleteUserRankMutation,
   type UserRankRecord
 } from '../../store/services/userApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import { PageShell, Panel, Button, DataTable, type Column } from '../ui';
 
@@ -13,12 +16,22 @@ const permissionCount = (rank: UserRankRecord) =>
   ).filter(Boolean).length;
 
 const UserRankManager = () => {
+  const dispatch = useDispatch();
   const { data: userRanks, isLoading, error } = useGetUserRanksQuery();
   const [deleteUserRank] = useDeleteUserRankMutation();
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to remove this user rank?')) {
-      await deleteUserRank(id);
+    if (!window.confirm('Are you sure you want to remove this user rank?'))
+      return;
+    try {
+      await deleteUserRank(id).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to remove the user rank.',
+          'danger'
+        )
+      );
     }
   };
 

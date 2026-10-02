@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../testUtils';
 import UserRankManager from '../../components/admin/UserRankManager';
@@ -182,7 +182,7 @@ describe('UserRankManager', () => {
   });
 
   it('calls deleteUserRank after confirm', async () => {
-    mockDeleteUserRank.mockResolvedValue({});
+    mockDeleteUserRank.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockUseGetUserRanksQuery.mockReturnValue({
       data: [makeRank(3, 'PowerUser', 200)],
       isLoading: false,
@@ -193,6 +193,31 @@ describe('UserRankManager', () => {
     await user.click(screen.getByRole('button', { name: /delete/i }));
     expect(window.confirm).toHaveBeenCalled();
     expect(mockDeleteUserRank).toHaveBeenCalledWith(3);
+  });
+
+  // The delete's outcome was ignored, so a refusal said nothing (#460).
+  it('alerts when deleting a rank fails', async () => {
+    mockDeleteUserRank.mockReturnValue({
+      unwrap: () =>
+        Promise.reject({ data: { msg: 'The rank still has members.' } })
+    });
+    mockUseGetUserRanksQuery.mockReturnValue({
+      data: [makeRank(3, 'PowerUser', 200)],
+      isLoading: false,
+      error: undefined
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<UserRankManager />);
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+
+    await waitFor(() => {
+      expect(store.getState().alert).toEqual([
+        expect.objectContaining({
+          alertType: 'danger',
+          msg: 'The rank still has members.'
+        })
+      ]);
+    });
   });
 
   it('does not delete when user cancels confirm', async () => {

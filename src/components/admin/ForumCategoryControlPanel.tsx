@@ -1,15 +1,19 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   useGetForumCategoriesAdminQuery,
   useCreateForumCategoryMutation,
   useUpdateForumCategoryMutation,
   useDeleteForumCategoryMutation
 } from '../../store/services/forumApi';
+import { addAlert } from '../../store/slices/alertSlice';
+import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import type { ForumCategory } from '../../types';
 import { PageShell, Panel, Button, SectionHeading } from '../ui';
 
 const CategoryRow = ({ category }: { category: ForumCategory }) => {
+  const dispatch = useDispatch();
   const [updateCategory] = useUpdateForumCategoryMutation();
   const [deleteCategory] = useDeleteForumCategoryMutation();
   const [editing, setEditing] = useState(false);
@@ -18,8 +22,35 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateCategory({ id: category.id, name, sort: parseInt(sort) || 0 });
-    setEditing(false);
+    try {
+      await updateCategory({
+        id: category.id,
+        name,
+        sort: parseInt(sort) || 0
+      }).unwrap();
+      setEditing(false);
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to save the category.',
+          'danger'
+        )
+      );
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this category?')) return;
+    try {
+      await deleteCategory(category.id).unwrap();
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to delete the category.',
+          'danger'
+        )
+      );
+    }
   };
 
   if (editing) {
@@ -85,13 +116,7 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
         <Button variant="link" onClick={() => setEditing(true)}>
           Edit
         </Button>
-        <Button
-          variant="link-danger"
-          onClick={() =>
-            window.confirm('Delete this category?') &&
-            deleteCategory(category.id)
-          }
-        >
+        <Button variant="link-danger" onClick={handleDelete}>
           Delete
         </Button>
       </td>
@@ -100,6 +125,7 @@ const CategoryRow = ({ category }: { category: ForumCategory }) => {
 };
 
 const ForumCategoryControlPanel = () => {
+  const dispatch = useDispatch();
   const {
     data: categories,
     isLoading,
@@ -112,9 +138,18 @@ const ForumCategoryControlPanel = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createCategory({ name, sort: parseInt(sort) || 0 });
-    setName('');
-    setSort('');
+    try {
+      await createCategory({ name, sort: parseInt(sort) || 0 }).unwrap();
+      setName('');
+      setSort('');
+    } catch (err) {
+      dispatch(
+        addAlert(
+          getApiErrorMessage(err) ?? 'Failed to create the category.',
+          'danger'
+        )
+      );
+    }
   };
 
   return (
