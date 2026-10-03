@@ -46,6 +46,20 @@ type AddContributionToReleaseArgs = ReleaseArgs &
   >['content']['application/json'];
 type AddContributionToReleaseResponse =
   paths['/communities/{communityId}/releases/{releaseId}/contributions']['post']['responses'][201]['content']['application/json'];
+type UpdateCommunityArgs = {
+  id: number;
+  name?: string;
+  description?: string;
+  image?: string;
+  registrationStatus?: string;
+  // Where new releases are announced on IRC (ADR-0030).
+  announceVisibility?: 'PUBLIC' | 'PRIVATE';
+  allowDuplicateFormats?: boolean;
+  curatorIds?: number[];
+  // Transfers the community leader (ADR-0021); communities_manage-gated
+  // server-side. null clears the leader.
+  leaderId?: number | null;
+};
 
 export const communityApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -71,21 +85,7 @@ export const communityApi = api.injectEndpoints({
       query: (data) => ({ url: '/communities', method: 'POST', body: data }),
       invalidatesTags: ['Community']
     }),
-    updateCommunity: build.mutation<
-      CommunityResponse,
-      {
-        id: number;
-        name?: string;
-        description?: string;
-        image?: string;
-        registrationStatus?: string;
-        allowDuplicateFormats?: boolean;
-        curatorIds?: number[];
-        // Transfers the community leader (ADR-0021); communities_manage-gated
-        // server-side. null clears the leader.
-        leaderId?: number | null;
-      }
-    >({
+    updateCommunity: build.mutation<CommunityResponse, UpdateCommunityArgs>({
       query: ({ id, ...data }) => ({
         url: `/communities/${id}`,
         method: 'PUT',

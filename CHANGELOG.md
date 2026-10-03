@@ -21,6 +21,9 @@ All notable changes to stellar-ui are documented here.
 - **Community Manager lists every community, closed ones included** (#475, stellar-api#902, ADR-0055). It reads the new staff list, so staff can see and edit a closed community they hold no role in.
   - **On the community page,** staff in such a community see its record, leader, members and pending offer. Its release list says "Releases are visible to this community's members." where it used to say there were none.
 - **The community page always shows a Leader line** (#475, raised on #474). A community without one reads "Leader: none", and its "(history)" link stays reachable.
+- **Community Manager sets where a community's releases are announced** (#477, stellar-api#328, ADR-0030). A **Release announcements** control in the edit row and the create form chooses **Public (#announce)** or **Private (members' channel)**. A new community defaults to public.
+  - **Help text under the control** says it routes IRC announcements only and never hides releases or limits downloads. It also says only members with a verified IRC nick can join the private channel, and that switching back to public is not retroactive.
+  - A refused save keeps the row open and alerts with the api's message.
 
 ### Changed
 
