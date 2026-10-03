@@ -48,6 +48,8 @@ export type RegistrationStatus = 'open' | 'invite' | 'closed';
 export type Community = components['schemas']['Community'];
 export type ReleaseContribution = components['schemas']['ReleaseContribution'];
 export type Contribution = components['schemas']['Contribution'];
+/** The uploader's own row: the one read besides the download grant that carries `downloadUrl` (stellar-api#908). */
+export type OwnContribution = components['schemas']['OwnContribution'];
 /** Freepass / Neutralpass (PRD-06 §4); `NONE` is the ordinary case. */
 export type RatioExempt = Contribution['ratioExempt'];
 export type ReleaseContributionDetail =

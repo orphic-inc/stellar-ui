@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 import { useGetContributionsQuery } from '../../store/services/communityApi';
 import { formatSize } from '../../utils';
 import Spinner from '../layout/Spinner';
-import type { Contribution } from '../../types';
+import type { OwnContribution } from '../../types';
 import RatioExemptBadge from '../communities/RatioExemptBadge';
 
 // A release with no community has no page to link to.
-const ReleaseTitle = ({ release }: { release: Contribution['release'] }) =>
+const ReleaseTitle = ({ release }: { release: OwnContribution['release'] }) =>
   release.communityId ? (
     <Link
       to={`/communities/${release.communityId}/releases/${release.id}`}
@@ -22,7 +22,7 @@ const ReleaseTitle = ({ release }: { release: Contribution['release'] }) =>
 
 // One row of the table: the release it belongs to, format with any ratio
 // exemption (ui#181), size, collaborators, notes and the download link.
-const ContributionRow = ({ c }: { c: Contribution }) => (
+const ContributionRow = ({ c }: { c: OwnContribution }) => (
   <tr data-st="row">
     <td>
       <ReleaseTitle release={c.release} />
