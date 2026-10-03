@@ -10,6 +10,11 @@ import { addAlert } from '../../store/slices/alertSlice';
 import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import PendingLeaderOffer from './PendingLeaderOffer';
+import {
+  AnnounceVisibilityField,
+  RegistrationStatusField,
+  type AnnounceVisibility
+} from './CommunitySettingFields';
 import type { Community, CommunityType, RegistrationStatus } from '../../types';
 import { PageShell, Panel, Button, SectionHeading } from '../ui';
 
@@ -21,12 +26,6 @@ const COMMUNITY_TYPES: CommunityType[] = [
   'Audiobooks',
   'Comedy',
   'Comics'
-];
-
-const REGISTRATION_STATUSES: { value: RegistrationStatus; label: string }[] = [
-  { value: 'open', label: 'Open' },
-  { value: 'invite', label: 'Invite only' },
-  { value: 'closed', label: 'Closed' }
 ];
 
 const VALID_REGISTRATION_STATUSES = ['open', 'invite', 'closed'] as const;
@@ -54,6 +53,8 @@ const EditRow = ({
     useState<RegistrationStatus>(
       toRegistrationStatus(community.registrationStatus)
     );
+  const [announceVisibility, setAnnounceVisibility] =
+    useState<AnnounceVisibility>(community.announceVisibility ?? 'PUBLIC');
   const [allowDuplicateFormats, setAllowDuplicateFormats] = useState(
     community.allowDuplicateFormats
   );
@@ -84,6 +85,7 @@ const EditRow = ({
         name,
         description,
         registrationStatus,
+        announceVisibility,
         allowDuplicateFormats,
         curatorIds: curators.map((s) => s.id),
         leaderId: leaderId.trim() === '' ? null : parseInt(leaderId, 10)
@@ -138,29 +140,18 @@ const EditRow = ({
                 className="w-full"
               />
             </div>
-            <div>
-              <label
-                htmlFor={`edit-cm-status-${community.id}`}
-                data-st="meta"
-                className="block mb-1"
-              >
-                Registration
-              </label>
-              <select
-                id={`edit-cm-status-${community.id}`}
-                data-st="field"
-                value={registrationStatus}
-                onChange={(e) =>
-                  setRegistrationStatus(e.target.value as RegistrationStatus)
-                }
-              >
-                {REGISTRATION_STATUSES.map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <RegistrationStatusField
+              id={`edit-cm-status-${community.id}`}
+              value={registrationStatus}
+              onChange={setRegistrationStatus}
+              labelClassName="block mb-1"
+            />
+            <AnnounceVisibilityField
+              id={`edit-cm-announce-${community.id}`}
+              value={announceVisibility}
+              onChange={setAnnounceVisibility}
+              labelClassName="block mb-1"
+            />
             <div>
               <label
                 htmlFor={`edit-cm-leader-${community.id}`}
@@ -279,6 +270,7 @@ const CommunityManager = () => {
   const [newDescription, setNewDescription] = useState('');
   const [newType, setNewType] = useState<CommunityType>('Music');
   const [newStatus, setNewStatus] = useState<RegistrationStatus>('open');
+  const [newAnnounce, setNewAnnounce] = useState<AnnounceVisibility>('PUBLIC');
   const [newAllowDuplicateFormats, setNewAllowDuplicateFormats] =
     useState(true);
   const [newLeaderId, setNewLeaderId] = useState('');
@@ -291,6 +283,7 @@ const CommunityManager = () => {
         description: newDescription,
         type: newType,
         registrationStatus: newStatus,
+        announceVisibility: newAnnounce,
         allowDuplicateFormats: newAllowDuplicateFormats,
         ...(newLeaderId !== '' && { leaderId: parseInt(newLeaderId, 10) })
       }).unwrap();
@@ -299,6 +292,7 @@ const CommunityManager = () => {
       setNewDescription('');
       setNewType('Music');
       setNewStatus('open');
+      setNewAnnounce('PUBLIC');
       setNewAllowDuplicateFormats(true);
       setNewLeaderId('');
     } catch (err) {
@@ -425,29 +419,19 @@ const CommunityManager = () => {
               ))}
             </select>
           </div>
-          <div>
-            <label
-              htmlFor="cm-status"
-              data-st="meta"
-              className="block text-sm font-medium mb-1"
-            >
-              Registration <span className="text-[var(--st-danger)]">*</span>
-            </label>
-            <select
-              id="cm-status"
-              data-st="field"
-              value={newStatus}
-              onChange={(e) =>
-                setNewStatus(e.target.value as RegistrationStatus)
-              }
-            >
-              {REGISTRATION_STATUSES.map(({ value, label }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <RegistrationStatusField
+            id="cm-status"
+            value={newStatus}
+            onChange={setNewStatus}
+            labelClassName="block text-sm font-medium mb-1"
+            required
+          />
+          <AnnounceVisibilityField
+            id="cm-announce"
+            value={newAnnounce}
+            onChange={setNewAnnounce}
+            labelClassName="block text-sm font-medium mb-1"
+          />
           <div className="flex-1 min-w-48">
             <label
               htmlFor="cm-description"
