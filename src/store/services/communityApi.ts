@@ -19,6 +19,8 @@ interface ReleaseArgs {
 
 type CommunitiesResponse =
   paths['/communities']['get']['responses'][200]['content']['application/json'];
+type ManagedCommunitiesResponse =
+  paths['/communities/manage']['get']['responses'][200]['content']['application/json'];
 type CommunityResponse =
   paths['/communities/{id}']['get']['responses'][200]['content']['application/json'];
 export type LeadershipLogResponse =
@@ -49,6 +51,13 @@ export const communityApi = api.injectEndpoints({
   endpoints: (build) => ({
     getCommunities: build.query<CommunitiesResponse, number>({
       query: (page = 1) => `/communities?page=${page}`,
+      providesTags: ['Community']
+    }),
+    // Every community, closed ones included, for staff administering them
+    // (stellar-api#902, ADR-0055). The member browse above stays what the
+    // caller can read.
+    getManagedCommunities: build.query<ManagedCommunitiesResponse, number>({
+      query: (page = 1) => `/communities/manage?page=${page}`,
       providesTags: ['Community']
     }),
     getCommunityById: build.query<CommunityResponse, number>({
@@ -388,6 +397,7 @@ export const communityApi = api.injectEndpoints({
 
 export const {
   useGetCommunitiesQuery,
+  useGetManagedCommunitiesQuery,
   useGetCommunityByIdQuery,
   useCreateCommunityMutation,
   useUpdateCommunityMutation,

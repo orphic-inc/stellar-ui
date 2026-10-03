@@ -10772,6 +10772,78 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/communities/manage': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Every community, for staff
+     * @description Requires `communities_manage`. Lists every community, closed ones included, with the same projection as `GET /communities`, ordered by id. `GET /communities` stays the member browse (#902, ADR-0055).
+     */
+    get: {
+      parameters: {
+        query?: {
+          page?: string;
+          limit?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Paginated communities */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              data: components['schemas']['Community'][];
+              meta: components['schemas']['PaginationMeta'];
+            };
+          };
+        };
+        /** @description Invalid query parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing communities_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/communities/{id}': {
     parameters: {
       query?: never;
@@ -10779,6 +10851,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description The community's administrative record. Members read it, and so do `communities_manage` and `admin` on every community, closed ones included; the community's contents keep the member gate on their own routes (#902, ADR-0055). */
     get: {
       parameters: {
         query?: never;
@@ -10810,6 +10883,15 @@ export interface paths {
         };
         /** @description Not authenticated */
         401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description A closed community the caller holds no role in, and not staff */
+        403: {
           headers: {
             [name: string]: unknown;
           };
@@ -12061,7 +12143,7 @@ export interface paths {
     };
     /**
      * The community's leadership log
-     * @description Each change of leader, newest first: founded, assigned (by staff), handed off (an accepted offer) or cleared. Offers, declines and withdrawals are not logged. Anyone who can read the community reads it; `actor` is sent to `communities_manage` or `admin` only (#897, ADR-0054).
+     * @description Each change of leader, newest first: founded, assigned (by staff), handed off (an accepted offer) or cleared. Offers, declines and withdrawals are not logged. Anyone who can read the community reads it, and so do `communities_manage` and `admin` on every community (ADR-0055); `actor` is sent to them only (#897, ADR-0054).
      */
     get: {
       parameters: {

@@ -13,7 +13,8 @@ let mockIsCreating = false;
 let mockCommunityDetail: unknown;
 
 jest.mock('../../store/services/communityApi', () => ({
-  useGetCommunitiesQuery: (...args: unknown[]) =>
+  // Staff list every community (stellar-api#902, #475).
+  useGetManagedCommunitiesQuery: (...args: unknown[]) =>
     mockGetCommunitiesQuery(...args),
   useCreateCommunityMutation: () => [
     mockCreateCommunity,
