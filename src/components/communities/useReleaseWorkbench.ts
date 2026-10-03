@@ -18,6 +18,8 @@ import type {
   VoteAggregate
 } from '../../store/services/communityApi';
 import { addAlert } from '../../store/slices/alertSlice';
+import { hasAnyPermission, hasPermission } from '../../utils/permissions';
+import type { AuthUser } from '../../types';
 
 type ReleaseWithVote = {
   myVote?: MyVote;
@@ -33,11 +35,7 @@ type ReleaseWithVote = {
 type ReleaseWorkbenchParams = {
   communityId: number;
   releaseId: number;
-  user: {
-    userRank?: {
-      permissions?: Record<string, boolean>;
-    };
-  } | null;
+  user: AuthUser | null | undefined;
 };
 
 export const useReleaseWorkbench = ({
@@ -85,12 +83,13 @@ export const useReleaseWorkbench = ({
   const myVote = releaseView?.myVote ?? null;
   const agg = releaseView?.voteAggregate ?? null;
   const historyEntries = historyData?.data ?? [];
-  const canManageTags = Boolean(
-    user?.userRank?.permissions?.communities_manage ||
-    user?.userRank?.permissions?.staff ||
-    user?.userRank?.permissions?.admin
-  );
-  const canEdit = canManageTags || Boolean(releaseView?.isContributor);
+  // The api's gates (#390): tags and history revert need communities_manage,
+  // while metadata editing also admits staff and the release's contributors.
+  // `admin` satisfies both through hasPermission.
+  const canManageTags = hasPermission(user, 'communities_manage');
+  const canEdit =
+    hasAnyPermission(user, ['communities_manage', 'staff']) ||
+    Boolean(releaseView?.isContributor);
 
   const handleVote = async (positive: boolean) => {
     const alreadyThis =

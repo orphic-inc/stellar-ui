@@ -33,6 +33,10 @@ All notable changes to stellar-ui are documented here.
 
 - **The vendored api contract no longer offers `downloadUrl` on release contribution reads** (#478, stellar-api#908). The api sends a contribution's download URL only through the download grant and to its uploader's own list, so `ReleaseContributionDetail`, `ReleaseContribution` and `Contribution` lose the field. **My Contributions** reads the uploader's list as the new `OwnContribution`, and its download links are unchanged. No screen read the field anywhere else.
 
+### Fixed
+
+- **A staff-only rank no longer sees release controls the api refuses** (#390). On a release page, the tag **×** and the history **Revert** button now need `communities_manage`, as the api requires. Before, a rank with only `staff` saw both, and each answered 403. Editing the release's details still admits staff and the release's contributors, as the api does.
+
 ## [0.10.2] — 2026-10-02
 
 ### Added
