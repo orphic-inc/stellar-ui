@@ -25,7 +25,7 @@ type CommunityResponse =
   paths['/communities/{id}']['get']['responses'][200]['content']['application/json'];
 export type LeadershipLogResponse =
   paths['/communities/{id}/leadership-log']['get']['responses'][200]['content']['application/json'];
-type CommunityReleasesResponse =
+export type CommunityReleasesResponse =
   paths['/communities/{communityId}/releases']['get']['responses'][200]['content']['application/json'];
 export type ReleaseResponse =
   paths['/communities/{communityId}/releases/{releaseId}']['get']['responses'][200]['content']['application/json'];
