@@ -158,7 +158,6 @@ const makeContribution = (overrides: Record<string, unknown> = {}) => ({
   releaseId: 5,
   contributorId: 3,
   releaseDescription: 'Lossless rip',
-  downloadUrl: 'https://example.com/f.torrent',
   sizeInBytes: 524288000,
   linkStatus: 'PASS',
   linkCheckedAt: null,

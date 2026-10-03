@@ -12,7 +12,6 @@ const contribution = (
   releaseId: 3,
   contributorId: 4,
   releaseDescription: null,
-  downloadUrl: 'https://example.com/f.torrent',
   sizeInBytes: 520_000_000,
   linkStatus: 'PASS',
   linkCheckedAt: null,

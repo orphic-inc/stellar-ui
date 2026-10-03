@@ -12224,6 +12224,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description Readable by the community's members, and by `reports_manage` holders while an `Open` or `Claimed` report targets the release, one of its contributions, or a comment in either's thread (ADR-0055 §3, #905). */
     get: {
       parameters: {
         query?: never;
@@ -14186,6 +14187,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description Readable by whoever may read the release detail, including a `reports_manage` holder whom an open report lets in (ADR-0055 §3, #905). No reader gets a `downloadUrl` here (#908): the download grant hands it out. */
     get: {
       parameters: {
         query?: never;
@@ -14392,6 +14394,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /** @description The caller's own uploads, the one read besides the download grant that carries each `downloadUrl` (#908). */
     get: {
       parameters: {
         query?: never;
@@ -14408,7 +14411,7 @@ export interface paths {
           };
           content: {
             'application/json': {
-              data: components['schemas']['Contribution'][];
+              data: components['schemas']['OwnContribution'][];
               meta: components['schemas']['PaginationMeta'];
             };
           };
@@ -31898,7 +31901,6 @@ export interface components {
         | 'png'
         | 'gif'
         | 'txt';
-      downloadUrl: string;
       sizeInBytes?: number | null;
       collaborators: {
         id: number;
@@ -31944,7 +31946,6 @@ export interface components {
         | 'png'
         | 'gif'
         | 'txt';
-      downloadUrl: string;
       sizeInBytes?: number | null;
       /** @enum {string} */
       linkStatus: 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL';
@@ -31957,6 +31958,9 @@ export interface components {
       }[];
       releaseDescription?: string | null;
       createdAt?: string;
+    };
+    OwnContribution: components['schemas']['Contribution'] & {
+      downloadUrl: string;
     };
     ReleaseFileQuality: {
       /** @enum {string|null} */
@@ -32003,7 +32007,6 @@ export interface components {
       releaseId: number;
       contributorId: number;
       releaseDescription?: string | null;
-      downloadUrl: string;
       sizeInBytes: number | null;
       /** @enum {string|null} */
       linkStatus: 'UNKNOWN' | 'PASS' | 'WARN' | 'FAIL' | null;

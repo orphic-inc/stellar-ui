@@ -22,6 +22,10 @@ All notable changes to stellar-ui are documented here.
   - **On the community page,** staff in such a community see its record, leader, members and pending offer. Its release list says "Releases are visible to this community's members." where it used to say there were none.
 - **The community page always shows a Leader line** (#475, raised on #474). A community without one reads "Leader: none", and its "(history)" link stays reachable.
 
+### Changed
+
+- **The vendored api contract no longer offers `downloadUrl` on release contribution reads** (#478, stellar-api#908). The api sends a contribution's download URL only through the download grant and to its uploader's own list, so `ReleaseContributionDetail`, `ReleaseContribution` and `Contribution` lose the field. **My Contributions** reads the uploader's list as the new `OwnContribution`, and its download links are unchanged. No screen read the field anywhere else.
+
 ## [0.10.2] — 2026-10-02
 
 ### Added
