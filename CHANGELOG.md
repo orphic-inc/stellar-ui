@@ -24,6 +24,10 @@ All notable changes to stellar-ui are documented here.
 - **Community Manager sets where a community's releases are announced** (#477, stellar-api#328, ADR-0030). A **Release announcements** control in the edit row and the create form chooses **Public (#announce)** or **Private (members' channel)**. A new community defaults to public.
   - **Help text under the control** says it routes IRC announcements only and never hides releases or limits downloads. It also says only members with a verified IRC nick can join the private channel, and that switching back to public is not retroactive.
   - A refused save keeps the row open and alerts with the api's message.
+- **Staff act on a member's whole invite tree** (#482, stellar-api#639). On another member's invite tree page, staff can apply one action to every member below them: a note, a disable, or revoking invite privileges. The member themselves is not included.
+  - **Only the actions the viewer may run are offered.** Each needs `invites_manage` plus its own permission: `users_edit`, `users_disable` or `invites_edit`.
+  - **Staff enter a reason and preview the tree first.** The preview lists the members and how many are already disabled or without invite privileges. The confirm button names the count, such as "Disable 3 members".
+  - **If the tree has changed since the preview,** the api's message is shown and staff preview again. Members are not messaged, and there is no bulk undo.
 
 ### Changed
 
