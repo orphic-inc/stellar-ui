@@ -18,6 +18,9 @@ All notable changes to stellar-ui are documented here.
   - **Each change of leader is one line,** newest first and paginated: the first leader, a staff reassignment ("replacing" whoever led), a handoff, and a staff clear.
   - **Staff also see who made the change,** as "· by" a name. The api sends that to staff only, and it is left off a handoff, where it is always the successor.
   - **Anyone who can read the community can open it.** A refusal reads as the community page's does.
+- **Community Manager lists every community, closed ones included** (#475, stellar-api#902, ADR-0055). It reads the new staff list, so staff can see and edit a closed community they hold no role in.
+  - **On the community page,** staff in such a community see its record, leader, members and pending offer. Its release list says "Releases are visible to this community's members." where it used to say there were none.
+- **The community page always shows a Leader line** (#475, raised on #474). A community without one reads "Leader: none", and its "(history)" link stays reachable.
 
 ## [0.10.2] — 2026-10-02
 

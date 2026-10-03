@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
-  useGetCommunitiesQuery,
+  useGetManagedCommunitiesQuery,
   useCreateCommunityMutation,
   useUpdateCommunityMutation
 } from '../../store/services/communityApi';
@@ -266,7 +266,11 @@ const EditRow = ({
 
 const CommunityManager = () => {
   const dispatch = useDispatch();
-  const { data: communities, isLoading, error } = useGetCommunitiesQuery(1);
+  const {
+    data: communities,
+    isLoading,
+    error
+  } = useGetManagedCommunitiesQuery(1);
   const [createCommunity, { isLoading: isCreating }] =
     useCreateCommunityMutation();
 

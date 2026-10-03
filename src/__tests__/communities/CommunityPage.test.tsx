@@ -250,14 +250,21 @@ describe('CommunityPage', () => {
     expect(leaderLink).toHaveAttribute('href', '/user/555');
   });
 
-  it('omits the leader line when the community has no leader', () => {
+  // Kept so a leaderless community's history stays reachable (#474, #475).
+  it('says "Leader: none" with the history link when there is no leader', () => {
     mockUseGetCommunityByIdQuery.mockReturnValue({
       data: makeCommunity(),
       isLoading: false,
       error: undefined
     });
     renderWithProviders(<CommunityPage />);
-    expect(screen.queryByText(/leader:/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/leader:/i).parentElement).toHaveTextContent(
+      'Leader: none (history)'
+    );
+    expect(screen.getByRole('link', { name: '(history)' })).toHaveAttribute(
+      'href',
+      '/communities/3/leadership'
+    );
   });
 
   it('renders releases with contributor and snatch stats', () => {
@@ -305,6 +312,28 @@ describe('CommunityPage', () => {
     });
     renderWithProviders(<CommunityPage />);
     expect(screen.getByText(/no releases yet/i)).toBeInTheDocument();
+  });
+
+  // Staff read the record of a closed community they hold no role in, but not
+  // its contents (stellar-api#902, ADR-0055).
+  it('says releases are for members when the release list answers 403', () => {
+    mockUseGetCommunityByIdQuery.mockReturnValue({
+      data: makeCommunity(),
+      isLoading: false,
+      error: undefined
+    });
+    mockUseGetReleasesByCommunityQuery.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { status: 403 }
+    });
+    renderWithProviders(<CommunityPage />);
+    expect(
+      screen.getByText("Releases are visible to this community's members.")
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/no releases yet/i)).not.toBeInTheDocument();
+    // A refused list states no count, rather than claiming it is empty.
+    expect(screen.queryByText('0 total')).not.toBeInTheDocument();
   });
 
   it('shows member management panel for community staff', () => {

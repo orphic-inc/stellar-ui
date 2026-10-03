@@ -86,8 +86,11 @@ const CommunityPage = () => {
     isLoading: loadingCommunity,
     error
   } = useGetCommunityByIdQuery(id);
-  const { data: releases, isLoading: loadingReleases } =
-    useGetReleasesByCommunityQuery({ communityId: id, page: releasePage });
+  const {
+    data: releases,
+    isLoading: loadingReleases,
+    error: releasesError
+  } = useGetReleasesByCommunityQuery({ communityId: id, page: releasePage });
 
   if (loadingCommunity) return <Spinner />;
   if (!community) {
@@ -171,6 +174,15 @@ const CommunityPage = () => {
   const total = releases?.meta?.total ?? 0;
   const pageSize = releases?.meta?.limit ?? 25;
   const totalPages = Math.ceil(total / pageSize);
+  // Staff read every community's record but not its contents (stellar-api#902,
+  // ADR-0055), so a 403 on the release list is that, not an empty community.
+  const releasesForbidden =
+    (releasesError as { status?: number } | undefined)?.status === 403;
+  const releasesEmpty = releasesForbidden
+    ? "Releases are visible to this community's members."
+    : 'No releases yet.';
+  // A refused list has no count to state; "0 total" would claim it is empty.
+  const releaseTotal = releasesForbidden ? '' : `${total} total`;
 
   return (
     <div>
@@ -196,23 +208,27 @@ const CommunityPage = () => {
         <p className="text-sm text-gray-400 mb-4">{community.description}</p>
       )}
 
-      {community.leaderId != null && (
-        <p className="text-sm text-gray-400 mb-4">
-          <span className="text-gray-500">Leader: </span>
+      {/* Always shown, so a leaderless community's history stays reachable
+          (stellar-ui#474, #475). */}
+      <p className="text-sm text-gray-400 mb-4">
+        <span className="text-gray-500">Leader: </span>
+        {community.leaderId != null ? (
           <Link
             to={`/user/${leader?.username ?? community.leaderId}`}
             className="text-indigo-400 hover:text-indigo-300"
           >
             {leader?.username ?? `User #${community.leaderId}`}
-          </Link>{' '}
-          <Link
-            to={`/communities/${community.id}/leadership`}
-            className="text-xs text-gray-500 hover:text-gray-300"
-          >
-            (history)
           </Link>
-        </p>
-      )}
+        ) : (
+          <span className="text-gray-500">none</span>
+        )}{' '}
+        <Link
+          to={`/communities/${community.id}/leadership`}
+          className="text-xs text-gray-500 hover:text-gray-300"
+        >
+          (history)
+        </Link>
+      </p>
 
       <LeaderOfferPanel
         community={community}
@@ -305,7 +321,7 @@ const CommunityPage = () => {
       <div data-st="panel">
         <div data-st="colhead">
           <span>Releases</span>
-          <span>{total} total</span>
+          <span>{releaseTotal}</span>
         </div>
 
         {loadingReleases ? (
@@ -314,7 +330,7 @@ const CommunityPage = () => {
           </div>
         ) : releaseList.length === 0 ? (
           <p className="px-4 py-6 text-sm text-gray-500 text-center">
-            No releases yet.
+            {releasesEmpty}
           </p>
         ) : (
           <div data-st="list">
