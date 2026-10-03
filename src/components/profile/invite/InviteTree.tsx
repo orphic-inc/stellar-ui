@@ -5,6 +5,7 @@ import { selectCurrentUser } from '../../../store/slices/authSlice';
 import { useGetMemberInviteTreeQuery } from '../../../store/services/userApi';
 import UserBadges from '../../layout/UserBadges';
 import Spinner from '../../layout/Spinner';
+import InviteSubtreeActions from './InviteSubtreeActions';
 import type { MemberInviteTreeNode, InviteTreeSummary } from '../../../types';
 
 const renderNode = (node: MemberInviteTreeNode): React.ReactNode => (
@@ -134,6 +135,10 @@ const InviteTree = ({ embedded = false }: { embedded?: boolean }) => {
       ) : (
         <>
           <Summary summary={data.summary} />
+          {/* Staff actions on another member's tree (#482); hidden on your own. */}
+          {id && targetId !== currentUser?.id && (
+            <InviteSubtreeActions rootId={targetId as number} />
+          )}
 
           <div data-st="panel">
             <table data-st="grid" className="w-full text-sm">

@@ -3006,6 +3006,199 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/users/{id}/invite-subtree/preview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Staff: preview an action on a member's invite subtree
+     * @description Requires `invites_manage` (#639). Every descendant of the member, the member themselves excluded, ordered by depth. `count` is the number to send as `expectedCount` when applying an action.
+     */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description The subtree an action would touch */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              rootUserId: number;
+              count: number;
+              disabled: number;
+              withoutInvites: number;
+              members: components['schemas']['InviteSubtreeMember'][];
+            };
+          };
+        };
+        /** @description Invalid path parameters */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Missing invites_manage */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/users/{id}/invite-subtree/action': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Staff: apply one action to a member's whole invite subtree
+     * @description Requires `invites_manage`, plus the permission the single-member action needs: `users_edit` for `note`, `users_disable` for `disable`, `invites_edit` for `revoke_invites` (#639). Every descendant gets a staff note carrying `reason`. `disable` and `revoke_invites` then change each member not already in that state, auditing each as the single-member route does. One transaction: all or nothing. `expectedCount` must match the subtree's current size. No member is messaged, and there is no bulk undo.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: {
+        content: {
+          'application/json': {
+            /** @enum {string} */
+            action: 'note' | 'disable' | 'revoke_invites';
+            reason: string;
+            expectedCount: number;
+          };
+        };
+      };
+      responses: {
+        /** @description The run applied */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': {
+              /** @enum {string} */
+              action: 'note' | 'disable' | 'revoke_invites';
+              count: number;
+              changed: number;
+              unchanged: number;
+            };
+          };
+        };
+        /** @description Invalid path parameters or request body */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['ValidationError'];
+          };
+        };
+        /** @description Not authenticated */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Lacks the action's own permission */
+        403: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description User not found */
+        404: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description The subtree no longer has `expectedCount` members */
+        409: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+        /** @description Rate limited */
+        429: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            'application/json': components['schemas']['MsgResponse'];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/users/{id}/invite-count': {
     parameters: {
       query?: never;
@@ -31197,6 +31390,13 @@ export interface components {
       /** Format: date-time */
       expiresAt?: string;
       instructions?: string;
+    };
+    InviteSubtreeMember: {
+      id: number;
+      username: string;
+      depth: number;
+      disabled: boolean;
+      canInvite: boolean;
     };
     RecoveryRequestItem: {
       id: number;
