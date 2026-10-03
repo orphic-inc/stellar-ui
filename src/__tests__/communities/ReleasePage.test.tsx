@@ -407,12 +407,12 @@ describe('ReleasePage', () => {
       error: undefined
     });
     renderWithProviders(<ReleasePage />);
-    await user.type(screen.getByPlaceholderText(/add tag/i), 'blues');
+    await user.type(screen.getByPlaceholderText(/add tag/i), '  Hip Hop  ');
     await user.click(screen.getByRole('button', { name: '+' }));
     expect(mockAddTag).toHaveBeenCalledWith({
       communityId: 1,
       releaseId: 5,
-      name: 'blues'
+      name: 'Hip Hop' // trimmed only: the api owns the name rule (#369)
     });
   });
 

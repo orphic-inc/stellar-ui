@@ -106,7 +106,8 @@ export const useReleaseWorkbench = ({
   };
 
   const handleAddTag = async () => {
-    const name = pendingTag.trim().toLowerCase();
+    // Trimmed only: the api owns the tag name rule (stellar-api#689, #369).
+    const name = pendingTag.trim();
     if (!name) return;
     try {
       await addTag({ communityId, releaseId, name }).unwrap();
