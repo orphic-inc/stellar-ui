@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   useGetTagAliasesQuery,
-  useCreateTagAliasMutation,
   useUpdateTagAliasMutation,
   useDeleteTagAliasMutation
 } from '../../store/services/tagAliasApi';
@@ -11,18 +10,16 @@ import { getApiErrorMessage } from '../../utils/apiError';
 import Spinner from '../layout/Spinner';
 import Time from '../layout/Time';
 import { PageShell, Panel, Button, Pagination } from '../ui';
+import AliasCreateRow from './AliasCreateRow';
+import TagCuration from './TagCuration';
 
 const TagAliasesPage = () => {
   const [page, setPage] = useState(1);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editBadTag, setEditBadTag] = useState('');
   const [editGoodTag, setEditGoodTag] = useState('');
-  const [newBadTag, setNewBadTag] = useState('');
-  const [newGoodTag, setNewGoodTag] = useState('');
-  const [error, setError] = useState('');
 
   const { data, isLoading } = useGetTagAliasesQuery({ page });
-  const [createTagAlias, { isLoading: creating }] = useCreateTagAliasMutation();
   const [updateTagAlias] = useUpdateTagAliasMutation();
   const [deleteTagAlias] = useDeleteTagAliasMutation();
   const dispatch = useDispatch();
@@ -31,21 +28,6 @@ const TagAliasesPage = () => {
 
   const aliases = data?.data ?? [];
   const meta = data?.meta;
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    const result = await createTagAlias({
-      badTag: newBadTag.trim(),
-      goodTag: newGoodTag.trim()
-    });
-    if ('error' in result) {
-      setError('Failed to create alias. Check that the canonical tag exists.');
-    } else {
-      setNewBadTag('');
-      setNewGoodTag('');
-    }
-  };
 
   const startEdit = (id: number, badTag: string, goodTagName: string) => {
     setEditingId(id);
@@ -179,53 +161,19 @@ const TagAliasesPage = () => {
                 )
               )}
 
-              {/* Create row */}
-              <tr data-st="row">
-                <td>
-                  <input
-                    data-st="field"
-                    className="w-full"
-                    placeholder="e.g. hip-hop"
-                    value={newBadTag}
-                    onChange={(e) => setNewBadTag(e.target.value)}
-                  />
-                </td>
-                <td>
-                  <input
-                    data-st="field"
-                    className="w-full"
-                    placeholder="e.g. hip.hop"
-                    value={newGoodTag}
-                    onChange={(e) => setNewGoodTag(e.target.value)}
-                  />
-                </td>
-                <td>
-                  <span className="text-xs text-[var(--st-text-faint)]">
-                    Canonical tag must exist
-                  </span>
-                </td>
-                <td className="text-right">
-                  <Button
-                    variant="primary"
-                    disabled={creating || !newBadTag || !newGoodTag}
-                    onClick={handleCreate}
-                  >
-                    {creating ? 'Adding…' : 'Add alias'}
-                  </Button>
-                </td>
-              </tr>
+              <AliasCreateRow />
             </tbody>
           </table>
         )}
       </Panel>
-
-      {error && <p className="text-sm text-[var(--st-danger)]">{error}</p>}
 
       <Pagination
         page={meta?.page ?? 1}
         totalPages={meta?.totalPages ?? 1}
         onChange={setPage}
       />
+
+      <TagCuration />
     </PageShell>
   );
 };

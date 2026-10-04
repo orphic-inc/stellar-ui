@@ -16,6 +16,13 @@ jest.mock('../../store/services/tagAliasApi', () => ({
   useDeleteTagAliasMutation: () => [mockDelete, { isLoading: false }]
 }));
 
+// The official-tag section (#365) has its own spec; here it only needs data.
+jest.mock('../../store/services/tagApi', () => ({
+  useGetOfficialTagsQuery: () => ({ data: [] }),
+  usePromoteTagMutation: () => [jest.fn(), { isLoading: false }],
+  useDemoteTagMutation: () => [jest.fn()]
+}));
+
 const makeAlias = (id: number) => ({
   id,
   badTag: `bad${id}`,
@@ -26,7 +33,7 @@ const makeAlias = (id: number) => ({
 describe('TagAliasesPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreate.mockResolvedValue({ data: {} });
+    mockCreate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     // RTK's trigger returns a promise with .unwrap() (#463).
     mockUpdate.mockReturnValue({ unwrap: () => Promise.resolve({}) });
     mockDelete.mockReturnValue({ unwrap: () => Promise.resolve({}) });
@@ -72,6 +79,32 @@ describe('TagAliasesPage', () => {
       badTag: 'hiphop',
       goodTag: 'hip.hop'
     });
+  });
+
+  it("alerts with the api's message when a create is refused", async () => {
+    mockCreate.mockReturnValue({
+      unwrap: () =>
+        Promise.reject({
+          status: 409,
+          data: { msg: 'shoegaze is an official tag and cannot be aliased' }
+        })
+    });
+    mockQuery.mockReturnValue({
+      data: { data: [], meta: { page: 1, totalPages: 1 } },
+      isLoading: false
+    });
+    const user = userEvent.setup();
+    const { store } = renderWithProviders(<TagAliasesPage />);
+    await user.type(screen.getByPlaceholderText('e.g. hip-hop'), 'shoegaze');
+    await user.type(screen.getByPlaceholderText('e.g. hip.hop'), 'dream.pop');
+    await user.click(screen.getByRole('button', { name: /add alias/i }));
+    await waitFor(() =>
+      expect(store.getState().alert[0]).toMatchObject({
+        alertType: 'danger',
+        msg: 'shoegaze is an official tag and cannot be aliased'
+      })
+    );
+    expect(screen.getByPlaceholderText('e.g. hip-hop')).toHaveValue('shoegaze');
   });
 
   it('deletes an alias via the Delete action', async () => {
