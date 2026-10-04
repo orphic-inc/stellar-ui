@@ -11,6 +11,7 @@ import Spinner from '../layout/Spinner';
 import { RandomReleaseLink, RandomArtistLink } from '../search/RandomLinks';
 import { formParamSetter, withPage } from '../../utils/searchParams';
 import { PageNumbers } from '../ui';
+import TagsFilterField from './TagsFilterField';
 
 const RELEASE_TYPES = [
   'Music',
@@ -270,19 +271,11 @@ const ReleaseBrowsePage = () => {
               placeholder="Artist, title, description…"
             />
           </div>
-          <div>
-            <label htmlFor="release-tags" data-st="meta" className={labelCls}>
-              Tags (comma-separated)
-            </label>
-            <input
-              id="release-tags"
-              name="tags"
-              defaultValue={tags}
-              data-st="field"
-              className={inputCls}
-              placeholder="e.g. jazz, blues"
-            />
-          </div>
+          <TagsFilterField
+            defaultValue={tags}
+            labelClassName={labelCls}
+            inputClassName={inputCls}
+          />
           <div>
             <label
               htmlFor="release-orderBy"
