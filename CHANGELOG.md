@@ -28,6 +28,7 @@ All notable changes to stellar-ui are documented here.
   - **Only the actions the viewer may run are offered.** Each needs `invites_manage` plus its own permission: `users_edit`, `users_disable` or `invites_edit`.
   - **Staff enter a reason and preview the tree first.** The preview lists the members and how many are already disabled or without invite privileges. The confirm button names the count, such as "Disable 3 members".
   - **If the tree has changed since the preview,** the api's message is shown and staff preview again. Members are not messaged, and there is no bulk undo.
+- **The release tag editor suggests official tags** (#365, stellar-api#298, ADR-0045). The add-tag field suggests the curated set as a member types. Any name is still accepted.
 
 ### Changed
 

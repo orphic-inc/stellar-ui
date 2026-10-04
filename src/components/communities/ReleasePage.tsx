@@ -21,6 +21,7 @@ import { releaseCover } from '../../utils/releaseCover';
 import ReleaseGroupPanel from './ReleaseGroupPanel';
 import ReleaseCredits from './ReleaseCredits';
 import DeleteReleaseButton from './DeleteReleaseButton';
+import TagAddRow from './TagAddRow';
 
 const FIELD_LABELS: Record<string, string> = {
   title: 'Title',
@@ -596,29 +597,12 @@ const ReleasePage = () => {
                   No tags yet.
                 </p>
               )}
-              <div className="flex gap-1">
-                <input
-                  type="text"
-                  data-st="field"
-                  value={pendingTag}
-                  onChange={(e) => setPendingTag(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddTag();
-                  }}
-                  placeholder="Add tag…"
-                  className="flex-1 min-w-0 text-xs rounded px-2 py-1"
-                />
-                <button
-                  type="button"
-                  disabled={addingTag || !pendingTag.trim()}
-                  onClick={handleAddTag}
-                  data-st="control"
-                  data-st-primary
-                  className="text-xs disabled:opacity-50"
-                >
-                  +
-                </button>
-              </div>
+              <TagAddRow
+                value={pendingTag}
+                onChange={setPendingTag}
+                onAdd={handleAddTag}
+                adding={addingTag}
+              />
             </div>
           </div>
 
