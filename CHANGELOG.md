@@ -30,6 +30,8 @@ All notable changes to stellar-ui are documented here.
   - **If the tree has changed since the preview,** the api's message is shown and staff preview again. Members are not messaged, and there is no bulk undo.
 - **The release tag editor suggests official tags** (#365, stellar-api#298, ADR-0045). The add-tag field suggests the curated set as a member types. Any name is still accepted.
 - **The release browse offers official tags as filter chips** (#365). Each chip adds its tag to the comma-separated tags filter, or takes it out, and any tag can still be typed.
+- **Staff curate the official tags** (#365). The tag aliases page has an **Official tags** section. Staff promote a tag by name, which creates the tag if it doesn't exist, and demote any official tag from the list. The api may fold the promoted name or redirect it through an alias, so the confirmation names the tag it landed on.
+  - A refused alias create now shows the api's message, such as a name that is an official tag. Before, it always said the canonical tag might not exist.
 
 ### Changed
 

@@ -8,6 +8,8 @@ export type TagSearchResponse =
   paths['/tags']['get']['responses'][200]['content']['application/json'];
 export type OfficialTags =
   paths['/tags/official']['get']['responses'][200]['content']['application/json'];
+type CuratedTag =
+  paths['/tags/{id}/official']['delete']['responses'][200]['content']['application/json'];
 
 export const tagApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -21,8 +23,28 @@ export const tagApi = api.injectEndpoints({
     getOfficialTags: build.query<OfficialTags, void>({
       query: () => '/tags/official',
       providesTags: ['OfficialTags']
+    }),
+    // Staff curation (tags_manage). Promote mints the tag when it does not
+    // exist, and answers the tag it landed on: the name is folded and followed
+    // through the alias table, so it can differ from the one sent.
+    promoteTag: build.mutation<CuratedTag, string>({
+      query: (name) => ({
+        url: '/tags/official',
+        method: 'POST',
+        body: { name }
+      }),
+      invalidatesTags: ['OfficialTags']
+    }),
+    demoteTag: build.mutation<CuratedTag, number>({
+      query: (id) => ({ url: `/tags/${id}/official`, method: 'DELETE' }),
+      invalidatesTags: ['OfficialTags']
     })
   })
 });
 
-export const { useSearchTagsQuery, useGetOfficialTagsQuery } = tagApi;
+export const {
+  useSearchTagsQuery,
+  useGetOfficialTagsQuery,
+  usePromoteTagMutation,
+  useDemoteTagMutation
+} = tagApi;
