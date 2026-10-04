@@ -69,6 +69,7 @@ export const api = createApi({
     'GlobalNotice',
     'Warning',
     'TagAlias',
+    'OfficialTags',
     'Session',
     'Invite',
     'InviteTree',

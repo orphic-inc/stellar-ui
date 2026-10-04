@@ -50,6 +50,10 @@ jest.mock('../../store/services/communityApi', () => ({
   useDeleteReleaseMutation: () => [jest.fn(), { isLoading: false }]
 }));
 
+jest.mock('../../store/services/tagApi', () => ({
+  useGetOfficialTagsQuery: () => ({ data: [] })
+}));
+
 jest.mock('../../store/services/releaseGroupApi', () => ({
   useGetReleaseGroupQuery: (...args: unknown[]) =>
     mockGetReleaseGroupQuery(...args)
